@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#080811">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Thudinest No. 2 &#183; Thudiyalur, Coimbatore</title>
 <style>
 /* ===== RESET ===== */
@@ -639,9 +642,10 @@ body {
   .tn-hero { padding: 40px 20px 70px; }
 }
 @media (max-width: 480px) {
-  .tn-gallery { grid-template-columns: 1fr; grid-template-rows: 220px 170px 160px; }
+  .tn-gallery { grid-template-columns: 1fr; grid-template-rows: 200px 155px 140px; border-radius: 12px; }
   .tn-photo:first-child { grid-column: auto; }
   .tn-strip-item { min-width: 128px; padding: 15px 14px; }
+  .tn-photo:hover { transform: none; }
 }
 
 /* Book & Contact */
@@ -866,6 +870,159 @@ a.tn-location-pill:hover {
 /* Mobile dropdown adjustment */
 @media (max-width: 500px) {
   .tn-contact-drop { min-width: 220px; }
+}
+
+/* ================================================================
+   MOBILE - comprehensive enhancements
+   ================================================================ */
+
+/* Font smoothing */
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* Safe-area insets for notched / Dynamic Island iPhones */
+#global-back-btn {
+  padding-top: max(13px, env(safe-area-inset-top, 0px));
+  padding-left: max(22px, env(safe-area-inset-left, 22px));
+}
+#screen-landing { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Use svh on supporting browsers so hero fills visible viewport */
+@supports (height: 100svh) {
+  .tn-hero { min-height: 100svh; }
+}
+
+/* Smooth landing-page scroll */
+#screen-landing { scroll-behavior: smooth; }
+
+/* Prevent pull-to-refresh from ruining game sessions */
+#screen-rummy, #screen-chess, #screen-pong {
+  overscroll-behavior: contain;
+}
+
+/* Feature strip: snap for a native swipe feel */
+.tn-strip { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.tn-strip-item { scroll-snap-align: start; flex-shrink: 0; }
+
+/* Adequate tap targets (WCAG 2.5.5) */
+.tn-btn-gold, .tn-btn-ghost, .tn-book-btn, .tn-contact-wa,
+.tn-location-pill, .tn-contact-wa { min-height: 48px; }
+
+/* ---- mobile: max 600px ---- */
+@media (max-width: 600px) {
+  /* Hero: center content, stack buttons full-width */
+  .tn-hero { padding: 72px 20px 80px; justify-content: center; }
+  .tn-hero-content { max-width: 100%; }
+  .tn-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tn-btn-gold, .tn-btn-ghost {
+    width: 100%;
+    justify-content: center;
+    padding: 17px 24px;
+    font-size: 0.95rem;
+  }
+  .tn-location-pill {
+    font-size: 0.58rem;
+    padding: 6px 14px;
+    letter-spacing: 1px;
+    white-space: normal;
+    text-align: center;
+    max-width: 270px;
+  }
+  .tn-hero-tagline { font-size: 0.93rem; margin-bottom: 28px; }
+  .tn-hero-num { letter-spacing: 5px; }
+  .tn-scroll-hint { bottom: 18px; }
+
+  /* Shrink orbs for mobile perf */
+  .tn-orb-1 { width: 280px; height: 280px; filter: blur(60px); }
+  .tn-orb-2 { width: 240px; height: 240px; filter: blur(55px); }
+  .tn-orb-3 { width: 200px; height: 200px; filter: blur(50px); }
+
+  /* Contact dropdown: fixed bottom sheet */
+  .tn-contact-drop {
+    position: fixed;
+    bottom: 16px;
+    left: 12px;
+    right: 12px;
+    top: auto;
+    min-width: 0;
+    transform: translateY(24px);
+    border-radius: 22px;
+    z-index: 9000;
+  }
+  .tn-contact-drop.open { transform: translateY(0); }
+
+  /* Section padding tighter */
+  .tn-sec { padding: 44px 18px; }
+  .tn-body { font-size: 0.92rem; line-height: 1.8; }
+  .tn-heading { font-size: clamp(1.55rem, 5.5vw, 2.2rem); }
+
+  /* Amenities: 2 columns on mobile */
+  .tn-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tn-tile { padding: 13px 11px; gap: 10px; border-radius: 12px; }
+  .tn-tile-icon { font-size: 1.2rem; }
+  .tn-tile-name { font-size: 0.76rem; }
+
+  /* Rules compact */
+  .tn-rules { gap: 8px; margin-top: 24px; }
+  .tn-rule { padding: 12px 13px; gap: 10px; border-radius: 10px; }
+  .tn-rule-txt { font-size: 0.82rem; }
+
+  /* Book buttons: stack WhatsApp row */
+  .tn-wa-row { flex-direction: column; gap: 8px; }
+  .tn-wa-row .tn-book-btn { width: 100%; min-width: 0; }
+  .tn-book-btn { padding: 14px 16px; border-radius: 12px; }
+
+  /* Games promo card */
+  .tn-games-wrap { padding: 0 18px 56px; }
+  .tn-games-card { padding: 40px 20px; border-radius: 18px; }
+  .tn-games-ttl { font-size: 1.5rem; }
+  .tn-games-emoji { font-size: 2.6rem; margin-bottom: 14px; }
+  .tn-game-pills { gap: 7px; }
+
+  /* Footer */
+  .tn-footer { padding: 32px 18px; font-size: 0.72rem; }
+  .tn-footer-links { gap: 6px 14px; }
+
+  /* Gallery heights (single-col already handled at 480px) */
+  .tn-gallery { margin-top: 28px; }
+
+  /* Game hub home cards */
+  .home-sub { margin-bottom: 40px; letter-spacing: 3px; }
+}
+
+/* ---- small phones: max 400px ---- */
+@media (max-width: 400px) {
+  .tn-hero { padding: 64px 16px 72px; }
+  .tn-location-pill { max-width: 230px; font-size: 0.52rem; }
+  .tn-hero-name { letter-spacing: -3px; }
+  .tn-sec { padding: 38px 16px; }
+  .tn-game-pills .tn-pill { font-size: 0.7rem; padding: 5px 11px; }
+  .tn-games-card { padding: 32px 16px; }
+  .tn-games-sub { font-size: 0.82rem; }
+  .game-card { width: 140px; padding: 22px 12px; }
+  .game-cards { gap: 12px; }
+}
+
+/* ---- prefers-reduced-motion (accessibility) ---- */
+@media (prefers-reduced-motion: reduce) {
+  .tn-orb-1, .tn-orb-2, .tn-orb-3,
+  .tn-scroll-hint, .tn-airbnb,
+  .home-title { animation: none !important; }
+  .tn-hero-actions .tn-btn-gold { animation: none !important; }
+  .tn-reveal {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .tn-tile, .tn-photo, .tn-book-btn,
+  .tn-btn-gold, .tn-btn-ghost { transition: none !important; }
 }
 </style>
 </head>
@@ -1092,7 +1249,7 @@ a.tn-location-pill:hover {
     <div class="game-card pong" onclick="showScreen('pong')">
       <span class="game-card-icon">&#127955;</span>
       <div class="game-card-title">Ping Pong</div>
-      <div class="game-card-desc">Classic paddle game<br>Mouse or keyboard</div>
+      <div class="game-card-desc">Classic paddle game<br>Mouse, keyboard or touch</div>
     </div>
   </div>
 </div>
