@@ -416,15 +416,12 @@ body {
   position: absolute; inset: 0; z-index: 0;
   background:
     url('./images/exterior.jpg') center/cover no-repeat,
-    radial-gradient(ellipse at 28% 65%, rgba(130,78,22,0.5) 0%, transparent 52%),
-    radial-gradient(ellipse at 72% 28%, rgba(18,46,100,0.38) 0%, transparent 48%),
-    radial-gradient(ellipse at 50% 95%, rgba(10,58,20,0.32) 0%, transparent 55%),
     linear-gradient(150deg, #0f0b05 0%, #07090e 52%, #050d07 100%);
 }
 .tn-hero-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(to top, #080811 0%, rgba(8,8,17,0.6) 52%, rgba(8,8,17,0.18) 100%);
+  background: linear-gradient(to top, rgba(8,8,17,0.92) 0%, rgba(8,8,17,0.35) 45%, rgba(8,8,17,0.08) 100%);
 }
 .tn-hero-content {
   position: relative; z-index: 1;
@@ -504,6 +501,30 @@ body {
 }
 .tn-strip-item:last-child { border-right: none; }
 .tn-strip-icon { font-size: 1.15rem; }
+
+/* Strip: 2-column grid on mobile */
+@media (max-width: 600px) {
+  .tn-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+  .tn-strip-item {
+    min-width: 0;
+    white-space: normal;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 14px 16px;
+    font-size: 0.76rem;
+    flex: auto;
+  }
+  .tn-strip-item:nth-child(odd)  { border-right: 1px solid rgba(255,255,255,0.06); }
+  .tn-strip-item:last-child,
+  .tn-strip-item:nth-last-child(2):nth-child(odd),
+  .tn-strip-item:nth-last-child(1) { border-bottom: none; }
+  .tn-strip-item:nth-last-child(2) { border-bottom: none; }
+}
 
 /* Section layout */
 .tn-sec {
@@ -703,21 +724,21 @@ body {
 }
 .tn-orb-1 {
   width: 580px; height: 580px;
-  background: radial-gradient(circle, rgba(245,155,60,0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(245,155,60,0.15) 0%, transparent 70%);
   filter: blur(80px);
   top: -12%; left: -8%;
   animation: tn-orb-a 13s ease-in-out infinite;
 }
 .tn-orb-2 {
   width: 480px; height: 480px;
-  background: radial-gradient(circle, rgba(120,40,230,0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(120,40,230,0.12) 0%, transparent 70%);
   filter: blur(80px);
   top: 18%; right: -6%;
   animation: tn-orb-b 10s ease-in-out infinite;
 }
 .tn-orb-3 {
   width: 380px; height: 380px;
-  background: radial-gradient(circle, rgba(20,150,80,0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(20,150,80,0.1) 0%, transparent 70%);
   filter: blur(70px);
   bottom: 8%; left: 28%;
   animation: tn-orb-c 15s ease-in-out infinite;
