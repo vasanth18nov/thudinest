@@ -1,9 +1,10 @@
-i wa<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Game Hub — Rummy · Chess · Ping Pong</title>
+<title>Thudinest No. 2 &#183; Thudiyalur, Coimbatore</title>
 <style>
 /* ===== RESET ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,15 +19,19 @@ body {
 }
 .screen { min-height: 100vh; }
 
-/* ===== GLOBAL BACK BUTTON ===== */
+/* ===== GLOBAL BACK BUTTON -- full-width sticky bar ===== */
 #global-back-btn {
-  position: fixed; top: 14px; left: 14px; z-index: 9999;
-  background: rgba(0,0,0,0.75); color: #fff;
-  border: 1px solid rgba(255,255,255,0.2); border-radius: 10px;
-  padding: 8px 16px; cursor: pointer; font-size: 0.82rem; font-weight: 700;
-  backdrop-filter: blur(8px); transition: background 0.2s;
+  position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 9999;
+  background: rgba(8,8,17,0.96);
+  color: #f5c842;
+  border: none; border-bottom: 1.5px solid rgba(245,200,66,0.22);
+  padding: 13px 22px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 800; letter-spacing: 0.5px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  transition: background 0.2s;
+  text-align: left; display: flex; align-items: center; gap: 8px;
 }
-#global-back-btn:hover { background: rgba(255,255,255,0.15); }
+#global-back-btn:hover { background: rgba(14,14,30,1); }
 
 /* ===== TOAST ===== */
 #toast {
@@ -381,30 +386,711 @@ body {
   #draw-area { gap: 10px; }
   .pile-slot { width: 70px; }
 }
+
+/* =====================================================================
+   THUDINEST LANDING PAGE
+   ===================================================================== */
+#screen-landing {
+  flex-direction: column;
+  min-height: 100vh;
+  background: #080811;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Hero */
+.tn-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 60px 24px 88px;
+  overflow: hidden;
+}
+.tn-hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    url('./images/exterior.jpg') center/cover no-repeat,
+    radial-gradient(ellipse at 28% 65%, rgba(130,78,22,0.5) 0%, transparent 52%),
+    radial-gradient(ellipse at 72% 28%, rgba(18,46,100,0.38) 0%, transparent 48%),
+    radial-gradient(ellipse at 50% 95%, rgba(10,58,20,0.32) 0%, transparent 55%),
+    linear-gradient(150deg, #0f0b05 0%, #07090e 52%, #050d07 100%);
+}
+.tn-hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, #080811 0%, rgba(8,8,17,0.6) 52%, rgba(8,8,17,0.18) 100%);
+}
+.tn-hero-content {
+  position: relative; z-index: 1;
+  text-align: center; max-width: 740px; width: 100%;
+}
+.tn-location-pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
+  padding: 7px 20px; font-size: 0.72rem; color: rgba(255,255,255,0.75);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 26px;
+}
+.tn-hero-name {
+  font-size: clamp(3.4rem, 11vw, 6.5rem); font-weight: 900;
+  line-height: 0.93; letter-spacing: -2px; margin-bottom: 8px;
+  color: #ffffff;
+}
+.tn-hero-num {
+  font-size: clamp(0.85rem, 2.2vw, 1.1rem); font-weight: 300;
+  color: rgba(255,255,255,0.42); letter-spacing: 8px;
+  text-transform: uppercase; margin-bottom: 28px;
+}
+.tn-hero-tagline {
+  font-size: clamp(0.95rem, 2.2vw, 1.08rem);
+  color: rgba(255,255,255,0.65); line-height: 1.75;
+  max-width: 480px; margin: 0 auto 42px;
+}
+.tn-hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.tn-btn-gold {
+  padding: 14px 34px; border-radius: 100px;
+  background: linear-gradient(135deg, #f5c842, #ffaa4d);
+  color: #1a0e00; font-size: 0.88rem; font-weight: 800;
+  letter-spacing: 0.4px; border: none; cursor: pointer;
+  transition: transform 0.22s, box-shadow 0.22s;
+  display: inline-flex; align-items: center; gap: 7px;
+  box-shadow: 0 4px 24px rgba(245,200,66,0.42);
+  text-decoration: none;
+}
+.tn-btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(245,200,66,0.6); }
+.tn-btn-ghost {
+  padding: 14px 34px; border-radius: 100px;
+  background: rgba(255,255,255,0.09);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: #fff; font-size: 0.88rem; font-weight: 700;
+  letter-spacing: 0.4px; border: 1px solid rgba(255,255,255,0.22);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+  display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+}
+.tn-btn-ghost:hover { background: rgba(255,255,255,0.17); border-color: rgba(255,255,255,0.46); }
+.tn-scroll-hint {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 5px; color: rgba(255,255,255,0.28); font-size: 0.65rem;
+  letter-spacing: 2px; text-transform: uppercase;
+  animation: tn-bounce 2.2s ease-in-out infinite;
+}
+@keyframes tn-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(7px); }
+}
+
+/* Feature Strip */
+.tn-strip {
+  display: flex; overflow-x: auto; scrollbar-width: none;
+  border-top: 1px solid rgba(245,200,66,0.14);
+  border-bottom: 1px solid rgba(245,200,66,0.14);
+  background: rgba(245,200,66,0.04);
+}
+.tn-strip::-webkit-scrollbar { display: none; }
+.tn-strip-item {
+  flex: 1; min-width: 145px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 10px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap; font-size: 0.78rem;
+  color: rgba(255,255,255,0.72); font-weight: 600;
+}
+.tn-strip-item:last-child { border-right: none; }
+.tn-strip-icon { font-size: 1.15rem; }
+
+/* Section layout */
+.tn-sec {
+  padding: 72px 24px; max-width: 1080px; margin: 0 auto; width: 100%;
+}
+.tn-label {
+  font-size: 0.67rem; color: #f5c842; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px;
+}
+.tn-heading {
+  font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800;
+  color: #fff; margin-bottom: 18px; line-height: 1.15;
+}
+.tn-body {
+  font-size: 1rem; color: rgba(255,255,255,0.58); line-height: 1.85;
+  max-width: 600px;
+}
+.tn-hr { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 0; }
+
+/* Gallery */
+.tn-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 270px 190px;
+  gap: 10px;
+  border-radius: 18px; overflow: hidden;
+  margin-top: 44px;
+}
+.tn-photo {
+  position: relative; overflow: hidden;
+  background-size: cover; background-position: center;
+  transition: transform 0.45s ease;
+}
+.tn-photo:hover { transform: scale(1.035); }
+.tn-photo:first-child { grid-row: span 2; }
+.tn-photo-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 22px 16px 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+  font-size: 0.7rem; color: rgba(255,255,255,0.7);
+  font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  pointer-events: none;
+}
+.tn-photo-icon {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.8rem; opacity: 0.16; pointer-events: none;
+}
+.tn-photo-p1 {
+  background:
+    url('./images/exterior.jpg') center/cover,
+    radial-gradient(ellipse at 40% 55%, #2c1d09 0%, #0e0906 100%);
+}
+.tn-photo-p2 {
+  background:
+    url('./images/bedroom.jpg') center/cover,
+    radial-gradient(ellipse at 50% 40%, #0b1522 0%, #060a10 100%);
+}
+.tn-photo-p3 {
+  background:
+    url('./images/bathroom.jpg') center/cover,
+    radial-gradient(ellipse at 50% 50%, #141410 0%, #090909 100%);
+}
+
+/* Amenities grid */
+.tn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(192px, 1fr));
+  gap: 13px; margin-top: 36px;
+}
+.tn-tile {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 18px 18px;
+  display: flex; align-items: center; gap: 14px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.tn-tile:hover { border-color: rgba(245,200,66,0.28); background: rgba(245,200,66,0.04); }
+.tn-tile-icon { font-size: 1.5rem; }
+.tn-tile-name { font-size: 0.84rem; color: rgba(255,255,255,0.7); font-weight: 600; }
+
+/* Rules */
+.tn-rules { display: flex; flex-direction: column; gap: 10px; margin-top: 32px; }
+.tn-rule {
+  display: flex; gap: 14px; padding: 15px 18px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; align-items: flex-start;
+}
+.tn-rule-ico { font-size: 1.05rem; flex-shrink: 0; padding-top: 2px; }
+.tn-rule-txt { font-size: 0.86rem; color: rgba(255,255,255,0.62); line-height: 1.65; }
+.tn-rule.warn { background: rgba(231,76,60,0.07); border-color: rgba(231,76,60,0.24); }
+.tn-rule.warn .tn-rule-txt { color: rgba(255,175,165,0.92); }
+.tn-rule.warn .tn-rule-txt strong { color: #ffa099; }
+
+/* Games promo */
+.tn-games-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
+.tn-games-card {
+  position: relative; overflow: hidden; border-radius: 22px;
+  padding: 56px 40px; text-align: center;
+  background: radial-gradient(ellipse at 50% 0%, #1c1440 0%, #0a0a1a 100%);
+  border: 1px solid rgba(255,255,255,0.09);
+}
+.tn-games-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.2), transparent 68%);
+}
+.tn-games-inner { position: relative; z-index: 1; }
+.tn-games-emoji { font-size: 3.2rem; display: block; margin-bottom: 18px; }
+.tn-games-ttl { font-size: 1.9rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.tn-games-sub {
+  color: rgba(255,255,255,0.44); font-size: 0.9rem; line-height: 1.65;
+  max-width: 370px; margin: 0 auto 28px;
+}
+.tn-game-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+.tn-pill {
+  padding: 6px 16px; border-radius: 100px;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; border: 1px solid;
+}
+.tn-pill.green  { color: #2ecc71; border-color: rgba(46,204,113,0.38); background: rgba(46,204,113,0.08); }
+.tn-pill.gold   { color: #f5c842; border-color: rgba(245,200,66,0.38); background: rgba(245,200,66,0.08); }
+.tn-pill.purple { color: #a855f7; border-color: rgba(168,85,247,0.38); background: rgba(168,85,247,0.08); }
+
+/* Footer */
+.tn-footer {
+  background: rgba(0,0,0,0.55); border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 40px 24px; text-align: center;
+  color: rgba(255,255,255,0.27); font-size: 0.78rem; line-height: 2.3;
+}
+.tn-footer strong { color: rgba(255,255,255,0.52); }
+
+/* Responsive -- landing */
+@media (max-width: 768px) {
+  .tn-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 210px 160px; }
+  .tn-photo:first-child { grid-column: span 2; grid-row: span 1; }
+  .tn-sec { padding: 52px 20px; }
+  .tn-games-card { padding: 36px 22px; }
+  .tn-hero { padding: 40px 20px 70px; }
+}
+@media (max-width: 480px) {
+  .tn-gallery { grid-template-columns: 1fr; grid-template-rows: 220px 170px 160px; }
+  .tn-photo:first-child { grid-column: auto; }
+  .tn-strip-item { min-width: 128px; padding: 15px 14px; }
+}
+
+/* Book & Contact */
+.tn-book-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+.tn-wa-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.tn-wa-row .tn-book-btn { flex: 1; min-width: 200px; }
+.tn-book-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 17px 22px; border-radius: 14px; border: none;
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.tn-book-btn:hover { transform: translateY(-2px); }
+.tn-book-ico { font-size: 1.55rem; flex-shrink: 0; }
+.tn-book-lab { display: flex; flex-direction: column; gap: 3px; }
+.tn-book-lab-main { font-size: 0.92rem; font-weight: 800; }
+.tn-book-lab-sub { font-size: 0.72rem; font-weight: 500; opacity: 0.75; }
+.tn-airbnb { background: #ff385c; color: #fff; box-shadow: 0 4px 20px rgba(255,56,92,0.35); }
+.tn-airbnb:hover { box-shadow: 0 8px 30px rgba(255,56,92,0.52); }
+.tn-gmaps { background: rgba(66,133,244,0.13); border: 1.5px solid rgba(66,133,244,0.38); color: #7eb7ff; }
+.tn-gmaps:hover { background: rgba(66,133,244,0.22); border-color: rgba(66,133,244,0.62); }
+.tn-wa { background: rgba(37,211,102,0.1); border: 1.5px solid rgba(37,211,102,0.32); color: #4ade80; }
+.tn-wa:hover { background: rgba(37,211,102,0.18); border-color: rgba(37,211,102,0.58); box-shadow: 0 4px 16px rgba(37,211,102,0.14); }
+.tn-footer-links { margin-top: 14px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; }
+.tn-footer-links a { color: rgba(245,200,66,0.65); text-decoration: none; font-size: 0.8rem; }
+.tn-footer-links a:hover { color: #f5c842; }
+@media (max-width: 540px) {
+  .tn-wa-row .tn-book-btn { min-width: 100%; flex: auto; }
+}
+
+/* =====================================================================
+   FUTURISTIC & DYNAMIC EFFECTS
+   ===================================================================== */
+
+/* Hero title -- solid white, no gradient */
+
+/* Dot grid overlay on hero */
+.tn-hero::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+  pointer-events: none;
+}
+
+/* Hero z-index layering */
+.tn-hero-content { z-index: 3 !important; }
+.tn-scroll-hint  { z-index: 3 !important; }
+
+/* Floating colour orbs in hero */
+.tn-orb {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 2;
+  will-change: transform;
+}
+.tn-orb-1 {
+  width: 580px; height: 580px;
+  background: radial-gradient(circle, rgba(245,155,60,0.3) 0%, transparent 70%);
+  filter: blur(80px);
+  top: -12%; left: -8%;
+  animation: tn-orb-a 13s ease-in-out infinite;
+}
+.tn-orb-2 {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(120,40,230,0.25) 0%, transparent 70%);
+  filter: blur(80px);
+  top: 18%; right: -6%;
+  animation: tn-orb-b 10s ease-in-out infinite;
+}
+.tn-orb-3 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(20,150,80,0.2) 0%, transparent 70%);
+  filter: blur(70px);
+  bottom: 8%; left: 28%;
+  animation: tn-orb-c 15s ease-in-out infinite;
+}
+@keyframes tn-orb-a {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(5%,4%) scale(1.07); }
+  66% { transform: translate(-4%,7%) scale(0.95); }
+}
+@keyframes tn-orb-b {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(-5%,-4%) scale(1.05); }
+  66% { transform: translate(4%,-8%) scale(0.96); }
+}
+@keyframes tn-orb-c {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(3%,-6%) scale(1.09); }
+}
+
+/* Scroll-reveal */
+.tn-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
+}
+.tn-visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+/* Clickable location pill */
+a.tn-location-pill {
+  cursor: pointer;
+  transition: background 0.22s, border-color 0.22s, color 0.22s;
+}
+a.tn-location-pill:hover {
+  background: rgba(245,200,66,0.2);
+  border-color: rgba(245,200,66,0.5);
+  color: #f5c842;
+}
+
+/* Hero gold button pulsing glow */
+@keyframes tn-gold-pulse {
+  0%,100% { box-shadow: 0 4px 24px rgba(245,200,66,0.42); }
+  50%  { box-shadow: 0 4px 36px rgba(245,200,66,0.72), 0 0 50px rgba(245,200,66,0.18); }
+}
+.tn-hero-actions .tn-btn-gold { animation: tn-gold-pulse 3s ease-in-out infinite; }
+.tn-hero-actions .tn-btn-gold:hover { animation: none; transform: translateY(-3px); box-shadow: 0 10px 42px rgba(245,200,66,0.75); }
+
+/* Contact dropdown */
+.tn-contact-wrap { position: relative; display: inline-block; }
+.tn-contact-drop {
+  position: absolute;
+  bottom: calc(100% + 14px); left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(8,8,20,0.97);
+  -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.13); border-radius: 18px;
+  padding: 10px; min-width: 250px;
+  display: flex; flex-direction: column; gap: 7px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.22,1,0.36,1), transform 0.28s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 -6px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  z-index: 200;
+}
+.tn-contact-drop.open {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.tn-contact-drop-label {
+  font-size: 0.61rem; color: rgba(255,255,255,0.3);
+  text-align: center; padding: 4px 8px 5px;
+  letter-spacing: 2px; text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 2px;
+}
+.tn-contact-wa {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 12px;
+  background: rgba(37,211,102,0.09); border: 1px solid rgba(37,211,102,0.22);
+  color: #4ade80; text-decoration: none; font-size: 0.88rem; font-weight: 700;
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+.tn-contact-wa:hover {
+  background: rgba(37,211,102,0.2);
+  border-color: rgba(37,211,102,0.5);
+  box-shadow: 0 0 18px rgba(37,211,102,0.18);
+}
+.tn-contact-wa-ico { font-size: 1.25rem; flex-shrink: 0; }
+
+/* Feature strip hover glow */
+.tn-strip-item { transition: background 0.2s, color 0.2s; cursor: default; }
+.tn-strip-item:hover { background: rgba(245,200,66,0.1); color: #f5c842; }
+.tn-strip-item:hover .tn-strip-icon { filter: drop-shadow(0 0 7px rgba(245,200,66,0.6)); }
+
+/* Tile neon hover */
+.tn-tile {
+  position: relative; overflow: hidden;
+  transition: border-color 0.22s, background 0.22s, transform 0.22s, box-shadow 0.22s;
+}
+.tn-tile::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(245,200,66,0.07), transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.tn-tile:hover::before { opacity: 1; }
+.tn-tile:hover {
+  border-color: rgba(245,200,66,0.38);
+  box-shadow: 0 0 22px rgba(245,200,66,0.14), 0 8px 28px rgba(0,0,0,0.35);
+  transform: translateY(-3px);
+}
+
+/* Photo shimmer on hover */
+.tn-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+  opacity: 0; transition: opacity 0.35s;
+}
+.tn-photo:hover::after { opacity: 1; }
+
+/* Airbnb button pulse */
+@keyframes tn-ab-pulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(255,56,92,0.35); }
+  50% { box-shadow: 0 4px 34px rgba(255,56,92,0.65), 0 0 0 4px rgba(255,56,92,0.1); }
+}
+.tn-airbnb { animation: tn-ab-pulse 2.6s ease-in-out infinite; }
+.tn-airbnb:hover { animation: none; }
+
+/* Section divider -- golden gradient */
+.tn-hr {
+  border: none; height: 1px; margin: 0;
+  background: linear-gradient(to right, transparent, rgba(245,200,66,0.25), transparent);
+}
+
+/* Games card purple glow */
+.tn-games-card {
+  box-shadow: 0 0 60px rgba(168,85,247,0.14), 0 20px 60px rgba(0,0,0,0.45);
+  transition: box-shadow 0.4s;
+}
+.tn-games-card:hover { box-shadow: 0 0 90px rgba(168,85,247,0.25), 0 20px 80px rgba(0,0,0,0.5); }
+
+/* Game Hub "Thudinest" title -- rainbow animated */
+@keyframes tn-hub-glow {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.home-title {
+  background: linear-gradient(270deg, #f5c842, #ff6b6b, #a855f7, #f5c842) !important;
+  background-size: 300% 300% !important;
+  animation: tn-hub-glow 5s ease infinite !important;
+}
+
+/* Mobile dropdown adjustment */
+@media (max-width: 500px) {
+  .tn-contact-drop { min-width: 220px; }
+}
 </style>
 </head>
 <body>
 
 <!-- ===== GLOBAL BACK BUTTON ===== -->
-<button id="global-back-btn" style="display:none" onclick="showScreen('home')">← Home</button>
+<button id="global-back-btn" style="display:none">&#8592; Back</button>
 
-<!-- ===== HOME SCREEN ===== -->
-<div id="screen-home" class="screen" style="display:flex">
-  <div class="home-title">Game Hub</div>
-  <div class="home-sub">Choose your game</div>
+<!-- ===== THUDINEST LANDING SCREEN ===== -->
+<div id="screen-landing" class="screen" style="display:flex">
+
+  <!-- Hero -->
+  <section class="tn-hero">
+    <div class="tn-hero-bg"></div>
+    <div class="tn-orb tn-orb-1"></div>
+    <div class="tn-orb tn-orb-2"></div>
+    <div class="tn-orb tn-orb-3"></div>
+    <div class="tn-hero-content">
+      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" class="tn-location-pill">&#128205; &nbsp;Poombuhar Nagar &#183; Thudiyalur &#183; Coimbatore &nbsp;&#8599;</a>
+      <h1 class="tn-hero-name">Thudinest</h1>
+      <div class="tn-hero-num">No. 2 &nbsp;&#183;&nbsp; MTP Road</div>
+      <p class="tn-hero-tagline">A cozy container home in Coimbatore's prime spot &#8212; perfect for couples, solo travelers &amp; remote workers.</p>
+      <div class="tn-hero-actions">
+        <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-btn-gold">&#128197; Book on Airbnb</a>
+        <div class="tn-contact-wrap">
+          <button class="tn-btn-ghost" id="contact-toggle" onclick="toggleContactDrop(event)">&#128222; Contact Us &#9662;</button>
+          <div id="tn-contact-drop" class="tn-contact-drop">
+            <div class="tn-contact-drop-label">Chat with us on WhatsApp</div>
+            <a href="https://wa.me/919698026106" target="_blank" rel="noopener" class="tn-contact-wa">
+              <span class="tn-contact-wa-ico">&#128172;</span>+91 96980 26106
+            </a>
+            <a href="https://wa.me/601161165161" target="_blank" rel="noopener" class="tn-contact-wa">
+              <span class="tn-contact-wa-ico">&#128172;</span>+60 11-6116 5161
+            </a>
+            <a href="https://wa.me/917092713486" target="_blank" rel="noopener" class="tn-contact-wa">
+              <span class="tn-contact-wa-ico">&#128172;</span>+91 70927 13486
+            </a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:22px">
+        <button style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.38);font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px" onclick="document.getElementById('tn-about').scrollIntoView({behavior:'smooth'})">Explore the Space &nbsp;&#8595;</button>
+      </div>
+    </div>
+    <div class="tn-scroll-hint"><span>Scroll</span><span style="font-size:0.95rem">&#8595;</span></div>
+  </section>
+
+  <!-- Feature strip -->
+  <div class="tn-strip">
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#128205;</span>Prime Roadside Location</div>
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#128274;</span>Private &amp; Peaceful</div>
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#128663;</span>Easy Parking</div>
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#128230;</span>Container Design</div>
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#9992;&#65039;</span>Short Getaways</div>
+    <div class="tn-strip-item"><span class="tn-strip-icon">&#128246;</span>Free Wi-Fi</div>
+  </div>
+
+  <!-- About -->
+  <div id="tn-about">
+    <div class="tn-sec tn-reveal">
+      <div class="tn-label">About This Space</div>
+      <h2 class="tn-heading">Welcome to Thudinest</h2>
+      <p class="tn-body">A home located right on MTP Road in Thudiyalur &#8212; one of Coimbatore's prime spots. This compact yet comfy stay is perfect for couples, solo travelers, or remote workers looking for something unique. Enjoy easy access, ample parking, and a relaxing vibe in a home that's as photogenic as it is peaceful.</p>
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="tn-reveal" style="max-width:1080px;margin:0 auto;padding:0 24px 72px">
+      <div class="tn-gallery">
+        <div class="tn-photo tn-photo-p1">
+          <span class="tn-photo-icon">&#127968;</span>
+          <div class="tn-photo-label">Exterior &#183; Container Home</div>
+        </div>
+        <div class="tn-photo tn-photo-p2">
+          <span class="tn-photo-icon">&#128719;</span>
+          <div class="tn-photo-label">Bedroom</div>
+        </div>
+        <div class="tn-photo tn-photo-p3">
+          <span class="tn-photo-icon">&#128705;</span>
+          <div class="tn-photo-label">Bathroom</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="tn-hr">
+
+  <!-- The Space -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label">The Space</div>
+    <h2 class="tn-heading">Everything You Need</h2>
+    <p class="tn-body">Cozy, clean, and well-maintained. The property includes a comfortable bedroom, attached bathroom, living area, and basic kitchen amenities &#8212; all thoughtfully designed for a relaxing stay.</p>
+    <div class="tn-grid">
+      <div class="tn-tile"><span class="tn-tile-icon">&#128719;</span><span class="tn-tile-name">Comfortable Bedroom</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#128703;</span><span class="tn-tile-name">Attached Bathroom</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#128715;</span><span class="tn-tile-name">Living Area</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#127859;</span><span class="tn-tile-name">Kitchen Amenities</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#128246;</span><span class="tn-tile-name">Free Wi-Fi</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#128663;</span><span class="tn-tile-name">Free Parking</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#129524;</span><span class="tn-tile-name">Towels &amp; Soap</span></div>
+      <div class="tn-tile"><span class="tn-tile-icon">&#128167;</span><span class="tn-tile-name">Drinking Water</span></div>
+    </div>
+  </div>
+
+  <hr class="tn-hr">
+
+  <!-- Guest Access -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label">Guest Access</div>
+    <h2 class="tn-heading">Yours to Enjoy</h2>
+    <p class="tn-body">Guests have full access to the bedroom, bathroom, living area, and kitchenette. Free Wi-Fi and parking are available. VG Hospital, restaurants, and shops are all just a short distance away on MTP Road.</p>
+  </div>
+
+  <hr class="tn-hr">
+
+  <!-- Notes & Rules -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label">Good to Know</div>
+    <h2 class="tn-heading">House Rules &amp; Notes</h2>
+    <div class="tn-rules">
+      <div class="tn-rule"><span class="tn-rule-ico">&#128230;</span><div class="tn-rule-txt">This is a tiny home &#8212; space is compact but thoughtfully designed for comfort.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128739;</span><div class="tn-rule-txt">Located right on MTP Road, easily accessible. There may be some light traffic noise.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#127973;</span><div class="tn-rule-txt">VG Hospital, restaurants, and shops are all close by for your convenience.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#129524;</span><div class="tn-rule-txt">Basic essentials provided: towels, soap, and drinking water.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#127769;</span><div class="tn-rule-txt">Please respect quiet hours after 10 PM.</div></div>
+      <div class="tn-rule warn"><span class="tn-rule-ico">&#9888;&#65039;</span><div class="tn-rule-txt"><strong>Please note:</strong> Unmarried couples are not allowed to stay.</div></div>
+    </div>
+  </div>
+
+  <hr class="tn-hr">
+
+  <!-- Book & Contact -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label">Book Your Stay</div>
+    <h2 class="tn-heading">Reserve &amp; Get in Touch</h2>
+    <p class="tn-body">Book instantly on Airbnb, get directions on Maps, or reach us directly on WhatsApp &#8212; we're happy to help with any questions!</p>
+    <div class="tn-book-actions">
+      <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-book-btn tn-airbnb">
+        <span class="tn-book-ico">&#127968;</span>
+        <span class="tn-book-lab">
+          <span class="tn-book-lab-main">Book on Airbnb</span>
+          <span class="tn-book-lab-sub">airbnb.com/h/thudinest</span>
+        </span>
+      </a>
+      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" class="tn-book-btn tn-gmaps">
+        <span class="tn-book-ico">&#128205;</span>
+        <span class="tn-book-lab">
+          <span class="tn-book-lab-main">Get Directions on Google Maps</span>
+          <span class="tn-book-lab-sub">Poombuhar Nagar, Thudiyalur, Coimbatore</span>
+        </span>
+      </a>
+      <div class="tn-wa-row">
+        <a href="https://wa.me/919698026106" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
+          <span class="tn-book-ico">&#128172;</span>
+          <span class="tn-book-lab">
+            <span class="tn-book-lab-main">WhatsApp</span>
+            <span class="tn-book-lab-sub">+91 96980 26106</span>
+          </span>
+        </a>
+        <a href="https://wa.me/601161165161" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
+          <span class="tn-book-ico">&#128172;</span>
+          <span class="tn-book-lab">
+            <span class="tn-book-lab-main">WhatsApp</span>
+            <span class="tn-book-lab-sub">+60 11-6116 5161</span>
+          </span>
+        </a>
+        <a href="https://wa.me/917092713486" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
+          <span class="tn-book-ico">&#128172;</span>
+          <span class="tn-book-lab">
+            <span class="tn-book-lab-main">WhatsApp</span>
+            <span class="tn-book-lab-sub">+91 70927 13486</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Games Promo -->
+  <div class="tn-games-wrap">
+    <div class="tn-games-card">
+      <div class="tn-games-inner">
+        <span class="tn-games-emoji">&#127918;</span>
+        <h3 class="tn-games-ttl">Thudinest Game Hub</h3>
+        <p class="tn-games-sub">Play Indian Rummy, Chess, or Ping Pong &#8212; built right in, no download needed.</p>
+        <div class="tn-game-pills">
+          <span class="tn-pill green">&#127183; Indian Rummy</span>
+          <span class="tn-pill gold">&#9823; Chess</span>
+          <span class="tn-pill purple">&#127955; Ping Pong</span>
+        </div>
+        <button class="tn-btn-gold" onclick="showScreen('home')" style="margin:0 auto;display:inline-flex">&#9654; &nbsp;Play Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="tn-footer">
+    <strong>Thudinest No. 2</strong><br>
+    Poombuhar Nagar, Thudiyalur, Coimbatore &#183; MTP Road &#183; Tamil Nadu, India
+    <div class="tn-footer-links">
+      <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Airbnb</a>
+      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">&#128205; Google Maps</a>
+      <a href="https://wa.me/919698026106" target="_blank" rel="noopener">&#128172; +91 96980 26106</a>
+      <a href="https://wa.me/601161165161" target="_blank" rel="noopener">&#128172; +60 11-6116 5161</a>
+      <a href="https://wa.me/917092713486" target="_blank" rel="noopener">&#128172; +91 70927 13486</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== GAME HUB HOME SCREEN ===== -->
+<div id="screen-home" class="screen" style="display:none">
+  <div class="home-title">Thudinest</div>
+  <div class="home-sub">Game Hub &#183; Choose Your Game</div>
   <div class="game-cards">
     <div class="game-card rummy" onclick="showScreen('rummy')">
-      <span class="game-card-icon">🃏</span>
+      <span class="game-card-icon">&#127183;</span>
       <div class="game-card-title">Rummy</div>
-      <div class="game-card-desc">Indian Rummy · 13 cards<br>Form sequences & sets to win</div>
+      <div class="game-card-desc">Indian Rummy &#183; 13 cards<br>Form sequences & sets to win</div>
     </div>
     <div class="game-card chess" onclick="showScreen('chess')">
-      <span class="game-card-icon">♟</span>
+      <span class="game-card-icon">&#9823;</span>
       <div class="game-card-title">Chess</div>
-      <div class="game-card-desc">Hard AI · Move counter<br>Points & captured pieces</div>
+      <div class="game-card-desc">Hard AI &#183; Move counter<br>Points & captured pieces</div>
     </div>
     <div class="game-card pong" onclick="showScreen('pong')">
-      <span class="game-card-icon">🏓</span>
+      <span class="game-card-icon">&#127955;</span>
       <div class="game-card-title">Ping Pong</div>
       <div class="game-card-desc">Classic paddle game<br>Mouse or keyboard</div>
     </div>
@@ -416,7 +1102,7 @@ body {
   <div id="setup-overlay">
     <div id="setup-box">
       <h1>King of hearts Kavina</h1>
-      <p>Indian Rummy — 13 cards, flexible groups</p>
+      <p>Indian Rummy &#8212; 13 cards, flexible groups</p>
       <div class="setup-lbl">NUMBER OF DECKS</div>
       <div id="deck-btns">
         <button class="dk-btn" onclick="selectDecks(1)" id="dk-1">1</button>
@@ -425,7 +1111,7 @@ body {
         <button class="dk-btn" onclick="selectDecks(4)" id="dk-4">4</button>
       </div>
       <div id="deck-note">104 cards + 4 printed jokers</div>
-      <button id="start-btn" onclick="startGame()">▶ Start Game</button>
+      <button id="start-btn" onclick="startGame()">&#9654; Start Game</button>
     </div>
   </div>
   <div id="rummy-app" style="display:none">
@@ -440,7 +1126,7 @@ body {
     </div>
     <div id="turn-bar">Loading...</div>
     <div id="gameover-banner"><h2 id="banner-title"></h2><p id="banner-msg"></p><button class="btn btn-green" onclick="newGame()">Play Again</button></div>
-    <div id="joker-hint">🃏 Joker hidden — place a pure sequence (3+ consecutive same-suit, no wildcards) to reveal it!</div>
+    <div id="joker-hint">&#127183; Joker hidden &#8212; place a pure sequence (3+ consecutive same-suit, no wildcards) to reveal it!</div>
     <div id="cpu-section">
       <div id="cpu-title">Computer's Hand <span class="badge" id="cpu-count-badge">0 cards</span></div>
       <div id="cpu-cards-row"></div>
@@ -458,7 +1144,7 @@ body {
       </div>
     </div>
     <div class="sbox">
-      <div class="stitle">Your Groups — any size ≥ 3, all 13 cards total &nbsp;•&nbsp; tap a card then tap a group</div>
+      <div class="stitle">Your Groups &#8212; any size &#8805; 3, all 13 cards total &nbsp;&#8226;&nbsp; tap a card then tap a group</div>
       <div id="melds-grid">
         <div class="meld-zone" id="mzone-0" onclick="onMeldZoneClick(0)" ondragover="onDragOver(event)" ondrop="onDrop(event,0)" ondragleave="onDragLeave(event)">
           <div class="meld-hdr"><span class="meld-lbl" id="mlbl-0">Group 1</span><span class="meld-st" id="mst-0"></span></div>
@@ -483,8 +1169,8 @@ body {
       <div id="hand-actions">
         <button class="btn btn-blue"   onclick="sortHand()">Sort</button>
         <button class="btn btn-orange" onclick="clearAllMelds()">Return All</button>
-        <button class="btn btn-gold"   onclick="checkAndDeclare()">Declare 🎉</button>
-        <button class="btn btn-red"    id="discard-sel-btn" onclick="discardSelected()" style="display:none">Discard ✕</button>
+        <button class="btn btn-gold"   onclick="checkAndDeclare()">Declare &#127881;</button>
+        <button class="btn btn-red"    id="discard-sel-btn" onclick="discardSelected()" style="display:none">Discard &#10005;</button>
         <button class="btn btn-purple" id="deselect-btn"    onclick="deselectCard()"    style="display:none">Deselect</button>
       </div>
       <div id="hand-cards" onclick="onHandZoneClick()" ondragover="onDragOver(event)" ondrop="onDropHand(event)" ondragleave="onDragLeave(event)"></div>
@@ -497,7 +1183,7 @@ body {
   <div class="chess-wrap">
     <div class="chess-title-bar">
       <h2>Chess</h2>
-      <small>You play White · AI plays Black · Hard Difficulty</small>
+      <small>You play White &#183; AI plays Black &#183; Hard Difficulty</small>
     </div>
     <div class="chess-layout">
       <div id="chess-board"></div>
@@ -517,7 +1203,7 @@ body {
           <div class="cstat"><span class="cstat-lbl">Total Moves</span><span class="cstat-val" id="chess-total-moves">0</span></div>
           <div class="cstat"><span class="cstat-lbl">Difficulty</span><span class="cstat-val">Hard</span></div>
         </div>
-        <div id="chess-status">Your turn — select a piece</div>
+        <div id="chess-status">Your turn &#8212; select a piece</div>
         <div class="clast-note" id="chess-last-note"></div>
         <button class="chess-newbtn" onclick="initChessGame()">New Game</button>
       </div>
@@ -542,12 +1228,12 @@ body {
   <div id="pong-fx-hud"></div>
   <canvas id="pong-canvas" width="800" height="400"></canvas>
   <div class="pong-touch-ctrl">
-    <button class="pong-ctrl-btn" id="pong-up-btn">▲</button>
-    <button class="pong-ctrl-btn" id="pong-dn-btn">▼</button>
+    <button class="pong-ctrl-btn" id="pong-up-btn">&#9650;</button>
+    <button class="pong-ctrl-btn" id="pong-dn-btn">&#9660;</button>
   </div>
   <div id="pong-msg">Press Start to play</div>
   <button class="pong-btn" id="pong-start-btn" onclick="pongStart()">START</button>
-  <div class="pong-hint">Mouse / drag canvas · W/S · ↑↓ · or tap ▲▼ buttons above<br>Hit glowing power-ups with the ball to unlock special effects!</div>
+  <div class="pong-hint">Mouse / drag canvas &#183; W/S &#183; &#8593;&#8595; &#183; or tap &#9650;&#9660; buttons above<br>Hit glowing power-ups with the ball to unlock special effects!</div>
 </div>
 
 <div id="toast"></div>
@@ -557,12 +1243,23 @@ body {
 // NAVIGATION
 // =====================================================================
 function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.style.display = 'none';
-  });
+  document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; });
   const scr = document.getElementById('screen-' + name);
-  scr.style.display = (name === 'home') ? 'flex' : 'block';
-  document.getElementById('global-back-btn').style.display = (name === 'home') ? 'none' : 'block';
+  scr.style.display = (name === 'landing' || name === 'home') ? 'flex' : 'block';
+  if (name === 'landing') scr.scrollTop = 0;
+
+  const bb = document.getElementById('global-back-btn');
+  if (name === 'landing') {
+    bb.style.display = 'none';
+  } else if (name === 'home') {
+    bb.style.display = 'flex';
+    bb.innerHTML = '&#8592; &nbsp;Back to Thudinest';
+    bb.onclick = () => showScreen('landing');
+  } else {
+    bb.style.display = 'flex';
+    bb.innerHTML = '&#8592; &nbsp;Back to Game Hub';
+    bb.onclick = () => showScreen('home');
+  }
 
   if (name === 'chess') initChessGame();
   if (name !== 'pong') stopPongGame();
@@ -572,10 +1269,10 @@ function showScreen(name) {
 // =====================================================================
 // RUMMY GAME (original logic)
 // =====================================================================
-const SUITS     = ['♠','♥','♦','♣'];
+const SUITS     = ['\u2660','\u2665','\u2666','\u2663'];
 const RANKS     = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const RANK_VAL  = Object.fromEntries(RANKS.map((r,i)=>[r,i+1]));
-const RED_SUITS = new Set(['♥','♦']);
+const RED_SUITS = new Set(['\u2665','\u2666']);
 
 let scores   = {cpu:0, player:0};
 let settings = {numDecks:2};
@@ -597,8 +1294,8 @@ function buildDeck(){
   const d=[]; let seq=0;
   for(let dk=0;dk<settings.numDecks;dk++){
     for(const s of SUITS) for(const r of RANKS) d.push({suit:s,rank:r,key:r+s,id:`${r}${s}_${seq++}`});
-    d.push({suit:'★',rank:'JKR',key:'JKR',id:`JKR_${seq++}`});
-    d.push({suit:'★',rank:'JKR',key:'JKR',id:`JKR_${seq++}`});
+    d.push({suit:'\u2605',rank:'JKR',key:'JKR',id:`JKR_${seq++}`});
+    d.push({suit:'\u2605',rank:'JKR',key:'JKR',id:`JKR_${seq++}`});
   }
   return d;
 }
@@ -629,10 +1326,10 @@ function isNaturalPureSeq(cards){
 }
 function checkJokerReveal(){
   if(state.jokerRevealed) return;
-  for(const meld of state.melds){ if(isNaturalPureSeq(meld)){ state.jokerRevealed=true; toast(`🃏 Joker revealed! All ${state.jokerRank}s are now wild!`); render(); return; } }
+  for(const meld of state.melds){ if(isNaturalPureSeq(meld)){ state.jokerRevealed=true; toast(`\u{1F0CF} Joker revealed! All ${state.jokerRank}s are now wild!`); render(); return; } }
 }
 function isSequence(cards){
-  if(cards.length<3) return [false,'need ≥3 cards'];
+  if(cards.length<3) return [false,'need \u22653 cards'];
   if(isNaturalPureSeq(cards)) return [true,''];
   const jokers=cards.filter(c=>isJoker(c)); const normal=cards.filter(c=>!isJoker(c));
   if(!normal.length) return [false,'no normal cards'];
@@ -646,7 +1343,7 @@ function isSequence(cards){
   return [false,'not a valid sequence'];
 }
 function isSet(cards){
-  if(cards.length<3) return [false,'need ≥3 cards'];
+  if(cards.length<3) return [false,'need \u22653 cards'];
   const normal=cards.filter(c=>!isJoker(c));
   if(!normal.length) return [false,'no normal cards'];
   if(new Set(normal.map(c=>c.rank)).size>1) return [false,'must be same rank'];
@@ -665,7 +1362,7 @@ function checkAllMelds(melds){
   if(total!==13) return [false,`Need all 13 cards grouped (have ${total})`];
   for(let i=0;i<4;i++){
     if(!melds[i].length) continue;
-    if(melds[i].length<3) return [false,`Group ${i+1} needs ≥3 cards (has ${melds[i].length})`];
+    if(melds[i].length<3) return [false,`Group ${i+1} needs \u22653 cards (has ${melds[i].length})`];
     const [ok,msg]=validateMeld(melds[i]);
     if(!ok) return [false,`Group ${i+1}: ${msg}`];
   }
@@ -800,7 +1497,7 @@ function cpuCheckAndDeclareWin(){
     if(ok){
       if(inHand===1){ state.discardPile.push(state.cpuHand[0]); state.cpuStatusMsg=`Computer discarded ${state.cpuHand[0].key} and wins!`; state.cpuHand=[]; }
       scores.cpu++; state.gameOver=true; state.cpuThinking=false; state.drawn=false;
-      render(); setTimeout(()=>showBanner('lose','Computer Wins! 🤖','Computer\'s cards are revealed below.'),150);
+      render(); setTimeout(()=>showBanner('lose','Computer Wins! \u{1F916}','Computer\'s cards are revealed below.'),150);
       return true;
     }
   }
@@ -808,13 +1505,13 @@ function cpuCheckAndDeclareWin(){
 }
 function drawFromDeck(){
   if(state.gameOver||state.cpuThinking){toast('Wait for computer to finish.');return;}
-  if(state.drawn){toast('Already drew — discard a card first.');return;}
+  if(state.drawn){toast('Already drew \u2014 discard a card first.');return;}
   if(!state.deck.length){toast('Deck is empty!');return;}
   state.playerHand.push(state.deck.pop()); state.drawn=true; render();
 }
 function pickFromDiscard(){
   if(state.gameOver||state.cpuThinking){toast('Wait for computer to finish.');return;}
-  if(state.drawn){toast('Already drew — discard a card first.');return;}
+  if(state.drawn){toast('Already drew \u2014 discard a card first.');return;}
   if(!state.discardPile.length){toast('Discard pile is empty!');return;}
   state.playerHand.push(state.discardPile.pop()); state.drawn=true; render();
 }
@@ -832,7 +1529,7 @@ function discardCard(cardId){
   if(state.playerHand.length===0){
     if(!state.jokerRevealed){ toast('Form a pure sequence first to reveal the Joker!'); state.playerHand.push(state.discardPile.pop()); state.drawn=true; return; }
     const [ok]=checkAllMelds(state.melds);
-    if(ok){ scores.player++; state.gameOver=true; render(); showBanner('win','You Win! 🎉','Congratulations!'); return; }
+    if(ok){ scores.player++; state.gameOver=true; render(); showBanner('win','You Win! \u{1F389}','Congratulations!'); return; }
   }
   render(); if(!state.gameOver) cpuTurn();
 }
@@ -844,7 +1541,7 @@ function checkAndDeclare(){
   if(!state.jokerRevealed){toast('Form a pure sequence first to reveal the Joker!');return;}
   if(state.playerHand.length){toast(`Move all ${state.playerHand.length} card(s) into groups first.`);return;}
   const [ok,msg]=checkAllMelds(state.melds);
-  if(ok){ scores.player++; state.gameOver=true; render(); showBanner('win','You Win! 🎉','Congratulations!'); }
+  if(ok){ scores.player++; state.gameOver=true; render(); showBanner('win','You Win! \u{1F389}','Congratulations!'); }
   else toast('Cannot declare: '+msg);
 }
 function onCardTap(e,cardId,source){
@@ -892,7 +1589,7 @@ function onDropHand(e){ e.preventDefault(); e.currentTarget.classList.remove('dr
 function triggerGraffiti(zone){
   const rect=zone.getBoundingClientRect(); const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
   const colors=['#f5c842','#2ecc71','#e74c3c','#3498db','#e67e22','#9b59b6','#fff'];
-  const shapes=['●','★','♦','▲','■','♠','♥','♣'];
+  const shapes=['\u25CF','\u2605','\u2666','\u25B2','\u25A0','\u2660','\u2665','\u2663'];
   for(let i=0;i<40;i++){
     const p=document.createElement('span'); p.className='confetti-p';
     const angle=Math.random()*Math.PI*2, dist=70+Math.random()*130;
@@ -904,7 +1601,7 @@ function makeCardEl(card,source,dblDiscard=false){
   const printed=isPrintedJoker(card),joker=isJoker(card),red=RED_SUITS.has(card.suit);
   const el=document.createElement('div'); el.id='cd-'+card.id;
   el.draggable=(source.type==='hand'||source.type==='meld');
-  if(printed){ el.className='card printed-joker'; el.innerHTML=`<span style="font-size:1.5rem">🃏</span><span style="font-size:.55rem;margin-top:2px;color:#d8b4fe;font-weight:900">JOKER</span>`; }
+  if(printed){ el.className='card printed-joker'; el.innerHTML=`<span style="font-size:1.5rem">\u{1F0CF}</span><span style="font-size:.55rem;margin-top:2px;color:#d8b4fe;font-weight:900">JOKER</span>`; }
   else { el.className=`card ${red?'red':'black'} ${joker?'rank-joker':''}`; el.innerHTML=`<span class="rank-top">${card.rank}<br>${card.suit}</span><span class="suit-ctr">${card.suit}</span><span class="rank-bot">${card.rank}<br>${card.suit}</span>${joker?'<div class="joker-badge">J</div>':''}`; }
   if(state.selId===card.id) el.classList.add('selected');
   if(el.draggable){ el.addEventListener('dragstart',e=>onCardDragStart(e,card.id,source)); el.addEventListener('dragend',e=>onCardDragEnd(e,card.id)); }
@@ -923,7 +1620,7 @@ function renderPlayerMelds(){
     zone.className='meld-zone';
     if(hasSel) zone.classList.add('ready-to-drop');
     if(!meld.length){ stEl.textContent=''; stEl.className='meld-st'; meldWasValid[i]=false; }
-    else if(meld.length>=3){ const [ok,msg]=validateMeld(meld); stEl.textContent=ok?'✓ Valid':'✗ '+msg; stEl.className='meld-st '+(ok?'ok':'bad'); if(!hasSel) zone.classList.add(ok?'meld-valid':'meld-bad'); if(ok&&!meldWasValid[i]) triggerGraffiti(zone); meldWasValid[i]=ok; }
+    else if(meld.length>=3){ const [ok,msg]=validateMeld(meld); stEl.textContent=ok?'\u2713 Valid':'\u2717 '+msg; stEl.className='meld-st '+(ok?'ok':'bad'); if(!hasSel) zone.classList.add(ok?'meld-valid':'meld-bad'); if(ok&&!meldWasValid[i]) triggerGraffiti(zone); meldWasValid[i]=ok; }
     else { stEl.textContent=`${meld.length}/3 min`; stEl.className='meld-st part'; meldWasValid[i]=false; }
   }
 }
@@ -936,7 +1633,7 @@ function renderCpuSection(){
     state.cpuMelds.forEach((meld,i)=>{
       if(!meld.length) return;
       const [ok,msg]=validateMeld(meld); const row2=document.createElement('div'); row2.className='cpu-grp-row';
-      const lbl=document.createElement('div'); lbl.className='cpu-grp-lbl'; lbl.innerHTML=`Group ${i+1} (${meld.length} cards): <span style="color:${ok?'#2ecc71':'#e74c3c'}">${ok?'✓ Valid':'✗ '+msg}</span>`;
+      const lbl=document.createElement('div'); lbl.className='cpu-grp-lbl'; lbl.innerHTML=`Group ${i+1} (${meld.length} cards): <span style="color:${ok?'#2ecc71':'#e74c3c'}">${ok?'\u2713 Valid':'\u2717 '+msg}</span>`;
       row2.appendChild(lbl); const cards=document.createElement('div'); cards.className='cpu-grp-cards';
       meld.forEach(card=>{const el=makeCardEl(card,{type:'cpu-reveal'});el.style.cursor='default';cards.appendChild(el);}); row2.appendChild(cards); revDiv.appendChild(row2);
     });
@@ -953,17 +1650,17 @@ function render(){
   const {deck,playerHand,discardPile,drawn,cpuThinking,gameOver,jokerRevealed,jokerRank,selId,selSrc}=state;
   document.getElementById('deck-badge').textContent=`Deck: ${deck.length}`;
   const jb=document.getElementById('joker-badge');
-  if(jokerRevealed){ jb.textContent=`Joker: All ${jokerRank}s ★`; jb.className='badge joker-on'; }
+  if(jokerRevealed){ jb.textContent=`Joker: All ${jokerRank}s \u2605`; jb.className='badge joker-on'; }
   else             { jb.textContent='Joker: hidden';               jb.className='badge joker-off'; }
   document.getElementById('score-badge').textContent=`CPU: ${scores.cpu} | You: ${scores.player}`;
   document.getElementById('joker-hint').style.display=jokerRevealed?'none':'block';
   const tb=document.getElementById('turn-bar'); const busy=cpuThinking||gameOver;
   const canDiscardNow=selId&&selSrc?.type==='hand'&&drawn&&!busy;
   if(gameOver)          { tb.textContent='Game Over'; tb.style.color='#aaa'; }
-  else if(cpuThinking)  { tb.textContent='💭 Computer is thinking...'; tb.style.color='#f5c842'; }
-  else if(!drawn)       { tb.textContent='Your turn — tap DECK or DISCARD to draw a card'; tb.style.color='#7fffb4'; }
-  else if(canDiscardNow){ tb.textContent='Selected — tap a Group to place it, or tap DISCARD (red) to discard'; tb.style.color='#f5c842'; }
-  else                  { tb.textContent='Card drawn — tap a card to select, then tap a Group or DISCARD pile'; tb.style.color='#f5c842'; }
+  else if(cpuThinking)  { tb.textContent='\u{1F4AD} Computer is thinking...'; tb.style.color='#f5c842'; }
+  else if(!drawn)       { tb.textContent='Your turn \u2014 tap DECK or DISCARD to draw a card'; tb.style.color='#7fffb4'; }
+  else if(canDiscardNow){ tb.textContent='Selected \u2014 tap a Group to place it, or tap DISCARD (red) to discard'; tb.style.color='#f5c842'; }
+  else                  { tb.textContent='Card drawn \u2014 tap a card to select, then tap a Group or DISCARD pile'; tb.style.color='#f5c842'; }
   document.getElementById('deck-pile').style.opacity=busy?'.45':'1';
   const dp=document.getElementById('discard-pile'); dp.style.opacity=busy?'.45':'1';
   dp.classList.toggle('can-discard-now',!!canDiscardNow);
@@ -986,7 +1683,7 @@ function hideBanner(){ document.getElementById('gameover-banner').className=''; 
 // =====================================================================
 // CHESS GAME
 // =====================================================================
-const CC_UNI = { K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙', k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟' };
+const CC_UNI = { K:'\u2654',Q:'\u2655',R:'\u2656',B:'\u2657',N:'\u2658',P:'\u2659', k:'\u265A',q:'\u265B',r:'\u265C',b:'\u265D',n:'\u265E',p:'\u265F' };
 const CC_VAL = { P:1,N:3,B:3,R:5,Q:9,K:0 };
 const CC_VAL_E = { P:100,N:320,B:330,R:500,Q:900,K:20000 };
 const CC_PST = {
@@ -1026,7 +1723,7 @@ function initChessGame(){
   ccGameOver = false; ccThinking = false; ccInCheck = false;
   renderChessBoard();
   updateChessInfo();
-  document.getElementById('chess-status').textContent = 'Your turn — select a piece';
+  document.getElementById('chess-status').textContent = 'Your turn \u2014 select a piece';
   document.getElementById('chess-last-note').textContent = '';
 }
 
@@ -1230,7 +1927,7 @@ function playerMakeMove(move){
   if(!blackMoves.length){
     ccInCheck=ccInCheckFn(ccBoard,'b');
     ccGameOver=true;
-    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! You win! ♔':'Stalemate — Draw!';
+    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! You win! \u2654':'Stalemate \u2014 Draw!';
     renderChessBoard(); updateChessInfo(); return;
   }
   ccInCheck=ccInCheckFn(ccBoard,'b');
@@ -1247,7 +1944,7 @@ function computerMakeMove(){
   if(!move){
     ccInCheck=ccInCheckFn(ccBoard,'b');
     ccGameOver=true; ccThinking=false;
-    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! You win! ♔':'Stalemate — Draw!';
+    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! You win! \u2654':'Stalemate \u2014 Draw!';
     renderChessBoard(); updateChessInfo(); return;
   }
   const cap=ccBoard[move.tr][move.tc];
@@ -1261,13 +1958,13 @@ function computerMakeMove(){
   if(!whiteMoves.length){
     ccInCheck=ccInCheckFn(ccBoard,'w');
     ccGameOver=true;
-    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! Computer wins! ♚':'Stalemate — Draw!';
+    document.getElementById('chess-status').textContent=ccInCheck?'Checkmate! Computer wins! \u265A':'Stalemate \u2014 Draw!';
     document.getElementById('chess-last-note').textContent='';
     renderChessBoard(); updateChessInfo(); return;
   }
   ccInCheck=ccInCheckFn(ccBoard,'w');
   const FL='abcdefgh', RK='87654321';
-  const nm=`${FL[move.fc]}${RK[move.fr]}→${FL[move.tc]}${RK[move.tr]}`;
+  const nm=`${FL[move.fc]}${RK[move.fr]}\u2192${FL[move.tc]}${RK[move.tr]}`;
   document.getElementById('chess-status').textContent=ccInCheck?'You are in Check!':'Your turn';
   document.getElementById('chess-last-note').textContent=`Computer played ${nm}`;
   renderChessBoard(); updateChessInfo();
@@ -1317,15 +2014,15 @@ function updateChessInfo(){
 }
 
 // =====================================================================
-// PONG GAME v2 — power-ups, trail, particles, sounds, mobile controls
+// PONG GAME v2 \u2014 power-ups, trail, particles, sounds, mobile controls
 // =====================================================================
 const PONG_W=800, PONG_H=400, PONG_PAD_W=14, PONG_PAD_H_BASE=80;
 
 const PU_DEFS=[
-  {id:'bigpad',  color:'#60a5fa', glyph:'⬆',  label:'BIG PADDLE', dur:7000},
-  {id:'slowball',color:'#34d399', glyph:'🐢', label:'SLOW BALL',   dur:6000},
-  {id:'cpuslow', color:'#fb923c', glyph:'💤', label:'CPU DAZED',   dur:7000},
-  {id:'shrink',  color:'#f87171', glyph:'✂',  label:'CPU SHRINK',  dur:7000},
+  {id:'bigpad',  color:'#60a5fa', glyph:'\u2B06',  label:'BIG PADDLE', dur:7000},
+  {id:'slowball',color:'#34d399', glyph:'\u{1F422}', label:'SLOW BALL',   dur:6000},
+  {id:'cpuslow', color:'#fb923c', glyph:'\u{1F4A4}', label:'CPU DAZED',   dur:7000},
+  {id:'shrink',  color:'#f87171', glyph:'\u2702',  label:'CPU SHRINK',  dur:7000},
 ];
 
 let pongRunning=false, pongAF=null;
@@ -1343,7 +2040,7 @@ function pCpuH(){    return pongFX.find(f=>f.id==='shrink')   ? PONG_PAD_H_BASE*
 function pCpuSpd(){  return pongFX.find(f=>f.id==='cpuslow')  ? 2.0 : 4.5; }
 function pBallCap(){ return pongFX.find(f=>f.id==='slowball') ? 5.5 : 14; }
 
-// ── Sound ──
+// \u2500\u2500 Sound \u2500\u2500
 function pSnd(freq,dur=0.08,vol=0.22,type='sine'){
   try{
     if(!pongAC) pongAC=new(window.AudioContext||window.webkitAudioContext)();
@@ -1361,7 +2058,7 @@ function pSndWall(){ pSnd(300,0.055,0.13); }
 function pSndScore(){ pSnd(200,0.2,0.28); setTimeout(()=>pSnd(160,0.18,0.22),140); }
 function pSndPU(){   [500,640,820].forEach((f,i)=>setTimeout(()=>pSnd(f,0.1,0.28),i*75)); }
 
-// ── Particles ──
+// \u2500\u2500 Particles \u2500\u2500
 function spawnParts(x,y,color,n=10){
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2, s=1.5+Math.random()*4.5;
@@ -1369,7 +2066,7 @@ function spawnParts(x,y,color,n=10){
   }
 }
 
-// ── Power-up ──
+// \u2500\u2500 Power-up \u2500\u2500
 function spawnPU(){
   const def=PU_DEFS[0|Math.random()*PU_DEFS.length];
   pongPU={x:220+Math.random()*360, y:70+Math.random()*(PONG_H-140), r:22, def, born:Date.now()};
@@ -1386,14 +2083,14 @@ function applyPU(def){
 }
 function refreshFxHud(){
   const now=Date.now(), hud=document.getElementById('pong-fx-hud'); if(!hud) return;
-  const glyph={bigpad:'⬆',slowball:'🐢',cpuslow:'💤',shrink:'✂'};
+  const glyph={bigpad:'\u2B06',slowball:'\u{1F422}',cpuslow:'\u{1F4A4}',shrink:'\u2702'};
   hud.innerHTML=pongFX.filter(f=>f.endTime>now).map(f=>{
     const rem=Math.ceil((f.endTime-now)/1000);
     return `<span class="pong-fx-badge" style="color:${f.color};border-color:${f.color}">${glyph[f.id]||''} ${f.label} ${rem}s</span>`;
   }).join('');
 }
 
-// ── Game lifecycle ──
+// \u2500\u2500 Game lifecycle \u2500\u2500
 function resetPongGame(){
   pongPS=0;pongCS=0;pongGameOver=false;pongTrail=[];pongParts=[];pongPU=null;pongFX=[];pongFlash=0;pongFrame=0;pongPUNext=300;
   document.getElementById('pong-pscore').textContent='0';
@@ -1428,7 +2125,7 @@ function pongStart(){
 function stopPongGame(){ pongRunning=false; if(pongAF){cancelAnimationFrame(pongAF);pongAF=null;} }
 function pongLoop(){ if(!pongRunning) return; updatePong(); drawPong(); pongAF=requestAnimationFrame(pongLoop); }
 
-// ── Update ──
+// \u2500\u2500 Update \u2500\u2500
 function updatePong(){
   const now=Date.now();
   pongFX=pongFX.filter(f=>f.endTime>now);
@@ -1508,12 +2205,12 @@ function updatePong(){
 
 function endPong(winner){
   pongRunning=false;pongGameOver=true;
-  document.getElementById('pong-msg').textContent=winner==='You'?'You win! 🎉 First to 11!':'CPU wins! Better luck next time...';
+  document.getElementById('pong-msg').textContent=winner==='You'?'You win! \u{1F389} First to 11!':'CPU wins! Better luck next time...';
   document.getElementById('pong-start-btn').style.display='';
   document.getElementById('pong-start-btn').textContent='Play Again';
 }
 
-// ── Draw ──
+// \u2500\u2500 Draw \u2500\u2500
 function pongDrawNet(ctx){
   ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=2;ctx.setLineDash([12,10]);
   ctx.beginPath();ctx.moveTo(PONG_W/2,0);ctx.lineTo(PONG_W/2,PONG_H);ctx.stroke();ctx.setLineDash([]);
@@ -1583,7 +2280,7 @@ function drawPong(){
   ctx.shadowBlur=0;
 }
 
-// ── Input ──
+// \u2500\u2500 Input \u2500\u2500
 document.addEventListener('keydown',e=>{
   pongKeys[e.key.toLowerCase()]=true;
   if(['arrowup','arrowdown'].includes(e.key.toLowerCase())) e.preventDefault();
@@ -1605,7 +2302,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       pongPlayer.y=Math.max(0,Math.min(PONG_H-ph,(e.touches[0].clientY-rect.top)*sy-ph/2));
     },{passive:false});
   }
-  // On-screen ▲▼ buttons
+  // On-screen \u25B2\u25BC buttons
   const upBtn=document.getElementById('pong-up-btn');
   const dnBtn=document.getElementById('pong-dn-btn');
   function bindBtn(btn,key){
@@ -1618,6 +2315,45 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   bindBtn(upBtn,'up'); bindBtn(dnBtn,'dn');
   pongDrawIdle();
+});
+
+// =====================================================================
+// CONTACT DROPDOWN
+// =====================================================================
+function toggleContactDrop(e) {
+  e.stopPropagation();
+  const drop = document.getElementById('tn-contact-drop');
+  const isOpen = drop.classList.contains('open');
+  drop.classList.toggle('open');
+  if (!isOpen) {
+    setTimeout(() => document.addEventListener('click', closeContactOnOutside), 0);
+  }
+}
+function closeContactOnOutside(e) {
+  const drop = document.getElementById('tn-contact-drop');
+  const btn  = document.getElementById('contact-toggle');
+  if (drop && !drop.contains(e.target) && btn && !btn.contains(e.target)) {
+    drop.classList.remove('open');
+  } else {
+    document.addEventListener('click', closeContactOnOutside, { once: true });
+    return;
+  }
+}
+
+// =====================================================================
+// SCROLL REVEAL \u2014 IntersectionObserver
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('tn-visible');
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+  document.querySelectorAll('.tn-reveal').forEach(el => revealObs.observe(el));
 });
 </script>
 </body>
