@@ -10,7 +10,7 @@
 <title>Thudinest No. 2 &#183; Thudiyalur, Coimbatore</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ===== RESET ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -946,15 +946,19 @@ body {
 }
 .tn-location-pill {
   display: inline-block;
-  background: rgba(255,255,255,0.1);
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255,255,255,0.08);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
-  padding: 7px 20px; font-size: 0.72rem; color: rgba(255,255,255,0.75);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 26px;
+  border: 1px solid rgba(34,211,238,0.3); border-radius: 100px;
+  padding: 7px 20px; font-size: 0.68rem; color: rgba(255,255,255,0.75);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 26px;
+  box-shadow: 0 0 0 1px rgba(34,211,238,0.06) inset, 0 0 18px rgba(34,211,238,0.08);
 }
 .tn-hero-name {
-  font-size: clamp(3.4rem, 11vw, 6.5rem); font-weight: 900;
-  line-height: 0.93; letter-spacing: -2px; margin-bottom: 8px;
+  font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 9.5vw, 5.4rem); font-weight: 800;
+  line-height: 1.05; letter-spacing: 1px; margin-bottom: 8px;
+  text-transform: uppercase;
   color: #ffffff;
 }
 .tn-hero-num {
@@ -1243,14 +1247,34 @@ body {
    FUTURISTIC & DYNAMIC EFFECTS
    ===================================================================== */
 
-/* Hero title -- solid white, no gradient */
+/* Hero title -- holographic animated gradient + neon glow */
+.tn-hero-name {
+  background: linear-gradient(100deg, #f5c842 0%, #22d3ee 28%, #a855f7 55%, #f5c842 78%, #22d3ee 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 22px rgba(34,211,238,0.28)) drop-shadow(0 0 46px rgba(168,85,247,0.18));
+  animation: tn-hologram 9s ease-in-out infinite;
+  position: relative;
+}
+@keyframes tn-hologram {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn-hero-name { animation: none; background-position: 0% 50%; }
+}
 
-/* Dot grid overlay on hero */
+/* Tech grid overlay on hero -- horizon perspective floor */
 .tn-hero::before {
   content: '';
   position: absolute; inset: 0; z-index: 1;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1.5px, transparent 1.5px);
-  background-size: 26px 26px;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.08) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,0.06) 1.5px, transparent 1.5px);
+  background-size: 64px 64px, 64px 64px, 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 100%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 100%, #000 0%, transparent 72%);
   pointer-events: none;
 }
 
@@ -1280,7 +1304,7 @@ body {
 }
 .tn-orb-3 {
   width: 380px; height: 380px;
-  background: radial-gradient(circle, rgba(20,150,80,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(34,211,238,0.13) 0%, transparent 70%);
   filter: blur(70px);
   bottom: 8%; left: 28%;
   animation: tn-orb-c 15s ease-in-out infinite;
@@ -1434,14 +1458,10 @@ a.tn-location-pill:hover {
    LANDING PAGE -- STYLE REFRESH
    ===================================================================== */
 
-/* Typography: editorial serif for display, Inter for body -- landing only */
+/* Typography: futuristic display for headings, Inter for body -- landing only */
 #screen-landing { font-family: 'Inter', 'Segoe UI', sans-serif; counter-reset: tn-section; position: relative; }
-.tn-hero-name {
-  font-family: 'Fraunces', Georgia, serif; font-weight: 600;
-  text-shadow: 0 14px 60px rgba(245,200,66,0.18), 0 6px 30px rgba(0,0,0,0.55);
-}
 .tn-heading, .tn-split-ttl {
-  font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.5px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.3px;
 }
 
 /* Scroll progress bar */
@@ -1451,21 +1471,21 @@ a.tn-location-pill:hover {
 }
 .tn-progress-fill {
   height: 100%; width: 0%;
-  background: linear-gradient(90deg, #f5c842, #ff6b6b, #a855f7);
-  box-shadow: 0 0 12px rgba(245,200,66,0.5);
+  background: linear-gradient(90deg, #f5c842, #22d3ee, #a855f7);
+  box-shadow: 0 0 12px rgba(34,211,238,0.5);
 }
 
-/* Section eyebrow labels: auto-numbered with accent rule */
+/* Section eyebrow labels: auto-numbered HUD tag */
 .tn-label { display: flex; align-items: center; gap: 12px; }
 .tn-label::before {
   counter-increment: tn-section;
-  content: counter(tn-section, decimal-leading-zero);
-  font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 500;
-  font-size: 1rem; color: rgba(245,200,66,0.55); letter-spacing: 0;
+  content: '[ ' counter(tn-section, decimal-leading-zero) ' ]';
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace; font-weight: 500;
+  font-size: 0.78rem; color: rgba(34,211,238,0.65); letter-spacing: 1px;
 }
 .tn-label::after {
   content: ''; flex: 0 0 30px; height: 1px;
-  background: linear-gradient(90deg, rgba(245,200,66,0.65), transparent);
+  background: linear-gradient(90deg, rgba(34,211,238,0.55), transparent);
 }
 
 /* Dividers: floating diamond glyph */
@@ -1659,8 +1679,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 /* ---- small phones: max 400px ---- */
 @media (max-width: 400px) {
   .tn-hero { padding: 64px 16px 72px; }
-  .tn-location-pill { max-width: 230px; font-size: 0.52rem; }
-  .tn-hero-name { letter-spacing: -3px; }
+  .tn-location-pill { max-width: 230px; font-size: 0.5rem; }
+  .tn-hero-name { letter-spacing: 0; }
   .tn-sec { padding: 38px 16px; }
   .game-card { width: 140px; padding: 22px 12px; }
   .game-cards { gap: 12px; }
