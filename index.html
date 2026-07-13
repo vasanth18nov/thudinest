@@ -1060,18 +1060,22 @@ body {
 .tn-split-card:hover { transform: translateY(-7px); }
 .tn-split-card.stay  { background: linear-gradient(160deg, rgba(245,200,66,0.14), rgba(245,200,66,0.02)); box-shadow: 0 20px 60px rgba(245,200,66,0.07); }
 .tn-split-card.games { background: linear-gradient(160deg, rgba(168,85,247,0.18), rgba(129,140,248,0.03)); box-shadow: 0 20px 60px rgba(168,85,247,0.1); }
+.tn-split-card.hosting { background: linear-gradient(160deg, rgba(56,189,248,0.16), rgba(59,130,246,0.03)); box-shadow: 0 20px 60px rgba(56,189,248,0.08); }
 .tn-split-card.stay:hover  { box-shadow: 0 26px 70px rgba(245,200,66,0.24); border-color: rgba(245,200,66,0.4); }
 .tn-split-card.games:hover { box-shadow: 0 26px 70px rgba(168,85,247,0.3);  border-color: rgba(168,85,247,0.42); }
+.tn-split-card.hosting:hover { box-shadow: 0 26px 70px rgba(56,189,248,0.28); border-color: rgba(56,189,248,0.42); }
 .tn-split-badge {
   position: absolute; top: 20px; right: 20px; font-size: 0.6rem; font-weight: 800;
   letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 11px; border-radius: 20px;
 }
 .tn-split-card.stay  .tn-split-badge { background: rgba(245,200,66,0.18); color: #f5c842; border: 1px solid rgba(245,200,66,0.35); }
 .tn-split-card.games .tn-split-badge { background: rgba(168,85,247,0.2);  color: #d3b3fc; border: 1px solid rgba(168,85,247,0.4); }
+.tn-split-card.hosting .tn-split-badge { background: rgba(56,189,248,0.2); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
 .tn-split-icon   { font-size: 2.6rem; display: block; margin-bottom: 16px; }
 .tn-split-kicker { font-size: 0.66rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
 .tn-split-card.stay  .tn-split-kicker { color: #f5c842; }
 .tn-split-card.games .tn-split-kicker { color: #c19bfa; }
+.tn-split-card.hosting .tn-split-kicker { color: #7dd3fc; }
 .tn-split-ttl { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.25; }
 .tn-split-sub { font-size: 0.87rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 22px; max-width: 420px; }
 .tn-split-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
@@ -1772,6 +1776,14 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
         </div>
         <button class="tn-split-cta" onclick="event.stopPropagation(); showScreen('home')">&#9654; Play Now</button>
       </div>
+      <div class="tn-split-card hosting" onclick="window.open('https://github.com/vasanth18nov/thudinest/issues/new?template=publish-page.yml&amp;labels=publish-request','_blank')">
+        <span class="tn-split-badge">Free</span>
+        <span class="tn-split-icon">&#127760;</span>
+        <div class="tn-split-kicker">Hosting</div>
+        <h3 class="tn-split-ttl">Publish Your Own Page</h3>
+        <p class="tn-split-sub">Got an access code from us? Create a free single-page website for your business in minutes &#8212; no charge, ever.</p>
+        <a href="https://github.com/vasanth18nov/thudinest/issues/new?template=publish-page.yml&amp;labels=publish-request" target="_blank" rel="noopener" class="tn-split-cta" onclick="event.stopPropagation()">&#128640; Get Hosting</a>
+      </div>
     </div>
   </div>
 
@@ -1911,6 +1923,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     <div class="tn-footer-links">
       <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Airbnb</a>
       <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">&#128205; Google Maps</a>
+      <a href="https://github.com/vasanth18nov/thudinest/issues/new?template=publish-page.yml&amp;labels=publish-request" target="_blank" rel="noopener">&#127760; Hosting</a>
       <a href="https://wa.me/919698026106" target="_blank" rel="noopener">&#128172; +91 96980 26106</a>
       <a href="https://wa.me/601161165161" target="_blank" rel="noopener">&#128172; +60 11-6116 5161</a>
       <a href="https://wa.me/917092713486" target="_blank" rel="noopener">&#128172; +91 70927 13486</a>

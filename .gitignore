@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large media (keep only web-optimised images)
+*.mp4
+*.mov
+*.MOV
+*.MP4
+*.m4a
+*.webm
+*.dmg
+*.zip
