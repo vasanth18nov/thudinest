@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Thudinest No. 2 &#183; Thudiyalur, Coimbatore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ===== RESET ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,6 +83,8 @@ body {
 .game-card.rummy  .game-card-title { color: #2ecc71; }
 .game-card.chess  .game-card-title { color: #f5c842; }
 .game-card.pong   .game-card-title { color: #818cf8; }
+.game-card.sudoku .game-card-title { color: #3498db; }
+.game-card.wordpuzzle .game-card-title { color: #ec4899; }
 .game-card-desc { font-size: 0.76rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
 /* ===== RUMMY SCREEN ===== */
@@ -367,6 +372,187 @@ body {
 }
 .pong-btn:hover { opacity: 0.85; }
 .pong-hint { font-size: 0.7rem; color: rgba(255,255,255,0.22); text-align: center; line-height: 1.8; }
+
+/* ===== SUDOKU SCREEN ===== */
+#screen-sudoku {
+  background: radial-gradient(ellipse at 50% 0%, #0b2a4a 0%, #060d16 100%);
+  min-height: 100vh; padding: 56px 16px 32px;
+}
+#sudoku-setup-overlay {
+  position: fixed; inset: 0; z-index: 5000;
+  background: radial-gradient(ellipse at center, #0b2a4a 0%, #030710 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+#sudoku-setup-box {
+  background: rgba(0,0,0,.55); border-radius: 20px;
+  padding: 44px 46px; text-align: center; max-width: 420px; width: 90%;
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 12px 60px rgba(0,0,0,.6);
+}
+#sudoku-setup-box h1 { font-size: 2.1rem; letter-spacing: 3px; color: #3498db; margin-bottom: 6px; }
+#sudoku-setup-box p  { color: #7fb3d5; font-size: .88rem; margin-bottom: 28px; }
+.sdk-diff-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+.sdk-diff-btn {
+  background: rgba(255,255,255,.1); color: #fff; border: 2px solid rgba(255,255,255,.2);
+  border-radius: 10px; padding: 12px 18px; cursor: pointer; font-size: .85rem; font-weight: 700;
+  transition: all .18s; touch-action: manipulation; flex: 1; min-width: 90px;
+}
+.sdk-diff-btn:hover  { background: rgba(255,255,255,.2); border-color: #3498db; }
+.sdk-diff-btn.active { background: #3498db; color: #fff; border-color: #3498db; }
+#sudoku-diff-note { font-size: .72rem; color: #888; margin-bottom: 26px; }
+#sudoku-start-btn {
+  background: #3498db; color: #fff; border: none; border-radius: 10px;
+  padding: 16px 44px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+  transition: opacity .15s, transform .1s; letter-spacing: 1px;
+  touch-action: manipulation; width: 100%; max-width: 240px;
+}
+#sudoku-start-btn:hover { opacity: .88; transform: translateY(-2px); }
+#sudoku-start-btn:disabled { opacity: .6; cursor: wait; }
+.sdk-wrap { max-width: 560px; margin: 0 auto; }
+.sdk-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,.5); border-radius: 12px;
+  padding: 10px 18px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.sdk-header h1 { font-size: 1.2rem; letter-spacing: 2px; color: #3498db; }
+.sdk-info-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: .82rem; }
+.sdk-badge { background: rgba(255,255,255,.13); border-radius: 8px; padding: 4px 10px; font-weight: 700; }
+#sudoku-gameover { display: none; border-radius: 12px; padding: 16px 22px; text-align: center; margin-bottom: 10px; max-width: 560px; margin-left: auto; margin-right: auto; }
+#sudoku-gameover.show { display: block; }
+#sudoku-gameover.win  { background: rgba(46,204,113,.2); border: 2px solid #2ecc71; }
+#sudoku-gameover.lose { background: rgba(231,76,60,.2);  border: 2px solid #e74c3c; }
+#sudoku-gameover h2   { font-size: 1.5rem; margin-bottom: 6px; }
+#sudoku-gameover.win  h2 { color: #2ecc71; }
+#sudoku-gameover.lose h2 { color: #e74c3c; }
+#sudoku-gameover p    { font-size: .85rem; color: #ccc; margin-bottom: 12px; }
+#sudoku-board {
+  display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr);
+  width: min(480px, calc(100vw - 32px)); aspect-ratio: 1; margin: 0 auto 16px;
+  background: rgba(255,255,255,.06);
+  border: 3px solid rgba(52,152,219,.5); border-radius: 6px; overflow: hidden;
+  box-shadow: 0 0 40px rgba(52,152,219,.12), 0 16px 48px rgba(0,0,0,.6);
+}
+.sdk-cell {
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(0.95rem, 3.6vw, 1.3rem); font-weight: 700; color: #d7e8f7;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.08);
+  cursor: pointer; position: relative; user-select: none; touch-action: manipulation;
+  transition: background .12s;
+}
+.sdk-cell:nth-child(3n) { border-right: 2px solid rgba(52,152,219,.45); }
+.sdk-cell:nth-child(9n+1) { border-left: 2px solid rgba(52,152,219,.45); }
+.sdk-row-thick { border-bottom: 2px solid rgba(52,152,219,.45) !important; }
+.sdk-cell.given { color: #fff; font-weight: 800; }
+.sdk-cell.user  { color: #6fc4ff; }
+.sdk-cell.wrong { color: #ff6b6b; }
+.sdk-cell.selected { background: rgba(52,152,219,.4); }
+.sdk-cell.peer     { background: rgba(52,152,219,.12); }
+.sdk-cell.same-num { background: rgba(245,200,66,.2); }
+.sdk-cell.hint-flash { animation: sdk-flash .7s ease; }
+@keyframes sdk-flash { 0%{background:rgba(46,204,113,.6);} 100%{background:transparent;} }
+.sdk-notes { position:absolute; inset:2px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); pointer-events:none; }
+.sdk-notes span { font-size:clamp(0.45rem,1.4vw,0.62rem); color:rgba(255,255,255,.5); display:flex; align-items:center; justify-content:center; font-weight:600; }
+#sudoku-numpad { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; max-width: 480px; margin-left:auto; margin-right:auto; }
+.sdk-num-btn {
+  width: 44px; height: 44px; border-radius: 8px; border: none;
+  background: rgba(255,255,255,.1); color: #fff; font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; transition: background .15s, transform .1s; touch-action: manipulation;
+}
+.sdk-num-btn:hover { background: rgba(52,152,219,.4); transform: translateY(-1px); }
+.sdk-num-btn.sdk-erase { background: rgba(231,76,60,.25); font-size: 1rem; }
+#sudoku-tools { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.sdk-tool-btn.active { background: #3498db !important; color:#fff !important; }
+
+/* ===== WORD SEARCH SCREEN ===== */
+#screen-wordpuzzle {
+  background: radial-gradient(ellipse at 50% 0%, #3a1240 0%, #0d0512 100%);
+  min-height: 100vh; padding: 56px 16px 32px;
+}
+#wp-setup-overlay {
+  position: fixed; inset: 0; z-index: 5000; overflow-y: auto; padding: 24px 16px;
+  background: radial-gradient(ellipse at center, #3a1240 0%, #050208 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+#wp-setup-box {
+  background: rgba(0,0,0,.55); border-radius: 20px;
+  padding: 40px 40px; text-align: center; max-width: 460px; width: 100%;
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 12px 60px rgba(0,0,0,.6);
+}
+#wp-setup-box h1 { font-size: 2.1rem; letter-spacing: 3px; color: #ec4899; margin-bottom: 6px; }
+#wp-setup-box p  { color: #e0a8c9; font-size: .88rem; margin-bottom: 24px; }
+.wp-cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
+.wp-cat-btn {
+  background: rgba(255,255,255,.07); color: #fff; border: 2px solid rgba(255,255,255,.15);
+  border-radius: 12px; padding: 14px 10px; cursor: pointer; font-size: .82rem; font-weight: 700;
+  transition: all .18s; touch-action: manipulation; display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.wp-cat-btn .wp-cat-icon { font-size: 1.5rem; }
+.wp-cat-btn:hover  { background: rgba(255,255,255,.14); border-color: #ec4899; }
+.wp-cat-btn.active { background: rgba(236,72,153,.25); border-color: #ec4899; }
+.wp-diff-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
+.wp-diff-btn {
+  background: rgba(255,255,255,.1); color: #fff; border: 2px solid rgba(255,255,255,.2);
+  border-radius: 10px; padding: 12px 16px; cursor: pointer; font-size: .82rem; font-weight: 700;
+  transition: all .18s; touch-action: manipulation; flex: 1; min-width: 90px;
+}
+.wp-diff-btn:hover  { background: rgba(255,255,255,.2); border-color: #ec4899; }
+.wp-diff-btn.active { background: #ec4899; color: #fff; border-color: #ec4899; }
+#wp-diff-note { font-size: .72rem; color: #888; margin-bottom: 26px; }
+#wp-start-btn {
+  background: linear-gradient(135deg,#ec4899,#a855f7); color: #fff; border: none; border-radius: 10px;
+  padding: 16px 44px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+  transition: opacity .15s, transform .1s; letter-spacing: 1px;
+  touch-action: manipulation; width: 100%; max-width: 260px;
+}
+#wp-start-btn:hover { opacity: .88; transform: translateY(-2px); }
+.wp-wrap { max-width: 980px; margin: 0 auto; }
+.wp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,.5); border-radius: 12px;
+  padding: 10px 18px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.wp-header h1 { font-size: 1.2rem; letter-spacing: 2px; color: #ec4899; }
+.wp-info-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: .82rem; }
+.wp-badge { background: rgba(255,255,255,.13); border-radius: 8px; padding: 4px 10px; font-weight: 700; }
+#wp-winbanner { display: none; border-radius: 12px; padding: 16px 22px; text-align: center; margin-bottom: 10px; background: rgba(46,204,113,.2); border: 2px solid #2ecc71; }
+#wp-winbanner.show { display: block; }
+#wp-winbanner h2 { font-size: 1.5rem; margin-bottom: 6px; color: #2ecc71; }
+#wp-winbanner p  { font-size: .85rem; color: #ccc; margin-bottom: 12px; }
+.wp-layout { display: flex; gap: 20px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+#wp-grid {
+  display: grid; gap: 2px; background: rgba(255,255,255,.06);
+  border: 2px solid rgba(236,72,153,.35); border-radius: 10px; padding: 6px;
+  width: min(560px, calc(100vw - 32px)); aspect-ratio: 1;
+  box-shadow: 0 0 40px rgba(236,72,153,.1), 0 16px 48px rgba(0,0,0,.6);
+  touch-action: none; user-select: none; flex: 1 1 420px; max-width: 560px;
+}
+.wp-cell {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.03); border-radius: 3px;
+  font-size: clamp(0.6rem, 2.6vw, 1rem); font-weight: 700; color: rgba(255,255,255,.8);
+  transition: background .1s, color .1s; position: relative;
+}
+.wp-cell.active-drag { background: rgba(236,72,153,.55); color: #fff; }
+.wp-word-list {
+  width: 260px; max-width: 100%; background: rgba(0,0,0,.3); border-radius: 12px;
+  padding: 16px 18px; flex: 1 1 240px;
+}
+.wp-word-list-title { font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.wp-word-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 4px; font-size: .88rem;
+  color: rgba(255,255,255,.75); font-weight: 600; letter-spacing: .5px;
+  transition: color .2s, opacity .2s;
+}
+.wp-word-item .wp-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.2); flex-shrink:0; }
+.wp-word-item.found { color: rgba(255,255,255,.32); text-decoration: line-through; }
+.wp-word-item.found .wp-dot { background: #2ecc71; }
+.wp-controls { display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+
+@media (max-width: 640px) {
+  .sdk-num-btn { width: 38px; height: 38px; font-size: 1rem; }
+  #sudoku-setup-box, #wp-setup-box { padding: 30px 22px; }
+  .wp-word-list { padding: 14px 16px; }
+}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 640px) {
@@ -888,6 +1074,110 @@ a.tn-location-pill:hover {
   animation: tn-hub-glow 5s ease infinite !important;
 }
 
+/* =====================================================================
+   LANDING PAGE -- STYLE REFRESH
+   ===================================================================== */
+
+/* Typography: editorial serif for display, Inter for body -- landing only */
+#screen-landing { font-family: 'Inter', 'Segoe UI', sans-serif; counter-reset: tn-section; position: relative; }
+.tn-hero-name {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  text-shadow: 0 14px 60px rgba(245,200,66,0.18), 0 6px 30px rgba(0,0,0,0.55);
+}
+.tn-heading, .tn-games-ttl {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.5px;
+}
+
+/* Scroll progress bar */
+.tn-progress-track {
+  position: sticky; top: 0; left: 0; width: 100%; height: 3px;
+  background: rgba(255,255,255,0.05); z-index: 600;
+}
+.tn-progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #f5c842, #ff6b6b, #a855f7);
+  box-shadow: 0 0 12px rgba(245,200,66,0.5);
+}
+
+/* Section eyebrow labels: auto-numbered with accent rule */
+.tn-label { display: flex; align-items: center; gap: 12px; }
+.tn-label::before {
+  counter-increment: tn-section;
+  content: counter(tn-section, decimal-leading-zero);
+  font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 500;
+  font-size: 1rem; color: rgba(245,200,66,0.55); letter-spacing: 0;
+}
+.tn-label::after {
+  content: ''; flex: 0 0 30px; height: 1px;
+  background: linear-gradient(90deg, rgba(245,200,66,0.65), transparent);
+}
+
+/* Dividers: floating diamond glyph */
+.tn-hr { position: relative; }
+.tn-hr::after {
+  content: '\2726'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); background: #080811;
+  color: #f5c842; font-size: 0.65rem; padding: 0 14px; line-height: 1;
+}
+
+/* Gold button shine sweep */
+.tn-btn-gold { position: relative; overflow: hidden; isolation: isolate; }
+.tn-btn-gold::before {
+  content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform: skewX(-20deg); transition: left 0.65s cubic-bezier(.22,1,.36,1);
+}
+.tn-btn-gold:hover::before { left: 130%; }
+
+/* Amenity tiles: icon badge */
+.tn-tile-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(245,200,66,0.09); border: 1px solid rgba(245,200,66,0.2);
+  font-size: 1.25rem; transition: background 0.22s, border-color 0.22s, transform 0.22s;
+}
+.tn-tile:hover .tn-tile-icon { background: rgba(245,200,66,0.18); border-color: rgba(245,200,66,0.4); transform: scale(1.08); }
+
+/* House rules: two-column grid with icon badges */
+.tn-rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tn-rule-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(255,255,255,0.06); font-size: 1rem;
+}
+.tn-rule.warn { grid-column: 1 / -1; }
+.tn-rule.warn .tn-rule-ico { background: rgba(231,76,60,0.16); }
+@media (max-width: 700px) {
+  .tn-rules { grid-template-columns: 1fr; }
+  .tn-rule.warn { grid-column: auto; }
+}
+
+/* Booking buttons: icon badges */
+.tn-book-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0;
+  background: rgba(255,255,255,0.1);
+}
+.tn-airbnb .tn-book-ico { background: rgba(255,255,255,0.18); }
+
+/* Games promo: gradient ring */
+.tn-games-card { position: relative; }
+.tn-games-card::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 22px; padding: 1px;
+  background: linear-gradient(135deg, rgba(245,200,66,0.5), rgba(168,85,247,0.5), rgba(236,72,153,0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0.55; pointer-events: none;
+}
+
+/* Footer: gold hairline top glow */
+.tn-footer { position: relative; }
+.tn-footer::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245,200,66,0.5), transparent);
+}
+
 /* Mobile dropdown adjustment */
 @media (max-width: 500px) {
   .tn-contact-drop { min-width: 220px; }
@@ -1054,6 +1344,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 <!-- ===== THUDINEST LANDING SCREEN ===== -->
 <div id="screen-landing" class="screen" style="display:flex">
+
+  <div class="tn-progress-track"><div class="tn-progress-fill" id="tn-progress-fill"></div></div>
 
   <!-- Hero -->
   <section class="tn-hero">
@@ -1272,6 +1564,16 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <div class="game-card-title">Ping Pong</div>
       <div class="game-card-desc">Classic paddle game<br>Mouse, keyboard or touch</div>
     </div>
+    <div class="game-card sudoku" onclick="showScreen('sudoku')">
+      <span class="game-card-icon">&#128290;</span>
+      <div class="game-card-title">Sudoku</div>
+      <div class="game-card-desc">Classic 9&#215;9 puzzle<br>3 difficulty levels &#183; notes & hints</div>
+    </div>
+    <div class="game-card wordpuzzle" onclick="showScreen('wordpuzzle')">
+      <span class="game-card-icon">&#128269;</span>
+      <div class="game-card-title">Word Search</div>
+      <div class="game-card-desc">5 themes &#183; 130+ words<br>Drag to find them all</div>
+    </div>
   </div>
 </div>
 
@@ -1414,6 +1716,113 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   <div class="pong-hint">Mouse / drag canvas &#183; W/S &#183; &#8593;&#8595; &#183; or tap &#9650;&#9660; buttons above<br>Hit glowing power-ups with the ball to unlock special effects!</div>
 </div>
 
+<!-- ===== SUDOKU SCREEN ===== -->
+<div id="screen-sudoku" class="screen" style="display:none">
+  <div id="sudoku-setup-overlay">
+    <div id="sudoku-setup-box">
+      <h1>Sudoku</h1>
+      <p>Classic 9&#215;9 logic puzzle</p>
+      <div class="setup-lbl">DIFFICULTY</div>
+      <div class="sdk-diff-btns">
+        <button class="sdk-diff-btn" onclick="selectSudokuDifficulty('easy')" id="sdk-diff-easy">Easy</button>
+        <button class="sdk-diff-btn active" onclick="selectSudokuDifficulty('medium')" id="sdk-diff-medium">Medium</button>
+        <button class="sdk-diff-btn" onclick="selectSudokuDifficulty('hard')" id="sdk-diff-hard">Hard</button>
+      </div>
+      <div id="sudoku-diff-note">3 mistakes and it's game over &#8212; use notes &amp; hints wisely</div>
+      <button id="sudoku-start-btn" onclick="startSudoku()">&#9654; Start Game</button>
+    </div>
+  </div>
+  <div id="sudoku-app" style="display:none">
+    <div class="sdk-wrap">
+      <div class="sdk-header">
+        <h1>SUDOKU</h1>
+        <div class="sdk-info-row">
+          <span class="sdk-badge" id="sdk-diff-badge">Level: Medium</span>
+          <span class="sdk-badge" id="sdk-timer">0:00</span>
+          <span class="sdk-badge" id="sdk-mistakes">0/3</span>
+          <button class="btn btn-red" onclick="newSudokuGame()">New Game</button>
+        </div>
+      </div>
+      <div id="sudoku-gameover">
+        <h2 id="sdk-banner-title"></h2>
+        <p id="sdk-banner-msg"></p>
+        <button class="btn btn-green" onclick="newSudokuGame()">Play Again</button>
+      </div>
+      <div id="sudoku-board"></div>
+      <div id="sudoku-numpad">
+        <button class="sdk-num-btn" onclick="sdkInputNumber(1)">1</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(2)">2</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(3)">3</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(4)">4</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(5)">5</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(6)">6</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(7)">7</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(8)">8</button>
+        <button class="sdk-num-btn" onclick="sdkInputNumber(9)">9</button>
+        <button class="sdk-num-btn sdk-erase" onclick="sdkErase()" title="Erase">&#9003;</button>
+      </div>
+      <div id="sudoku-tools">
+        <button class="btn btn-blue sdk-tool-btn" id="sdk-notes-btn" onclick="sdkToggleNotes()">&#9998; Notes</button>
+        <button class="btn btn-gold sdk-tool-btn" onclick="sdkHint()">&#128161; Hint</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WORD SEARCH SCREEN ===== -->
+<div id="screen-wordpuzzle" class="screen" style="display:none">
+  <div id="wp-setup-overlay">
+    <div id="wp-setup-box">
+      <h1>Word Search</h1>
+      <p>Pick a theme and go hunting for words</p>
+      <div class="setup-lbl">CATEGORY</div>
+      <div class="wp-cat-grid">
+        <button class="wp-cat-btn active" id="wp-cat-animals" onclick="selectWPCategory('animals')"><span class="wp-cat-icon">&#128062;</span>Animals</button>
+        <button class="wp-cat-btn" id="wp-cat-countries" onclick="selectWPCategory('countries')"><span class="wp-cat-icon">&#127757;</span>Countries</button>
+        <button class="wp-cat-btn" id="wp-cat-food" onclick="selectWPCategory('food')"><span class="wp-cat-icon">&#127826;</span>Food</button>
+        <button class="wp-cat-btn" id="wp-cat-space" onclick="selectWPCategory('space')"><span class="wp-cat-icon">&#128640;</span>Space</button>
+        <button class="wp-cat-btn" id="wp-cat-sports" onclick="selectWPCategory('sports')"><span class="wp-cat-icon">&#9917;</span>Sports</button>
+      </div>
+      <div class="setup-lbl">DIFFICULTY</div>
+      <div class="wp-diff-btns">
+        <button class="wp-diff-btn" onclick="selectWPDifficulty('easy')" id="wp-diff-easy">Easy</button>
+        <button class="wp-diff-btn active" onclick="selectWPDifficulty('medium')" id="wp-diff-medium">Medium</button>
+        <button class="wp-diff-btn" onclick="selectWPDifficulty('hard')" id="wp-diff-hard">Hard</button>
+      </div>
+      <div id="wp-diff-note">Drag across letters &#8212; any direction &#8212; to find each word</div>
+      <button id="wp-start-btn" onclick="startWordPuzzle()">&#9654; Start Game</button>
+    </div>
+  </div>
+  <div id="wp-app" style="display:none">
+    <div class="wp-wrap">
+      <div class="wp-header">
+        <h1>WORD SEARCH</h1>
+        <div class="wp-info-row">
+          <span class="wp-badge" id="wp-cat-badge">Animals</span>
+          <span class="wp-badge" id="wp-timer">0:00</span>
+          <span class="wp-badge" id="wp-found-count">0/0</span>
+          <button class="btn btn-red" onclick="newWordPuzzle()">Change Theme</button>
+        </div>
+      </div>
+      <div id="wp-winbanner">
+        <h2>&#127881; All Found!</h2>
+        <p id="wp-win-msg"></p>
+        <button class="btn btn-green" onclick="wpRegenerate()">Play Again</button>
+      </div>
+      <div class="wp-layout">
+        <div id="wp-grid"></div>
+        <div class="wp-word-list">
+          <div class="wp-word-list-title">Find These Words</div>
+          <div id="wp-word-list-items"></div>
+          <div class="wp-controls">
+            <button class="btn btn-blue" onclick="wpRegenerate()">New Puzzle</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1424,7 +1833,7 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; });
   const scr = document.getElementById('screen-' + name);
   scr.style.display = (name === 'landing' || name === 'home') ? 'flex' : 'block';
-  if (name === 'landing') scr.scrollTop = 0;
+  if (name === 'landing') window.scrollTo(0, 0);
 
   const bb = document.getElementById('global-back-btn');
   if (name === 'landing') {
@@ -1442,6 +1851,8 @@ function showScreen(name) {
   if (name === 'chess') initChessGame();
   if (name !== 'pong') stopPongGame();
   if (name === 'pong') resetPongGame();
+  if (name === 'sudoku') sdkResumeTimer(); else sdkPauseTimer();
+  if (name === 'wordpuzzle') wpResumeTimer(); else wpPauseTimer();
 }
 
 // =====================================================================
@@ -2496,6 +2907,456 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // =====================================================================
+// SHARED CONFETTI BURST
+// =====================================================================
+function fireConfettiBurst(cx,cy){
+  const colors=['#f5c842','#2ecc71','#e74c3c','#3498db','#e67e22','#9b59b6','#fff','#ec4899'];
+  const shapes=['●','★','♦','▲','■','♠','♥','♣'];
+  for(let i=0;i<50;i++){
+    const p=document.createElement('span'); p.className='confetti-p';
+    const angle=Math.random()*Math.PI*2, dist=80+Math.random()*160;
+    p.style.cssText=`left:${cx}px;top:${cy}px;color:${colors[0|Math.random()*colors.length]};font-size:${8+Math.random()*14}px;--dx:${Math.cos(angle)*dist}px;--dy:${Math.sin(angle)*dist}px;--dur:${.6+Math.random()*.8}s;`;
+    p.textContent=shapes[0|Math.random()*shapes.length]; document.body.appendChild(p); setTimeout(()=>p.remove(),1500);
+  }
+}
+
+// =====================================================================
+// SUDOKU GAME
+// =====================================================================
+let sdk = null;
+let sdkTimerId = null;
+let sdkDifficulty = 'medium';
+const SDK_DIFF_CLUES = { easy:40, medium:32, hard:25 };
+
+function selectSudokuDifficulty(d){
+  sdkDifficulty = d;
+  ['easy','medium','hard'].forEach(k=>{ document.getElementById('sdk-diff-'+k).classList.toggle('active', k===d); });
+}
+function sdkIsSafe(g,r,c,n){
+  for(let i=0;i<9;i++){ if(g[r][i]===n||g[i][c]===n) return false; }
+  const br=r-r%3, bc=c-c%3;
+  for(let i=0;i<3;i++) for(let j=0;j<3;j++) if(g[br+i][bc+j]===n) return false;
+  return true;
+}
+function sdkFillGrid(g){
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      if(g[r][c]===0){
+        const nums=[1,2,3,4,5,6,7,8,9]; shuffle(nums);
+        for(const n of nums){
+          if(sdkIsSafe(g,r,c,n)){
+            g[r][c]=n;
+            if(sdkFillGrid(g)) return true;
+            g[r][c]=0;
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+function sdkCountSolutions(g, limit){
+  let count=0;
+  function solve(){
+    for(let r=0;r<9;r++){
+      for(let c=0;c<9;c++){
+        if(g[r][c]===0){
+          for(let n=1;n<=9;n++){
+            if(count>=limit) return;
+            if(sdkIsSafe(g,r,c,n)){
+              g[r][c]=n;
+              solve();
+              g[r][c]=0;
+              if(count>=limit) return;
+            }
+          }
+          return;
+        }
+      }
+    }
+    count++;
+  }
+  solve();
+  return count;
+}
+function sdkGeneratePuzzle(targetClues){
+  const solved = Array.from({length:9},()=>Array(9).fill(0));
+  sdkFillGrid(solved);
+  const puzzle = solved.map(row=>row.slice());
+  const positions = []; for(let i=0;i<81;i++) positions.push(i);
+  shuffle(positions);
+  let clues = 81;
+  for(const pos of positions){
+    if(clues<=targetClues) break;
+    const r=(pos/9)|0, c=pos%9;
+    if(puzzle[r][c]===0) continue;
+    const backup = puzzle[r][c];
+    puzzle[r][c]=0;
+    const copy = puzzle.map(row=>row.slice());
+    const solCount = sdkCountSolutions(copy, 2);
+    if(solCount!==1){ puzzle[r][c]=backup; } else { clues--; }
+  }
+  return {puzzle, solved};
+}
+function startSudoku(){
+  const btn=document.getElementById('sudoku-start-btn');
+  btn.disabled=true; btn.textContent='Generating…';
+  setTimeout(()=>{
+    const {puzzle,solved} = sdkGeneratePuzzle(SDK_DIFF_CLUES[sdkDifficulty]);
+    sdk = {
+      solved,
+      values: puzzle.map(row=>row.slice()),
+      given: puzzle.map(row=>row.map(v=>v!==0)),
+      notes: Array.from({length:9},()=>Array.from({length:9},()=>new Set())),
+      selR:-1, selC:-1, mistakes:0, notesMode:false, seconds:0, over:false, won:false
+    };
+    document.getElementById('sudoku-setup-overlay').style.display='none';
+    document.getElementById('sudoku-app').style.display='block';
+    document.getElementById('sdk-diff-badge').textContent = 'Level: '+sdkDifficulty[0].toUpperCase()+sdkDifficulty.slice(1);
+    document.getElementById('sudoku-gameover').className='';
+    document.getElementById('sdk-notes-btn').classList.remove('active');
+    buildSdkBoard();
+    renderSdk();
+    updateSdkTimer();
+    sdkResumeTimer();
+    btn.disabled=false; btn.textContent='▶ Start Game';
+    toast('New Sudoku! '+sdkDifficulty+' difficulty.');
+  }, 30);
+}
+function newSudokuGame(){
+  document.getElementById('sudoku-app').style.display='none';
+  document.getElementById('sudoku-setup-overlay').style.display='flex';
+  sdkPauseTimer();
+}
+function sdkPauseTimer(){ if(sdkTimerId){ clearInterval(sdkTimerId); sdkTimerId=null; } }
+function sdkResumeTimer(){ if(sdk && !sdk.over && !sdkTimerId){ sdkTimerId=setInterval(()=>{ sdk.seconds++; updateSdkTimer(); },1000); } }
+function updateSdkTimer(){
+  if(!sdk) return;
+  const m=(0|sdk.seconds/60), s=sdk.seconds%60;
+  document.getElementById('sdk-timer').textContent = m+':'+String(s).padStart(2,'0');
+}
+function buildSdkBoard(){
+  const board=document.getElementById('sudoku-board');
+  board.innerHTML='';
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const cell=document.createElement('div');
+      cell.className='sdk-cell';
+      cell.id='sdk-cell-'+r+'-'+c;
+      if(r===2||r===5) cell.classList.add('sdk-row-thick');
+      cell.onclick=()=>sdkSelectCell(r,c);
+      board.appendChild(cell);
+    }
+  }
+}
+function sdkSelectCell(r,c){
+  if(!sdk||sdk.over) return;
+  sdk.selR=r; sdk.selC=c; renderSdk();
+}
+function sdkInputNumber(n){
+  if(!sdk||sdk.over) return;
+  const r=sdk.selR, c=sdk.selC;
+  if(r<0||c<0||sdk.given[r][c]) return;
+  if(sdk.notesMode){
+    if(sdk.values[r][c]!==0) return;
+    const set=sdk.notes[r][c];
+    if(set.has(n)) set.delete(n); else set.add(n);
+    renderSdk(); return;
+  }
+  sdk.values[r][c]=n;
+  sdk.notes[r][c].clear();
+  if(n!==sdk.solved[r][c]){
+    sdk.mistakes++;
+    if(sdk.mistakes>=3){ renderSdk(); sdkGameOver(false); return; }
+  }
+  renderSdk();
+  sdkCheckWin();
+}
+function sdkErase(){
+  if(!sdk||sdk.over) return;
+  const r=sdk.selR, c=sdk.selC;
+  if(r<0||c<0||sdk.given[r][c]) return;
+  sdk.values[r][c]=0; sdk.notes[r][c].clear();
+  renderSdk();
+}
+function sdkToggleNotes(){
+  if(!sdk) return;
+  sdk.notesMode=!sdk.notesMode;
+  document.getElementById('sdk-notes-btn').classList.toggle('active', sdk.notesMode);
+}
+function sdkHint(){
+  if(!sdk||sdk.over) return;
+  let r=sdk.selR, c=sdk.selC;
+  if(r<0||c<0||sdk.given[r][c]||sdk.values[r][c]===sdk.solved[r][c]){
+    const cands=[];
+    for(let i=0;i<9;i++) for(let j=0;j<9;j++) if(!sdk.given[i][j] && sdk.values[i][j]!==sdk.solved[i][j]) cands.push([i,j]);
+    if(!cands.length){ toast('No hints needed!'); return; }
+    [r,c]=cands[0|Math.random()*cands.length];
+  }
+  sdk.values[r][c]=sdk.solved[r][c]; sdk.notes[r][c].clear();
+  sdk.selR=r; sdk.selC=c;
+  renderSdk();
+  const el=document.getElementById('sdk-cell-'+r+'-'+c);
+  el.classList.add('hint-flash'); setTimeout(()=>el.classList.remove('hint-flash'),700);
+  sdkCheckWin();
+}
+function sdkCheckWin(){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(sdk.values[r][c]!==sdk.solved[r][c]) return;
+  sdkGameOver(true);
+}
+function sdkGameOver(won){
+  sdk.over=true; sdk.won=won;
+  sdkPauseTimer();
+  const banner=document.getElementById('sudoku-gameover');
+  banner.className='show '+(won?'win':'lose');
+  document.getElementById('sdk-banner-title').textContent = won?'\u{1F3C6} Solved!':'❌ Game Over';
+  document.getElementById('sdk-banner-msg').textContent = won
+    ? `You solved it in ${document.getElementById('sdk-timer').textContent} with ${sdk.mistakes} mistake(s).`
+    : 'Too many mistakes. Give it another go!';
+  if(won){
+    const rect=document.getElementById('sudoku-board').getBoundingClientRect();
+    fireConfettiBurst(rect.left+rect.width/2, rect.top+rect.height/2);
+  }
+}
+function renderSdk(){
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const el=document.getElementById('sdk-cell-'+r+'-'+c);
+      const v=sdk.values[r][c];
+      el.classList.remove('given','user','wrong','selected','peer','same-num');
+      el.innerHTML='';
+      if(v!==0){
+        el.textContent=v;
+        if(sdk.given[r][c]) el.classList.add('given');
+        else el.classList.add(v===sdk.solved[r][c]?'user':'wrong');
+      } else if(sdk.notes[r][c].size){
+        const wrap=document.createElement('div'); wrap.className='sdk-notes';
+        for(let n=1;n<=9;n++){ const s=document.createElement('span'); s.textContent=sdk.notes[r][c].has(n)?n:''; wrap.appendChild(s); }
+        el.appendChild(wrap);
+      }
+      if(sdk.selR===r&&sdk.selC===c) el.classList.add('selected');
+      else if(sdk.selR>=0){
+        const sameBox = (Math.floor(r/3)===Math.floor(sdk.selR/3) && Math.floor(c/3)===Math.floor(sdk.selC/3));
+        if(r===sdk.selR||c===sdk.selC||sameBox) el.classList.add('peer');
+        const selVal=sdk.values[sdk.selR][sdk.selC];
+        if(selVal!==0 && v===selVal) el.classList.add('same-num');
+      }
+    }
+  }
+  document.getElementById('sdk-mistakes').textContent = sdk.mistakes+'/3';
+}
+document.addEventListener('keydown', (e)=>{
+  const scr=document.getElementById('screen-sudoku');
+  if(!scr || scr.style.display==='none') return;
+  if(!sdk||sdk.over||sdk.selR<0) return;
+  if(e.key>='1'&&e.key<='9'){ sdkInputNumber(parseInt(e.key,10)); }
+  else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){ sdkErase(); }
+  else if(e.key==='ArrowUp'){ sdk.selR=Math.max(0,sdk.selR-1); renderSdk(); }
+  else if(e.key==='ArrowDown'){ sdk.selR=Math.min(8,sdk.selR+1); renderSdk(); }
+  else if(e.key==='ArrowLeft'){ sdk.selC=Math.max(0,sdk.selC-1); renderSdk(); }
+  else if(e.key==='ArrowRight'){ sdk.selC=Math.min(8,sdk.selC+1); renderSdk(); }
+});
+
+// =====================================================================
+// WORD SEARCH GAME
+// =====================================================================
+const WP_CATEGORIES = {
+  animals:  { label:'Animals',  words:['TIGER','ELEPHANT','GIRAFFE','DOLPHIN','KANGAROO','PENGUIN','CHEETAH','OCTOPUS','RACCOON','PANTHER','FALCON','ZEBRA','COYOTE','OTTER','WALRUS','IGUANA','JAGUAR','LEMUR','MEERKAT','GAZELLE','HEDGEHOG','FLAMINGO','ANTELOPE','BADGER','CAMEL','BISON'] },
+  countries:{ label:'Countries',words:['CANADA','BRAZIL','FRANCE','GERMANY','JAPAN','EGYPT','MEXICO','NORWAY','SWEDEN','GREECE','TURKEY','KENYA','CHINA','INDIA','SPAIN','ITALY','CHILE','PERU','CUBA','POLAND','FINLAND','ICELAND','VIETNAM','THAILAND','MOROCCO','PORTUGAL'] },
+  food:     { label:'Food',     words:['MANGO','BANANA','ORANGE','PAPAYA','LYCHEE','CARROT','POTATO','PUMPKIN','SPINACH','CABBAGE','AVOCADO','COCONUT','PINEAPPLE','BROCCOLI','CUCUMBER','RADISH','LETTUCE','ONION','GARLIC','GINGER','TOMATO','GUAVA','WAFFLE','NOODLE'] },
+  space:    { label:'Space',    words:['GALAXY','PLANET','COMET','METEOR','NEBULA','ASTEROID','SATELLITE','ROCKET','ASTRONAUT','ORBIT','TELESCOPE','SATURN','JUPITER','MERCURY','URANUS','NEPTUNE','ECLIPSE','COSMOS','GRAVITY','STARDUST','SUPERNOVA','MILKYWAY'] },
+  sports:   { label:'Sports',   words:['CRICKET','FOOTBALL','TENNIS','HOCKEY','RUGBY','BOXING','CYCLING','SWIMMING','VOLLEYBALL','BADMINTON','WRESTLING','ARCHERY','BOWLING','SPRINT','MARATHON','SKATING','SURFING','GOLF','KARATE','JUDO'] }
+};
+const WP_DIFF = { easy:{size:10,count:8}, medium:{size:12,count:12}, hard:{size:15,count:16} };
+const WP_COLORS = ['#ec4899','#3498db','#2ecc71','#f5c842','#a855f7','#e67e22','#1abc9c','#e74c3c','#818cf8','#f472b6','#38bdf8','#84cc16'];
+const WP_DIRS = [[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+
+let wpCategory='animals', wpDifficulty='medium';
+let wp=null;
+let wpTimerId=null;
+let wpDragging=false, wpStartCell=null, wpPath=[];
+
+function selectWPCategory(cat){
+  wpCategory=cat;
+  Object.keys(WP_CATEGORIES).forEach(k=>document.getElementById('wp-cat-'+k).classList.toggle('active',k===cat));
+}
+function selectWPDifficulty(d){
+  wpDifficulty=d;
+  ['easy','medium','hard'].forEach(k=>document.getElementById('wp-diff-'+k).classList.toggle('active',k===d));
+}
+function wpBuildGrid(size, words){
+  const grid=Array.from({length:size},()=>Array(size).fill(null));
+  const placed=[];
+  const sorted=[...words].sort((a,b)=>b.length-a.length);
+  for(const word of sorted){
+    let ok=false;
+    for(let attempt=0; attempt<300 && !ok; attempt++){
+      const dir=WP_DIRS[0|Math.random()*WP_DIRS.length];
+      const r0=0|Math.random()*size, c0=0|Math.random()*size;
+      const rEnd=r0+dir[0]*(word.length-1), cEnd=c0+dir[1]*(word.length-1);
+      if(rEnd<0||rEnd>=size||cEnd<0||cEnd>=size) continue;
+      let fits=true;
+      for(let i=0;i<word.length;i++){
+        const r=r0+dir[0]*i, c=c0+dir[1]*i;
+        const cell=grid[r][c];
+        if(cell!==null&&cell!==word[i]){ fits=false; break; }
+      }
+      if(!fits) continue;
+      for(let i=0;i<word.length;i++){ const r=r0+dir[0]*i,c=c0+dir[1]*i; grid[r][c]=word[i]; }
+      placed.push({word,r0,c0,dir});
+      ok=true;
+    }
+  }
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(grid[r][c]===null) grid[r][c]=letters[0|Math.random()*26];
+  return {grid,placed};
+}
+function startWordPuzzle(){
+  const cfg=WP_DIFF[wpDifficulty];
+  const catWords=WP_CATEGORIES[wpCategory].words.filter(w=>w.length<=cfg.size);
+  const pool=[...catWords]; shuffle(pool);
+  const chosen=pool.slice(0,cfg.count);
+  const {grid,placed}=wpBuildGrid(cfg.size, chosen);
+  wp={ size:cfg.size, grid, words:placed, found:new Set(), seconds:0, over:false, colorIdx:0 };
+  document.getElementById('wp-setup-overlay').style.display='none';
+  document.getElementById('wp-app').style.display='block';
+  document.getElementById('wp-cat-badge').textContent=WP_CATEGORIES[wpCategory].label;
+  document.getElementById('wp-winbanner').className='';
+  buildWPBoard();
+  buildWPWordList();
+  updateWPFoundCount();
+  updateWPTimer();
+  wpResumeTimer();
+  toast('Find all '+placed.length+' words!');
+}
+function newWordPuzzle(){
+  document.getElementById('wp-app').style.display='none';
+  document.getElementById('wp-setup-overlay').style.display='flex';
+  wpPauseTimer();
+}
+function wpRegenerate(){ startWordPuzzle(); }
+function wpPauseTimer(){ if(wpTimerId){ clearInterval(wpTimerId); wpTimerId=null; } }
+function wpResumeTimer(){ if(wp && !wp.over && !wpTimerId){ wpTimerId=setInterval(()=>{ wp.seconds++; updateWPTimer(); },1000); } }
+function updateWPTimer(){
+  if(!wp) return;
+  const m=(0|wp.seconds/60), s=wp.seconds%60;
+  document.getElementById('wp-timer').textContent=m+':'+String(s).padStart(2,'0');
+}
+function buildWPBoard(){
+  const gridEl=document.getElementById('wp-grid');
+  gridEl.innerHTML='';
+  gridEl.style.gridTemplateColumns='repeat('+wp.size+',1fr)';
+  gridEl.style.gridTemplateRows='repeat('+wp.size+',1fr)';
+  for(let r=0;r<wp.size;r++){
+    for(let c=0;c<wp.size;c++){
+      const cell=document.createElement('div');
+      cell.className='wp-cell';
+      cell.id='wp-cell-'+r+'-'+c;
+      cell.textContent=wp.grid[r][c];
+      cell.dataset.r=r; cell.dataset.c=c;
+      cell.addEventListener('pointerdown', wpPointerDown);
+      gridEl.appendChild(cell);
+    }
+  }
+  if(!gridEl.dataset.bound){
+    gridEl.addEventListener('pointermove', wpPointerMove);
+    gridEl.addEventListener('pointerup', wpPointerUp);
+    gridEl.addEventListener('pointercancel', wpPointerUp);
+    gridEl.dataset.bound='1';
+  }
+}
+function buildWPWordList(){
+  const list=document.getElementById('wp-word-list-items');
+  list.innerHTML='';
+  wp.words.slice().sort((a,b)=>a.word.localeCompare(b.word)).forEach(w=>{
+    const item=document.createElement('div');
+    item.className='wp-word-item';
+    item.id='wp-word-'+w.word;
+    item.innerHTML='<span class="wp-dot"></span>'+w.word;
+    list.appendChild(item);
+  });
+}
+function wpCellAt(clientX, clientY){
+  const el=document.elementFromPoint(clientX, clientY);
+  if(!el || !el.classList.contains('wp-cell')) return null;
+  return {r:parseInt(el.dataset.r,10), c:parseInt(el.dataset.c,10)};
+}
+function wpPointerDown(e){
+  if(!wp||wp.over) return;
+  e.preventDefault();
+  const cell=wpCellAt(e.clientX,e.clientY);
+  if(!cell) return;
+  wpDragging=true; wpStartCell=cell; wpPath=[cell];
+  document.getElementById('wp-grid').setPointerCapture(e.pointerId);
+  wpRenderPath();
+}
+function wpPointerMove(e){
+  if(!wpDragging||!wp||wp.over) return;
+  const cell=wpCellAt(e.clientX,e.clientY);
+  if(!cell) return;
+  const dr=cell.r-wpStartCell.r, dc=cell.c-wpStartCell.c;
+  const steps=Math.max(Math.abs(dr),Math.abs(dc));
+  if(steps===0){ wpPath=[wpStartCell]; wpRenderPath(); return; }
+  if(dr!==0 && dc!==0 && Math.abs(dr)!==Math.abs(dc)) return;
+  const stepR = dr===0?0:dr/Math.abs(dr), stepC = dc===0?0:dc/Math.abs(dc);
+  const path=[];
+  for(let i=0;i<=steps;i++){
+    const r=wpStartCell.r+stepR*i, c=wpStartCell.c+stepC*i;
+    if(r<0||r>=wp.size||c<0||c>=wp.size) return;
+    path.push({r,c});
+  }
+  wpPath=path;
+  wpRenderPath();
+}
+function wpPointerUp(e){
+  if(!wpDragging) return;
+  wpDragging=false;
+  wpTryMatchPath();
+  wpPath=[]; wpRenderPath();
+}
+function wpRenderPath(){
+  document.querySelectorAll('.wp-cell.active-drag').forEach(el=>el.classList.remove('active-drag'));
+  wpPath.forEach(p=>{
+    const el=document.getElementById('wp-cell-'+p.r+'-'+p.c);
+    if(el) el.classList.add('active-drag');
+  });
+}
+function wpTryMatchPath(){
+  if(wpPath.length<2) return;
+  const str = wpPath.map(p=>wp.grid[p.r][p.c]).join('');
+  const rev = str.split('').reverse().join('');
+  const match = wp.words.find(w=>!wp.found.has(w.word) && (w.word===str||w.word===rev));
+  if(!match) return;
+  wp.found.add(match.word);
+  const color = WP_COLORS[wp.colorIdx % WP_COLORS.length]; wp.colorIdx++;
+  wpPath.forEach(p=>{
+    const el=document.getElementById('wp-cell-'+p.r+'-'+p.c);
+    el.classList.add('found');
+    el.style.background=color;
+    el.style.color='#fff';
+  });
+  const item=document.getElementById('wp-word-'+match.word);
+  item.classList.add('found');
+  item.querySelector('.wp-dot').style.background=color;
+  updateWPFoundCount();
+  toast('Found '+match.word+'! ✅');
+  if(wp.found.size===wp.words.length) wpGameWin();
+}
+function updateWPFoundCount(){
+  document.getElementById('wp-found-count').textContent = wp.found.size+'/'+wp.words.length;
+}
+function wpGameWin(){
+  wp.over=true;
+  wpPauseTimer();
+  const banner=document.getElementById('wp-winbanner');
+  banner.className='show';
+  document.getElementById('wp-win-msg').textContent = `You found all ${wp.words.length} words in ${document.getElementById('wp-timer').textContent}!`;
+  const rect=document.getElementById('wp-grid').getBoundingClientRect();
+  fireConfettiBurst(rect.left+rect.width/2, rect.top+rect.height/2);
+}
+
+// =====================================================================
 // CONTACT DROPDOWN
 // =====================================================================
 function toggleContactDrop(e) {
@@ -2532,6 +3393,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
   document.querySelectorAll('.tn-reveal').forEach(el => revealObs.observe(el));
+});
+
+// =====================================================================
+// LANDING SCROLL PROGRESS BAR
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const fill = document.getElementById('tn-progress-fill');
+  if (!fill) return;
+  function updateProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    fill.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
 });
 </script>
 </body>
