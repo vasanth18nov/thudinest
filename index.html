@@ -1043,6 +1043,51 @@ body {
   .tn-strip-item:nth-last-child(2) { border-bottom: none; }
 }
 
+/* Stay & Play split (top-of-page dual CTA) */
+.tn-split-wrap { max-width: 1080px; margin: 0 auto; padding: 56px 24px 8px; position: relative; z-index: 2; }
+.tn-split { display: flex; gap: 20px; flex-wrap: wrap; }
+.tn-split-card {
+  flex: 1 1 320px; border-radius: 22px; padding: 34px 30px;
+  position: relative; overflow: hidden; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tn-split-card:hover { transform: translateY(-7px); }
+.tn-split-card.stay  { background: linear-gradient(160deg, rgba(245,200,66,0.14), rgba(245,200,66,0.02)); box-shadow: 0 20px 60px rgba(245,200,66,0.07); }
+.tn-split-card.games { background: linear-gradient(160deg, rgba(168,85,247,0.18), rgba(129,140,248,0.03)); box-shadow: 0 20px 60px rgba(168,85,247,0.1); }
+.tn-split-card.stay:hover  { box-shadow: 0 26px 70px rgba(245,200,66,0.24); border-color: rgba(245,200,66,0.4); }
+.tn-split-card.games:hover { box-shadow: 0 26px 70px rgba(168,85,247,0.3);  border-color: rgba(168,85,247,0.42); }
+.tn-split-badge {
+  position: absolute; top: 20px; right: 20px; font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 11px; border-radius: 20px;
+}
+.tn-split-card.stay  .tn-split-badge { background: rgba(245,200,66,0.18); color: #f5c842; border: 1px solid rgba(245,200,66,0.35); }
+.tn-split-card.games .tn-split-badge { background: rgba(168,85,247,0.2);  color: #d3b3fc; border: 1px solid rgba(168,85,247,0.4); }
+.tn-split-icon   { font-size: 2.6rem; display: block; margin-bottom: 16px; }
+.tn-split-kicker { font-size: 0.66rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+.tn-split-card.stay  .tn-split-kicker { color: #f5c842; }
+.tn-split-card.games .tn-split-kicker { color: #c19bfa; }
+.tn-split-ttl { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.25; }
+.tn-split-sub { font-size: 0.87rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 22px; max-width: 420px; }
+.tn-split-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
+.tn-split-cta {
+  display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px;
+  border-radius: 12px; font-weight: 800; font-size: 0.85rem; text-decoration: none;
+  border: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+}
+.tn-split-cta:hover { opacity: 0.88; transform: translateY(-2px); }
+.tn-split-card.stay  .tn-split-cta { background: #f5c842; color: #262013; }
+.tn-split-card.games .tn-split-cta { background: linear-gradient(135deg,#a855f7,#818cf8); color: #fff; }
+@media (max-width: 720px) {
+  .tn-split { flex-direction: column; }
+}
+@media (max-width: 480px) {
+  .tn-split-wrap { padding: 44px 18px 4px; }
+  .tn-split-card { padding: 28px 22px; border-radius: 18px; }
+  .tn-split-ttl { font-size: 1.28rem; }
+}
+
 /* Section layout */
 .tn-sec {
   padding: 72px 24px; max-width: 1080px; margin: 0 auto; width: 100%;
@@ -1135,26 +1180,6 @@ body {
 .tn-rule.warn .tn-rule-txt { color: rgba(255,175,165,0.92); }
 .tn-rule.warn .tn-rule-txt strong { color: #ffa099; }
 
-/* Games promo */
-.tn-games-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
-.tn-games-card {
-  position: relative; overflow: hidden; border-radius: 22px;
-  padding: 56px 40px; text-align: center;
-  background: radial-gradient(ellipse at 50% 0%, #1c1440 0%, #0a0a1a 100%);
-  border: 1px solid rgba(255,255,255,0.09);
-}
-.tn-games-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.2), transparent 68%);
-}
-.tn-games-inner { position: relative; z-index: 1; }
-.tn-games-emoji { font-size: 3.2rem; display: block; margin-bottom: 18px; }
-.tn-games-ttl { font-size: 1.9rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.tn-games-sub {
-  color: rgba(255,255,255,0.44); font-size: 0.9rem; line-height: 1.65;
-  max-width: 370px; margin: 0 auto 28px;
-}
-.tn-game-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
 .tn-pill {
   padding: 6px 16px; border-radius: 100px;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; border: 1px solid;
@@ -1176,7 +1201,6 @@ body {
   .tn-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 210px 160px; }
   .tn-photo:first-child { grid-column: span 2; grid-row: span 1; }
   .tn-sec { padding: 52px 20px; }
-  .tn-games-card { padding: 36px 22px; }
   .tn-hero { padding: 40px 20px 70px; }
 }
 @media (max-width: 480px) {
@@ -1388,11 +1412,11 @@ a.tn-location-pill:hover {
 }
 
 /* Games card purple glow */
-.tn-games-card {
+.tn-split-card.games {
   box-shadow: 0 0 60px rgba(168,85,247,0.14), 0 20px 60px rgba(0,0,0,0.45);
-  transition: box-shadow 0.4s;
+  transition: box-shadow 0.4s, transform 0.3s ease, border-color 0.3s ease;
 }
-.tn-games-card:hover { box-shadow: 0 0 90px rgba(168,85,247,0.25), 0 20px 80px rgba(0,0,0,0.5); }
+.tn-split-card.games:hover { box-shadow: 0 0 90px rgba(168,85,247,0.25), 0 20px 80px rgba(0,0,0,0.5); }
 
 /* Game Hub "Thudinest" title -- rainbow animated */
 @keyframes tn-hub-glow {
@@ -1415,7 +1439,7 @@ a.tn-location-pill:hover {
   font-family: 'Fraunces', Georgia, serif; font-weight: 600;
   text-shadow: 0 14px 60px rgba(245,200,66,0.18), 0 6px 30px rgba(0,0,0,0.55);
 }
-.tn-heading, .tn-games-ttl {
+.tn-heading, .tn-split-ttl {
   font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.5px;
 }
 
@@ -1491,9 +1515,8 @@ a.tn-location-pill:hover {
 }
 .tn-airbnb .tn-book-ico { background: rgba(255,255,255,0.18); }
 
-/* Games promo: gradient ring */
-.tn-games-card { position: relative; }
-.tn-games-card::before {
+/* Games card: gradient ring */
+.tn-split-card.games::after {
   content: ''; position: absolute; inset: -1px; border-radius: 22px; padding: 1px;
   background: linear-gradient(135deg, rgba(245,200,66,0.5), rgba(168,85,247,0.5), rgba(236,72,153,0.4));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1621,13 +1644,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .tn-wa-row .tn-book-btn { width: 100%; min-width: 0; }
   .tn-book-btn { padding: 14px 16px; border-radius: 12px; }
 
-  /* Games promo card */
-  .tn-games-wrap { padding: 0 18px 56px; }
-  .tn-games-card { padding: 40px 20px; border-radius: 18px; }
-  .tn-games-ttl { font-size: 1.5rem; }
-  .tn-games-emoji { font-size: 2.6rem; margin-bottom: 14px; }
-  .tn-game-pills { gap: 7px; }
-
   /* Footer */
   .tn-footer { padding: 32px 18px; font-size: 0.72rem; }
   .tn-footer-links { gap: 6px 14px; }
@@ -1645,9 +1661,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .tn-location-pill { max-width: 230px; font-size: 0.52rem; }
   .tn-hero-name { letter-spacing: -3px; }
   .tn-sec { padding: 38px 16px; }
-  .tn-game-pills .tn-pill { font-size: 0.7rem; padding: 5px 11px; }
-  .tn-games-card { padding: 32px 16px; }
-  .tn-games-sub { font-size: 0.82rem; }
   .game-card { width: 140px; padding: 22px 12px; }
   .game-cards { gap: 12px; }
 }
@@ -1713,6 +1726,33 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     </div>
     <div class="tn-scroll-hint"><span>Scroll</span><span style="font-size:0.95rem">&#8595;</span></div>
   </section>
+
+  <!-- Stay & Play &#8212; side by side -->
+  <div class="tn-split-wrap">
+    <div class="tn-split">
+      <div class="tn-split-card stay" onclick="window.open('https://airbnb.com/h/thudinest','_blank')">
+        <span class="tn-split-badge">Book Now</span>
+        <span class="tn-split-icon">&#127968;</span>
+        <div class="tn-split-kicker">Stay With Us</div>
+        <h3 class="tn-split-ttl">Reserve Your Getaway</h3>
+        <p class="tn-split-sub">A cozy container home right on MTP Road, Thudiyalur &#8212; instant booking, easy parking &amp; free Wi-Fi.</p>
+        <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-split-cta" onclick="event.stopPropagation()">&#128197; Book on Airbnb</a>
+      </div>
+      <div class="tn-split-card games" onclick="showScreen('home')">
+        <span class="tn-split-badge">Free to Play</span>
+        <span class="tn-split-icon">&#127918;</span>
+        <div class="tn-split-kicker">Game Hub</div>
+        <h3 class="tn-split-ttl">9 Games, Zero Downloads</h3>
+        <p class="tn-split-sub">Rummy, Chess, Ping Pong, Sudoku, Word Search, Darts, Snake, Pac-Bot &amp; Robo Jump &#8212; all playable right in your browser.</p>
+        <div class="tn-split-pills">
+          <span class="tn-pill green">&#127183; Rummy</span>
+          <span class="tn-pill gold">&#9823; Chess</span>
+          <span class="tn-pill purple">&#127955; Ping Pong</span>
+        </div>
+        <button class="tn-split-cta" onclick="event.stopPropagation(); showScreen('home')">&#9654; Play Now</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Feature strip -->
   <div class="tn-strip">
@@ -1839,26 +1879,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
             <span class="tn-book-lab-sub">+91 70927 13486</span>
           </span>
         </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Games Promo -->
-  <div class="tn-games-wrap">
-    <div class="tn-games-card">
-      <div class="tn-games-inner">
-        <span class="tn-games-emoji">&#127918;</span>
-        <h3 class="tn-games-ttl">Thudinest Game Hub</h3>
-        <p class="tn-games-sub">9 games built right in &#8212; Rummy, Chess, Pac-Bot and more, no download needed.</p>
-        <div class="tn-game-pills">
-          <span class="tn-pill green">&#127183; Indian Rummy</span>
-          <span class="tn-pill gold">&#9823; Chess</span>
-          <span class="tn-pill purple">&#127955; Ping Pong</span>
-          <span class="tn-pill green">&#128013; Snake</span>
-          <span class="tn-pill gold">&#129302; Pac-Bot</span>
-          <span class="tn-pill purple">&#127939; Robo Jump</span>
-        </div>
-        <button class="tn-btn-gold" onclick="showScreen('home')" style="margin:0 auto;display:inline-flex">&#9654; &nbsp;Play Now</button>
       </div>
     </div>
   </div>
