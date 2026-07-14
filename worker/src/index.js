@@ -58,6 +58,9 @@ export default {
       if (url.pathname === "/api/page" && request.method === "GET") {
         return withCors(await handleGetPage(url, env));
       }
+      if (url.pathname === "/api/delete" && request.method === "POST") {
+        return withCors(await handleDeletePage(request, env));
+      }
     } catch (err) {
       return withCors(json({ ok: false, error: `Server error: ${err.message}` }, 500));
     }
@@ -140,6 +143,32 @@ async function ghListDir(env, path) {
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`GitHub GET ${path} failed (${res.status})`);
   return res.json();
+}
+
+async function ghDeleteFile(env, path, sha, message) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
+    {
+      method: "DELETE",
+      headers: ghHeaders(env),
+      body: JSON.stringify({ message, sha, branch: "main" }),
+    }
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`GitHub DELETE ${path} failed (${res.status}): ${text}`);
+  }
+}
+
+async function deleteDirRecursive(env, dirPath, message) {
+  const entries = await ghListDir(env, dirPath);
+  for (const entry of entries) {
+    if (entry.type === "dir") {
+      await deleteDirRecursive(env, entry.path, message);
+    } else if (entry.type === "file") {
+      await ghDeleteFile(env, entry.path, entry.sha, message);
+    }
+  }
 }
 
 async function ghPutFile(env, path, base64Content, message, sha) {
@@ -420,6 +449,31 @@ async function handleGetPage(url, env) {
       logo: meta.logo || null,
     },
   });
+}
+
+async function handleDeletePage(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "Invalid request." }, 400);
+  }
+
+  if (String(body.adminCode || "").trim() !== ADMIN_ACCESS_CODE) {
+    return json({ ok: false, error: "Invalid admin code." }, 401);
+  }
+
+  const slug = String(body.slug || "").trim().toLowerCase();
+  if (!slug) return json({ ok: false, error: "Missing slug." }, 400);
+
+  const dirPath = `p/${slug}`;
+  const entries = await ghListDir(env, dirPath);
+  if (entries.length === 0) {
+    return json({ ok: false, error: `No page found for "${slug}".` }, 404);
+  }
+
+  await deleteDirRecursive(env, dirPath, `Delete page: ${slug}`);
+  return json({ ok: true });
 }
 
 async function handlePublish(request, env) {

@@ -263,14 +263,37 @@
           </div>
           <div style="display:flex;gap:8px">
             <a class="btn-mini" href="https://thudinest.com/p/${encodeURIComponent(p.slug)}/" target="_blank" rel="noopener" style="text-decoration:none">View</a>
-            <button class="btn-mini" data-slug="${escapeHtml(p.slug)}">Edit</button>
+            <button class="btn-mini" data-edit-slug="${escapeHtml(p.slug)}">Edit</button>
+            <button class="btn-mini" data-delete-slug="${escapeHtml(p.slug)}" style="color:#fca5a5;border-color:rgba(248,113,113,0.4)">Delete</button>
           </div>
         </div>`;
       })
       .join("");
-    listEl.querySelectorAll("button[data-slug]").forEach((btn) => {
-      btn.addEventListener("click", () => openEdit(btn.dataset.slug));
+    listEl.querySelectorAll("button[data-edit-slug]").forEach((btn) => {
+      btn.addEventListener("click", () => openEdit(btn.dataset.editSlug));
     });
+    listEl.querySelectorAll("button[data-delete-slug]").forEach((btn) => {
+      btn.addEventListener("click", () => deletePage(btn.dataset.deleteSlug));
+    });
+  }
+
+  async function deletePage(slug) {
+    if (!confirm(`Delete the page "${slug}"? This removes it from the live site immediately and can't be undone from here.`)) {
+      return;
+    }
+    const res = await fetch(`${WORKER_BASE}/api/delete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminCode, slug }),
+    });
+    const data = await res.json();
+    const listBanner = document.getElementById("listBanner");
+    if (data.ok) {
+      listBanner.innerHTML = `<div class="banner success">Deleted "${escapeHtml(slug)}".</div>`;
+      await loadList();
+    } else {
+      listBanner.innerHTML = `<div class="banner error">${escapeHtml(data.error || "Couldn't delete.")}</div>`;
+    }
   }
 
   function escapeHtml(s) {
