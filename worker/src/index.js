@@ -3,9 +3,14 @@ const GITHUB_API = "https://api.github.com";
 const ALLOWED_ORIGIN = "https://thudinest.com";
 
 const THEMES = {
-  retail: { label: "Retail", color: "#16a34a", dark: "#0f7a37", light: "#dcfce7" },
-  education: { label: "Education", color: "#2563eb", dark: "#1d4ed8", light: "#dbeafe" },
-  industry: { label: "Industry", color: "#d97706", dark: "#b45309", light: "#fef3c7" },
+  retail: { label: "Retail", icon: "&#128717;", color: "#16a34a", dark: "#0f7a37", light: "#dcfce7" },
+  education: { label: "Education", icon: "&#127891;", color: "#2563eb", dark: "#1d4ed8", light: "#dbeafe" },
+  industry: { label: "Industry", icon: "&#127981;", color: "#d97706", dark: "#b45309", light: "#fef3c7" },
+  construction: { label: "Construction", icon: "&#127959;", color: "#ea580c", dark: "#c2410c", light: "#ffedd5" },
+  automobile: { label: "Automobile", icon: "&#128663;", color: "#dc2626", dark: "#b91c1c", light: "#fee2e2" },
+  healthcare: { label: "Healthcare", icon: "&#127973;", color: "#0d9488", dark: "#0f766e", light: "#ccfbf1" },
+  food: { label: "Food & Dining", icon: "&#127869;", color: "#e11d48", dark: "#be123c", light: "#ffe4e6" },
+  services: { label: "Professional Services", icon: "&#128188;", color: "#4f46e5", dark: "#4338ca", light: "#e0e7ff" },
 };
 
 export default {
@@ -116,7 +121,7 @@ function buildInfoRow(label, value) {
   return `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`;
 }
 
-function renderPage({ businessName, theme, description, phone, whatsapp, email, address, images }) {
+function renderPage({ businessName, theme, description, phone, whatsapp, email, address, images, logo }) {
   const t = THEMES[theme] || THEMES.retail;
   const gallery =
     images.length > 0
@@ -135,6 +140,9 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
   const actions = [buildActionButton("phone", phone), buildActionButton("whatsapp", whatsapp)]
     .filter(Boolean)
     .join("");
+  const avatar = logo
+    ? `<img class="avatar" src="${esc(logo)}" alt="${esc(businessName)} logo">`
+    : `<div class="avatar avatar-fallback">${t.icon}</div>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -157,21 +165,38 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
     color: #fff; min-height: 100vh;
   }
   .hero {
-    padding: 64px 24px 48px; text-align: center; position: relative; overflow: hidden;
+    padding: 56px 24px 48px; text-align: center; position: relative; overflow: hidden;
     background: linear-gradient(160deg, ${t.color}33, transparent 60%);
     border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .hero .watermark {
+    position: absolute; top: -40px; right: -30px; font-size: 11rem; opacity: 0.06;
+    transform: rotate(-12deg); pointer-events: none; line-height: 1;
+  }
+  .avatar {
+    width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+    border: 3px solid ${t.color}88; box-shadow: 0 8px 30px ${t.color}55;
+    margin: 0 auto 18px; display: block; position: relative; z-index: 1;
+  }
+  .avatar-fallback {
+    display: flex; align-items: center; justify-content: center; font-size: 2.4rem;
+    background: linear-gradient(160deg, ${t.color}, ${t.dark});
   }
   .hero .badge {
     display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px;
     font-weight: 700; background: ${t.color}2e; color: ${t.light}; border: 1px solid ${t.color}66;
-    border-radius: 999px; padding: 6px 16px; margin-bottom: 18px;
+    border-radius: 999px; padding: 6px 16px; margin-bottom: 18px; position: relative; z-index: 1;
   }
+  .badge .ico { margin-right: 6px; }
   .hero h1 {
     margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 5vw, 2.6rem);
-    font-weight: 700; letter-spacing: -0.02em;
+    font-weight: 700; letter-spacing: -0.02em; position: relative; z-index: 1;
   }
-  .hero p.tagline { margin: 14px auto 0; max-width: 34rem; opacity: 0.75; font-size: 1.05rem; line-height: 1.65; }
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
+  .hero p.tagline {
+    margin: 14px auto 0; max-width: 34rem; opacity: 0.75; font-size: 1.05rem; line-height: 1.65;
+    position: relative; z-index: 1;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; position: relative; z-index: 1; }
   .act {
     display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 12px 22px;
     font-size: 0.92rem; font-weight: 600; text-decoration: none; transition: transform 0.2s ease;
@@ -206,7 +231,9 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
 </head>
 <body>
   <div class="hero">
-    <span class="badge">${esc(t.label)}</span>
+    <span class="watermark">${t.icon}</span>
+    ${avatar}
+    <span class="badge"><span class="ico">${t.icon}</span>${esc(t.label)}</span>
     <h1>${esc(businessName)}</h1>
     <p class="tagline">${esc(description)}</p>
     <div class="actions">${actions}</div>
@@ -297,6 +324,18 @@ async function handlePublish(request, env) {
     imagePaths.push(`images/image-${i}.${ext}`);
   }
 
+  let logoPath = null;
+  const logoDataUrl = body.logo && body.logo.dataUrl;
+  const logoMatch = /^data:image\/(\w+);base64,(.+)$/.exec(logoDataUrl || "");
+  if (logoMatch) {
+    const ext = logoMatch[1] === "jpeg" ? "jpg" : logoMatch[1];
+    const base64 = logoMatch[2];
+    const path = `p/${slug}/logo.${ext}`;
+    const existing = await ghGetFile(env, path);
+    await ghPutFile(env, path, base64, `Publish page: ${slug} (logo)`, existing ? existing.sha : undefined);
+    logoPath = `logo.${ext}`;
+  }
+
   const html = renderPage({
     businessName,
     theme: themeKey,
@@ -306,6 +345,7 @@ async function handlePublish(request, env) {
     email,
     address,
     images: imagePaths,
+    logo: logoPath,
   });
   const indexPath = `p/${slug}/index.html`;
   const existingIndex = await ghGetFile(env, indexPath);
