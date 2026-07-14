@@ -84,6 +84,9 @@
     border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; cursor: pointer;
   }
   .hint { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+  details { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
+  summary { cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.55); }
+  details[open] summary { color: #fff; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -159,6 +162,31 @@
           <label for="address">Address <span class="opt">(optional)</span></label>
           <input type="text" id="address">
         </div>
+        <details>
+          <summary>Social media links <span class="opt">(optional)</span></summary>
+          <div class="details-body" style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
+            <div>
+              <label for="socialInstagram">Instagram</label>
+              <input type="text" id="socialInstagram" placeholder="instagram.com/yourhandle or @yourhandle">
+            </div>
+            <div>
+              <label for="socialFacebook">Facebook</label>
+              <input type="text" id="socialFacebook" placeholder="facebook.com/yourpage">
+            </div>
+            <div>
+              <label for="socialLinkedin">LinkedIn</label>
+              <input type="text" id="socialLinkedin" placeholder="linkedin.com/in/yourname">
+            </div>
+            <div>
+              <label for="socialTwitter">X (Twitter)</label>
+              <input type="text" id="socialTwitter" placeholder="@yourhandle">
+            </div>
+            <div>
+              <label for="socialYoutube">YouTube</label>
+              <input type="text" id="socialYoutube" placeholder="@yourchannel">
+            </div>
+          </div>
+        </details>
         <div>
           <label>Photos <span class="opt">(up to 15)</span></label>
           <div class="dropzone" id="dropzone">Click to choose photos, or drag &amp; drop here</div>
@@ -348,6 +376,12 @@
     document.getElementById("whatsapp").value = p.whatsapp;
     document.getElementById("email").value = p.email;
     document.getElementById("address").value = p.address;
+    const social = p.social || {};
+    document.getElementById("socialInstagram").value = social.instagram || "";
+    document.getElementById("socialFacebook").value = social.facebook || "";
+    document.getElementById("socialLinkedin").value = social.linkedin || "";
+    document.getElementById("socialTwitter").value = social.twitter || "";
+    document.getElementById("socialYoutube").value = social.youtube || "";
     selectTheme(p.theme || "retail");
     images = (p.images || []).map((path) => ({ keep: path, previewUrl: `https://thudinest.com/p/${p.slug}/${path}` }));
     logo = p.logo ? { keep: p.logo, previewUrl: `https://thudinest.com/p/${p.slug}/${p.logo}` } : null;
@@ -461,6 +495,13 @@
       address: document.getElementById("address").value,
       images: images.map((img) => (img.keep ? { keep: img.keep } : { dataUrl: img.dataUrl })),
       logo: logo ? (logo.keep ? { keep: logo.keep } : { dataUrl: logo.dataUrl }) : null,
+      social: {
+        instagram: document.getElementById("socialInstagram").value,
+        facebook: document.getElementById("socialFacebook").value,
+        linkedin: document.getElementById("socialLinkedin").value,
+        twitter: document.getElementById("socialTwitter").value,
+        youtube: document.getElementById("socialYoutube").value,
+      },
     };
 
     try {

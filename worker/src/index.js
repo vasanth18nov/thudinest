@@ -43,6 +43,35 @@ const THEMES = {
   },
 };
 
+const SOCIAL_PLATFORMS = {
+  instagram: {
+    label: "Instagram",
+    domain: "instagram.com",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  },
+  facebook: {
+    label: "Facebook",
+    domain: "facebook.com",
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H17V3.6C16.7 3.55 15.7 3.5 14.5 3.5c-2.5 0-4.2 1.5-4.2 4.3v2.1H7.6V13h2.7v8h3.2Z"/></svg>',
+  },
+  linkedin: {
+    label: "LinkedIn",
+    domain: "linkedin.com/in",
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM20.5 20h-3.37v-6.06c0-1.44-.03-3.3-2.02-3.3-2.02 0-2.33 1.58-2.33 3.2V20H9.4V8.5h3.24v1.57h.05c.45-.85 1.56-1.75 3.2-1.75 3.43 0 4.06 2.26 4.06 5.2V20Z"/></svg>',
+  },
+  twitter: {
+    label: "X (Twitter)",
+    domain: "twitter.com",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg>',
+  },
+  youtube: {
+    label: "YouTube",
+    domain: "youtube.com",
+    handlePrefix: "@",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 8.7v6.6l6-3.3-6-3.3Z" fill="currentColor" stroke="none"/></svg>',
+  },
+};
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") return withCors(new Response(null, { status: 204 }));
@@ -208,8 +237,50 @@ function buildContactCard(icon, label, value, href) {
     : `<div class="c-card">${inner}</div>`;
 }
 
-function renderPage({ businessName, theme, description, phone, whatsapp, email, address, images, logo }) {
+function normalizeSocialUrl(platform, value) {
+  let v = String(value || "").trim();
+  if (!v) return "";
+  if (/^https?:\/\//i.test(v)) return v;
+  if (/^www\./i.test(v)) return `https://${v}`;
+  const domainRoot = platform.domain.split("/")[0];
+  if (v.toLowerCase().includes(domainRoot)) {
+    return `https://${v.replace(/^\/+/, "")}`;
+  }
+  // Bare handle (e.g. "@name" or "name") -> build the platform's default profile URL.
+  v = v.replace(/^@/, "").replace(/^\/+/, "");
+  const prefix = platform.handlePrefix || "";
+  return `https://${platform.domain}/${prefix}${v}`;
+}
+
+function buildSocialLink(key, value) {
+  const platform = SOCIAL_PLATFORMS[key];
+  if (!platform) return "";
+  const url = normalizeSocialUrl(platform, value);
+  if (!url) return "";
+  return `<a class="social-ico" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(
+    platform.label
+  )}" title="${esc(platform.label)}">${platform.svg}</a>`;
+}
+
+function renderPage({
+  businessName,
+  theme,
+  description,
+  phone,
+  whatsapp,
+  email,
+  address,
+  images,
+  logo,
+  social,
+}) {
   const t = THEMES[theme] || THEMES.retail;
+  const s = social || {};
+
+  const socialLinks = Object.keys(SOCIAL_PLATFORMS)
+    .map((key) => buildSocialLink(key, s[key]))
+    .filter(Boolean)
+    .join("");
 
   const gallery =
     images.length > 0
@@ -332,6 +403,17 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
   .act.call { background: ${t.color}; color: #fff; box-shadow: 0 6px 24px ${t.color}55; }
   .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
   .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+  .social-row {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 18px 0 4px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+  .social-ico {
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .social-ico svg { width: 19px; height: 19px; }
+  .social-ico:hover { color: #fff; border-color: ${t.color}88; transform: translateY(-2px); }
   main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
   .sec { margin-bottom: 36px; animation: fadeUp 0.6s ease both; }
   .sec:nth-of-type(1) { animation-delay: 0.15s; }
@@ -385,6 +467,7 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
     ${avatar}
     <h1 class="name">${esc(businessName)}</h1>
     <div class="actions">${actions}</div>
+    ${socialLinks ? `<div class="social-row">${socialLinks}</div>` : ""}
   </div>
   <main>
     ${about}
@@ -447,6 +530,7 @@ async function handleGetPage(url, env) {
       address: meta.address || "",
       images: meta.images || [],
       logo: meta.logo || null,
+      social: meta.social || {},
     },
   });
 }
@@ -508,6 +592,12 @@ async function handlePublish(request, env) {
   const email = String(body.email || "").trim();
   const address = String(body.address || "").trim();
   const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
+
+  const social = {};
+  for (const key of Object.keys(SOCIAL_PLATFORMS)) {
+    const value = String((body.social && body.social[key]) || "").trim();
+    if (value) social[key] = value;
+  }
 
   const metaPath = `p/${slug}/meta.json`;
   const existingMetaFile = await ghGetFile(env, metaPath);
@@ -581,6 +671,7 @@ async function handlePublish(request, env) {
     address,
     images: imagePaths,
     logo: logoPath,
+    social,
   });
   const indexPath = `p/${slug}/index.html`;
   const existingIndex = await ghGetFile(env, indexPath);
@@ -604,6 +695,7 @@ async function handlePublish(request, env) {
     address,
     images: imagePaths,
     logo: logoPath,
+    social,
   };
   await ghPutFile(env, metaPath, utf8ToBase64(JSON.stringify(meta, null, 2)), `Publish page: ${slug} (meta)`, metaSha);
 

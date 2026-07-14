@@ -170,6 +170,32 @@
       <input type="text" id="address" placeholder="RS Puram, Coimbatore">
     </div>
 
+    <details>
+      <summary>Social media links <span class="opt">(optional)</span></summary>
+      <div class="details-body" style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label for="socialInstagram">Instagram</label>
+          <input type="text" id="socialInstagram" placeholder="instagram.com/yourhandle or @yourhandle">
+        </div>
+        <div>
+          <label for="socialFacebook">Facebook</label>
+          <input type="text" id="socialFacebook" placeholder="facebook.com/yourpage">
+        </div>
+        <div>
+          <label for="socialLinkedin">LinkedIn</label>
+          <input type="text" id="socialLinkedin" placeholder="linkedin.com/in/yourname">
+        </div>
+        <div>
+          <label for="socialTwitter">X (Twitter)</label>
+          <input type="text" id="socialTwitter" placeholder="@yourhandle">
+        </div>
+        <div>
+          <label for="socialYoutube">YouTube</label>
+          <input type="text" id="socialYoutube" placeholder="@yourchannel">
+        </div>
+      </div>
+    </details>
+
     <div>
       <label>Photos <span class="opt">(optional, up to 15)</span></label>
       <div class="dropzone" id="dropzone">Click to choose photos, or drag &amp; drop here</div>
@@ -327,6 +353,13 @@
       editKey: document.getElementById("editKey").value,
       images,
       logo,
+      social: {
+        instagram: document.getElementById("socialInstagram").value,
+        facebook: document.getElementById("socialFacebook").value,
+        linkedin: document.getElementById("socialLinkedin").value,
+        twitter: document.getElementById("socialTwitter").value,
+        youtube: document.getElementById("socialYoutube").value,
+      },
     };
 
     try {
