@@ -11,3 +11,6 @@ Thumbs.db
 *.webm
 *.dmg
 *.zip
+
+# Wrangler local build cache
+worker/.wrangler/
