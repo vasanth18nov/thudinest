@@ -1,0 +1,11 @@
+name = "thudinesthosting-publish"
+main = "src/index.js"
+compatibility_date = "2026-07-14"
+
+[vars]
+GITHUB_OWNER = "vasanth18nov"
+GITHUB_REPO = "thudinest"
+PAGES_BASE_URL = "https://thudinest.com"
+
+# GITHUB_TOKEN is a secret, set separately with:
+#   npx wrangler secret put GITHUB_TOKEN

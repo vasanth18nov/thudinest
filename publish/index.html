@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publish Your Page | ThudinestHosting</title>
+<meta name="description" content="Publish a free single-page website for your business.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #38bdf8; --brand-dark: #0284c7; --brand-light: #7dd3fc;
+    --ok: #22c55e; --err: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 60%);
+  }
+  a { color: var(--brand-light); }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+  .back { font-size: 0.85rem; text-decoration: none; color: rgba(255,255,255,0.5); }
+  .back:hover { color: #fff; }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.7rem, 5vw, 2.2rem);
+    margin: 16px 0 8px;
+  }
+  p.sub { color: rgba(255,255,255,0.6); margin: 0 0 32px; line-height: 1.6; }
+  form {
+    display: flex; flex-direction: column; gap: 20px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 28px 26px; backdrop-filter: blur(10px);
+  }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: rgba(255,255,255,0.85); }
+  label .opt { font-weight: 400; color: rgba(255,255,255,0.4); }
+  input[type="text"], input[type="tel"], input[type="email"], textarea {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 11px 13px; color: #fff; font-size: 0.95rem; font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  textarea { resize: vertical; min-height: 80px; }
+  .theme-picker { display: flex; gap: 10px; }
+  .theme-opt {
+    flex: 1; text-align: center; padding: 12px 8px; border-radius: 10px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15); font-size: 0.85rem; font-weight: 600;
+    background: rgba(255,255,255,0.03);
+  }
+  .theme-opt.selected { border-color: var(--brand); background: rgba(56,189,248,0.15); }
+  .theme-opt[data-theme="retail"].selected { border-color: #16a34a; background: rgba(22,163,74,0.18); }
+  .theme-opt[data-theme="education"].selected { border-color: #2563eb; background: rgba(37,99,235,0.18); }
+  .theme-opt[data-theme="industry"].selected { border-color: #d97706; background: rgba(217,119,6,0.18); }
+  .dropzone {
+    border: 2px dashed rgba(255,255,255,0.2); border-radius: 14px; padding: 24px;
+    text-align: center; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 0.9rem;
+  }
+  .dropzone.drag { border-color: var(--brand); color: #fff; }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .thumb { position: relative; width: 74px; height: 74px; border-radius: 10px; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb button {
+    position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%;
+    border: none; background: rgba(0,0,0,0.7); color: #fff; cursor: pointer; font-size: 12px; line-height: 1;
+  }
+  details { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
+  summary { cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.55); }
+  details[open] summary { color: #fff; }
+  .details-body { margin-top: 12px; }
+  button.submit {
+    background: var(--brand); color: #04141c; border: none; border-radius: 999px;
+    padding: 14px 20px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px;
+  }
+  button.submit:disabled { opacity: 0.6; cursor: wait; }
+  .banner { border-radius: 12px; padding: 14px 16px; font-size: 0.9rem; line-height: 1.55; }
+  .banner.error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: #fecaca; }
+  .banner.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #bbf7d0; }
+  .banner strong { display: block; margin-bottom: 4px; }
+  .editkey-box {
+    margin-top: 10px; background: rgba(0,0,0,0.35); border-radius: 8px; padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; word-break: break-all;
+  }
+  .hint { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">&larr; Back to thudinest.com</a>
+  <h1>Publish Your Page</h1>
+  <p class="sub">Free single-page website for your business. Fill this in, hit publish, and it's live in seconds.</p>
+
+  <div id="result"></div>
+
+  <form id="publish-form">
+    <div>
+      <label for="accessCode">Access code</label>
+      <input type="text" id="accessCode" required placeholder="Given by ThudinestHosting">
+    </div>
+
+    <div>
+      <label for="slug">Page URL (slug)</label>
+      <input type="text" id="slug" required placeholder="fresh-grocer" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+      <p class="hint">Lowercase letters, numbers and hyphens only. Your page: thudinest.com/p/&lt;slug&gt;/</p>
+    </div>
+
+    <div>
+      <label for="businessName">Business name</label>
+      <input type="text" id="businessName" required placeholder="Fresh Grocer">
+    </div>
+
+    <div>
+      <label>Theme</label>
+      <div class="theme-picker" id="theme-picker">
+        <div class="theme-opt selected" data-theme="retail">Retail</div>
+        <div class="theme-opt" data-theme="education">Education</div>
+        <div class="theme-opt" data-theme="industry">Industry</div>
+      </div>
+    </div>
+
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" required placeholder="Farm fresh vegetables delivered daily in Coimbatore."></textarea>
+    </div>
+
+    <div>
+      <label for="phone">Phone number <span class="opt">(optional)</span></label>
+      <input type="tel" id="phone" placeholder="+91 98765 43210">
+    </div>
+
+    <div>
+      <label for="whatsapp">WhatsApp number <span class="opt">(optional)</span></label>
+      <input type="tel" id="whatsapp" placeholder="+91 98765 43210">
+    </div>
+
+    <div>
+      <label for="email">Email <span class="opt">(optional)</span></label>
+      <input type="email" id="email" placeholder="you@business.com">
+    </div>
+
+    <div>
+      <label for="address">Address <span class="opt">(optional)</span></label>
+      <input type="text" id="address" placeholder="RS Puram, Coimbatore">
+    </div>
+
+    <div>
+      <label>Photos <span class="opt">(optional, up to 6)</span></label>
+      <div class="dropzone" id="dropzone">Click to choose photos, or drag &amp; drop here</div>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <details>
+      <summary>Already published? Enter your edit key to update your page</summary>
+      <div class="details-body">
+        <label for="editKey">Edit key</label>
+        <input type="text" id="editKey" placeholder="Shown to you when you first published">
+      </div>
+    </details>
+
+    <button type="submit" class="submit" id="submitBtn">Publish my page</button>
+  </form>
+</div>
+
+<script>
+  // Update this after deploying the Cloudflare Worker (see worker/README.md).
+  const WORKER_URL = "https://thudinesthosting-publish.YOUR-SUBDOMAIN.workers.dev/api/publish";
+
+  const form = document.getElementById("publish-form");
+  const resultEl = document.getElementById("result");
+  const submitBtn = document.getElementById("submitBtn");
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+  const thumbsEl = document.getElementById("thumbs");
+  const themePicker = document.getElementById("theme-picker");
+
+  let selectedTheme = "retail";
+  let images = []; // { dataUrl }
+
+  themePicker.addEventListener("click", (e) => {
+    const opt = e.target.closest(".theme-opt");
+    if (!opt) return;
+    selectedTheme = opt.dataset.theme;
+    [...themePicker.children].forEach((c) => c.classList.toggle("selected", c === opt));
+  });
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.classList.add("drag"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag"));
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("drag");
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener("change", () => handleFiles(fileInput.files));
+
+  function handleFiles(fileList) {
+    const files = [...fileList].filter((f) => f.type.startsWith("image/")).slice(0, 6 - images.length);
+    files.forEach(resizeAndAdd);
+  }
+
+  function resizeAndAdd(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 1280;
+        const scale = Math.min(1, maxW / img.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        images.push({ dataUrl });
+        renderThumbs();
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderThumbs() {
+    thumbsEl.innerHTML = "";
+    images.forEach((img, i) => {
+      const div = document.createElement("div");
+      div.className = "thumb";
+      div.innerHTML = `<img src="${img.dataUrl}"><button type="button" data-i="${i}">&times;</button>`;
+      thumbsEl.appendChild(div);
+    });
+  }
+
+  thumbsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    images.splice(Number(btn.dataset.i), 1);
+    renderThumbs();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Publishing…";
+    resultEl.innerHTML = "";
+
+    const payload = {
+      accessCode: document.getElementById("accessCode").value,
+      slug: document.getElementById("slug").value.trim().toLowerCase(),
+      businessName: document.getElementById("businessName").value,
+      theme: selectedTheme,
+      description: document.getElementById("description").value,
+      phone: document.getElementById("phone").value,
+      whatsapp: document.getElementById("whatsapp").value,
+      email: document.getElementById("email").value,
+      address: document.getElementById("address").value,
+      editKey: document.getElementById("editKey").value,
+      images,
+    };
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        let html = `<div class="banner success"><strong>🎉 Your page is live!</strong>
+          <a href="${data.url}" target="_blank" rel="noopener">${data.url}</a></div>`;
+        if (data.editKey) {
+          html += `<div class="banner success" style="margin-top:10px">
+            <strong>Save this edit key</strong> — you'll need it to update this page later. It won't be shown again.
+            <div class="editkey-box">${data.editKey}</div>
+          </div>`;
+        }
+        resultEl.innerHTML = html;
+        form.reset();
+        images = [];
+        renderThumbs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        resultEl.innerHTML = `<div class="banner error"><strong>Couldn't publish</strong>${data.error || "Unknown error."}</div>`;
+      }
+    } catch (err) {
+      resultEl.innerHTML = `<div class="banner error"><strong>Network error</strong>${err.message}</div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Publish my page";
+    }
+  });
+</script>
+</body>
+</html>
