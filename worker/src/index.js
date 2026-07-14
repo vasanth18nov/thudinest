@@ -3,14 +3,38 @@ const GITHUB_API = "https://api.github.com";
 const ALLOWED_ORIGIN = "https://thudinest.com";
 
 const THEMES = {
-  retail: { label: "Retail", icon: "&#128717;", color: "#16a34a", dark: "#0f7a37", light: "#dcfce7" },
-  education: { label: "Education", icon: "&#127891;", color: "#2563eb", dark: "#1d4ed8", light: "#dbeafe" },
-  industry: { label: "Industry", icon: "&#127981;", color: "#d97706", dark: "#b45309", light: "#fef3c7" },
-  construction: { label: "Construction", icon: "&#127959;", color: "#ea580c", dark: "#c2410c", light: "#ffedd5" },
-  automobile: { label: "Automobile", icon: "&#128663;", color: "#dc2626", dark: "#b91c1c", light: "#fee2e2" },
-  healthcare: { label: "Healthcare", icon: "&#127973;", color: "#0d9488", dark: "#0f766e", light: "#ccfbf1" },
-  food: { label: "Food & Dining", icon: "&#127869;", color: "#e11d48", dark: "#be123c", light: "#ffe4e6" },
-  services: { label: "Professional Services", icon: "&#128188;", color: "#4f46e5", dark: "#4338ca", light: "#e0e7ff" },
+  retail: {
+    label: "Retail", icon: "&#128717;", color: "#16a34a", dark: "#0f7a37", light: "#dcfce7",
+    gallery: "Our Products", about: "About the Store",
+  },
+  education: {
+    label: "Education", icon: "&#127891;", color: "#2563eb", dark: "#1d4ed8", light: "#dbeafe",
+    gallery: "Our Campus & Programs", about: "About Us",
+  },
+  industry: {
+    label: "Industry", icon: "&#127981;", color: "#d97706", dark: "#b45309", light: "#fef3c7",
+    gallery: "Our Facility", about: "About the Company",
+  },
+  construction: {
+    label: "Construction", icon: "&#127959;", color: "#ea580c", dark: "#c2410c", light: "#ffedd5",
+    gallery: "Our Projects", about: "About Us",
+  },
+  automobile: {
+    label: "Automobile", icon: "&#128663;", color: "#dc2626", dark: "#b91c1c", light: "#fee2e2",
+    gallery: "Our Vehicles & Services", about: "About Us",
+  },
+  healthcare: {
+    label: "Healthcare", icon: "&#127973;", color: "#0d9488", dark: "#0f766e", light: "#ccfbf1",
+    gallery: "Our Facility", about: "About Us",
+  },
+  food: {
+    label: "Food & Dining", icon: "&#127869;", color: "#e11d48", dark: "#be123c", light: "#ffe4e6",
+    gallery: "Menu & Ambience", about: "Our Story",
+  },
+  services: {
+    label: "Professional Services", icon: "&#128188;", color: "#4f46e5", dark: "#4338ca", light: "#e0e7ff",
+    gallery: "Our Work", about: "About Us",
+  },
 };
 
 export default {
@@ -112,37 +136,68 @@ function buildActionButton(kind, value) {
     const tel = value.replace(/[^\d+]/g, "");
     return `<a class="act call" href="tel:${esc(tel)}">&#128222; Call</a>`;
   }
+  if (kind === "email") {
+    return `<a class="act mail" href="mailto:${esc(value)}">&#9993; Email</a>`;
+  }
   const digits = value.replace(/[^\d]/g, "");
   return `<a class="act wa" href="https://wa.me/${esc(digits)}" target="_blank" rel="noopener">&#128172; WhatsApp</a>`;
 }
 
-function buildInfoRow(label, value) {
+function buildContactCard(icon, label, value, href) {
   if (!value) return "";
-  return `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`;
+  const inner = `<span class="c-ico">${icon}</span><span class="c-txt"><span class="c-lab">${esc(
+    label
+  )}</span><span class="c-val">${esc(value)}</span></span>`;
+  return href
+    ? `<a class="c-card" href="${href}"${href.startsWith("http") ? ' target="_blank" rel="noopener"' : ""}>${inner}</a>`
+    : `<div class="c-card">${inner}</div>`;
 }
 
 function renderPage({ businessName, theme, description, phone, whatsapp, email, address, images, logo }) {
   const t = THEMES[theme] || THEMES.retail;
+
   const gallery =
     images.length > 0
-      ? `<div class="gallery">${images
-          .map((src) => `<img src="${esc(src)}" alt="" loading="lazy">`)
-          .join("")}</div>`
+      ? `<section class="sec">
+           <h2 class="sec-title">${esc(t.gallery)}</h2>
+           <div class="gallery">${images
+             .map((src) => `<div class="g-item"><img src="${esc(src)}" alt="" loading="lazy"></div>`)
+             .join("")}</div>
+         </section>`
       : "";
-  const infoRows = [
-    buildInfoRow("Phone", phone),
-    buildInfoRow("WhatsApp", whatsapp),
-    buildInfoRow("Email", email),
-    buildInfoRow("Address", address),
+
+  const contactCards = [
+    buildContactCard("&#128222;", "Phone", phone, phone ? `tel:${phone.replace(/[^\d+]/g, "")}` : ""),
+    buildContactCard(
+      "&#128172;",
+      "WhatsApp",
+      whatsapp,
+      whatsapp ? `https://wa.me/${whatsapp.replace(/[^\d]/g, "")}` : ""
+    ),
+    buildContactCard("&#9993;", "Email", email, email ? `mailto:${email}` : ""),
+    buildContactCard("&#128205;", "Address", address, ""),
   ]
     .filter(Boolean)
     .join("");
-  const actions = [buildActionButton("phone", phone), buildActionButton("whatsapp", whatsapp)]
+
+  const actions = [
+    buildActionButton("phone", phone),
+    buildActionButton("whatsapp", whatsapp),
+    buildActionButton("email", email),
+  ]
     .filter(Boolean)
     .join("");
+
   const avatar = logo
     ? `<img class="avatar" src="${esc(logo)}" alt="${esc(businessName)} logo">`
     : `<div class="avatar avatar-fallback">${t.icon}</div>`;
+
+  const about = description
+    ? `<section class="sec">
+         <h2 class="sec-title">${esc(t.about)}</h2>
+         <div class="about-card">${esc(description)}</div>
+       </section>`
+    : "";
 
   return `<!doctype html>
 <html lang="en">
@@ -153,97 +208,117 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
 <meta name="description" content="${esc(description)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --brand: ${t.color}; --brand-dark: ${t.dark}; --brand-light: ${t.light};
-  }
+  :root { --brand: ${t.color}; --brand-dark: ${t.dark}; --brand-light: ${t.light}; }
   * { box-sizing: border-box; }
   body {
     margin: 0; font-family: 'Inter', sans-serif;
-    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 60%);
-    color: #fff; min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 55%);
+    color: #fff; min-height: 100vh; -webkit-font-smoothing: antialiased;
   }
-  .hero {
-    padding: 56px 24px 48px; text-align: center; position: relative; overflow: hidden;
-    background: linear-gradient(160deg, ${t.color}33, transparent 60%);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+  .cover {
+    height: 200px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 20% 30%, ${t.color}55, transparent 55%),
+      radial-gradient(circle at 80% 70%, ${t.dark}66, transparent 55%),
+      linear-gradient(160deg, ${t.color}30, #0a0a1a 85%);
+    background-size: 200% 200%;
+    animation: drift 16s ease-in-out infinite alternate;
   }
-  .hero .watermark {
-    position: absolute; top: -40px; right: -30px; font-size: 11rem; opacity: 0.06;
-    transform: rotate(-12deg); pointer-events: none; line-height: 1;
+  @keyframes drift { 0% { background-position: 0% 0%, 100% 100%, 0 0; } 100% { background-position: 20% 15%, 80% 85%, 0 0; } }
+  .cover .orb {
+    position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.5; pointer-events: none;
   }
+  .cover .orb1 { width: 180px; height: 180px; background: ${t.color}; top: -60px; left: 8%; }
+  .cover .orb2 { width: 140px; height: 140px; background: ${t.light}; bottom: -50px; right: 12%; }
+  .cover .watermark {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-55%) rotate(-8deg);
+    font-size: 9rem; opacity: 0.08; pointer-events: none; line-height: 1;
+  }
+  .profile { max-width: 780px; margin: -64px auto 0; padding: 0 24px; text-align: center; position: relative; z-index: 2; }
   .avatar {
-    width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
-    border: 3px solid ${t.color}88; box-shadow: 0 8px 30px ${t.color}55;
-    margin: 0 auto 18px; display: block; position: relative; z-index: 1;
+    width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
+    border: 5px solid #0a0a1a; outline: 2px solid ${t.color}aa; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px ${t.color}22;
+    display: block; margin: 0 auto;
   }
   .avatar-fallback {
-    display: flex; align-items: center; justify-content: center; font-size: 2.4rem;
+    display: flex; align-items: center; justify-content: center; font-size: 3.6rem;
     background: linear-gradient(160deg, ${t.color}, ${t.dark});
   }
-  .hero .badge {
-    display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px;
-    font-weight: 700; background: ${t.color}2e; color: ${t.light}; border: 1px solid ${t.color}66;
-    border-radius: 999px; padding: 6px 16px; margin-bottom: 18px; position: relative; z-index: 1;
+  h1.name {
+    margin: 22px 0 0; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+    font-size: clamp(1.9rem, 5.5vw, 2.9rem); letter-spacing: -0.02em;
+    background: linear-gradient(100deg, #fff 30%, ${t.light});
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px ${t.color}55;
   }
-  .badge .ico { margin-right: 6px; }
-  .hero h1 {
-    margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 5vw, 2.6rem);
-    font-weight: 700; letter-spacing: -0.02em; position: relative; z-index: 1;
-  }
-  .hero p.tagline {
-    margin: 14px auto 0; max-width: 34rem; opacity: 0.75; font-size: 1.05rem; line-height: 1.65;
-    position: relative; z-index: 1;
-  }
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; position: relative; z-index: 1; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0 8px; }
   .act {
-    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 12px 22px;
-    font-size: 0.92rem; font-weight: 600; text-decoration: none; transition: transform 0.2s ease;
+    display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 13px 24px;
+    font-size: 0.93rem; font-weight: 700; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .act:hover { transform: translateY(-2px); }
-  .act.call { background: ${t.color}; color: #fff; }
-  .act.wa { background: #25D366; color: #fff; }
-  main { max-width: 780px; margin: 0 auto; padding: 44px 24px 24px; }
-  .gallery {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 32px;
+  .act:hover { transform: translateY(-3px); }
+  .act.call { background: ${t.color}; color: #fff; box-shadow: 0 6px 24px ${t.color}55; }
+  .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
+  .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+  main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
+  .sec { margin-bottom: 36px; }
+  .sec-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; margin: 0 0 18px;
+    display: flex; align-items: center; gap: 10px;
   }
-  .gallery img {
-    width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+  .sec-title::before { content: ""; width: 4px; height: 20px; background: ${t.color}; border-radius: 2px; display: inline-block; }
+  .about-card {
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 30px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    font-size: 1.05rem; line-height: 1.75; color: rgba(255,255,255,0.85);
   }
-  .info {
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 26px 28px;
-    background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); margin-bottom: 24px;
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .g-item {
+    border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+    aspect-ratio: 1; position: relative;
   }
-  .info h2 { margin: 0 0 14px; font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; }
-  .info dl { margin: 0; }
-  .info dt {
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45);
-    margin-top: 14px;
+  .g-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+  .g-item:hover img { transform: scale(1.08); }
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .c-card {
+    display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 18px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
-  .info dt:first-child { margin-top: 0; }
-  .info dd { margin: 3px 0 0; font-size: 1rem; color: rgba(255,255,255,0.92); }
-  footer {
-    text-align: center; padding: 32px 24px; font-size: 0.8rem; color: rgba(255,255,255,0.35);
+  a.c-card:hover { transform: translateY(-2px); border-color: ${t.color}77; }
+  .c-ico {
+    width: 42px; height: 42px; border-radius: 12px; flex: none; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    background: ${t.color}26; border: 1px solid ${t.color}44;
   }
+  .c-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .c-lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); }
+  .c-val { font-size: 0.98rem; font-weight: 600; overflow-wrap: anywhere; }
+  footer { text-align: center; padding: 36px 24px 44px; font-size: 0.8rem; color: rgba(255,255,255,0.35); }
   footer a { color: ${t.light}; font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
-  <div class="hero">
+  <div class="cover">
+    <span class="orb orb1"></span>
+    <span class="orb orb2"></span>
     <span class="watermark">${t.icon}</span>
+  </div>
+  <div class="profile">
     ${avatar}
-    <span class="badge"><span class="ico">${t.icon}</span>${esc(t.label)}</span>
-    <h1>${esc(businessName)}</h1>
-    <p class="tagline">${esc(description)}</p>
+    <h1 class="name">${esc(businessName)}</h1>
     <div class="actions">${actions}</div>
   </div>
   <main>
+    ${about}
     ${gallery}
-    <div class="info">
-      <h2>Contact</h2>
-      <dl>${infoRows}</dl>
-    </div>
+    <section class="sec">
+      <h2 class="sec-title">Get in Touch</h2>
+      <div class="contact-grid">${contactCards}</div>
+    </section>
   </main>
   <footer>Powered by <a href="/">ThudinestHosting</a></footer>
 </body>
