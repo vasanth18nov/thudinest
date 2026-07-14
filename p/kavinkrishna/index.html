@@ -11,7 +11,7 @@ He is known for being kind, respectful, and willing to help others whenever he c
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --brand: #2563eb; --brand-dark: #1d4ed8; --brand-light: #dbeafe; }
+  :root { --brand: #a855f7; --brand-dark: #7e22ce; --brand-light: #f3e8ff; }
   * { box-sizing: border-box; }
   body {
     margin: 0; font-family: 'Inter', sans-serif;
@@ -21,9 +21,9 @@ He is known for being kind, respectful, and willing to help others whenever he c
   .cover {
     height: 200px; position: relative; overflow: hidden;
     background:
-      radial-gradient(circle at 20% 30%, #2563eb55, transparent 55%),
-      radial-gradient(circle at 80% 70%, #1d4ed866, transparent 55%),
-      linear-gradient(160deg, #2563eb30, #0a0a1a 85%);
+      radial-gradient(circle at 20% 30%, #a855f755, transparent 55%),
+      radial-gradient(circle at 80% 70%, #7e22ce66, transparent 55%),
+      linear-gradient(160deg, #a855f730, #0a0a1a 85%);
     background-size: 200% 200%;
     animation: drift 16s ease-in-out infinite alternate;
   }
@@ -32,8 +32,8 @@ He is known for being kind, respectful, and willing to help others whenever he c
     position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.5; pointer-events: none;
     animation: orbit 10s ease-in-out infinite;
   }
-  .cover .orb1 { width: 180px; height: 180px; background: #2563eb; top: -60px; left: 8%; }
-  .cover .orb2 { width: 140px; height: 140px; background: #dbeafe; bottom: -50px; right: 12%; animation-delay: -4s; }
+  .cover .orb1 { width: 180px; height: 180px; background: #a855f7; top: -60px; left: 8%; }
+  .cover .orb2 { width: 140px; height: 140px; background: #f3e8ff; bottom: -50px; right: 12%; animation-delay: -4s; }
   @keyframes orbit {
     0%, 100% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(14px, -10px) scale(1.08); }
@@ -44,26 +44,26 @@ He is known for being kind, respectful, and willing to help others whenever he c
   }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes glowPulse {
-    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px #2563eb22; }
-    50% { box-shadow: 0 10px 46px rgba(0,0,0,0.55), 0 0 0 10px #2563eb33; }
+    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px #a855f722; }
+    50% { box-shadow: 0 10px 46px rgba(0,0,0,0.55), 0 0 0 10px #a855f733; }
   }
   .profile { max-width: 780px; margin: -64px auto 0; padding: 0 24px; text-align: center; position: relative; z-index: 2; }
   .avatar {
     width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
-    border: 5px solid #0a0a1a; outline: 2px solid #2563ebaa;
+    border: 5px solid #0a0a1a; outline: 2px solid #a855f7aa;
     display: block; margin: 0 auto;
     animation: fadeUp 0.6s ease both, glowPulse 4s ease-in-out infinite 0.6s;
   }
   .avatar-fallback {
     display: flex; align-items: center; justify-content: center; font-size: 3.6rem;
-    background: linear-gradient(160deg, #2563eb, #1d4ed8);
+    background: linear-gradient(160deg, #a855f7, #7e22ce);
   }
   h1.name {
     margin: 22px 0 0; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
     font-size: clamp(1.9rem, 5.5vw, 2.9rem); letter-spacing: -0.02em;
-    background: linear-gradient(100deg, #fff 30%, #dbeafe);
+    background: linear-gradient(100deg, #fff 30%, #f3e8ff);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 30px #2563eb55;
+    text-shadow: 0 0 30px #a855f755;
     animation: fadeUp 0.6s ease 0.1s both;
   }
   .actions {
@@ -75,7 +75,7 @@ He is known for being kind, respectful, and willing to help others whenever he c
     font-size: 0.93rem; font-weight: 700; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .act:hover { transform: translateY(-3px); }
-  .act.call { background: #2563eb; color: #fff; box-shadow: 0 6px 24px #2563eb55; }
+  .act.call { background: #a855f7; color: #fff; box-shadow: 0 6px 24px #a855f755; }
   .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
   .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
   main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
@@ -87,7 +87,7 @@ He is known for being kind, respectful, and willing to help others whenever he c
     font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; margin: 0 0 18px;
     display: flex; align-items: center; gap: 10px; justify-content: center;
   }
-  .sec-title::before { content: ""; width: 4px; height: 20px; background: #2563eb; border-radius: 2px; display: inline-block; }
+  .sec-title::before { content: ""; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; display: inline-block; }
   .about-card {
     border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 30px;
     background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
@@ -108,24 +108,24 @@ He is known for being kind, respectful, and willing to help others whenever he c
     background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
     transition: transform 0.2s ease, border-color 0.2s ease;
   }
-  a.c-card:hover { transform: translateY(-2px); border-color: #2563eb77; }
+  a.c-card:hover { transform: translateY(-2px); border-color: #a855f777; }
   .c-ico {
     width: 42px; height: 42px; border-radius: 12px; flex: none; font-size: 1.2rem;
     display: flex; align-items: center; justify-content: center;
-    background: #2563eb26; border: 1px solid #2563eb44;
+    background: #a855f726; border: 1px solid #a855f744;
   }
   .c-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .c-lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); }
   .c-val { font-size: 0.98rem; font-weight: 600; overflow-wrap: anywhere; }
   footer { text-align: center; padding: 36px 24px 44px; font-size: 0.8rem; color: rgba(255,255,255,0.35); }
-  footer a { color: #dbeafe; font-weight: 600; text-decoration: none; }
+  footer a { color: #f3e8ff; font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
   <div class="cover">
     <span class="orb orb1"></span>
     <span class="orb orb2"></span>
-    <span class="watermark">&#127891;</span>
+    <span class="watermark">&#128100;</span>
   </div>
   <div class="profile">
     <img class="avatar" src="logo.jpg" alt="Kavin Krishna logo">
@@ -134,13 +134,13 @@ He is known for being kind, respectful, and willing to help others whenever he c
   </div>
   <main>
     <section class="sec">
-         <h2 class="sec-title">About Us</h2>
+         <h2 class="sec-title">About Me</h2>
          <div class="about-card">Kavin Krishna is a bright and energetic 13-year-old boy who enjoys learning new things and taking on challenges. He is curious by nature, always asking questions and exploring ideas that spark his interest. Whether it’s sports, technology, reading, or spending time with friends and family, Kavin approaches life with enthusiasm and a positive attitude.
 
 He is known for being kind, respectful, and willing to help others whenever he can. Like many teenagers, he is discovering his strengths, building confidence, and working toward his dreams one step at a time. With determination, a willingness to learn, and a caring personality, Kavin has the potential to achieve great things in the future.</div>
        </section>
     <section class="sec">
-           <h2 class="sec-title">Our Campus &amp; Programs</h2>
+           <h2 class="sec-title">Gallery</h2>
            <div class="gallery"><div class="g-item"><img src="images/image-new-aab8ecb8.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-c6c3b3c3.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-2ff06d4b.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-606282b9.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-4596021d.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-b15edb54.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-fc4e45f8.jpg" alt="" loading="lazy"></div></div>
          </section>
     <section class="sec">
