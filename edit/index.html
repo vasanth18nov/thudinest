@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage Pages | ThudinestHosting</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand: #38bdf8; --brand-dark: #0284c7; --brand-light: #7dd3fc; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 60%);
+  }
+  a { color: var(--brand-light); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+  .back { font-size: 0.85rem; text-decoration: none; color: rgba(255,255,255,0.5); }
+  .back:hover { color: #fff; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 5vw, 2rem); margin: 16px 0 24px; }
+  .card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 24px; backdrop-filter: blur(10px);
+  }
+  input[type="text"], input[type="tel"], input[type="email"], input[type="password"], textarea {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 11px 13px; color: #fff; font-size: 0.95rem; font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: rgba(255,255,255,0.85); }
+  label .opt { font-weight: 400; color: rgba(255,255,255,0.4); }
+  button.primary {
+    background: var(--brand); color: #04141c; border: none; border-radius: 999px;
+    padding: 12px 22px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  }
+  button.primary:disabled { opacity: 0.6; cursor: wait; }
+  button.ghost {
+    background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 999px;
+    padding: 11px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .page-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+  .page-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 14px 18px;
+  }
+  .page-row .info { min-width: 0; }
+  .page-row .biz { font-weight: 700; font-size: 1rem; }
+  .page-row .meta { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+  .banner { border-radius: 12px; padding: 14px 16px; font-size: 0.9rem; line-height: 1.55; margin-bottom: 16px; }
+  .banner.error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: #fecaca; }
+  .banner.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #bbf7d0; }
+  form { display: flex; flex-direction: column; gap: 18px; }
+  .theme-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .theme-opt {
+    text-align: center; padding: 14px 8px; border-radius: 12px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15); font-size: 0.82rem; font-weight: 600;
+    background: rgba(255,255,255,0.03);
+  }
+  .theme-opt .theme-ico { display: block; font-size: 1.4rem; margin-bottom: 6px; }
+  .theme-opt.selected { border-color: var(--accent, var(--brand)); background: var(--accent-bg, rgba(56,189,248,0.15)); }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .thumb { position: relative; width: 74px; height: 74px; border-radius: 10px; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb button {
+    position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%;
+    border: none; background: rgba(0,0,0,0.7); color: #fff; cursor: pointer; font-size: 12px; line-height: 1;
+  }
+  .dropzone {
+    border: 2px dashed rgba(255,255,255,0.2); border-radius: 14px; padding: 20px;
+    text-align: center; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 0.88rem;
+  }
+  .logo-row { display: flex; align-items: center; gap: 16px; }
+  .logo-preview {
+    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 0.6;
+  }
+  .btn-mini {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+    border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; cursor: pointer;
+  }
+  .hint { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">&larr; Back to thudinest.com</a>
+  <h1>Manage Pages</h1>
+
+  <div id="gate" class="card">
+    <label for="gateCode">Admin access code</label>
+    <input type="password" id="gateCode" placeholder="Enter admin code">
+    <div style="margin-top:14px"><button class="primary" id="gateBtn" type="button">Unlock</button></div>
+    <div id="gateError"></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div id="listView">
+      <div class="top-row">
+        <span class="hint" id="pageCount"></span>
+        <button class="primary" id="newPageBtn" type="button">+ New page</button>
+      </div>
+      <div id="listBanner"></div>
+      <div class="page-list" id="pageList"></div>
+    </div>
+
+    <div id="formView" class="hidden">
+      <div class="top-row">
+        <button class="ghost" id="backToListBtn" type="button">&larr; Back to list</button>
+      </div>
+      <div id="formBanner"></div>
+      <form id="editForm" class="card">
+        <div>
+          <label for="slug">Page URL (slug)</label>
+          <input type="text" id="slug" required placeholder="fresh-grocer" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+          <p class="hint">thudinest.com/p/&lt;slug&gt;/</p>
+        </div>
+        <div>
+          <label for="businessName">Business / page name</label>
+          <input type="text" id="businessName" required>
+        </div>
+        <div>
+          <label>Theme</label>
+          <div class="theme-picker" id="theme-picker"></div>
+        </div>
+        <div>
+          <label>Logo / profile picture <span class="opt">(optional)</span></label>
+          <div class="logo-row">
+            <div class="logo-preview" id="logoPreview">&#128247;</div>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn-mini" id="logoChooseBtn">Choose image</button>
+              <button type="button" class="btn-mini" id="logoRemoveBtn" style="display:none">Remove</button>
+            </div>
+            <input type="file" id="logoInput" accept="image/*" hidden>
+          </div>
+        </div>
+        <div>
+          <label for="description">Description</label>
+          <textarea id="description" required></textarea>
+        </div>
+        <div>
+          <label for="phone">Phone <span class="opt">(optional)</span></label>
+          <input type="tel" id="phone">
+        </div>
+        <div>
+          <label for="whatsapp">WhatsApp <span class="opt">(optional)</span></label>
+          <input type="tel" id="whatsapp">
+        </div>
+        <div>
+          <label for="email">Email <span class="opt">(optional)</span></label>
+          <input type="email" id="email">
+        </div>
+        <div>
+          <label for="address">Address <span class="opt">(optional)</span></label>
+          <input type="text" id="address">
+        </div>
+        <div>
+          <label>Photos <span class="opt">(up to 15)</span></label>
+          <div class="dropzone" id="dropzone">Click to choose photos, or drag &amp; drop here</div>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+        <button type="submit" class="primary" id="submitBtn">Save page</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WORKER_BASE = "https://thudinesthosting-publish.thudinesthosting.workers.dev";
+  const THEMES = [
+    ["retail", "&#128717;", "Retail", "#16a34a"],
+    ["education", "&#127891;", "Education", "#2563eb"],
+    ["industry", "&#127981;", "Industry", "#d97706"],
+    ["construction", "&#127959;", "Construction", "#ea580c"],
+    ["automobile", "&#128663;", "Automobile", "#dc2626"],
+    ["healthcare", "&#127973;", "Healthcare", "#0d9488"],
+    ["food", "&#127869;", "Food & Dining", "#e11d48"],
+    ["services", "&#128188;", "Services", "#4f46e5"],
+    ["personal", "&#128100;", "Personal", "#a855f7"],
+  ];
+
+  let adminCode = sessionStorage.getItem("th_admin_code") || "";
+  let editingSlug = null; // null = creating new
+  let images = []; // { keep } or { dataUrl }
+  let logo = null; // { keep } or { dataUrl } or null
+  let selectedTheme = "retail";
+
+  const gate = document.getElementById("gate");
+  const app = document.getElementById("app");
+  const listView = document.getElementById("listView");
+  const formView = document.getElementById("formView");
+  const themePicker = document.getElementById("theme-picker");
+
+  themePicker.innerHTML = THEMES.map(
+    ([key, ico, label, color]) =>
+      `<div class="theme-opt" data-theme="${key}" data-color="${color}"><span class="theme-ico">${ico}</span>${label}</div>`
+  ).join("");
+
+  themePicker.addEventListener("click", (e) => {
+    const opt = e.target.closest(".theme-opt");
+    if (!opt) return;
+    selectedTheme = opt.dataset.theme;
+    [...themePicker.children].forEach((c) => {
+      const isSelected = c === opt;
+      c.classList.toggle("selected", isSelected);
+      if (isSelected) {
+        c.style.setProperty("--accent", opt.dataset.color);
+        c.style.setProperty("--accent-bg", opt.dataset.color + "2e");
+      } else {
+        c.style.removeProperty("--accent");
+        c.style.removeProperty("--accent-bg");
+      }
+    });
+  });
+
+  function selectTheme(themeKey) {
+    const opt = [...themePicker.children].find((c) => c.dataset.theme === themeKey) || themePicker.children[0];
+    opt.click();
+  }
+
+  async function unlock() {
+    const code = document.getElementById("gateCode").value.trim();
+    const res = await fetch(`${WORKER_BASE}/api/pages?code=${encodeURIComponent(code)}`);
+    if (res.status === 401) {
+      document.getElementById("gateError").innerHTML = '<div class="banner error">Invalid admin code.</div>';
+      return;
+    }
+    adminCode = code;
+    sessionStorage.setItem("th_admin_code", code);
+    gate.classList.add("hidden");
+    app.classList.remove("hidden");
+    await loadList();
+  }
+  document.getElementById("gateBtn").addEventListener("click", unlock);
+  document.getElementById("gateCode").addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
+
+  async function loadList() {
+    const listBanner = document.getElementById("listBanner");
+    listBanner.innerHTML = "";
+    const res = await fetch(`${WORKER_BASE}/api/pages?code=${encodeURIComponent(adminCode)}`);
+    const data = await res.json();
+    if (!data.ok) {
+      listBanner.innerHTML = `<div class="banner error">${data.error}</div>`;
+      return;
+    }
+    document.getElementById("pageCount").textContent = `${data.pages.length} page${data.pages.length === 1 ? "" : "s"} published`;
+    const listEl = document.getElementById("pageList");
+    listEl.innerHTML = data.pages
+      .map((p) => {
+        const theme = THEMES.find((t) => t[0] === p.theme);
+        const icon = theme ? theme[1] : "&#128196;";
+        const when = p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "unknown";
+        return `<div class="page-row">
+          <div class="info">
+            <div class="biz">${icon} ${escapeHtml(p.businessName || p.slug)}</div>
+            <div class="meta">/p/${escapeHtml(p.slug)}/ &middot; updated ${when}</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a class="btn-mini" href="https://thudinest.com/p/${encodeURIComponent(p.slug)}/" target="_blank" rel="noopener" style="text-decoration:none">View</a>
+            <button class="btn-mini" data-slug="${escapeHtml(p.slug)}">Edit</button>
+          </div>
+        </div>`;
+      })
+      .join("");
+    listEl.querySelectorAll("button[data-slug]").forEach((btn) => {
+      btn.addEventListener("click", () => openEdit(btn.dataset.slug));
+    });
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s || "";
+    return d.innerHTML;
+  }
+
+  function resetForm() {
+    document.getElementById("editForm").reset();
+    images = [];
+    logo = null;
+    editingSlug = null;
+    renderThumbs();
+    renderLogoPreview();
+  }
+
+  document.getElementById("newPageBtn").addEventListener("click", () => {
+    resetForm();
+    document.getElementById("slug").removeAttribute("readonly");
+    selectTheme("retail");
+    showForm();
+  });
+
+  document.getElementById("backToListBtn").addEventListener("click", async () => {
+    formView.classList.add("hidden");
+    listView.classList.remove("hidden");
+    await loadList();
+  });
+
+  function showForm() {
+    listView.classList.add("hidden");
+    formView.classList.remove("hidden");
+    document.getElementById("formBanner").innerHTML = "";
+  }
+
+  async function openEdit(slug) {
+    const res = await fetch(`${WORKER_BASE}/api/page?slug=${encodeURIComponent(slug)}&code=${encodeURIComponent(adminCode)}`);
+    const data = await res.json();
+    if (!data.ok) {
+      alert(data.error || "Couldn't load page.");
+      return;
+    }
+    resetForm();
+    const p = data.page;
+    editingSlug = p.slug;
+    document.getElementById("slug").value = p.slug;
+    document.getElementById("slug").setAttribute("readonly", "readonly");
+    document.getElementById("businessName").value = p.businessName;
+    document.getElementById("description").value = p.description;
+    document.getElementById("phone").value = p.phone;
+    document.getElementById("whatsapp").value = p.whatsapp;
+    document.getElementById("email").value = p.email;
+    document.getElementById("address").value = p.address;
+    selectTheme(p.theme || "retail");
+    images = (p.images || []).map((path) => ({ keep: path, previewUrl: `https://thudinest.com/p/${p.slug}/${path}` }));
+    logo = p.logo ? { keep: p.logo, previewUrl: `https://thudinest.com/p/${p.slug}/${p.logo}` } : null;
+    renderThumbs();
+    renderLogoPreview();
+    showForm();
+  }
+
+  // ---- image + logo upload handling (shared with publish page pattern) ----
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+  const thumbsEl = document.getElementById("thumbs");
+  const logoPreview = document.getElementById("logoPreview");
+  const logoInput = document.getElementById("logoInput");
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.style.borderColor = "var(--brand)"; });
+  dropzone.addEventListener("dragleave", () => { dropzone.style.borderColor = ""; });
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.style.borderColor = "";
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener("change", () => handleFiles(fileInput.files));
+
+  function handleFiles(fileList) {
+    const files = [...fileList].filter((f) => f.type.startsWith("image/")).slice(0, 15 - images.length);
+    files.forEach((file) =>
+      resizeImage(file, 1280, 0.82, (dataUrl) => {
+        images.push({ dataUrl, previewUrl: dataUrl });
+        renderThumbs();
+      })
+    );
+  }
+
+  function resizeImage(file, maxDim, quality, callback) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderThumbs() {
+    thumbsEl.innerHTML = "";
+    images.forEach((img, i) => {
+      const div = document.createElement("div");
+      div.className = "thumb";
+      div.innerHTML = `<img src="${img.previewUrl}"><button type="button" data-i="${i}">&times;</button>`;
+      thumbsEl.appendChild(div);
+    });
+  }
+  thumbsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    images.splice(Number(btn.dataset.i), 1);
+    renderThumbs();
+  });
+
+  function renderLogoPreview() {
+    if (logo) {
+      logoPreview.innerHTML = `<img src="${logo.previewUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      document.getElementById("logoRemoveBtn").style.display = "inline-block";
+    } else {
+      logoPreview.innerHTML = "&#128247;";
+      document.getElementById("logoRemoveBtn").style.display = "none";
+    }
+  }
+  document.getElementById("logoChooseBtn").addEventListener("click", () => logoInput.click());
+  document.getElementById("logoRemoveBtn").addEventListener("click", () => { logo = null; renderLogoPreview(); });
+  logoInput.addEventListener("change", () => {
+    const file = logoInput.files[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    resizeImage(file, 320, 0.85, (dataUrl) => {
+      logo = { dataUrl, previewUrl: dataUrl };
+      renderLogoPreview();
+    });
+  });
+
+  const slugInput = document.getElementById("slug");
+  slugInput.addEventListener("input", () => {
+    const start = slugInput.selectionStart, end = slugInput.selectionEnd;
+    slugInput.value = slugInput.value.toLowerCase();
+    slugInput.setSelectionRange(start, end);
+  });
+
+  document.getElementById("editForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving… (can take up to 2 min)";
+
+    const payload = {
+      adminCode,
+      slug: slugInput.value.trim().toLowerCase(),
+      businessName: document.getElementById("businessName").value,
+      theme: selectedTheme,
+      description: document.getElementById("description").value,
+      phone: document.getElementById("phone").value,
+      whatsapp: document.getElementById("whatsapp").value,
+      email: document.getElementById("email").value,
+      address: document.getElementById("address").value,
+      images: images.map((img) => (img.keep ? { keep: img.keep } : { dataUrl: img.dataUrl })),
+      logo: logo ? (logo.keep ? { keep: logo.keep } : { dataUrl: logo.dataUrl }) : null,
+    };
+
+    try {
+      const res = await fetch(`${WORKER_BASE}/api/publish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      const banner = document.getElementById("formBanner");
+      if (data.ok) {
+        banner.innerHTML = `<div class="banner success">Saved. Live at <a href="${data.url}" target="_blank" rel="noopener">${data.url}</a> within a couple of minutes.</div>`;
+      } else {
+        banner.innerHTML = `<div class="banner error">${data.error}</div>`;
+      }
+    } catch (err) {
+      document.getElementById("formBanner").innerHTML = `<div class="banner error">Network error: ${err.message}</div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Save page";
+    }
+  });
+
+  if (adminCode) {
+    gate.classList.add("hidden");
+    app.classList.remove("hidden");
+    loadList();
+  }
+</script>
+</body>
+</html>

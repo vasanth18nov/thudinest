@@ -1,4 +1,6 @@
 const ACCESS_CODE = "thudinest";
+const ADMIN_ACCESS_CODE = "thudinestedit";
+const MAX_IMAGES = 15;
 const GITHUB_API = "https://api.github.com";
 const ALLOWED_ORIGIN = "https://thudinest.com";
 
@@ -35,6 +37,10 @@ const THEMES = {
     label: "Professional Services", icon: "&#128188;", color: "#4f46e5", dark: "#4338ca", light: "#e0e7ff",
     gallery: "Our Work", about: "About Us",
   },
+  personal: {
+    label: "Personal", icon: "&#128100;", color: "#a855f7", dark: "#7e22ce", light: "#f3e8ff",
+    gallery: "Gallery", about: "About Me",
+  },
 };
 
 export default {
@@ -42,12 +48,18 @@ export default {
     if (request.method === "OPTIONS") return withCors(new Response(null, { status: 204 }));
 
     const url = new URL(request.url);
-    if (url.pathname === "/api/publish" && request.method === "POST") {
-      try {
+    try {
+      if (url.pathname === "/api/publish" && request.method === "POST") {
         return withCors(await handlePublish(request, env));
-      } catch (err) {
-        return withCors(json({ ok: false, error: `Server error: ${err.message}` }, 500));
       }
+      if (url.pathname === "/api/pages" && request.method === "GET") {
+        return withCors(await handleListPages(url, env));
+      }
+      if (url.pathname === "/api/page" && request.method === "GET") {
+        return withCors(await handleGetPage(url, env));
+      }
+    } catch (err) {
+      return withCors(json({ ok: false, error: `Server error: ${err.message}` }, 500));
     }
     return withCors(json({ ok: false, error: "Not found" }, 404));
   },
@@ -56,9 +68,13 @@ export default {
 function withCors(res) {
   const headers = new Headers(res.headers);
   headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
-  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
   return new Response(res.body, { status: res.status, headers });
+}
+
+function checkAdmin(url) {
+  return (url.searchParams.get("code") || "").trim() === ADMIN_ACCESS_CODE;
 }
 
 function json(obj, status = 200) {
@@ -112,6 +128,16 @@ async function ghGetFile(env, path) {
     { headers: ghHeaders(env) }
   );
   if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub GET ${path} failed (${res.status})`);
+  return res.json();
+}
+
+async function ghListDir(env, path) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
+    { headers: ghHeaders(env) }
+  );
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`GitHub GET ${path} failed (${res.status})`);
   return res.json();
 }
@@ -229,18 +255,29 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
   @keyframes drift { 0% { background-position: 0% 0%, 100% 100%, 0 0; } 100% { background-position: 20% 15%, 80% 85%, 0 0; } }
   .cover .orb {
     position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.5; pointer-events: none;
+    animation: orbit 10s ease-in-out infinite;
   }
   .cover .orb1 { width: 180px; height: 180px; background: ${t.color}; top: -60px; left: 8%; }
-  .cover .orb2 { width: 140px; height: 140px; background: ${t.light}; bottom: -50px; right: 12%; }
+  .cover .orb2 { width: 140px; height: 140px; background: ${t.light}; bottom: -50px; right: 12%; animation-delay: -4s; }
+  @keyframes orbit {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(14px, -10px) scale(1.08); }
+  }
   .cover .watermark {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-55%) rotate(-8deg);
     font-size: 9rem; opacity: 0.08; pointer-events: none; line-height: 1;
   }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px ${t.color}22; }
+    50% { box-shadow: 0 10px 46px rgba(0,0,0,0.55), 0 0 0 10px ${t.color}33; }
+  }
   .profile { max-width: 780px; margin: -64px auto 0; padding: 0 24px; text-align: center; position: relative; z-index: 2; }
   .avatar {
     width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
-    border: 5px solid #0a0a1a; outline: 2px solid ${t.color}aa; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px ${t.color}22;
+    border: 5px solid #0a0a1a; outline: 2px solid ${t.color}aa;
     display: block; margin: 0 auto;
+    animation: fadeUp 0.6s ease both, glowPulse 4s ease-in-out infinite 0.6s;
   }
   .avatar-fallback {
     display: flex; align-items: center; justify-content: center; font-size: 3.6rem;
@@ -252,8 +289,12 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
     background: linear-gradient(100deg, #fff 30%, ${t.light});
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     text-shadow: 0 0 30px ${t.color}55;
+    animation: fadeUp 0.6s ease 0.1s both;
   }
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0 8px; }
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0 8px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
   .act {
     display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 13px 24px;
     font-size: 0.93rem; font-weight: 700; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -263,16 +304,20 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
   .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
   .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
   main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
-  .sec { margin-bottom: 36px; }
+  .sec { margin-bottom: 36px; animation: fadeUp 0.6s ease both; }
+  .sec:nth-of-type(1) { animation-delay: 0.15s; }
+  .sec:nth-of-type(2) { animation-delay: 0.25s; }
+  .sec:nth-of-type(3) { animation-delay: 0.35s; }
   .sec-title {
     font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; margin: 0 0 18px;
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 10px; justify-content: center;
   }
   .sec-title::before { content: ""; width: 4px; height: 20px; background: ${t.color}; border-radius: 2px; display: inline-block; }
   .about-card {
     border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 30px;
     background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
     font-size: 1.05rem; line-height: 1.75; color: rgba(255,255,255,0.85);
+    text-align: center;
   }
   .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
   .g-item {
@@ -326,6 +371,57 @@ function renderPage({ businessName, theme, description, phone, whatsapp, email, 
 `;
 }
 
+async function handleListPages(url, env) {
+  if (!checkAdmin(url)) return json({ ok: false, error: "Invalid admin code." }, 401);
+
+  const entries = await ghListDir(env, "p");
+  const dirs = entries.filter((e) => e.type === "dir");
+
+  const pages = await Promise.all(
+    dirs.map(async (dir) => {
+      const metaFile = await ghGetFile(env, `p/${dir.name}/meta.json`);
+      if (!metaFile) return { slug: dir.name, businessName: null, theme: null, updatedAt: null };
+      const meta = JSON.parse(base64ToUtf8(metaFile.content));
+      return {
+        slug: dir.name,
+        businessName: meta.businessName || null,
+        theme: meta.theme || null,
+        updatedAt: meta.updated_at || null,
+      };
+    })
+  );
+
+  pages.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+  return json({ ok: true, pages });
+}
+
+async function handleGetPage(url, env) {
+  if (!checkAdmin(url)) return json({ ok: false, error: "Invalid admin code." }, 401);
+
+  const slug = (url.searchParams.get("slug") || "").trim().toLowerCase();
+  if (!slug) return json({ ok: false, error: "Missing slug." }, 400);
+
+  const metaFile = await ghGetFile(env, `p/${slug}/meta.json`);
+  if (!metaFile) return json({ ok: false, error: `No page found for "${slug}".` }, 404);
+
+  const meta = JSON.parse(base64ToUtf8(metaFile.content));
+  return json({
+    ok: true,
+    page: {
+      slug,
+      businessName: meta.businessName || "",
+      theme: meta.theme || "retail",
+      description: meta.description || "",
+      phone: meta.phone || "",
+      whatsapp: meta.whatsapp || "",
+      email: meta.email || "",
+      address: meta.address || "",
+      images: meta.images || [],
+      logo: meta.logo || null,
+    },
+  });
+}
+
 async function handlePublish(request, env) {
   let body;
   try {
@@ -334,8 +430,9 @@ async function handlePublish(request, env) {
     return json({ ok: false, error: "Invalid request." }, 400);
   }
 
+  const isAdmin = String(body.adminCode || "").trim() === ADMIN_ACCESS_CODE;
   const accessCode = String(body.accessCode || "").trim().toLowerCase();
-  if (accessCode !== ACCESS_CODE) {
+  if (!isAdmin && accessCode !== ACCESS_CODE) {
     return json({ ok: false, error: "Invalid access code." }, 400);
   }
 
@@ -356,7 +453,7 @@ async function handlePublish(request, env) {
   const whatsapp = String(body.whatsapp || "").trim();
   const email = String(body.email || "").trim();
   const address = String(body.address || "").trim();
-  const images = Array.isArray(body.images) ? body.images.slice(0, 6) : [];
+  const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
 
   const metaPath = `p/${slug}/meta.json`;
   const existingMetaFile = await ghGetFile(env, metaPath);
@@ -369,15 +466,17 @@ async function handlePublish(request, env) {
   if (existingMetaFile) {
     metaSha = existingMetaFile.sha;
     const existingMeta = JSON.parse(base64ToUtf8(existingMetaFile.content));
-    const providedHash = editKey ? await sha256Hex(editKey) : null;
-    if (!editKey || providedHash !== existingMeta.edit_key_hash) {
-      return json(
-        {
-          ok: false,
-          error: `The page URL "${slug}" is already taken. If it's yours, enter the edit key you saved when you first published it.`,
-        },
-        409
-      );
+    if (!isAdmin) {
+      const providedHash = editKey ? await sha256Hex(editKey) : null;
+      if (!editKey || providedHash !== existingMeta.edit_key_hash) {
+        return json(
+          {
+            ok: false,
+            error: `The page URL "${slug}" is already taken. If it's yours, enter the edit key you saved when you first published it.`,
+          },
+          409
+        );
+      }
     }
     editKeyHash = existingMeta.edit_key_hash;
   } else {
@@ -388,27 +487,34 @@ async function handlePublish(request, env) {
 
   const imagePaths = [];
   for (let i = 0; i < images.length; i++) {
-    const dataUrl = images[i] && images[i].dataUrl;
+    const item = images[i];
+    if (item && item.keep) {
+      imagePaths.push(item.keep);
+      continue;
+    }
+    const dataUrl = item && item.dataUrl;
     const match = /^data:image\/(\w+);base64,(.+)$/.exec(dataUrl || "");
     if (!match) continue;
     const ext = match[1] === "jpeg" ? "jpg" : match[1];
     const base64 = match[2];
-    const path = `p/${slug}/images/image-${i}.${ext}`;
-    const existing = await ghGetFile(env, path);
-    await ghPutFile(env, path, base64, `Publish page: ${slug} (image ${i})`, existing ? existing.sha : undefined);
-    imagePaths.push(`images/image-${i}.${ext}`);
+    const path = `p/${slug}/images/image-new-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+    await ghPutFile(env, path, base64, `Publish page: ${slug} (image)`);
+    imagePaths.push(path.replace(`p/${slug}/`, ""));
   }
 
   let logoPath = null;
-  const logoDataUrl = body.logo && body.logo.dataUrl;
-  const logoMatch = /^data:image\/(\w+);base64,(.+)$/.exec(logoDataUrl || "");
-  if (logoMatch) {
-    const ext = logoMatch[1] === "jpeg" ? "jpg" : logoMatch[1];
-    const base64 = logoMatch[2];
-    const path = `p/${slug}/logo.${ext}`;
-    const existing = await ghGetFile(env, path);
-    await ghPutFile(env, path, base64, `Publish page: ${slug} (logo)`, existing ? existing.sha : undefined);
-    logoPath = `logo.${ext}`;
+  if (body.logo && body.logo.keep) {
+    logoPath = body.logo.keep;
+  } else if (body.logo && body.logo.dataUrl) {
+    const logoMatch = /^data:image\/(\w+);base64,(.+)$/.exec(body.logo.dataUrl);
+    if (logoMatch) {
+      const ext = logoMatch[1] === "jpeg" ? "jpg" : logoMatch[1];
+      const base64 = logoMatch[2];
+      const path = `p/${slug}/logo.${ext}`;
+      const existing = await ghGetFile(env, path);
+      await ghPutFile(env, path, base64, `Publish page: ${slug} (logo)`, existing ? existing.sha : undefined);
+      logoPath = `logo.${ext}`;
+    }
   }
 
   const html = renderPage({
@@ -432,7 +538,19 @@ async function handlePublish(request, env) {
     existingIndex ? existingIndex.sha : undefined
   );
 
-  const meta = { edit_key_hash: editKeyHash, updated_at: new Date().toISOString() };
+  const meta = {
+    edit_key_hash: editKeyHash,
+    updated_at: new Date().toISOString(),
+    businessName,
+    theme: themeKey,
+    description,
+    phone,
+    whatsapp,
+    email,
+    address,
+    images: imagePaths,
+    logo: logoPath,
+  };
   await ghPutFile(env, metaPath, utf8ToBase64(JSON.stringify(meta, null, 2)), `Publish page: ${slug} (meta)`, metaSha);
 
   const pagesBaseUrl = env.PAGES_BASE_URL || "https://thudinest.com";

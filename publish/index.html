@@ -129,6 +129,7 @@
         <div class="theme-opt" data-theme="healthcare" data-color="#0d9488"><span class="theme-ico">&#127973;</span>Healthcare</div>
         <div class="theme-opt" data-theme="food" data-color="#e11d48"><span class="theme-ico">&#127869;</span>Food &amp; Dining</div>
         <div class="theme-opt" data-theme="services" data-color="#4f46e5"><span class="theme-ico">&#128188;</span>Services</div>
+        <div class="theme-opt" data-theme="personal" data-color="#a855f7"><span class="theme-ico">&#128100;</span>Personal</div>
       </div>
     </div>
 
@@ -170,7 +171,7 @@
     </div>
 
     <div>
-      <label>Photos <span class="opt">(optional, up to 6)</span></label>
+      <label>Photos <span class="opt">(optional, up to 15)</span></label>
       <div class="dropzone" id="dropzone">Click to choose photos, or drag &amp; drop here</div>
       <input type="file" id="fileInput" accept="image/*" multiple hidden>
       <div class="thumbs" id="thumbs"></div>
@@ -185,6 +186,7 @@
     </details>
 
     <button type="submit" class="submit" id="submitBtn">Publish my page</button>
+    <p class="hint" style="text-align:center">Takes about 2 minutes to go live after you submit.</p>
   </form>
 </div>
 
@@ -207,6 +209,13 @@
   let selectedTheme = "retail";
   let images = []; // { dataUrl }
   let logo = null; // { dataUrl }
+
+  const slugInput = document.getElementById("slug");
+  slugInput.addEventListener("input", () => {
+    const start = slugInput.selectionStart, end = slugInput.selectionEnd;
+    slugInput.value = slugInput.value.toLowerCase();
+    slugInput.setSelectionRange(start, end);
+  });
 
   themePicker.addEventListener("click", (e) => {
     const opt = e.target.closest(".theme-opt");
@@ -255,7 +264,7 @@
   fileInput.addEventListener("change", () => handleFiles(fileInput.files));
 
   function handleFiles(fileList) {
-    const files = [...fileList].filter((f) => f.type.startsWith("image/")).slice(0, 6 - images.length);
+    const files = [...fileList].filter((f) => f.type.startsWith("image/")).slice(0, 15 - images.length);
     files.forEach((file) =>
       resizeImage(file, 1280, 0.82, (dataUrl) => {
         images.push({ dataUrl });
@@ -302,7 +311,7 @@
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     submitBtn.disabled = true;
-    submitBtn.textContent = "Publishing…";
+    submitBtn.textContent = "Publishing… (up to 2 min)";
     resultEl.innerHTML = "";
 
     const payload = {
@@ -329,8 +338,8 @@
       const data = await res.json();
 
       if (data.ok) {
-        let html = `<div class="banner success"><strong>🎉 Your page is live!</strong>
-          <a href="${data.url}" target="_blank" rel="noopener">${data.url}</a></div>`;
+        let html = `<div class="banner success"><strong>🎉 Almost there!</strong>
+          It'll be live at <a href="${data.url}" target="_blank" rel="noopener">${data.url}</a> within about 2 minutes.</div>`;
         if (data.editKey) {
           html += `<div class="banner success" style="margin-top:10px">
             <strong>Save this edit key</strong> — you'll need it to update this page later. It won't be shown again.
