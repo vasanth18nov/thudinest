@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Babu Seshadri | ThudinestHosting</title>
+<meta name="description" content="I’m Babu, a passionate software engineer who believes every problem has a solution… unless it’s caused by a missing semicolon or a production issue on a Friday evening.
+
+I enjoy building software, learning new technologies, and finding smarter ways to automate everyday tasks. I’m always curious about what’s next in the tech world, whether it’s AI, cloud computing, or the latest framework everyone suddenly claims is “the future.”
+
+My biggest dream is to become an entrepreneur someday. I want to build products that people genuinely love to use and create something that makes a real impact. Every side project is a step toward that goal—even if a few of them end up as “work in progress” forever.
+
+Outside of work, I enjoy exploring new ideas, solving interesting challenges, and convincing myself that this weekend is finally the one where I’ll finish all my personal projects. (Spoiler: I usually start three new ones instead.)
+
+I believe success comes from staying curious, learning continuously, and never being afraid to try something new. If you’re into technology, innovation, startups, or just enjoy a good debugging story, let’s connect. Who knows? Our next conversation might turn into the next big startup… or at least a great coffee chat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand: #a855f7; --brand-dark: #7e22ce; --brand-light: #f3e8ff; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 55%);
+    color: #fff; min-height: 100vh; -webkit-font-smoothing: antialiased;
+  }
+  .cover {
+    height: 200px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 20% 30%, #a855f755, transparent 55%),
+      radial-gradient(circle at 80% 70%, #7e22ce66, transparent 55%),
+      linear-gradient(160deg, #a855f730, #0a0a1a 85%);
+    background-size: 200% 200%;
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+  .cover.has-cloud {
+    background:
+      linear-gradient(rgba(8,8,20,0.62), rgba(8,8,20,0.62)),
+      url('cloud.svg') center / cover no-repeat;
+    animation: none;
+  }
+  @keyframes drift { 0% { background-position: 0% 0%, 100% 100%, 0 0; } 100% { background-position: 20% 15%, 80% 85%, 0 0; } }
+  .cover .orb {
+    position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.5; pointer-events: none;
+    animation: orbit 10s ease-in-out infinite;
+  }
+  .cover .orb1 { width: 180px; height: 180px; background: #a855f7; top: -60px; left: 8%; }
+  .cover .orb2 { width: 140px; height: 140px; background: #f3e8ff; bottom: -50px; right: 12%; animation-delay: -4s; }
+  @keyframes orbit {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(14px, -10px) scale(1.08); }
+  }
+  .cover .watermark {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-55%) rotate(-8deg);
+    font-size: 9rem; opacity: 0.08; pointer-events: none; line-height: 1;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px #a855f722; }
+    50% { box-shadow: 0 10px 46px rgba(0,0,0,0.55), 0 0 0 10px #a855f733; }
+  }
+  .profile { max-width: 780px; margin: -64px auto 0; padding: 0 24px; text-align: center; position: relative; z-index: 2; }
+  .avatar {
+    width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
+    border: 5px solid #0a0a1a; outline: 2px solid #a855f7aa;
+    display: block; margin: 0 auto;
+    animation: fadeUp 0.6s ease both, glowPulse 4s ease-in-out infinite 0.6s;
+  }
+  .avatar-fallback {
+    display: flex; align-items: center; justify-content: center; font-size: 3.6rem;
+    background: linear-gradient(160deg, #a855f7, #7e22ce);
+  }
+  h1.name {
+    margin: 22px 0 0; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+    font-size: clamp(1.9rem, 5.5vw, 2.9rem); letter-spacing: -0.02em;
+    background: linear-gradient(100deg, #fff 30%, #f3e8ff);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px #a855f755;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0 8px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+  .act {
+    display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 13px 24px;
+    font-size: 0.93rem; font-weight: 700; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .act:hover { transform: translateY(-3px); }
+  .act.call { background: #a855f7; color: #fff; box-shadow: 0 6px 24px #a855f755; }
+  .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
+  .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+  .social-row {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 18px 0 4px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+  .social-ico {
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .social-ico svg { width: 19px; height: 19px; }
+  .social-ico:hover { color: #fff; border-color: #a855f788; transform: translateY(-2px); }
+  main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
+  .sec { margin-bottom: 36px; animation: fadeUp 0.6s ease both; }
+  .sec:nth-of-type(1) { animation-delay: 0.15s; }
+  .sec:nth-of-type(2) { animation-delay: 0.25s; }
+  .sec:nth-of-type(3) { animation-delay: 0.35s; }
+  .sec-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; margin: 0 0 18px;
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+  }
+  .sec-title::before { content: ""; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; display: inline-block; }
+  .about-card {
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 30px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    font-size: 1.05rem; line-height: 1.75; color: rgba(255,255,255,0.85);
+    text-align: center;
+  }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .g-item {
+    border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+    aspect-ratio: 1; position: relative;
+  }
+  .g-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+  .g-item:hover img { transform: scale(1.08); }
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .c-card {
+    display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 18px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  a.c-card:hover { transform: translateY(-2px); border-color: #a855f777; }
+  .c-ico {
+    width: 42px; height: 42px; border-radius: 12px; flex: none; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    background: #a855f726; border: 1px solid #a855f744;
+  }
+  .c-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .c-lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); }
+  .c-val { font-size: 0.98rem; font-weight: 600; overflow-wrap: anywhere; }
+  .qr-card {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 26px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+  }
+  .qr-card img { border-radius: 12px; background: #fff; padding: 10px; }
+  .qr-url { margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.55); overflow-wrap: anywhere; text-align: center; }
+  footer { text-align: center; padding: 36px 24px 44px; font-size: 0.8rem; color: rgba(255,255,255,0.35); }
+  footer a { color: #f3e8ff; font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="cover has-cloud">
+    
+  </div>
+  <div class="profile">
+    <img class="avatar" src="logo.jpg" alt="Babu Seshadri logo">
+    <h1 class="name">Babu Seshadri</h1>
+    <div class="actions"><a class="act call" href="tel:+919841267194">&#128222; Call</a><a class="act wa" href="https://wa.me/919841267194" target="_blank" rel="noopener">&#128172; WhatsApp</a><a class="act mail" href="mailto:babusesh@gmail.com">&#9993; Email</a></div>
+    
+  </div>
+  <main>
+    <section class="sec">
+         <h2 class="sec-title">About Me</h2>
+         <div class="about-card">I’m Babu, a passionate software engineer who believes every problem has a solution… unless it’s caused by a missing semicolon or a production issue on a Friday evening.
+
+I enjoy building software, learning new technologies, and finding smarter ways to automate everyday tasks. I’m always curious about what’s next in the tech world, whether it’s AI, cloud computing, or the latest framework everyone suddenly claims is “the future.”
+
+My biggest dream is to become an entrepreneur someday. I want to build products that people genuinely love to use and create something that makes a real impact. Every side project is a step toward that goal—even if a few of them end up as “work in progress” forever.
+
+Outside of work, I enjoy exploring new ideas, solving interesting challenges, and convincing myself that this weekend is finally the one where I’ll finish all my personal projects. (Spoiler: I usually start three new ones instead.)
+
+I believe success comes from staying curious, learning continuously, and never being afraid to try something new. If you’re into technology, innovation, startups, or just enjoy a good debugging story, let’s connect. Who knows? Our next conversation might turn into the next big startup… or at least a great coffee chat.</div>
+       </section>
+    <section class="sec">
+           <h2 class="sec-title">Gallery</h2>
+           <div class="gallery"><div class="g-item"><img src="images/image-new-5a233944.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-62767f2e.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-f38bdae8.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-bfd57a02.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-492bf8f2.jpg" alt="" loading="lazy"></div><div class="g-item"><img src="images/image-new-e934266c.jpg" alt="" loading="lazy"></div></div>
+         </section>
+    <section class="sec">
+      <h2 class="sec-title">Get in Touch</h2>
+      <div class="contact-grid"><a class="c-card" href="tel:+919841267194"><span class="c-ico">&#128222;</span><span class="c-txt"><span class="c-lab">Phone</span><span class="c-val">+91 98412 67194</span></span></a><a class="c-card" href="https://wa.me/919841267194" target="_blank" rel="noopener"><span class="c-ico">&#128172;</span><span class="c-txt"><span class="c-lab">WhatsApp</span><span class="c-val">+91 98412 67194</span></span></a><a class="c-card" href="mailto:babusesh@gmail.com"><span class="c-ico">&#9993;</span><span class="c-txt"><span class="c-lab">Email</span><span class="c-val">babusesh@gmail.com</span></span></a><div class="c-card"><span class="c-ico">&#128205;</span><span class="c-txt"><span class="c-lab">Address</span><span class="c-val">Thiruvanmayur</span></span></div></div>
+    </section>
+    <section class="sec">
+      <h2 class="sec-title">Scan to View on Mobile</h2>
+      <div class="qr-card">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;margin=8&amp;data=https%3A%2F%2Fthudinest.com%2Fp%2Fbabusesh%2F" alt="QR code for this page" width="160" height="160" loading="lazy">
+        <p class="qr-url">https://thudinest.com/p/babusesh/</p>
+      </div>
+    </section>
+  </main>
+  <footer>Powered by <a href="/">ThudinestHosting</a></footer>
+</body>
+</html>
