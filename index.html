@@ -944,26 +944,17 @@ body {
   position: relative; z-index: 1;
   text-align: center; max-width: 740px; width: 100%;
 }
-.tn-location-pill {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  background: rgba(255,255,255,0.08);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border: 1px solid rgba(34,211,238,0.3); border-radius: 100px;
-  padding: 7px 20px; font-size: 0.68rem; color: rgba(255,255,255,0.75);
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 26px;
-  box-shadow: 0 0 0 1px rgba(34,211,238,0.06) inset, 0 0 18px rgba(34,211,238,0.08);
-}
 .tn-hero-name {
   font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-  font-size: clamp(2.5rem, 9.5vw, 5.4rem); font-weight: 800;
+  font-size: clamp(3.1rem, 12vw, 6.8rem); font-weight: 800;
   line-height: 1.05; letter-spacing: 1px; margin-bottom: 8px;
   text-transform: uppercase;
   color: #ffffff;
 }
-.tn-hero-num {
-  font-size: clamp(0.85rem, 2.2vw, 1.1rem); font-weight: 300;
-  color: rgba(255,255,255,0.42); letter-spacing: 8px;
+.tn-hero-byline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(0.72rem, 2vw, 0.92rem); font-weight: 500;
+  color: rgba(125,211,252,0.75); letter-spacing: 6px;
   text-transform: uppercase; margin-bottom: 28px;
 }
 .tn-hero-dual {
@@ -1378,16 +1369,6 @@ th.tn-compare-us { color: #7dd3fc !important; }
 }
 .tn-visible { opacity: 1 !important; transform: translateY(0) !important; }
 
-/* Clickable location pill */
-a.tn-location-pill {
-  cursor: pointer;
-  transition: background 0.22s, border-color 0.22s, color 0.22s;
-}
-a.tn-location-pill:hover {
-  background: rgba(245,200,66,0.2);
-  border-color: rgba(245,200,66,0.5);
-  color: #f5c842;
-}
 
 /* Hero gold button pulsing glow */
 @keyframes tn-gold-pulse {
@@ -1637,7 +1618,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 /* Adequate tap targets (WCAG 2.5.5) */
 .tn-btn-gold, .tn-btn-ghost, .tn-book-btn, .tn-contact-wa,
-.tn-location-pill, .tn-contact-wa { min-height: 48px; }
+.tn-contact-wa { min-height: 48px; }
 
 /* ---- mobile: max 600px ---- */
 @media (max-width: 600px) {
@@ -1659,16 +1640,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     padding: 17px 24px;
     font-size: 0.95rem;
   }
-  .tn-location-pill {
-    font-size: 0.58rem;
-    padding: 6px 14px;
-    letter-spacing: 1px;
-    white-space: normal;
-    text-align: center;
-    max-width: 270px;
-  }
   .tn-hero-tagline { font-size: 0.93rem; margin-bottom: 28px; }
-  .tn-hero-num { letter-spacing: 5px; }
   .tn-hero-dual { text-align: center; }
   .tn-scroll-hint { bottom: 18px; }
 
@@ -1726,7 +1698,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 /* ---- small phones: max 400px ---- */
 @media (max-width: 400px) {
   .tn-hero { padding: 64px 16px 72px; }
-  .tn-location-pill { max-width: 230px; font-size: 0.5rem; }
   .tn-hero-name { letter-spacing: 0; }
   .tn-sec { padding: 38px 16px; }
   .game-card { width: 140px; padding: 22px 12px; }
@@ -1766,9 +1737,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     <div class="tn-orb tn-orb-2"></div>
     <div class="tn-orb tn-orb-3"></div>
     <div class="tn-hero-content">
-      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" class="tn-location-pill">&#128205; &nbsp;Poombuhar Nagar &#183; Thudiyalur &#183; Coimbatore &nbsp;&#8599;</a>
       <h1 class="tn-hero-name">Thudinest</h1>
-      <div class="tn-hero-num">No. 2 &nbsp;&#183;&nbsp; MTP Road</div>
+      <div class="tn-hero-byline">Homestays &middot; Web Hosting &middot; Games</div>
       <div class="tn-hero-dual">&#127760; Not just a place to stay &#8212; we also host your website, free.</div>
       <p class="tn-hero-tagline">A cozy container home in Coimbatore's prime spot &#8212; perfect for couples, solo travelers &amp; remote workers.</p>
       <div class="tn-hero-actions">
