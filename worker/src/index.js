@@ -126,6 +126,112 @@ function esc(str) {
   })[c]);
 }
 
+const WORDCLOUD_STOPWORDS = new Set([
+  "the", "and", "for", "are", "but", "not", "you", "your", "with", "this", "that", "from", "have",
+  "has", "had", "was", "were", "will", "would", "can", "could", "should", "our", "their", "its",
+  "a", "an", "of", "in", "on", "at", "to", "is", "as", "by", "or", "we", "us", "i", "be", "been",
+  "being", "all", "any", "also", "more", "most", "some", "such", "no", "nor", "only", "own",
+  "same", "so", "than", "too", "very", "just", "into", "about", "over", "under", "then", "once",
+  "here", "there", "when", "where", "why", "how", "what", "which", "who", "whom", "get", "one",
+]);
+
+function hashString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return h >>> 0;
+}
+
+function seededRandom(seed) {
+  let s = seed >>> 0;
+  return function () {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function rectsOverlap(a, b) {
+  return !(a.x + a.w < b.x || b.x + b.w < a.x || a.y + a.h < b.y || b.y + b.h < a.y);
+}
+
+function extractTopWords(text, limit) {
+  const counts = new Map();
+  const words = String(text || "").toLowerCase().match(/[a-z']+/g) || [];
+  for (const w of words) {
+    if (w.length < 3 || WORDCLOUD_STOPWORDS.has(w)) continue;
+    counts.set(w, (counts.get(w) || 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+}
+
+function buildWordCloudSvg(text, theme) {
+  const words = extractTopWords(text, 24);
+  if (words.length < 4) return null;
+
+  const W = 1400;
+  const H = 320;
+  const rand = seededRandom(hashString(text));
+  const maxCount = words[0][1];
+  const palette = [theme.light, "#ffffff", theme.color, "#e5e7eb"];
+  const placed = [];
+  const items = [];
+
+  words.forEach(([word, count], i) => {
+    // Blend frequency with rank so same-frequency words (common in short text)
+    // still get visual size variety instead of all rendering at max size.
+    const freqRatio = count / maxCount;
+    const rankRatio = 1 - i / words.length;
+    const sizeRatio = freqRatio * 0.55 + rankRatio * 0.45;
+    const fontSize = Math.round(22 + sizeRatio * 50);
+    const approxW = word.length * fontSize * 0.6;
+    const approxH = fontSize * 1.15;
+    const cx = W / 2;
+    const cy = H / 2;
+    let angle = rand() * Math.PI * 2;
+    let radius = 0;
+    let x, y;
+    let placedOk = false;
+
+    for (let tries = 0; tries < 220; tries++) {
+      x = cx + Math.cos(angle) * radius - approxW / 2;
+      y = cy + Math.sin(angle) * radius * 0.55 - approxH / 2;
+      const box = { x, y, w: approxW, h: approxH };
+      if (
+        x >= 12 &&
+        y >= 12 &&
+        x + approxW <= W - 12 &&
+        y + approxH <= H - 12 &&
+        !placed.some((p) => rectsOverlap(p, box))
+      ) {
+        placed.push(box);
+        placedOk = true;
+        break;
+      }
+      angle += 0.5;
+      radius += 4;
+    }
+    if (!placedOk) return;
+
+    const color = palette[i % palette.length];
+    const opacity = Math.min(0.9, 0.4 + sizeRatio * 0.5).toFixed(2);
+    const rotate = i % 5 === 0 ? (rand() > 0.5 ? -8 : 8) : 0;
+    const tx = (x + approxW / 2).toFixed(1);
+    const ty = (y + approxH * 0.72).toFixed(1);
+    items.push(
+      `<text x="${tx}" y="${ty}" font-size="${fontSize}" font-family="'Space Grotesk', sans-serif" font-weight="700" fill="${color}" fill-opacity="${opacity}" text-anchor="middle"${
+        rotate ? ` transform="rotate(${rotate} ${tx} ${ty})"` : ""
+      }>${esc(word)}</text>`
+    );
+  });
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+<rect width="${W}" height="${H}" fill="#000000"/>
+${items.join("\n")}
+</svg>`;
+}
+
 async function sha256Hex(str) {
   const data = new TextEncoder().encode(str);
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -273,6 +379,8 @@ function renderPage({
   images,
   logo,
   social,
+  cloud,
+  pageUrl,
 }) {
   const t = THEMES[theme] || THEMES.retail;
   const s = social || {};
@@ -281,6 +389,10 @@ function renderPage({
     .map((key) => buildSocialLink(key, s[key]))
     .filter(Boolean)
     .join("");
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(
+    pageUrl || ""
+  )}`;
 
   const gallery =
     images.length > 0
@@ -351,6 +463,12 @@ function renderPage({
       linear-gradient(160deg, ${t.color}30, #0a0a1a 85%);
     background-size: 200% 200%;
     animation: drift 16s ease-in-out infinite alternate;
+  }
+  .cover.has-cloud {
+    background:
+      linear-gradient(rgba(8,8,20,0.62), rgba(8,8,20,0.62)),
+      url('cloud.svg') center / cover no-repeat;
+    animation: none;
   }
   @keyframes drift { 0% { background-position: 0% 0%, 100% 100%, 0 0; } 100% { background-position: 20% 15%, 80% 85%, 0 0; } }
   .cover .orb {
@@ -453,15 +571,24 @@ function renderPage({
   .c-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .c-lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); }
   .c-val { font-size: 0.98rem; font-weight: 600; overflow-wrap: anywhere; }
+  .qr-card {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 26px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+  }
+  .qr-card img { border-radius: 12px; background: #fff; padding: 10px; }
+  .qr-url { margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.55); overflow-wrap: anywhere; text-align: center; }
   footer { text-align: center; padding: 36px 24px 44px; font-size: 0.8rem; color: rgba(255,255,255,0.35); }
   footer a { color: ${t.light}; font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
-  <div class="cover">
-    <span class="orb orb1"></span>
-    <span class="orb orb2"></span>
-    <span class="watermark">${t.icon}</span>
+  <div class="cover${cloud ? " has-cloud" : ""}">
+    ${
+      cloud
+        ? ""
+        : `<span class="orb orb1"></span><span class="orb orb2"></span><span class="watermark">${t.icon}</span>`
+    }
   </div>
   <div class="profile">
     ${avatar}
@@ -476,6 +603,17 @@ function renderPage({
       <h2 class="sec-title">Get in Touch</h2>
       <div class="contact-grid">${contactCards}</div>
     </section>
+    ${
+      pageUrl
+        ? `<section class="sec">
+      <h2 class="sec-title">Scan to View on Mobile</h2>
+      <div class="qr-card">
+        <img src="${esc(qrUrl)}" alt="QR code for this page" width="160" height="160" loading="lazy">
+        <p class="qr-url">${esc(pageUrl)}</p>
+      </div>
+    </section>`
+        : ""
+    }
   </main>
   <footer>Powered by <a href="/">ThudinestHosting</a></footer>
 </body>
@@ -661,6 +799,24 @@ async function handlePublish(request, env) {
     }
   }
 
+  let cloudPath = null;
+  const cloudSvg = buildWordCloudSvg(description, THEMES[themeKey]);
+  if (cloudSvg) {
+    const path = `p/${slug}/cloud.svg`;
+    const existingCloud = await ghGetFile(env, path);
+    await ghPutFile(
+      env,
+      path,
+      utf8ToBase64(cloudSvg),
+      `Publish page: ${slug} (word cloud)`,
+      existingCloud ? existingCloud.sha : undefined
+    );
+    cloudPath = "cloud.svg";
+  }
+
+  const pagesBaseUrl = env.PAGES_BASE_URL || "https://thudinest.com";
+  const pageUrl = `${pagesBaseUrl}/p/${slug}/`;
+
   const html = renderPage({
     businessName,
     theme: themeKey,
@@ -672,6 +828,8 @@ async function handlePublish(request, env) {
     images: imagePaths,
     logo: logoPath,
     social,
+    cloud: cloudPath,
+    pageUrl,
   });
   const indexPath = `p/${slug}/index.html`;
   const existingIndex = await ghGetFile(env, indexPath);
@@ -696,11 +854,11 @@ async function handlePublish(request, env) {
     images: imagePaths,
     logo: logoPath,
     social,
+    cloud: cloudPath,
   };
   await ghPutFile(env, metaPath, utf8ToBase64(JSON.stringify(meta, null, 2)), `Publish page: ${slug} (meta)`, metaSha);
 
-  const pagesBaseUrl = env.PAGES_BASE_URL || "https://thudinest.com";
-  const result = { ok: true, url: `${pagesBaseUrl}/p/${slug}/` };
+  const result = { ok: true, url: pageUrl };
   if (returnedEditKey) result.editKey = returnedEditKey;
   return json(result, 200);
 }
