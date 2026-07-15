@@ -932,7 +932,7 @@ body {
 .tn-hero-bg {
   position: absolute; inset: 0; z-index: 0;
   background:
-    url('./images/exterior.jpg') center/cover no-repeat,
+    url('./images/1.png') center/cover no-repeat,
     linear-gradient(150deg, #0f0b05 0%, #07090e 52%, #050d07 100%);
 }
 .tn-hero-bg::after {
@@ -965,6 +965,13 @@ body {
   font-size: clamp(0.85rem, 2.2vw, 1.1rem); font-weight: 300;
   color: rgba(255,255,255,0.42); letter-spacing: 8px;
   text-transform: uppercase; margin-bottom: 28px;
+}
+.tn-hero-dual {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.35);
+  border-radius: 100px; padding: 9px 22px; margin-bottom: 22px;
+  font-size: clamp(0.78rem, 2vw, 0.92rem); font-weight: 600; color: #bee9fd;
+  box-shadow: 0 0 24px rgba(56,189,248,0.12);
 }
 .tn-hero-tagline {
   font-size: clamp(0.95rem, 2.2vw, 1.08rem);
@@ -1204,6 +1211,25 @@ body {
 .tn-rule.warn { background: rgba(231,76,60,0.07); border-color: rgba(231,76,60,0.24); }
 .tn-rule.warn .tn-rule-txt { color: rgba(255,175,165,0.92); }
 .tn-rule.warn .tn-rule-txt strong { color: #ffa099; }
+
+/* Hosting comparison table */
+.tn-compare-wrap {
+  margin-top: 40px; overflow-x: auto; border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02);
+}
+.tn-compare { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 560px; }
+.tn-compare th, .tn-compare td {
+  padding: 14px 18px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.65); white-space: nowrap;
+}
+.tn-compare thead th {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.4); font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.tn-compare tbody tr:last-child td { border-bottom: none; }
+.tn-compare td:first-child, .tn-compare th:first-child { color: rgba(255,255,255,0.85); font-weight: 600; }
+.tn-compare-us { background: rgba(56,189,248,0.08); color: #bee9fd !important; font-weight: 700 !important; }
+th.tn-compare-us { color: #7dd3fc !important; }
 
 .tn-pill {
   padding: 6px 16px; border-radius: 100px;
@@ -1643,6 +1669,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   }
   .tn-hero-tagline { font-size: 0.93rem; margin-bottom: 28px; }
   .tn-hero-num { letter-spacing: 5px; }
+  .tn-hero-dual { text-align: center; }
   .tn-scroll-hint { bottom: 18px; }
 
   /* Shrink orbs for mobile perf */
@@ -1742,6 +1769,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" class="tn-location-pill">&#128205; &nbsp;Poombuhar Nagar &#183; Thudiyalur &#183; Coimbatore &nbsp;&#8599;</a>
       <h1 class="tn-hero-name">Thudinest</h1>
       <div class="tn-hero-num">No. 2 &nbsp;&#183;&nbsp; MTP Road</div>
+      <div class="tn-hero-dual">&#127760; Not just a place to stay &#8212; we also host your website, free.</div>
       <p class="tn-hero-tagline">A cozy container home in Coimbatore's prime spot &#8212; perfect for couples, solo travelers &amp; remote workers.</p>
       <div class="tn-hero-actions">
         <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-btn-gold">&#128197; Book on Airbnb</a>
@@ -1804,6 +1832,71 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       </div>
     </div>
   </div>
+
+  <hr class="tn-hr">
+
+  <!-- Why Host With Us -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label" style="color:#7dd3fc">ThudinestHosting</div>
+    <h2 class="tn-heading">Your Own Website, Live in Minutes</h2>
+    <p class="tn-body">No coding, no server setup, no hosting bills. Tell us about your business, add a few photos, and your page is published automatically &#8212; free, with an access code from us.</p>
+
+    <div class="tn-rules" style="margin-top:32px">
+      <div class="tn-rule"><span class="tn-rule-ico">&#9997;&#65039;</span><div class="tn-rule-txt"><strong>Fill in your details</strong> &#8212; business name, description, contact info, and a theme that fits (Retail, Education, Construction, Personal &amp; more).</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128248;</span><div class="tn-rule-txt"><strong>Add your photos and logo</strong> &#8212; drag, drop, done. No editing software needed.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128640;</span><div class="tn-rule-txt"><strong>Hit publish</strong> &#8212; your page goes live at your own link within about 2 minutes.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128257;</span><div class="tn-rule-txt"><strong>Update anytime</strong> &#8212; come back and edit your page whenever your details change.</div></div>
+    </div>
+
+    <div class="tn-compare-wrap">
+      <table class="tn-compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="tn-compare-us">ThudinestHosting</th>
+            <th>Traditional Website</th>
+            <th>DIY Builders</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cost</td>
+            <td class="tn-compare-us">Free</td>
+            <td>&#8377;&#8377;&#8377; + developer fees</td>
+            <td>Monthly subscription</td>
+          </tr>
+          <tr>
+            <td>Time to go live</td>
+            <td class="tn-compare-us">~2 minutes</td>
+            <td>Days to weeks</td>
+            <td>Hours to days</td>
+          </tr>
+          <tr>
+            <td>Coding required</td>
+            <td class="tn-compare-us">None</td>
+            <td>Yes, or hire someone</td>
+            <td>Usually none</td>
+          </tr>
+          <tr>
+            <td>Hosting included</td>
+            <td class="tn-compare-us">Yes, free forever</td>
+            <td>Separate ongoing cost</td>
+            <td>Tied to subscription</td>
+          </tr>
+          <tr>
+            <td>Mobile-ready</td>
+            <td class="tn-compare-us">Always</td>
+            <td>Depends on developer</td>
+            <td>Usually</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <a href="/publish/" class="tn-btn-cyan" style="margin-top:32px">&#127760; Host My Page</a>
+  </div>
+
+  <hr class="tn-hr">
 
   <!-- Feature strip -->
   <div class="tn-strip">
