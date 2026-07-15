@@ -167,16 +167,55 @@ function extractTopWords(text, limit) {
 }
 
 function buildWordCloudSvg(text, theme) {
-  const words = extractTopWords(text, 24);
+  const words = extractTopWords(text, 40);
   if (words.length < 4) return null;
 
   const W = 1400;
   const H = 320;
   const rand = seededRandom(hashString(text));
   const maxCount = words[0][1];
-  const palette = [theme.light, "#ffffff", theme.color, "#e5e7eb"];
+  const palette = [
+    theme.color,
+    theme.light,
+    "#ffffff",
+    theme.dark,
+    "#f5c842",
+    "#22d3ee",
+    "#ec4899",
+    "#84cc16",
+  ];
   const placed = [];
   const items = [];
+
+  function tryPlace(word, fontSize, packFactor) {
+    const approxW = word.length * fontSize * 0.56 * packFactor;
+    const approxH = fontSize * 1.05 * packFactor;
+    const cx = W / 2;
+    const cy = H / 2;
+    let angle = rand() * Math.PI * 2;
+    let radius = 0;
+
+    for (let tries = 0; tries < 320; tries++) {
+      const x = cx + Math.cos(angle) * radius - approxW / 2;
+      const y = cy + Math.sin(angle) * radius * 0.55 - approxH / 2;
+      const box = { x, y, w: approxW, h: approxH };
+      if (
+        x >= 6 &&
+        y >= 6 &&
+        x + approxW <= W - 6 &&
+        y + approxH <= H - 6 &&
+        !placed.some((p) => rectsOverlap(p, box))
+      ) {
+        placed.push(box);
+        return { x: x + approxW / 2, y: y + approxH * 0.72 };
+      }
+      angle += 0.32;
+      radius += 3;
+    }
+    return null;
+  }
+
+  const overflow = [];
 
   words.forEach(([word, count], i) => {
     // Blend frequency with rank so same-frequency words (common in short text)
@@ -184,45 +223,39 @@ function buildWordCloudSvg(text, theme) {
     const freqRatio = count / maxCount;
     const rankRatio = 1 - i / words.length;
     const sizeRatio = freqRatio * 0.55 + rankRatio * 0.45;
-    const fontSize = Math.round(22 + sizeRatio * 50);
-    const approxW = word.length * fontSize * 0.6;
-    const approxH = fontSize * 1.15;
-    const cx = W / 2;
-    const cy = H / 2;
-    let angle = rand() * Math.PI * 2;
-    let radius = 0;
-    let x, y;
-    let placedOk = false;
+    const fontSize = Math.round(20 + sizeRatio * 48);
 
-    for (let tries = 0; tries < 220; tries++) {
-      x = cx + Math.cos(angle) * radius - approxW / 2;
-      y = cy + Math.sin(angle) * radius * 0.55 - approxH / 2;
-      const box = { x, y, w: approxW, h: approxH };
-      if (
-        x >= 12 &&
-        y >= 12 &&
-        x + approxW <= W - 12 &&
-        y + approxH <= H - 12 &&
-        !placed.some((p) => rectsOverlap(p, box))
-      ) {
-        placed.push(box);
-        placedOk = true;
-        break;
-      }
-      angle += 0.5;
-      radius += 4;
+    const pos = tryPlace(word, fontSize, 1);
+    if (!pos) {
+      overflow.push([word, fontSize]);
+      return;
     }
-    if (!placedOk) return;
 
-    const color = palette[i % palette.length];
-    const opacity = Math.min(0.9, 0.4 + sizeRatio * 0.5).toFixed(2);
-    const rotate = i % 5 === 0 ? (rand() > 0.5 ? -8 : 8) : 0;
-    const tx = (x + approxW / 2).toFixed(1);
-    const ty = (y + approxH * 0.72).toFixed(1);
+    const color = palette[Math.floor(rand() * palette.length)];
+    const opacity = Math.min(0.92, 0.45 + sizeRatio * 0.47).toFixed(2);
+    const rotate = i % 4 === 0 ? (rand() > 0.5 ? -8 : 8) : 0;
+    const tx = pos.x.toFixed(1);
+    const ty = pos.y.toFixed(1);
     items.push(
       `<text x="${tx}" y="${ty}" font-size="${fontSize}" font-family="'Space Grotesk', sans-serif" font-weight="700" fill="${color}" fill-opacity="${opacity}" text-anchor="middle"${
         rotate ? ` transform="rotate(${rotate} ${tx} ${ty})"` : ""
       }>${esc(word)}</text>`
+    );
+  });
+
+  // Fill pass: retry anything that didn't fit, shrunk down, to pack the
+  // canvas tighter instead of leaving gaps.
+  overflow.forEach(([word, fontSize]) => {
+    const smallSize = Math.max(14, Math.round(fontSize * 0.6));
+    const pos = tryPlace(word, smallSize, 0.92);
+    if (!pos) return;
+    const color = palette[Math.floor(rand() * palette.length)];
+    const tx = pos.x.toFixed(1);
+    const ty = pos.y.toFixed(1);
+    items.push(
+      `<text x="${tx}" y="${ty}" font-size="${smallSize}" font-family="'Space Grotesk', sans-serif" font-weight="700" fill="${color}" fill-opacity="0.4" text-anchor="middle">${esc(
+        word
+      )}</text>`
     );
   });
 
