@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Density Check | ThudinestHosting</title>
+<meta name="description" content="Fresh Grocer is Coimbatore favorite neighborhood grocery store delivering farm fresh vegetables organic fruits dairy bakery items spices grains pulses snacks beverages and household essentials daily. We partner directly with local farmers to bring fresh seasonal produce at fair prices supporting sustainable agriculture. Our team handpicks every vegetable and fruit for quality freshness and taste across Coimbatore RS Puram Thudiyalur and Saravanampatti.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand: #16a34a; --brand-dark: #0f7a37; --brand-light: #dcfce7; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 55%);
+    color: #fff; min-height: 100vh; -webkit-font-smoothing: antialiased;
+  }
+  .cover {
+    height: 200px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 20% 30%, #16a34a55, transparent 55%),
+      radial-gradient(circle at 80% 70%, #0f7a3766, transparent 55%),
+      linear-gradient(160deg, #16a34a30, #0a0a1a 85%);
+    background-size: 200% 200%;
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+  .cover.has-cloud {
+    background:
+      linear-gradient(rgba(8,8,20,0.62), rgba(8,8,20,0.62)),
+      url('cloud.svg') center / cover no-repeat;
+    animation: none;
+  }
+  @keyframes drift { 0% { background-position: 0% 0%, 100% 100%, 0 0; } 100% { background-position: 20% 15%, 80% 85%, 0 0; } }
+  .cover .orb {
+    position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.5; pointer-events: none;
+    animation: orbit 10s ease-in-out infinite;
+  }
+  .cover .orb1 { width: 180px; height: 180px; background: #16a34a; top: -60px; left: 8%; }
+  .cover .orb2 { width: 140px; height: 140px; background: #dcfce7; bottom: -50px; right: 12%; animation-delay: -4s; }
+  @keyframes orbit {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(14px, -10px) scale(1.08); }
+  }
+  .cover .watermark {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-55%) rotate(-8deg);
+    font-size: 9rem; opacity: 0.08; pointer-events: none; line-height: 1;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 6px #16a34a22; }
+    50% { box-shadow: 0 10px 46px rgba(0,0,0,0.55), 0 0 0 10px #16a34a33; }
+  }
+  .profile { max-width: 780px; margin: -64px auto 0; padding: 0 24px; text-align: center; position: relative; z-index: 2; }
+  .avatar {
+    width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
+    border: 5px solid #0a0a1a; outline: 2px solid #16a34aaa;
+    display: block; margin: 0 auto;
+    animation: fadeUp 0.6s ease both, glowPulse 4s ease-in-out infinite 0.6s;
+  }
+  .avatar-fallback {
+    display: flex; align-items: center; justify-content: center; font-size: 3.6rem;
+    background: linear-gradient(160deg, #16a34a, #0f7a37);
+  }
+  h1.name {
+    margin: 22px 0 0; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+    font-size: clamp(1.9rem, 5.5vw, 2.9rem); letter-spacing: -0.02em;
+    background: linear-gradient(100deg, #fff 30%, #dcfce7);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px #16a34a55;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0 8px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+  .act {
+    display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 13px 24px;
+    font-size: 0.93rem; font-weight: 700; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .act:hover { transform: translateY(-3px); }
+  .act.call { background: #16a34a; color: #fff; box-shadow: 0 6px 24px #16a34a55; }
+  .act.wa { background: #25D366; color: #fff; box-shadow: 0 6px 24px #25D36655; }
+  .act.mail { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+  .social-row {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 18px 0 4px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+  .social-ico {
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .social-ico svg { width: 19px; height: 19px; }
+  .social-ico:hover { color: #fff; border-color: #16a34a88; transform: translateY(-2px); }
+  main { max-width: 780px; margin: 0 auto; padding: 52px 24px 24px; }
+  .sec { margin-bottom: 36px; animation: fadeUp 0.6s ease both; }
+  .sec:nth-of-type(1) { animation-delay: 0.15s; }
+  .sec:nth-of-type(2) { animation-delay: 0.25s; }
+  .sec:nth-of-type(3) { animation-delay: 0.35s; }
+  .sec-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; margin: 0 0 18px;
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+  }
+  .sec-title::before { content: ""; width: 4px; height: 20px; background: #16a34a; border-radius: 2px; display: inline-block; }
+  .about-card {
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 30px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    font-size: 1.05rem; line-height: 1.75; color: rgba(255,255,255,0.85);
+    text-align: center;
+  }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .g-item {
+    border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+    aspect-ratio: 1; position: relative;
+  }
+  .g-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+  .g-item:hover img { transform: scale(1.08); }
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .c-card {
+    display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 18px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  a.c-card:hover { transform: translateY(-2px); border-color: #16a34a77; }
+  .c-ico {
+    width: 42px; height: 42px; border-radius: 12px; flex: none; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    background: #16a34a26; border: 1px solid #16a34a44;
+  }
+  .c-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .c-lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); }
+  .c-val { font-size: 0.98rem; font-weight: 600; overflow-wrap: anywhere; }
+  .qr-card {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 26px;
+    background: rgba(255,255,255,0.035); backdrop-filter: blur(12px);
+  }
+  .qr-card img { border-radius: 12px; background: #fff; padding: 10px; }
+  .qr-url { margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.55); overflow-wrap: anywhere; text-align: center; }
+  footer { text-align: center; padding: 36px 24px 44px; font-size: 0.8rem; color: rgba(255,255,255,0.35); }
+  footer a { color: #dcfce7; font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="cover has-cloud">
+    
+  </div>
+  <div class="profile">
+    <div class="avatar avatar-fallback">&#128717;</div>
+    <h1 class="name">Cloud Density Check</h1>
+    <div class="actions"></div>
+    
+  </div>
+  <main>
+    <section class="sec">
+         <h2 class="sec-title">About the Store</h2>
+         <div class="about-card">Fresh Grocer is Coimbatore favorite neighborhood grocery store delivering farm fresh vegetables organic fruits dairy bakery items spices grains pulses snacks beverages and household essentials daily. We partner directly with local farmers to bring fresh seasonal produce at fair prices supporting sustainable agriculture. Our team handpicks every vegetable and fruit for quality freshness and taste across Coimbatore RS Puram Thudiyalur and Saravanampatti.</div>
+       </section>
+    
+    <section class="sec">
+      <h2 class="sec-title">Get in Touch</h2>
+      <div class="contact-grid"></div>
+    </section>
+    <section class="sec">
+      <h2 class="sec-title">Scan to View on Mobile</h2>
+      <div class="qr-card">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;margin=8&amp;data=https%3A%2F%2Fthudinest.com%2Fp%2Fcloud-density-check%2F" alt="QR code for this page" width="160" height="160" loading="lazy">
+        <p class="qr-url">https://thudinest.com/p/cloud-density-check/</p>
+      </div>
+    </section>
+  </main>
+  <footer>Powered by <a href="/">ThudinestHosting</a></footer>
+</body>
+</html>
