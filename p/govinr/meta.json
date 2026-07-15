@@ -1,6 +1,6 @@
 {
   "edit_key_hash": "f819c68e3bbdbd7d0d825235a218c2529448c7b2902ff2394ea7b089e2798040",
-  "updated_at": "2026-07-15T05:37:12.803Z",
+  "updated_at": "2026-07-15T05:41:34.582Z",
   "businessName": "R Govindaraj",
   "theme": "personal",
   "description": "I’m Govindaraj, a mechanical engineer who has spent more than 40 years working with machines. If it has gears, bearings, motors, or moving parts, there’s a good chance I’ve repaired it, improved it, or built it.\n\nMy engineering journey has taken me through a wide range of industries—from manufacturing jeans buttons to operating and maintaining CNC machines, from carton box manufacturing equipment to automobile mechanics and industrial engineering. Every new machine has been another puzzle to solve, and that’s exactly what I enjoy.\n\nPeople often say experience is the best teacher. After four decades in engineering, I’ve learned that every breakdown has a reason, every problem has a solution, and every machine deserves someone patient enough to understand how it works.\n\nWhen I’m not in the workshop, you’ll probably find me in my garden. Gardening is my way of slowing down. Just like machines, plants need care, attention, and the right environment to thrive. Watching a garden grow is just as satisfying as bringing a silent machine back to life.\n\nI live in Thudiyalur with my wife, Deepa, who has been my constant source of support throughout this journey. Together, we’ve built a life rooted in hard work, curiosity, and simple joys.\n\nEngineering isn’t just my profession it’s the way I think. Whether it’s designing a better solution, repairing a complex machine, or sharing knowledge with others, I believe there’s always a smarter way to get the job done. After all these years, my passion for engineering is just as strong as it was on day one.",
@@ -8,8 +8,15 @@
   "whatsapp": "+919698026106",
   "email": "gdmultitech@gmail.com",
   "address": "Thudinest , No 2 Poombuhar Nagar",
-  "images": [],
-  "logo": null,
+  "images": [
+    "images/image-new-6f5d61c2.jpg",
+    "images/image-new-2bc52895.jpg",
+    "images/image-new-5b2a20da.jpg",
+    "images/image-new-09cd57dc.jpg",
+    "images/image-new-fbd9fe2e.jpg",
+    "images/image-new-02f2e8da.jpg"
+  ],
+  "logo": "logo.jpg",
   "social": {},
   "cloud": "cloud.svg"
 }
