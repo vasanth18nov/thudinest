@@ -983,6 +983,17 @@ body {
   text-decoration: none;
 }
 .tn-btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(245,200,66,0.6); }
+.tn-btn-cyan {
+  padding: 14px 34px; border-radius: 100px;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #04141c; font-size: 0.88rem; font-weight: 800;
+  letter-spacing: 0.4px; border: none; cursor: pointer;
+  transition: transform 0.22s, box-shadow 0.22s;
+  display: inline-flex; align-items: center; gap: 7px;
+  box-shadow: 0 4px 24px rgba(56,189,248,0.42);
+  text-decoration: none;
+}
+.tn-btn-cyan:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(56,189,248,0.6); }
 .tn-btn-ghost {
   padding: 14px 34px; border-radius: 100px;
   background: rgba(255,255,255,0.09);
@@ -1087,6 +1098,11 @@ body {
 .tn-split-cta:hover { opacity: 0.88; transform: translateY(-2px); }
 .tn-split-card.stay  .tn-split-cta { background: #f5c842; color: #262013; }
 .tn-split-card.games .tn-split-cta { background: linear-gradient(135deg,#a855f7,#818cf8); color: #fff; }
+.tn-split-card.hosting .tn-split-cta { background: linear-gradient(135deg,#38bdf8,#0ea5e9); color: #04141c; }
+.tn-split-kicker-top {
+  text-align: center; font-size: 0.7rem; font-weight: 800; letter-spacing: 4px;
+  text-transform: uppercase; color: rgba(255,255,255,0.4); margin: 0 0 22px;
+}
 @media (max-width: 720px) {
   .tn-split { flex-direction: column; }
   .tn-split-card { flex: 1 1 auto; }
@@ -1611,7 +1627,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     margin-left: auto;
     margin-right: auto;
   }
-  .tn-btn-gold, .tn-btn-ghost {
+  .tn-btn-gold, .tn-btn-ghost, .tn-btn-cyan {
     width: 100%;
     justify-content: center;
     padding: 17px 24px;
@@ -1729,6 +1745,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <p class="tn-hero-tagline">A cozy container home in Coimbatore's prime spot &#8212; perfect for couples, solo travelers &amp; remote workers.</p>
       <div class="tn-hero-actions">
         <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-btn-gold">&#128197; Book on Airbnb</a>
+        <a href="/publish/" class="tn-btn-cyan">&#127760; Host My Page</a>
         <div class="tn-contact-wrap">
           <button class="tn-btn-ghost" id="contact-toggle" onclick="toggleContactDrop(event)">&#128222; Contact Us &#9662;</button>
           <div id="tn-contact-drop" class="tn-contact-drop">
@@ -1752,8 +1769,9 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     <div class="tn-scroll-hint"><span>Scroll</span><span style="font-size:0.95rem">&#8595;</span></div>
   </section>
 
-  <!-- Stay & Play &#8212; side by side -->
-  <div class="tn-split-wrap">
+  <!-- Stay, Host & Play -->
+  <div class="tn-split-wrap tn-reveal">
+    <p class="tn-split-kicker-top">Stay &middot; Host &middot; Play</p>
     <div class="tn-split">
       <div class="tn-split-card stay" onclick="window.open('https://airbnb.com/h/thudinest','_blank')">
         <span class="tn-split-badge">Book Now</span>
@@ -1763,26 +1781,26 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
         <p class="tn-split-sub">A cozy container home right on MTP Road, Thudiyalur &#8212; instant booking, easy parking &amp; free Wi-Fi.</p>
         <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-split-cta" onclick="event.stopPropagation()">&#128197; Book on Airbnb</a>
       </div>
+      <div class="tn-split-card hosting" onclick="location.href='/publish/'">
+        <span class="tn-split-badge">Free</span>
+        <span class="tn-split-icon">&#127760;</span>
+        <div class="tn-split-kicker">ThudinestHosting</div>
+        <h3 class="tn-split-ttl">Publish Your Own Page</h3>
+        <p class="tn-split-sub">Got an access code from us? Create a free single-page website for your business in minutes &#8212; no charge, ever.</p>
+        <a href="/publish/" class="tn-split-cta" onclick="event.stopPropagation()">&#128640; Get Hosting</a>
+      </div>
       <div class="tn-split-card games" onclick="showScreen('home')">
-        <span class="tn-split-badge">Free to Play</span>
+        <span class="tn-split-badge">Just for Fun</span>
         <span class="tn-split-icon">&#127918;</span>
-        <div class="tn-split-kicker">Game Hub</div>
+        <div class="tn-split-kicker">Entertainment</div>
         <h3 class="tn-split-ttl">9 Games, Zero Downloads</h3>
-        <p class="tn-split-sub">Rummy, Chess, Ping Pong, Sudoku, Word Search, Darts, Snake, Pac-Bot &amp; Robo Jump &#8212; all playable right in your browser.</p>
+        <p class="tn-split-sub">Rummy, Chess, Ping Pong, Sudoku, Word Search, Darts, Snake, Pac-Bot &amp; Robo Jump &#8212; a little fun while you're here.</p>
         <div class="tn-split-pills">
           <span class="tn-pill green">&#127183; Rummy</span>
           <span class="tn-pill gold">&#9823; Chess</span>
           <span class="tn-pill purple">&#127955; Ping Pong</span>
         </div>
         <button class="tn-split-cta" onclick="event.stopPropagation(); showScreen('home')">&#9654; Play Now</button>
-      </div>
-      <div class="tn-split-card hosting" onclick="location.href='/publish/'">
-        <span class="tn-split-badge">Free</span>
-        <span class="tn-split-icon">&#127760;</span>
-        <div class="tn-split-kicker">Hosting</div>
-        <h3 class="tn-split-ttl">Publish Your Own Page</h3>
-        <p class="tn-split-sub">Got an access code from us? Create a free single-page website for your business in minutes &#8212; no charge, ever.</p>
-        <a href="/publish/" class="tn-split-cta" onclick="event.stopPropagation()">&#128640; Get Hosting</a>
       </div>
     </div>
   </div>
