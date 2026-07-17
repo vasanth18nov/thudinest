@@ -970,17 +970,6 @@ body {
   max-width: 480px; margin: 0 auto 42px;
 }
 .tn-hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.tn-btn-gold {
-  padding: 14px 34px; border-radius: 100px;
-  background: linear-gradient(135deg, #f5c842, #ffaa4d);
-  color: #1a0e00; font-size: 0.88rem; font-weight: 800;
-  letter-spacing: 0.4px; border: none; cursor: pointer;
-  transition: transform 0.22s, box-shadow 0.22s;
-  display: inline-flex; align-items: center; gap: 7px;
-  box-shadow: 0 4px 24px rgba(245,200,66,0.42);
-  text-decoration: none;
-}
-.tn-btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(245,200,66,0.6); }
 .tn-btn-ghost {
   padding: 14px 34px; border-radius: 100px;
   background: rgba(255,255,255,0.09);
@@ -1364,14 +1353,6 @@ th.tn-compare-us { color: #7dd3fc !important; }
 .tn-visible { opacity: 1 !important; transform: translateY(0) !important; }
 
 
-/* Hero gold button pulsing glow */
-@keyframes tn-gold-pulse {
-  0%,100% { box-shadow: 0 4px 24px rgba(245,200,66,0.42); }
-  50%  { box-shadow: 0 4px 36px rgba(245,200,66,0.72), 0 0 50px rgba(245,200,66,0.18); }
-}
-.tn-hero-actions .tn-btn-gold { animation: tn-gold-pulse 3s ease-in-out infinite; }
-.tn-hero-actions .tn-btn-gold:hover { animation: none; transform: translateY(-3px); box-shadow: 0 10px 42px rgba(245,200,66,0.75); }
-
 /* Contact dropdown */
 .tn-contact-wrap { position: relative; display: inline-block; }
 .tn-contact-drop {
@@ -1517,15 +1498,6 @@ th.tn-compare-us { color: #7dd3fc !important; }
   color: #f5c842; font-size: 0.65rem; padding: 0 14px; line-height: 1;
 }
 
-/* Gold button shine sweep */
-.tn-btn-gold { position: relative; overflow: hidden; isolation: isolate; }
-.tn-btn-gold::before {
-  content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
-  transform: skewX(-20deg); transition: left 0.65s cubic-bezier(.22,1,.36,1);
-}
-.tn-btn-gold:hover::before { left: 130%; }
-
 /* Amenity tiles: icon badge */
 .tn-tile-icon {
   display: inline-flex; align-items: center; justify-content: center;
@@ -1611,7 +1583,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .tn-strip-item { scroll-snap-align: start; flex-shrink: 0; }
 
 /* Adequate tap targets (WCAG 2.5.5) */
-.tn-btn-gold, .tn-btn-ghost, .tn-book-btn, .tn-contact-wa,
+.tn-btn-ghost, .tn-book-btn, .tn-contact-wa,
 .tn-contact-wa { min-height: 48px; }
 
 /* ---- mobile: max 600px ---- */
@@ -1628,7 +1600,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     margin-left: auto;
     margin-right: auto;
   }
-  .tn-btn-gold, .tn-btn-ghost {
+  .tn-btn-ghost {
     width: 100%;
     justify-content: center;
     padding: 17px 24px;
@@ -1703,14 +1675,13 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .tn-orb-1, .tn-orb-2, .tn-orb-3,
   .tn-scroll-hint, .tn-airbnb,
   .home-title { animation: none !important; }
-  .tn-hero-actions .tn-btn-gold { animation: none !important; }
   .tn-reveal {
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
   .tn-tile, .tn-photo, .tn-book-btn,
-  .tn-btn-gold, .tn-btn-ghost { transition: none !important; }
+  .tn-btn-ghost { transition: none !important; }
 }
 </style>
 </head>
@@ -1733,10 +1704,9 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     <div class="tn-hero-content">
       <h1 class="tn-hero-name">Thudinest</h1>
       <div class="tn-hero-byline">Homestays &middot; Web Hosting &middot; Surveys &middot; Games</div>
-      <div class="tn-hero-dual">&#127760; Not just a place to stay &#8212; we also host your website, free.</div>
+      <div class="tn-hero-dual">&#127760; Not just a stay &#8212; we also host websites, run live surveys, and offer free games.</div>
       <p class="tn-hero-tagline">A cozy homestay in Coimbatore &#8212; and a free home for your website, live surveys, and a little fun, too.</p>
       <div class="tn-hero-actions">
-        <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-btn-gold">&#128197; Book on Airbnb</a>
         <div class="tn-contact-wrap">
           <button class="tn-btn-ghost" id="contact-toggle" onclick="toggleContactDrop(event)">&#128222; Contact Us &#9662;</button>
           <div id="tn-contact-drop" class="tn-contact-drop">
