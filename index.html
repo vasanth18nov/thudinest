@@ -992,6 +992,17 @@ body {
   text-decoration: none;
 }
 .tn-btn-cyan:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(56,189,248,0.6); }
+.tn-btn-lime {
+  padding: 14px 34px; border-radius: 100px;
+  background: linear-gradient(135deg, #84cc16, #16a34a);
+  color: #04141c; font-size: 0.88rem; font-weight: 800;
+  letter-spacing: 0.4px; border: none; cursor: pointer;
+  transition: transform 0.22s, box-shadow 0.22s;
+  display: inline-flex; align-items: center; gap: 7px;
+  box-shadow: 0 4px 24px rgba(132,204,22,0.42);
+  text-decoration: none;
+}
+.tn-btn-lime:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(132,204,22,0.6); }
 .tn-btn-ghost {
   padding: 14px 34px; border-radius: 100px;
   background: rgba(255,255,255,0.09);
@@ -1070,9 +1081,11 @@ body {
 .tn-split-card.stay  { background: linear-gradient(160deg, rgba(245,200,66,0.14), rgba(245,200,66,0.02)); box-shadow: 0 20px 60px rgba(245,200,66,0.07); }
 .tn-split-card.games { background: linear-gradient(160deg, rgba(168,85,247,0.18), rgba(129,140,248,0.03)); box-shadow: 0 20px 60px rgba(168,85,247,0.1); }
 .tn-split-card.hosting { background: linear-gradient(160deg, rgba(56,189,248,0.16), rgba(59,130,246,0.03)); box-shadow: 0 20px 60px rgba(56,189,248,0.08); }
+.tn-split-card.survey { background: linear-gradient(160deg, rgba(132,204,22,0.16), rgba(34,197,94,0.03)); box-shadow: 0 20px 60px rgba(132,204,22,0.08); }
 .tn-split-card.stay:hover  { box-shadow: 0 26px 70px rgba(245,200,66,0.24); border-color: rgba(245,200,66,0.4); }
 .tn-split-card.games:hover { box-shadow: 0 26px 70px rgba(168,85,247,0.3);  border-color: rgba(168,85,247,0.42); }
 .tn-split-card.hosting:hover { box-shadow: 0 26px 70px rgba(56,189,248,0.28); border-color: rgba(56,189,248,0.42); }
+.tn-split-card.survey:hover { box-shadow: 0 26px 70px rgba(132,204,22,0.28); border-color: rgba(132,204,22,0.42); }
 .tn-split-badge {
   position: absolute; top: 20px; right: 20px; font-size: 0.6rem; font-weight: 800;
   letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 11px; border-radius: 20px;
@@ -1080,11 +1093,13 @@ body {
 .tn-split-card.stay  .tn-split-badge { background: rgba(245,200,66,0.18); color: #f5c842; border: 1px solid rgba(245,200,66,0.35); }
 .tn-split-card.games .tn-split-badge { background: rgba(168,85,247,0.2);  color: #d3b3fc; border: 1px solid rgba(168,85,247,0.4); }
 .tn-split-card.hosting .tn-split-badge { background: rgba(56,189,248,0.2); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
+.tn-split-card.survey .tn-split-badge { background: rgba(132,204,22,0.2); color: #bef264; border: 1px solid rgba(132,204,22,0.4); }
 .tn-split-icon   { font-size: 2.6rem; display: block; margin-bottom: 16px; }
 .tn-split-kicker { font-size: 0.66rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
 .tn-split-card.stay  .tn-split-kicker { color: #f5c842; }
 .tn-split-card.games .tn-split-kicker { color: #c19bfa; }
 .tn-split-card.hosting .tn-split-kicker { color: #7dd3fc; }
+.tn-split-card.survey .tn-split-kicker { color: #bef264; }
 .tn-split-ttl { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.25; }
 .tn-split-sub { font-size: 0.87rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 22px; max-width: 420px; }
 .tn-split-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
@@ -1097,6 +1112,7 @@ body {
 .tn-split-card.stay  .tn-split-cta { background: #f5c842; color: #262013; }
 .tn-split-card.games .tn-split-cta { background: linear-gradient(135deg,#a855f7,#818cf8); color: #fff; }
 .tn-split-card.hosting .tn-split-cta { background: linear-gradient(135deg,#38bdf8,#0ea5e9); color: #04141c; }
+.tn-split-card.survey .tn-split-cta { background: linear-gradient(135deg,#84cc16,#16a34a); color: #04141c; }
 .tn-split-kicker-top {
   text-align: center; font-size: 0.7rem; font-weight: 800; letter-spacing: 4px;
   text-transform: uppercase; color: rgba(255,255,255,0.4); margin: 0 0 22px;
@@ -1634,7 +1650,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     margin-left: auto;
     margin-right: auto;
   }
-  .tn-btn-gold, .tn-btn-ghost, .tn-btn-cyan {
+  .tn-btn-gold, .tn-btn-ghost, .tn-btn-cyan, .tn-btn-lime {
     width: 100%;
     justify-content: center;
     padding: 17px 24px;
@@ -1769,7 +1785,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   <!-- Stay, Host & Play -->
   <div class="tn-split-wrap tn-reveal">
-    <p class="tn-split-kicker-top">Stay &middot; Host &middot; Play</p>
+    <p class="tn-split-kicker-top">Stay &middot; Host &middot; Survey &middot; Play</p>
     <div class="tn-split">
       <div class="tn-split-card stay" onclick="window.open('https://airbnb.com/h/thudinest','_blank')">
         <span class="tn-split-badge">Book Now</span>
@@ -1786,6 +1802,14 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
         <h3 class="tn-split-ttl">Publish Your Own Page</h3>
         <p class="tn-split-sub">Got an access code from us? Create a free single-page website for your business in minutes &#8212; no charge, ever.</p>
         <a href="/publish/" class="tn-split-cta" onclick="event.stopPropagation()">&#128640; Get Hosting</a>
+      </div>
+      <div class="tn-split-card survey" onclick="location.href='/survey/create/'">
+        <span class="tn-split-badge">Free</span>
+        <span class="tn-split-icon">&#128202;</span>
+        <div class="tn-split-kicker">ThudinestSurvey</div>
+        <h3 class="tn-split-ttl">Ask, Share, Watch Live</h3>
+        <p class="tn-split-sub">Create a quick survey, share the QR code, and watch answers turn into live word clouds and charts &#8212; no sign-up for you or your respondents.</p>
+        <a href="/survey/create/" class="tn-split-cta" onclick="event.stopPropagation()">&#128202; Create a Survey</a>
       </div>
       <div class="tn-split-card games" onclick="showScreen('home')">
         <span class="tn-split-badge">Just for Fun</span>
@@ -1864,6 +1888,69 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     </div>
 
     <a href="/publish/" class="tn-btn-cyan" style="margin-top:32px">&#127760; Host My Page</a>
+  </div>
+
+  <hr class="tn-hr">
+
+  <!-- Why Survey With Us -->
+  <div class="tn-sec tn-reveal">
+    <div class="tn-label" style="color:#bef264">ThudinestSurvey</div>
+    <h2 class="tn-heading">Get Instant Feedback, Live</h2>
+    <p class="tn-body">No app to install, no account for you or your respondents. Write a few questions, share a QR code, and watch answers turn into a live word cloud and charts as they come in.</p>
+
+    <div class="tn-rules" style="margin-top:32px">
+      <div class="tn-rule"><span class="tn-rule-ico">&#9997;&#65039;</span><div class="tn-rule-txt"><strong>Write your questions</strong> &#8212; open text or multiple choice, mix and match.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128241;</span><div class="tn-rule-txt"><strong>Share the QR code</strong> &#8212; anyone can scan and answer, no sign-up or app needed.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128202;</span><div class="tn-rule-txt"><strong>Watch results live</strong> &#8212; a word cloud for open answers, bar charts for choices, updating every couple of seconds.</div></div>
+      <div class="tn-rule"><span class="tn-rule-ico">&#128274;</span><div class="tn-rule-txt"><strong>Only you see results</strong> &#8212; a private results link is yours alone, no login required.</div></div>
+    </div>
+
+    <div class="tn-compare-wrap">
+      <table class="tn-compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="tn-compare-us">ThudinestSurvey</th>
+            <th>Paper Forms</th>
+            <th>Paid Survey Tools</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cost</td>
+            <td class="tn-compare-us">Free</td>
+            <td>Printing costs</td>
+            <td>Monthly subscription</td>
+          </tr>
+          <tr>
+            <td>Sign-up required</td>
+            <td class="tn-compare-us">None, for anyone</td>
+            <td>None</td>
+            <td>Usually yes</td>
+          </tr>
+          <tr>
+            <td>Results</td>
+            <td class="tn-compare-us">Live, as answers arrive</td>
+            <td>Manual counting</td>
+            <td>After manual export</td>
+          </tr>
+          <tr>
+            <td>Visualizations</td>
+            <td class="tn-compare-us">Word cloud + charts, built in</td>
+            <td>None</td>
+            <td>Extra setup</td>
+          </tr>
+          <tr>
+            <td>Setup time</td>
+            <td class="tn-compare-us">~1 minute</td>
+            <td>Print &amp; distribute</td>
+            <td>Minutes to hours</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <a href="/survey/create/" class="tn-btn-lime" style="margin-top:32px">&#128202; Create a Survey</a>
   </div>
 
   <hr class="tn-hr">
@@ -2005,6 +2092,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Airbnb</a>
       <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">&#128205; Google Maps</a>
       <a href="/publish/">&#127760; Hosting</a>
+      <a href="/survey/create/">&#128202; Survey</a>
       <a href="https://wa.me/919698026106" target="_blank" rel="noopener">&#128172; +91 96980 26106</a>
       <a href="https://wa.me/601161165161" target="_blank" rel="noopener">&#128172; +60 11-6116 5161</a>
       <a href="https://wa.me/917092713486" target="_blank" rel="noopener">&#128172; +91 70927 13486</a>
