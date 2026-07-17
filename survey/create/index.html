@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create a Survey | ThudinestHosting</title>
+<meta name="description" content="Create a live survey with a QR code -- no sign in needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand: #38bdf8; --brand-dark: #0284c7; --brand-light: #7dd3fc; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 60%);
+  }
+  a { color: var(--brand-light); }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+  .back { font-size: 0.85rem; text-decoration: none; color: rgba(255,255,255,0.5); }
+  .back:hover { color: #fff; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.7rem, 5vw, 2.2rem); margin: 16px 0 8px; }
+  p.sub { color: rgba(255,255,255,0.6); margin: 0 0 32px; line-height: 1.6; }
+  form {
+    display: flex; flex-direction: column; gap: 20px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 28px 26px; backdrop-filter: blur(10px);
+  }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: rgba(255,255,255,0.85); }
+  label .opt { font-weight: 400; color: rgba(255,255,255,0.4); }
+  input[type="text"], textarea {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 11px 13px; color: #fff; font-size: 0.95rem; font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .q-card {
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 18px;
+    background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 12px;
+  }
+  .q-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .q-head span { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+  .type-toggle { display: flex; gap: 6px; }
+  .type-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+    border-radius: 8px; padding: 6px 12px; font-size: 0.78rem; cursor: pointer;
+  }
+  .type-btn.selected { background: rgba(56,189,248,0.2); border-color: var(--brand); color: #fff; }
+  .options-list { display: flex; flex-direction: column; gap: 8px; }
+  .option-row { display: flex; gap: 8px; align-items: center; }
+  .option-row input { flex: 1; }
+  .btn-mini {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+    border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+  }
+  .btn-remove { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.3); color: #fca5a5; }
+  button.submit {
+    background: var(--brand); color: #04141c; border: none; border-radius: 999px;
+    padding: 14px 20px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px;
+  }
+  button.submit:disabled { opacity: 0.6; cursor: wait; }
+  .banner { border-radius: 12px; padding: 14px 16px; font-size: 0.9rem; line-height: 1.55; }
+  .banner.error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: #fecaca; }
+  .banner.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #bbf7d0; }
+  .result-box {
+    margin-top: 10px; background: rgba(0,0,0,0.35); border-radius: 8px; padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; word-break: break-all;
+  }
+  .qr-wrap { text-align: center; margin: 16px 0; }
+  .qr-wrap img { border-radius: 10px; background: #fff; padding: 8px; }
+  .hint { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+  #addQBtn { align-self: flex-start; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">&larr; Back to thudinest.com</a>
+  <h1>Create a Live Survey</h1>
+  <p class="sub">Ask a few questions, get a QR code, and watch answers roll in live -- no sign-up needed for you or your respondents.</p>
+
+  <div id="result"></div>
+
+  <form id="survey-form">
+    <div>
+      <label for="accessCode">Access code</label>
+      <input type="text" id="accessCode" required placeholder="Given by ThudinestHosting">
+    </div>
+    <div>
+      <label for="title">Survey title</label>
+      <input type="text" id="title" required placeholder="Team Lunch Preferences">
+    </div>
+
+    <div id="questions"></div>
+    <button type="button" class="btn-mini" id="addQBtn">+ Add question</button>
+
+    <button type="submit" class="submit" id="submitBtn">Create survey</button>
+  </form>
+</div>
+
+<script>
+  const WORKER_BASE = "https://thudinesthosting-publish.thudinesthosting.workers.dev";
+  const questionsEl = document.getElementById("questions");
+  const form = document.getElementById("survey-form");
+  const resultEl = document.getElementById("result");
+  const submitBtn = document.getElementById("submitBtn");
+
+  let questions = [];
+
+  function addQuestion(type) {
+    questions.push({ type: type || "text", prompt: "", options: ["", ""] });
+    renderQuestions();
+  }
+
+  function renderQuestions() {
+    questionsEl.innerHTML = questions
+      .map((q, qi) => {
+        const optionsHtml =
+          q.type === "choice"
+            ? `<div class="options-list" data-qi="${qi}">
+                ${q.options
+                  .map(
+                    (opt, oi) => `<div class="option-row">
+                      <input type="text" data-qi="${qi}" data-oi="${oi}" class="opt-input" placeholder="Option ${oi + 1}" value="${escapeAttr(opt)}">
+                      ${q.options.length > 2 ? `<button type="button" class="btn-mini btn-remove" data-remove-opt data-qi="${qi}" data-oi="${oi}">&times;</button>` : ""}
+                    </div>`
+                  )
+                  .join("")}
+                <button type="button" class="btn-mini" data-add-opt data-qi="${qi}">+ Add option</button>
+              </div>`
+            : "";
+        return `<div class="q-card">
+          <div class="q-head">
+            <span>Question ${qi + 1}</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="type-toggle">
+                <button type="button" class="type-btn${q.type === "text" ? " selected" : ""}" data-set-type="text" data-qi="${qi}">Open text</button>
+                <button type="button" class="type-btn${q.type === "choice" ? " selected" : ""}" data-set-type="choice" data-qi="${qi}">Multiple choice</button>
+              </div>
+              ${questions.length > 1 ? `<button type="button" class="btn-mini btn-remove" data-remove-q data-qi="${qi}">Remove</button>` : ""}
+            </div>
+          </div>
+          <input type="text" class="prompt-input" data-qi="${qi}" placeholder="Type your question" value="${escapeAttr(q.prompt)}">
+          ${optionsHtml}
+        </div>`;
+      })
+      .join("");
+  }
+
+  function escapeAttr(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  }
+
+  questionsEl.addEventListener("click", (e) => {
+    const setType = e.target.closest("[data-set-type]");
+    if (setType) {
+      const qi = Number(setType.dataset.qi);
+      questions[qi].type = setType.dataset.setType;
+      if (questions[qi].type === "choice" && questions[qi].options.length < 2) {
+        questions[qi].options = ["", ""];
+      }
+      renderQuestions();
+      return;
+    }
+    const removeQ = e.target.closest("[data-remove-q]");
+    if (removeQ) {
+      questions.splice(Number(removeQ.dataset.qi), 1);
+      renderQuestions();
+      return;
+    }
+    const addOpt = e.target.closest("[data-add-opt]");
+    if (addOpt) {
+      const qi = Number(addOpt.dataset.qi);
+      if (questions[qi].options.length < 8) questions[qi].options.push("");
+      renderQuestions();
+      return;
+    }
+    const removeOpt = e.target.closest("[data-remove-opt]");
+    if (removeOpt) {
+      const qi = Number(removeOpt.dataset.qi);
+      const oi = Number(removeOpt.dataset.oi);
+      questions[qi].options.splice(oi, 1);
+      renderQuestions();
+      return;
+    }
+  });
+
+  questionsEl.addEventListener("input", (e) => {
+    if (e.target.classList.contains("prompt-input")) {
+      questions[Number(e.target.dataset.qi)].prompt = e.target.value;
+    } else if (e.target.classList.contains("opt-input")) {
+      questions[Number(e.target.dataset.qi)].options[Number(e.target.dataset.oi)] = e.target.value;
+    }
+  });
+
+  document.getElementById("addQBtn").addEventListener("click", () => addQuestion("text"));
+
+  addQuestion("text");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating…";
+    resultEl.innerHTML = "";
+
+    const payload = {
+      accessCode: document.getElementById("accessCode").value,
+      title: document.getElementById("title").value,
+      questions: questions.map((q) => ({
+        type: q.type,
+        prompt: q.prompt,
+        options: q.type === "choice" ? q.options : undefined,
+      })),
+    };
+
+    try {
+      const res = await fetch(`${WORKER_BASE}/api/survey/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(data.participantUrl)}`;
+        resultEl.innerHTML = `
+          <div class="banner success">
+            <strong>Survey created!</strong>
+            <div class="qr-wrap"><img src="${qrUrl}" alt="QR code to answer the survey" width="220" height="220"></div>
+            <div>Participant link:</div>
+            <div class="result-box">${data.participantUrl}</div>
+            <div style="margin-top:10px">Your results link (bookmark this, it won't be shown again):</div>
+            <div class="result-box">${data.resultsUrl}</div>
+            <p class="hint"><a href="${data.resultsUrl}" target="_blank" rel="noopener">Open live results &rarr;</a></p>
+          </div>`;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        resultEl.innerHTML = `<div class="banner error"><strong>Couldn't create survey</strong><br>${data.error || "Unknown error."}</div>`;
+      }
+    } catch (err) {
+      resultEl.innerHTML = `<div class="banner error"><strong>Network error</strong><br>${err.message}</div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Create survey";
+    }
+  });
+</script>
+</body>
+</html>

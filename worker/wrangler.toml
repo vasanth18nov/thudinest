@@ -7,5 +7,9 @@ GITHUB_OWNER = "vasanth18nov"
 GITHUB_REPO = "thudinest"
 PAGES_BASE_URL = "https://thudinest.com"
 
+[[kv_namespaces]]
+binding = "SURVEYS"
+id = "9652d43420a64a8795de34ffc0973cc4"
+
 # GITHUB_TOKEN is a secret, set separately with:
 #   npx wrangler secret put GITHUB_TOKEN

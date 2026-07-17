@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survey | ThudinestHosting</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand: #38bdf8; --brand-dark: #0284c7; --brand-light: #7dd3fc; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 60%);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 48px 20px 80px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 28px; text-align: center; }
+  form, .card {
+    display: flex; flex-direction: column; gap: 22px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 28px 26px; backdrop-filter: blur(10px);
+  }
+  .q-block label.prompt { display: block; font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+  textarea, input[type="text"] {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 11px 13px; color: #fff; font-size: 0.95rem; font-family: inherit;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  .choice-list { display: flex; flex-direction: column; gap: 8px; }
+  .choice-opt {
+    display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; padding: 11px 14px; cursor: pointer;
+  }
+  .choice-opt:has(input:checked) { border-color: var(--brand); background: rgba(56,189,248,0.1); }
+  .choice-opt input { accent-color: var(--brand); }
+  button.submit {
+    background: var(--brand); color: #04141c; border: none; border-radius: 999px;
+    padding: 14px 20px; font-size: 1rem; font-weight: 700; cursor: pointer;
+  }
+  button.submit:disabled { opacity: 0.6; cursor: wait; }
+  .banner { border-radius: 12px; padding: 14px 16px; font-size: 0.9rem; line-height: 1.55; }
+  .banner.error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: #fecaca; }
+  .thanks { text-align: center; font-size: 1.15rem; padding: 30px 10px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="surveyTitle">Loading survey&hellip;</h1>
+  <div id="loadError"></div>
+  <form id="survey-form" class="hidden"></form>
+  <div id="thanks" class="card hidden">
+    <div class="thanks">&#9989; Thanks for your answer!</div>
+  </div>
+</div>
+
+<script>
+  const WORKER_BASE = "https://thudinesthosting-publish.thudinesthosting.workers.dev";
+  const params = new URLSearchParams(location.search);
+  const surveyId = (params.get("id") || "").trim();
+
+  const titleEl = document.getElementById("surveyTitle");
+  const formEl = document.getElementById("survey-form");
+  const thanksEl = document.getElementById("thanks");
+  const loadErrorEl = document.getElementById("loadError");
+
+  async function load() {
+    if (!surveyId) {
+      titleEl.textContent = "Survey not found";
+      loadErrorEl.innerHTML = '<div class="banner error">No survey ID in the link.</div>';
+      return;
+    }
+    try {
+      const res = await fetch(`${WORKER_BASE}/api/survey/def?id=${encodeURIComponent(surveyId)}`);
+      const data = await res.json();
+      if (!data.ok) {
+        titleEl.textContent = "Survey not found";
+        loadErrorEl.innerHTML = `<div class="banner error">${data.error || "This survey may have expired."}</div>`;
+        return;
+      }
+      renderForm(data.title, data.questions);
+    } catch (err) {
+      titleEl.textContent = "Couldn't load survey";
+      loadErrorEl.innerHTML = `<div class="banner error">Network error: ${err.message}</div>`;
+    }
+  }
+
+  function esc(s) {
+    const d = document.createElement("div");
+    d.textContent = s || "";
+    return d.innerHTML;
+  }
+
+  function renderForm(title, questions) {
+    titleEl.textContent = title;
+    formEl.innerHTML =
+      questions
+        .map((q) => {
+          if (q.type === "choice") {
+            return `<div class="q-block">
+              <label class="prompt">${esc(q.prompt)}</label>
+              <div class="choice-list">
+                ${q.options
+                  .map(
+                    (opt, oi) => `<label class="choice-opt">
+                      <input type="radio" name="${q.id}" value="${esc(opt)}" ${oi === 0 ? "" : ""}>
+                      ${esc(opt)}
+                    </label>`
+                  )
+                  .join("")}
+              </div>
+            </div>`;
+          }
+          return `<div class="q-block">
+            <label class="prompt" for="${q.id}">${esc(q.prompt)}</label>
+            <textarea id="${q.id}" name="${q.id}" placeholder="Type your answer&hellip;"></textarea>
+          </div>`;
+        })
+        .join("") + `<button type="submit" class="submit" id="submitBtn">Submit</button>`;
+    formEl.classList.remove("hidden");
+  }
+
+  formEl.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+
+    const answers = {};
+    new FormData(formEl).forEach((value, key) => {
+      answers[key] = value;
+    });
+
+    try {
+      const res = await fetch(`${WORKER_BASE}/api/survey/respond`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: surveyId, answers }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        formEl.classList.add("hidden");
+        thanksEl.classList.remove("hidden");
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+        alert(data.error || "Couldn't submit your answer.");
+      }
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
+      alert("Network error: " + err.message);
+    }
+  });
+
+  load();
+</script>
+</body>
+</html>

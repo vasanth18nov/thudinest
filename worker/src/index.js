@@ -4,6 +4,11 @@ const MAX_IMAGES = 15;
 const GITHUB_API = "https://api.github.com";
 const ALLOWED_ORIGIN = "https://thudinest.com";
 
+const SURVEY_TTL_SECONDS = 60 * 24 * 60 * 60; // 60 days
+const MAX_QUESTIONS = 10;
+const MAX_OPTIONS = 8;
+const MAX_RESPONSES_LISTED = 1000;
+
 const THEMES = {
   retail: {
     label: "Retail", icon: "&#128717;", color: "#16a34a", dark: "#0f7a37", light: "#dcfce7",
@@ -89,6 +94,18 @@ export default {
       }
       if (url.pathname === "/api/delete" && request.method === "POST") {
         return withCors(await handleDeletePage(request, env));
+      }
+      if (url.pathname === "/api/survey/create" && request.method === "POST") {
+        return withCors(await handleSurveyCreate(request, env));
+      }
+      if (url.pathname === "/api/survey/def" && request.method === "GET") {
+        return withCors(await handleSurveyDef(url, env));
+      }
+      if (url.pathname === "/api/survey/respond" && request.method === "POST") {
+        return withCors(await handleSurveyRespond(request, env));
+      }
+      if (url.pathname === "/api/survey/results" && request.method === "GET") {
+        return withCors(await handleSurveyResults(url, env));
       }
     } catch (err) {
       return withCors(json({ ok: false, error: `Server error: ${err.message}` }, 500));
@@ -894,4 +911,203 @@ async function handlePublish(request, env) {
   const result = { ok: true, url: pageUrl };
   if (returnedEditKey) result.editKey = returnedEditKey;
   return json(result, 200);
+}
+
+function randomId(len) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let out = "";
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  for (let i = 0; i < len; i++) out += chars[bytes[i] % chars.length];
+  return out;
+}
+
+async function handleSurveyCreate(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "Invalid request." }, 400);
+  }
+
+  const accessCode = String(body.accessCode || "").trim().toLowerCase();
+  if (accessCode !== ACCESS_CODE) {
+    return json({ ok: false, error: "Invalid access code." }, 400);
+  }
+
+  const title = String(body.title || "").trim();
+  if (!title) return json({ ok: false, error: "Survey title is required." }, 400);
+
+  const rawQuestions = Array.isArray(body.questions) ? body.questions.slice(0, MAX_QUESTIONS) : [];
+  if (rawQuestions.length === 0) {
+    return json({ ok: false, error: "Add at least one question." }, 400);
+  }
+
+  const questions = [];
+  for (let i = 0; i < rawQuestions.length; i++) {
+    const q = rawQuestions[i];
+    const prompt = String((q && q.prompt) || "").trim();
+    if (!prompt) return json({ ok: false, error: `Question ${i + 1} needs a prompt.` }, 400);
+    const type = q && q.type === "choice" ? "choice" : "text";
+    const question = { id: `q${i + 1}`, type, prompt };
+    if (type === "choice") {
+      const options = (Array.isArray(q.options) ? q.options : [])
+        .map((o) => String(o || "").trim())
+        .filter(Boolean)
+        .slice(0, MAX_OPTIONS);
+      if (options.length < 2) {
+        return json({ ok: false, error: `Question ${i + 1} needs at least 2 options.` }, 400);
+      }
+      question.options = options;
+    }
+    questions.push(question);
+  }
+
+  let surveyId;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const candidate = randomId(6);
+    const existing = await env.SURVEYS.get(`survey:${candidate}:def`);
+    if (!existing) {
+      surveyId = candidate;
+      break;
+    }
+  }
+  if (!surveyId) return json({ ok: false, error: "Couldn't generate a survey ID, try again." }, 500);
+
+  const hostKey = crypto.randomUUID();
+  const hostKeyHash = await sha256Hex(hostKey);
+
+  const def = {
+    title,
+    questions,
+    hostKeyHash,
+    createdAt: new Date().toISOString(),
+  };
+
+  await env.SURVEYS.put(`survey:${surveyId}:def`, JSON.stringify(def), {
+    expirationTtl: SURVEY_TTL_SECONDS,
+  });
+
+  const base = env.PAGES_BASE_URL || "https://thudinest.com";
+  return json(
+    {
+      ok: true,
+      surveyId,
+      hostKey,
+      participantUrl: `${base}/survey/?id=${surveyId}`,
+      resultsUrl: `${base}/survey/results/?id=${surveyId}&key=${hostKey}`,
+    },
+    200
+  );
+}
+
+async function handleSurveyDef(url, env) {
+  const id = (url.searchParams.get("id") || "").trim().toLowerCase();
+  if (!id) return json({ ok: false, error: "Missing survey id." }, 400);
+
+  const raw = await env.SURVEYS.get(`survey:${id}:def`);
+  if (!raw) return json({ ok: false, error: "Survey not found." }, 404);
+
+  const def = JSON.parse(raw);
+  return json({ ok: true, title: def.title, questions: def.questions });
+}
+
+async function handleSurveyRespond(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "Invalid request." }, 400);
+  }
+
+  const id = String(body.id || "").trim().toLowerCase();
+  if (!id) return json({ ok: false, error: "Missing survey id." }, 400);
+
+  const raw = await env.SURVEYS.get(`survey:${id}:def`);
+  if (!raw) return json({ ok: false, error: "Survey not found." }, 404);
+  const def = JSON.parse(raw);
+
+  const submitted = body.answers && typeof body.answers === "object" ? body.answers : {};
+  const answers = {};
+  for (const q of def.questions) {
+    const value = submitted[q.id];
+    if (q.type === "choice") {
+      const text = String(value || "").trim();
+      if (q.options.includes(text)) answers[q.id] = text;
+    } else {
+      const text = String(value || "").trim().slice(0, 500);
+      if (text) answers[q.id] = text;
+    }
+  }
+
+  if (Object.keys(answers).length === 0) {
+    return json({ ok: false, error: "No answers to submit." }, 400);
+  }
+
+  const responseId = crypto.randomUUID();
+  await env.SURVEYS.put(
+    `survey:${id}:resp:${responseId}`,
+    JSON.stringify({ answers, submittedAt: new Date().toISOString() }),
+    { expirationTtl: SURVEY_TTL_SECONDS }
+  );
+
+  return json({ ok: true }, 200);
+}
+
+async function handleSurveyResults(url, env) {
+  const id = (url.searchParams.get("id") || "").trim().toLowerCase();
+  const key = (url.searchParams.get("key") || "").trim();
+  if (!id || !key) return json({ ok: false, error: "Missing survey id or key." }, 400);
+
+  const rawDef = await env.SURVEYS.get(`survey:${id}:def`);
+  if (!rawDef) return json({ ok: false, error: "Survey not found." }, 404);
+  const def = JSON.parse(rawDef);
+
+  const keyHash = await sha256Hex(key);
+  if (keyHash !== def.hostKeyHash) {
+    return json({ ok: false, error: "Invalid results key." }, 401);
+  }
+
+  const list = await env.SURVEYS.list({ prefix: `survey:${id}:resp:`, limit: MAX_RESPONSES_LISTED });
+  const responses = await Promise.all(list.keys.map((k) => env.SURVEYS.get(k.name)));
+
+  const tallies = {};
+  const textAnswers = {};
+  for (const q of def.questions) {
+    if (q.type === "choice") {
+      tallies[q.id] = {};
+      for (const opt of q.options) tallies[q.id][opt] = 0;
+    } else {
+      textAnswers[q.id] = [];
+    }
+  }
+
+  let responseCount = 0;
+  for (const raw of responses) {
+    if (!raw) continue;
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    responseCount++;
+    for (const q of def.questions) {
+      const value = parsed.answers && parsed.answers[q.id];
+      if (!value) continue;
+      if (q.type === "choice" && tallies[q.id] && value in tallies[q.id]) {
+        tallies[q.id][value]++;
+      } else if (q.type === "text") {
+        textAnswers[q.id].push(value);
+      }
+    }
+  }
+
+  return json({
+    ok: true,
+    title: def.title,
+    questions: def.questions,
+    responseCount,
+    tallies,
+    textAnswers,
+  });
 }
