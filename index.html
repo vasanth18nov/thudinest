@@ -1683,6 +1683,207 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .tn-tile, .tn-photo, .tn-book-btn,
   .tn-btn-ghost { transition: none !important; }
 }
+/* =====================================================================
+   NEW GAMES (Snakes & Ladders, Carrom, Kovai Quiz, 2048, Dots & Boxes)
+   ===================================================================== */
+.game-card.ladders .game-card-title { color: #ff9f43; }
+.game-card.carrom  .game-card-title { color: #e9b872; }
+.game-card.trivia  .game-card-title { color: #a78bfa; }
+.game-card.g2048   .game-card-title { color: #ef6c4d; }
+.game-card.dots    .game-card-title { color: #38bdf8; }
+
+/* shared setup overlay for the new games */
+.ng-overlay {
+  position: fixed; inset: 0; z-index: 5000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.ng-box {
+  background: rgba(0,0,0,.55); border-radius: 20px;
+  padding: 40px 38px; text-align: center; max-width: 440px; width: 100%;
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 12px 60px rgba(0,0,0,.6);
+  max-height: 92vh; overflow-y: auto;
+}
+.ng-box h1 { font-size: 2rem; letter-spacing: 3px; margin-bottom: 6px; }
+.ng-box .ng-sub { color: rgba(255,255,255,.5); font-size: .86rem; margin-bottom: 24px; line-height: 1.6; }
+.ng-lbl { font-size: .68rem; letter-spacing: 2.5px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-bottom: 10px; }
+.ng-opts { display: flex; gap: 9px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.ng-opt {
+  background: rgba(255,255,255,.09); color: #fff; border: 2px solid rgba(255,255,255,.18);
+  border-radius: 10px; padding: 11px 16px; cursor: pointer; font-size: .82rem; font-weight: 700;
+  transition: all .18s; touch-action: manipulation; flex: 1 1 auto; min-width: 84px;
+}
+.ng-opt:hover { background: rgba(255,255,255,.18); }
+.ng-note { font-size: .71rem; color: #8b8b9e; margin-bottom: 22px; line-height: 1.65; }
+.ng-start {
+  border: none; border-radius: 11px; padding: 15px 40px; font-size: 1rem; font-weight: 800;
+  cursor: pointer; letter-spacing: 1px; touch-action: manipulation; width: 100%; max-width: 250px;
+  transition: opacity .15s, transform .1s;
+}
+.ng-start:hover { opacity: .88; transform: translateY(-2px); }
+.ng-wrap { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.ng-header {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  background: rgba(0,0,0,.5); border-radius: 12px; padding: 10px 16px; margin-bottom: 12px;
+  flex-wrap: wrap; gap: 8px;
+}
+.ng-header h1 { font-size: 1.15rem; letter-spacing: 2px; }
+.ng-badges { display: flex; gap: 7px; flex-wrap: wrap; font-size: .78rem; }
+.ng-badge { background: rgba(255,255,255,.12); border-radius: 8px; padding: 5px 10px; font-weight: 700; }
+.ng-banner {
+  display: none; border-radius: 12px; padding: 16px 20px; text-align: center;
+  margin-bottom: 12px; width: 100%; background: rgba(46,204,113,.15); border: 2px solid #2ecc71;
+}
+.ng-banner.show { display: block; }
+.ng-banner h2 { font-size: 1.4rem; margin-bottom: 5px; }
+.ng-banner p  { font-size: .84rem; color: #ccc; margin-bottom: 12px; }
+.ng-hint { font-size: .72rem; color: rgba(255,255,255,.35); margin-top: 12px; text-align: center; line-height: 1.6; }
+.ng-canvas { border-radius: 12px; max-width: 100%; height: auto; touch-action: none; display: block; }
+
+/* ===== SNAKES & LADDERS ===== */
+#screen-ladders { background: radial-gradient(ellipse at 50% 0%, #3b2410 0%, #140b04 100%); min-height: 100vh; padding: 56px 14px 32px; }
+#ladders-setup { background: radial-gradient(ellipse at center, #3b2410 0%, #0d0602 100%); }
+#ladders-setup h1 { color: #ff9f43; }
+#ladders-setup .ng-opt.active { background: #ff9f43; color: #2a1607; border-color: #ff9f43; }
+#ladders-start { background: #ff9f43; color: #2a1607; }
+#screen-ladders .ng-header h1 { color: #ff9f43; }
+#snl-turnbar {
+  width: 100%; text-align: center; padding: 11px; border-radius: 10px; margin-bottom: 12px;
+  font-weight: 800; font-size: .92rem; background: rgba(255,159,67,.14); border: 1px solid rgba(255,159,67,.3);
+}
+.snl-players { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; width: 100%; }
+.snl-pchip {
+  display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,.07);
+  border: 2px solid transparent; border-radius: 10px; padding: 7px 12px; font-size: .78rem; font-weight: 700;
+}
+.snl-pchip.active { border-color: #ff9f43; background: rgba(255,159,67,.16); }
+.snl-dot { width: 13px; height: 13px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+#snl-dice-row { display: flex; align-items: center; gap: 16px; margin-top: 14px; }
+#snl-dice {
+  width: 68px; height: 68px; border-radius: 14px; background: #fff; color: #1a1a2e;
+  display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900;
+  box-shadow: 0 6px 22px rgba(0,0,0,.5); transition: transform .12s;
+}
+#snl-dice.rolling { animation: snlShake .28s infinite; }
+@keyframes snlShake { 0%,100%{transform:rotate(-9deg) scale(1.04)} 50%{transform:rotate(9deg) scale(.96)} }
+#snl-roll-btn { background: #ff9f43; color: #2a1607; border: none; border-radius: 11px; padding: 16px 32px; font-size: 1rem; font-weight: 800; cursor: pointer; letter-spacing: 1px; touch-action: manipulation; }
+#snl-roll-btn:disabled { opacity: .4; cursor: not-allowed; }
+#snl-log { font-size: .78rem; color: #d9b48f; margin-top: 12px; min-height: 20px; text-align: center; }
+
+/* ===== CARROM ===== */
+#screen-carrom { background: radial-gradient(ellipse at 50% 0%, #2e2113 0%, #0f0a05 100%); min-height: 100vh; padding: 56px 14px 32px; }
+#carrom-setup { background: radial-gradient(ellipse at center, #2e2113 0%, #080502 100%); }
+#carrom-setup h1 { color: #e9b872; }
+#carrom-setup .ng-opt.active { background: #e9b872; color: #2a1c0b; border-color: #e9b872; }
+#carrom-start { background: #e9b872; color: #2a1c0b; }
+#screen-carrom .ng-header h1 { color: #e9b872; }
+.crm-score { display: flex; gap: 10px; width: 100%; margin-bottom: 12px; }
+.crm-side {
+  flex: 1; background: rgba(0,0,0,.45); border: 2px solid transparent; border-radius: 12px;
+  padding: 10px 12px; text-align: center;
+}
+.crm-side.active { border-color: #e9b872; background: rgba(233,184,114,.12); }
+.crm-side .crm-name { font-size: .72rem; letter-spacing: 1.5px; color: rgba(255,255,255,.5); text-transform: uppercase; }
+.crm-side .crm-val { font-size: 1.5rem; font-weight: 900; margin-top: 2px; }
+#crm-status { text-align: center; font-size: .85rem; font-weight: 700; color: #e9b872; margin-top: 12px; min-height: 22px; }
+#crm-power-wrap { width: 100%; max-width: 460px; height: 9px; background: rgba(255,255,255,.1); border-radius: 6px; margin-top: 12px; overflow: hidden; }
+#crm-power { height: 100%; width: 0%; background: linear-gradient(90deg,#2ecc71,#f5c842,#e74c3c); transition: width .05s; }
+
+/* ===== KOVAI QUIZ ===== */
+#screen-trivia { background: radial-gradient(ellipse at 50% 0%, #241a45 0%, #0b0818 100%); min-height: 100vh; padding: 56px 14px 32px; }
+#trivia-setup { background: radial-gradient(ellipse at center, #241a45 0%, #07050f 100%); }
+#trivia-setup h1 { color: #a78bfa; }
+#trivia-setup .ng-opt.active { background: #a78bfa; color: #1b1233; border-color: #a78bfa; }
+#trivia-start { background: #a78bfa; color: #1b1233; }
+#screen-trivia .ng-header h1 { color: #a78bfa; }
+#trv-timerbar { width: 100%; height: 7px; background: rgba(255,255,255,.1); border-radius: 5px; overflow: hidden; margin-bottom: 16px; }
+#trv-timerfill { height: 100%; width: 100%; background: linear-gradient(90deg,#a78bfa,#22d3ee); transition: width .25s linear; }
+#trv-qcard {
+  width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(167,139,250,.25);
+  border-radius: 16px; padding: 22px 20px; margin-bottom: 14px;
+}
+#trv-qcat { font-size: .66rem; letter-spacing: 2.5px; text-transform: uppercase; color: #a78bfa; margin-bottom: 9px; }
+#trv-qtext { font-size: 1.05rem; font-weight: 700; line-height: 1.55; }
+.trv-answers { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.trv-ans {
+  background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.13); border-radius: 12px;
+  padding: 14px 16px; text-align: left; cursor: pointer; font-size: .9rem; font-weight: 600; color: #fff;
+  transition: all .16s; touch-action: manipulation; display: flex; gap: 11px; align-items: center;
+}
+.trv-ans:hover:not(.locked) { background: rgba(167,139,250,.16); border-color: #a78bfa; }
+.trv-ans .trv-key {
+  width: 25px; height: 25px; flex: 0 0 25px; border-radius: 7px; background: rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center; font-size: .76rem; font-weight: 800;
+}
+.trv-ans.correct { background: rgba(46,204,113,.2); border-color: #2ecc71; }
+.trv-ans.wrong   { background: rgba(231,76,60,.18); border-color: #e74c3c; }
+.trv-ans.locked  { cursor: default; }
+#trv-explain {
+  display: none; width: 100%; margin-top: 14px; padding: 14px 16px; border-radius: 12px;
+  background: rgba(255,255,255,.05); border-left: 3px solid #a78bfa;
+  font-size: .82rem; color: #cfc6f0; line-height: 1.65;
+}
+#trv-explain.show { display: block; }
+#trv-next { margin-top: 14px; background: #a78bfa; color: #1b1233; border: none; border-radius: 11px; padding: 14px 34px; font-weight: 800; cursor: pointer; display: none; font-size: .95rem; }
+#trv-next.show { display: block; }
+#trv-result { display: none; text-align: center; width: 100%; }
+#trv-result.show { display: block; }
+#trv-result .trv-big { font-size: 3.2rem; font-weight: 900; color: #a78bfa; }
+#trv-result .trv-rank { font-size: 1.1rem; font-weight: 700; margin: 6px 0 18px; }
+
+/* ===== 2048 ===== */
+#screen-g2048 { background: radial-gradient(ellipse at 50% 0%, #3a2115 0%, #120906 100%); min-height: 100vh; padding: 56px 14px 32px; }
+#g2048-setup { background: radial-gradient(ellipse at center, #3a2115 0%, #0b0503 100%); }
+#g2048-setup h1 { color: #ef6c4d; }
+#g2048-setup .ng-opt.active { background: #ef6c4d; color: #24100a; border-color: #ef6c4d; }
+#g2048-start { background: #ef6c4d; color: #24100a; }
+#screen-g2048 .ng-header h1 { color: #ef6c4d; }
+#tfe-board {
+  position: relative; width: 100%; max-width: 400px; aspect-ratio: 1/1;
+  background: rgba(255,255,255,.06); border-radius: 14px; padding: 3%;
+  display: grid; gap: 3%; touch-action: none;
+}
+.tfe-cell { background: rgba(255,255,255,.05); border-radius: 9px; }
+.tfe-tile {
+  position: absolute; display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; font-weight: 900; font-family: 'Inter','Segoe UI',sans-serif;
+  transition: left .1s ease, top .1s ease; color: #1e1206;
+}
+.tfe-tile.new { animation: tfePop .16s ease; }
+.tfe-tile.merged { animation: tfeMerge .16s ease; }
+@keyframes tfePop   { from { transform: scale(.2); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+@keyframes tfeMerge { 0% { transform: scale(1) } 50% { transform: scale(1.16) } 100% { transform: scale(1) } }
+#tfe-actions { display: flex; gap: 9px; margin-top: 14px; }
+
+/* ===== DOTS & BOXES ===== */
+#screen-dots { background: radial-gradient(ellipse at 50% 0%, #0d2a3d 0%, #04101a 100%); min-height: 100vh; padding: 56px 14px 32px; }
+#dots-setup { background: radial-gradient(ellipse at center, #0d2a3d 0%, #020a10 100%); }
+#dots-setup h1 { color: #38bdf8; }
+#dots-setup .ng-opt.active { background: #38bdf8; color: #04212f; border-color: #38bdf8; }
+#dots-start { background: #38bdf8; color: #04212f; }
+#screen-dots .ng-header h1 { color: #38bdf8; }
+.dab-score { display: flex; gap: 10px; width: 100%; margin-bottom: 12px; }
+.dab-side { flex: 1; background: rgba(0,0,0,.4); border: 2px solid transparent; border-radius: 12px; padding: 9px 12px; text-align: center; }
+.dab-side.active { border-color: currentColor; }
+.dab-side .dab-name { font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; opacity: .75; }
+.dab-side .dab-val { font-size: 1.45rem; font-weight: 900; }
+#dab-board { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1/1; touch-action: manipulation; }
+.dab-dot { position: absolute; border-radius: 50%; background: #cfe9fb; transform: translate(-50%,-50%); }
+.dab-line { position: absolute; border-radius: 4px; background: rgba(255,255,255,.09); cursor: pointer; transition: background .15s; }
+.dab-line:hover { background: rgba(56,189,248,.45); }
+.dab-line.taken { cursor: default; }
+.dab-box {
+  position: absolute; border-radius: 5px; display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: .95rem; opacity: 0; transition: opacity .22s; pointer-events: none;
+}
+.dab-box.filled { opacity: 1; }
+#dab-status { text-align: center; font-size: .86rem; font-weight: 700; margin-top: 14px; min-height: 22px; }
+
+@media (max-width: 600px) {
+  .ng-box { padding: 30px 22px; }
+  .ng-box h1 { font-size: 1.6rem; }
+  #snl-dice { width: 58px; height: 58px; font-size: 2rem; }
+  #trv-qtext { font-size: .96rem; }
+}
 </style>
 </head>
 <body>
@@ -2095,6 +2296,31 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <span class="game-card-icon">&#127939;</span>
       <div class="game-card-title">Robo Jump</div>
       <div class="game-card-desc">Side-scrolling platformer<br>Stomp bots &#183; grab coins &#183; reach the flag</div>
+    </div>
+    <div class="game-card ladders" onclick="showScreen('ladders')">
+      <span class="game-card-icon">&#127765;</span>
+      <div class="game-card-title">Snakes &amp; Ladders</div>
+      <div class="game-card-desc">Paramapadham &#183; up to 4 players<br>Climb to 100, dodge the snakes</div>
+    </div>
+    <div class="game-card carrom" onclick="showScreen('carrom')">
+      <span class="game-card-icon">&#9899;</span>
+      <div class="game-card-title">Carrom</div>
+      <div class="game-card-desc">Flick physics &#183; 3 levels<br>Pocket your coins &amp; the queen</div>
+    </div>
+    <div class="game-card trivia" onclick="showScreen('trivia')">
+      <span class="game-card-icon">&#127963;</span>
+      <div class="game-card-title">Kovai Quiz</div>
+      <div class="game-card-desc">50 questions on Coimbatore<br>Food, temples, hills &amp; this house</div>
+    </div>
+    <div class="game-card g2048" onclick="showScreen('g2048')">
+      <span class="game-card-icon">&#127922;</span>
+      <div class="game-card-title">2048</div>
+      <div class="game-card-desc">Slide &amp; merge the tiles<br>3 board sizes &#183; undo &#183; best score</div>
+    </div>
+    <div class="game-card dots" onclick="showScreen('dots')">
+      <span class="game-card-icon">&#9638;</span>
+      <div class="game-card-title">Dots &amp; Boxes</div>
+      <div class="game-card-desc">Pass and play or vs CPU<br>Close a box, go again</div>
     </div>
   </div>
 </div>
@@ -2539,6 +2765,227 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 <div id="toast"></div>
 
+<!-- ===== SNAKES & LADDERS SCREEN ===== -->
+<div id="screen-ladders" class="screen" style="display:none">
+  <div class="ng-overlay" id="ladders-setup">
+    <div class="ng-box">
+      <h1>Snakes &amp; Ladders</h1>
+      <p class="ng-sub">Paramapadham &#8212; the classic climb to 100</p>
+      <div class="ng-lbl">Players</div>
+      <div class="ng-opts" id="snl-mode-opts">
+        <button class="ng-opt active" onclick="snlSetMode('cpu1')">You vs CPU</button>
+        <button class="ng-opt" onclick="snlSetMode('cpu2')">You vs 2 CPU</button>
+        <button class="ng-opt" onclick="snlSetMode('p2')">2 Players</button>
+        <button class="ng-opt" onclick="snlSetMode('p3')">3 Players</button>
+        <button class="ng-opt" onclick="snlSetMode('p4')">4 Players</button>
+      </div>
+      <div class="ng-note">Roll the dice, ride the ladders, dodge the snakes. Land past 100 and you stay put, so you need the exact roll to finish.</div>
+      <button class="ng-start" id="ladders-start" onclick="snlStart()">&#9654; Start Game</button>
+    </div>
+  </div>
+
+  <div class="ng-wrap">
+    <div class="ng-header">
+      <h1>SNAKES &amp; LADDERS</h1>
+      <div class="ng-badges"><span class="ng-badge">Rolls <b id="snl-rolls">0</b></span></div>
+    </div>
+    <div class="ng-banner" id="snl-banner">
+      <h2 id="snl-banner-title">Winner!</h2>
+      <p id="snl-banner-msg"></p>
+      <button class="btn btn-green" onclick="snlNewGame()">Play Again</button>
+    </div>
+    <div id="snl-turnbar">Your turn</div>
+    <div class="snl-players" id="snl-players"></div>
+    <canvas id="snl-canvas" class="ng-canvas" width="440" height="440"></canvas>
+    <div id="snl-dice-row">
+      <div id="snl-dice">&#9860;</div>
+      <button id="snl-roll-btn" onclick="snlRoll()">ROLL</button>
+    </div>
+    <div id="snl-log"></div>
+    <div class="ng-hint">Tap ROLL on your turn &#183; ladders lift you up &#183; snakes drag you down</div>
+  </div>
+</div>
+
+<!-- ===== CARROM SCREEN ===== -->
+<div id="screen-carrom" class="screen" style="display:none">
+  <div class="ng-overlay" id="carrom-setup">
+    <div class="ng-box">
+      <h1>Carrom</h1>
+      <p class="ng-sub">Flick the striker, pocket your coins, hunt the queen</p>
+      <div class="ng-lbl">Difficulty</div>
+      <div class="ng-opts" id="crm-diff-opts">
+        <button class="ng-opt" onclick="crmSetDiff('easy')">Easy</button>
+        <button class="ng-opt active" onclick="crmSetDiff('normal')">Normal</button>
+        <button class="ng-opt" onclick="crmSetDiff('hard')">Hard</button>
+      </div>
+      <div class="ng-note">You play the white coins, the CPU plays black. Drag back from the striker like a slingshot and release to shoot. Queen is worth 3. Pocketing the striker costs you a point.</div>
+      <button class="ng-start" id="carrom-start" onclick="crmStart()">&#9654; Start Game</button>
+    </div>
+  </div>
+
+  <div class="ng-wrap">
+    <div class="ng-header">
+      <h1>CARROM</h1>
+      <div class="ng-badges"><span class="ng-badge">Shots <b id="crm-shots">0</b></span></div>
+    </div>
+    <div class="ng-banner" id="crm-banner">
+      <h2 id="crm-banner-title"></h2>
+      <p id="crm-banner-msg"></p>
+      <button class="btn btn-green" onclick="crmNewGame()">Play Again</button>
+    </div>
+    <div class="crm-score">
+      <div class="crm-side active" id="crm-side-you">
+        <div class="crm-name">You &#183; White</div>
+        <div class="crm-val" id="crm-score-you" style="color:#fff">0</div>
+      </div>
+      <div class="crm-side" id="crm-side-cpu">
+        <div class="crm-name">CPU &#183; Black</div>
+        <div class="crm-val" id="crm-score-cpu" style="color:#8b8b9e">0</div>
+      </div>
+    </div>
+    <canvas id="crm-canvas" class="ng-canvas" width="460" height="460"></canvas>
+    <div id="crm-power-wrap"><div id="crm-power"></div></div>
+    <div id="crm-status">Drag the striker sideways to position it</div>
+    <div class="ng-hint">Drag left or right along the base line to move the striker &#183; drag backwards from it and release to shoot</div>
+  </div>
+</div>
+
+<!-- ===== KOVAI QUIZ SCREEN ===== -->
+<div id="screen-trivia" class="screen" style="display:none">
+  <div class="ng-overlay" id="trivia-setup">
+    <div class="ng-box">
+      <h1>Kovai Quiz</h1>
+      <p class="ng-sub">How well do you know Coimbatore and the hills around it?</p>
+      <div class="ng-lbl">Category</div>
+      <div class="ng-opts" id="trv-cat-opts">
+        <button class="ng-opt active" onclick="trvSetCat('mixed')">Mixed</button>
+        <button class="ng-opt" onclick="trvSetCat('city')">City &amp; Kongu</button>
+        <button class="ng-opt" onclick="trvSetCat('food')">Food</button>
+        <button class="ng-opt" onclick="trvSetCat('temples')">Temples</button>
+        <button class="ng-opt" onclick="trvSetCat('nature')">Hills &amp; Nature</button>
+        <button class="ng-opt" onclick="trvSetCat('house')">Thudinest</button>
+      </div>
+      <div class="ng-note">Ten questions, twenty seconds each. Answer fast for bonus points. Every answer comes with a little story, so you leave knowing the place better than when you arrived.</div>
+      <button class="ng-start" id="trivia-start" onclick="trvStart()">&#9654; Start Quiz</button>
+    </div>
+  </div>
+
+  <div class="ng-wrap">
+    <div class="ng-header">
+      <h1>KOVAI QUIZ</h1>
+      <div class="ng-badges">
+        <span class="ng-badge">Q <b id="trv-qnum">1</b>/10</span>
+        <span class="ng-badge">Score <b id="trv-score">0</b></span>
+        <span class="ng-badge">Streak <b id="trv-streak">0</b></span>
+      </div>
+    </div>
+    <div id="trv-play" style="width:100%">
+      <div id="trv-timerbar"><div id="trv-timerfill"></div></div>
+      <div id="trv-qcard">
+        <div id="trv-qcat"></div>
+        <div id="trv-qtext"></div>
+      </div>
+      <div class="trv-answers" id="trv-answers"></div>
+      <div id="trv-explain"></div>
+      <button id="trv-next" onclick="trvNext()">Next Question &#8594;</button>
+    </div>
+    <div id="trv-result">
+      <div class="trv-big" id="trv-final">0</div>
+      <div class="trv-rank" id="trv-rank"></div>
+      <div id="trv-breakdown" style="font-size:.84rem;color:#b9b0d8;line-height:1.8;margin-bottom:20px"></div>
+      <button class="btn btn-purple" onclick="trvNewGame()" style="padding:14px 30px">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2048 SCREEN ===== -->
+<div id="screen-g2048" class="screen" style="display:none">
+  <div class="ng-overlay" id="g2048-setup">
+    <div class="ng-box">
+      <h1>2048</h1>
+      <p class="ng-sub">Slide, merge, and chase the golden tile</p>
+      <div class="ng-lbl">Board Size</div>
+      <div class="ng-opts" id="tfe-size-opts">
+        <button class="ng-opt" onclick="tfeSetSize(3)">3 &#215; 3</button>
+        <button class="ng-opt active" onclick="tfeSetSize(4)">4 &#215; 4</button>
+        <button class="ng-opt" onclick="tfeSetSize(5)">5 &#215; 5</button>
+      </div>
+      <div class="ng-note">Swipe or use the arrow keys. Equal tiles merge into one. Reach 2048 to win, then keep going for a bigger score.</div>
+      <button class="ng-start" id="g2048-start" onclick="tfeStart()">&#9654; Start Game</button>
+    </div>
+  </div>
+
+  <div class="ng-wrap">
+    <div class="ng-header">
+      <h1>2048</h1>
+      <div class="ng-badges">
+        <span class="ng-badge">Score <b id="tfe-score">0</b></span>
+        <span class="ng-badge">Best <b id="tfe-best">0</b></span>
+      </div>
+    </div>
+    <div class="ng-banner" id="tfe-banner">
+      <h2 id="tfe-banner-title"></h2>
+      <p id="tfe-banner-msg"></p>
+      <button class="btn btn-green" onclick="tfeNewGame()">Play Again</button>
+      <button class="btn btn-gold" id="tfe-keepgoing" onclick="tfeKeepGoing()" style="display:none;margin-left:8px">Keep Going</button>
+    </div>
+    <div id="tfe-board"></div>
+    <div id="tfe-actions">
+      <button class="btn btn-purple" onclick="tfeUndo()">&#8630; Undo</button>
+      <button class="btn btn-red" onclick="tfeNewGame()">New Game</button>
+    </div>
+    <div class="ng-hint">Swipe on the board or use arrow keys / WASD</div>
+  </div>
+</div>
+
+<!-- ===== DOTS & BOXES SCREEN ===== -->
+<div id="screen-dots" class="screen" style="display:none">
+  <div class="ng-overlay" id="dots-setup">
+    <div class="ng-box">
+      <h1>Dots &amp; Boxes</h1>
+      <p class="ng-sub">Close a box, claim it, and go again</p>
+      <div class="ng-lbl">Opponent</div>
+      <div class="ng-opts" id="dab-mode-opts">
+        <button class="ng-opt active" onclick="dabSetMode('cpu')">You vs CPU</button>
+        <button class="ng-opt" onclick="dabSetMode('two')">2 Players</button>
+      </div>
+      <div class="ng-lbl">Grid</div>
+      <div class="ng-opts" id="dab-size-opts">
+        <button class="ng-opt" onclick="dabSetSize(4)">Small</button>
+        <button class="ng-opt active" onclick="dabSetSize(5)">Medium</button>
+        <button class="ng-opt" onclick="dabSetSize(6)">Large</button>
+      </div>
+      <div class="ng-note">Tap the gap between two dots to draw a line. Complete the fourth side of a box and it is yours, plus you get another turn. Most boxes wins.</div>
+      <button class="ng-start" id="dots-start" onclick="dabStart()">&#9654; Start Game</button>
+    </div>
+  </div>
+
+  <div class="ng-wrap">
+    <div class="ng-header">
+      <h1>DOTS &amp; BOXES</h1>
+      <div class="ng-badges"><span class="ng-badge">Lines <b id="dab-lines">0</b></span></div>
+    </div>
+    <div class="ng-banner" id="dab-banner">
+      <h2 id="dab-banner-title"></h2>
+      <p id="dab-banner-msg"></p>
+      <button class="btn btn-green" onclick="dabNewGame()">Play Again</button>
+    </div>
+    <div class="dab-score">
+      <div class="dab-side active" id="dab-side-0" style="color:#38bdf8">
+        <div class="dab-name" id="dab-name-0">You</div>
+        <div class="dab-val" id="dab-score-0">0</div>
+      </div>
+      <div class="dab-side" id="dab-side-1" style="color:#f472b6">
+        <div class="dab-name" id="dab-name-1">CPU</div>
+        <div class="dab-val" id="dab-score-1">0</div>
+      </div>
+    </div>
+    <div id="dab-board"></div>
+    <div id="dab-status">Your turn</div>
+    <div class="ng-hint">Complete a box to score and move again</div>
+  </div>
+</div>
+
 <script>
 // =====================================================================
 // NAVIGATION
@@ -2570,6 +3017,8 @@ function showScreen(name) {
   if (name === 'snake') snakeResumeLoop(); else snakePauseLoop();
   if (name === 'pacman') pacResumeLoop(); else pacPauseLoop();
   if (name === 'platformer') platResumeLoop(); else platPauseLoop();
+  if (name === 'carrom') crmResumeLoop(); else crmPauseLoop();
+  if (name === 'trivia') trvResumeTimer(); else trvPauseTimer();
 }
 
 // =====================================================================
@@ -5318,6 +5767,964 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', updateProgress);
   updateProgress();
 });
+// =====================================================================
+// SNAKES & LADDERS (PARAMAPADHAM)
+// =====================================================================
+const SNL_SNAKES  = {17:7, 54:34, 62:19, 64:60, 87:24, 93:73, 95:75, 98:79};
+const SNL_LADDERS = {4:14, 9:31, 21:42, 28:84, 36:44, 51:67, 71:91, 80:100};
+const SNL_COLORS  = ['#ff9f43', '#38bdf8', '#2ecc71', '#f472b6'];
+const SNL_CELL    = 44;
+const SNL_DICE_FACES = ['\u2680','\u2681','\u2682','\u2683','\u2684','\u2685'];
+
+let snlMode = 'cpu1';
+let snl = null;
+let snlBoardCache = null;
+
+function snlSetMode(m) {
+  snlMode = m;
+  const map = {cpu1:0, cpu2:1, p2:2, p3:3, p4:4};
+  document.querySelectorAll('#snl-mode-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', i === map[m]));
+}
+function snlStart() {
+  document.getElementById('ladders-setup').style.display = 'none';
+  snlNewGame();
+}
+function snlCellPos(n) {
+  const idx = n - 1, row = Math.floor(idx / 10), col = idx % 10;
+  const c = (row % 2 === 0) ? col : 9 - col;
+  return { x: c * SNL_CELL + SNL_CELL / 2, y: (9 - row) * SNL_CELL + SNL_CELL / 2 };
+}
+function snlBuildBoard() {
+  const cv = document.createElement('canvas');
+  cv.width = 440; cv.height = 440;
+  const g = cv.getContext('2d');
+  for (let n = 1; n <= 100; n++) {
+    const idx = n - 1, row = Math.floor(idx / 10), col = idx % 10;
+    const c = (row % 2 === 0) ? col : 9 - col;
+    const x = c * SNL_CELL, y = (9 - row) * SNL_CELL;
+    g.fillStyle = ((row + c) % 2 === 0) ? 'rgba(255,255,255,0.05)' : 'rgba(255,159,67,0.10)';
+    g.fillRect(x, y, SNL_CELL, SNL_CELL);
+    g.strokeStyle = 'rgba(255,255,255,0.07)'; g.lineWidth = 1;
+    g.strokeRect(x + .5, y + .5, SNL_CELL - 1, SNL_CELL - 1);
+    g.fillStyle = (n === 100) ? '#ffd89b' : 'rgba(255,255,255,0.35)';
+    g.font = (n === 100 ? '700 ' : '600 ') + '11px Inter, sans-serif';
+    g.fillText(n, x + 4, y + 14);
+  }
+  // ladders
+  Object.entries(SNL_LADDERS).forEach(([from, to]) => {
+    const a = snlCellPos(+from), b = snlCellPos(+to);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+    const nx = -dy / len * 7, ny = dx / len * 7;
+    g.strokeStyle = '#c98a3c'; g.lineWidth = 4; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(a.x + nx, a.y + ny); g.lineTo(b.x + nx, b.y + ny); g.stroke();
+    g.beginPath(); g.moveTo(a.x - nx, a.y - ny); g.lineTo(b.x - nx, b.y - ny); g.stroke();
+    g.lineWidth = 2.5; g.strokeStyle = '#e0a75b';
+    const rungs = Math.max(3, Math.round(len / 26));
+    for (let i = 1; i < rungs; i++) {
+      const t = i / rungs, px = a.x + dx * t, py = a.y + dy * t;
+      g.beginPath(); g.moveTo(px + nx, py + ny); g.lineTo(px - nx, py - ny); g.stroke();
+    }
+  });
+  // snakes
+  Object.entries(SNL_SNAKES).forEach(([from, to], i) => {
+    const a = snlCellPos(+from), b = snlCellPos(+to);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+    const nx = -dy / len, ny = dx / len;
+    const hue = [140, 168, 96, 190, 120, 152, 108, 176][i % 8];
+    g.strokeStyle = 'hsl(' + hue + ',55%,45%)'; g.lineWidth = 8; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(a.x, a.y);
+    const seg = 3, amp = 15;
+    for (let s = 1; s <= seg; s++) {
+      const t0 = (s - 1) / seg, t1 = s / seg, tm = (t0 + t1) / 2;
+      const sign = (s % 2 === 0) ? 1 : -1;
+      g.quadraticCurveTo(
+        a.x + dx * tm + nx * amp * sign, a.y + dy * tm + ny * amp * sign,
+        a.x + dx * t1, a.y + dy * t1
+      );
+    }
+    g.stroke();
+    g.strokeStyle = 'hsla(' + hue + ',60%,72%,.55)'; g.lineWidth = 2.5;
+    g.stroke();
+    g.fillStyle = 'hsl(' + hue + ',58%,40%)';
+    g.beginPath(); g.arc(a.x, a.y, 9, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff';
+    g.beginPath(); g.arc(a.x - 3, a.y - 2.5, 2.1, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.arc(a.x + 3, a.y - 2.5, 2.1, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#111';
+    g.beginPath(); g.arc(a.x - 3, a.y - 2.5, 1, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.arc(a.x + 3, a.y - 2.5, 1, 0, Math.PI * 2); g.fill();
+  });
+  return cv;
+}
+function snlNewGame() {
+  if (!snlBoardCache) snlBoardCache = snlBuildBoard();
+  const cfg = {
+    cpu1: [{n:'You',cpu:false},{n:'CPU',cpu:true}],
+    cpu2: [{n:'You',cpu:false},{n:'CPU 1',cpu:true},{n:'CPU 2',cpu:true}],
+    p2:   [{n:'Player 1',cpu:false},{n:'Player 2',cpu:false}],
+    p3:   [{n:'Player 1',cpu:false},{n:'Player 2',cpu:false},{n:'Player 3',cpu:false}],
+    p4:   [{n:'Player 1',cpu:false},{n:'Player 2',cpu:false},{n:'Player 3',cpu:false},{n:'Player 4',cpu:false}]
+  }[snlMode];
+  snl = {
+    players: cfg.map((p, i) => ({ name: p.n, cpu: p.cpu, pos: 0, color: SNL_COLORS[i] })),
+    turn: 0, rolls: 0, busy: false, over: false
+  };
+  document.getElementById('snl-banner').classList.remove('show');
+  document.getElementById('snl-rolls').textContent = '0';
+  document.getElementById('snl-log').textContent = '';
+  document.getElementById('snl-dice').innerHTML = '&#9860;';
+  snlRenderChips(); snlDraw(); snlUpdateTurn();
+}
+function snlRenderChips() {
+  document.getElementById('snl-players').innerHTML = snl.players.map((p, i) =>
+    '<div class="snl-pchip' + (i === snl.turn ? ' active' : '') + '">' +
+    '<span class="snl-dot" style="background:' + p.color + ';color:' + p.color + '"></span>' +
+    p.name + ' <b style="color:' + p.color + '">' + p.pos + '</b></div>').join('');
+}
+function snlUpdateTurn() {
+  const p = snl.players[snl.turn];
+  const bar = document.getElementById('snl-turnbar');
+  bar.textContent = snl.over ? 'Game over' : (p.cpu ? p.name + ' is rolling...' : p.name + ' \u2014 tap ROLL');
+  bar.style.color = p.color;
+  document.getElementById('snl-roll-btn').disabled = snl.over || snl.busy || p.cpu;
+  snlRenderChips();
+  if (!snl.over && p.cpu && !snl.busy) setTimeout(snlRoll, 850);
+}
+function snlDraw() {
+  const cv = document.getElementById('snl-canvas'); if (!cv || !snl) return;
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, 440, 440);
+  g.drawImage(snlBoardCache, 0, 0);
+  const groups = {};
+  snl.players.forEach((p, i) => { if (p.pos > 0) (groups[p.pos] = groups[p.pos] || []).push(i); });
+  Object.entries(groups).forEach(([cell, list]) => {
+    const base = snlCellPos(+cell);
+    list.forEach((pi, k) => {
+      const off = list.length > 1 ? (k - (list.length - 1) / 2) * 11 : 0;
+      const p = snl.players[pi];
+      g.beginPath(); g.arc(base.x + off, base.y + 6, 9, 0, Math.PI * 2);
+      g.fillStyle = p.color; g.fill();
+      g.lineWidth = 2; g.strokeStyle = 'rgba(0,0,0,.55)'; g.stroke();
+    });
+  });
+}
+function snlRoll() {
+  if (!snl || snl.busy || snl.over) return;
+  snl.busy = true;
+  document.getElementById('snl-roll-btn').disabled = true;
+  const dice = document.getElementById('snl-dice');
+  dice.classList.add('rolling');
+  let ticks = 0;
+  const spin = setInterval(() => {
+    dice.textContent = SNL_DICE_FACES[Math.floor(Math.random() * 6)];
+    if (++ticks > 9) {
+      clearInterval(spin); dice.classList.remove('rolling');
+      const val = 1 + Math.floor(Math.random() * 6);
+      dice.textContent = SNL_DICE_FACES[val - 1];
+      snl.rolls++;
+      document.getElementById('snl-rolls').textContent = snl.rolls;
+      snlApplyRoll(val);
+    }
+  }, 70);
+}
+function snlApplyRoll(val) {
+  const p = snl.players[snl.turn];
+  const log = document.getElementById('snl-log');
+  if (p.pos + val > 100) {
+    log.textContent = p.name + ' rolled ' + val + ' \u2014 needs exactly ' + (100 - p.pos) + ' to finish';
+    return snlEndTurn();
+  }
+  const target = p.pos + val;
+  const stepTo = () => {
+    if (p.pos < target) {
+      p.pos++; snlDraw(); snlRenderChips();
+      setTimeout(stepTo, 130);
+    } else {
+      const snake = SNL_SNAKES[p.pos], ladder = SNL_LADDERS[p.pos];
+      if (ladder) {
+        log.textContent = p.name + ' rolled ' + val + ' \u2014 ladder up to ' + ladder + '!';
+        setTimeout(() => { p.pos = ladder; snlDraw(); snlRenderChips(); setTimeout(snlAfterMove, 420); }, 320);
+      } else if (snake) {
+        log.textContent = p.name + ' rolled ' + val + ' \u2014 snake down to ' + snake + '!';
+        setTimeout(() => { p.pos = snake; snlDraw(); snlRenderChips(); setTimeout(snlAfterMove, 420); }, 320);
+      } else {
+        log.textContent = p.name + ' rolled ' + val;
+        setTimeout(snlAfterMove, 260);
+      }
+    }
+  };
+  stepTo();
+}
+function snlAfterMove() {
+  const p = snl.players[snl.turn];
+  if (p.pos === 100) {
+    snl.over = true; snl.busy = false;
+    const b = document.getElementById('snl-banner');
+    document.getElementById('snl-banner-title').textContent = p.name + ' wins!';
+    document.getElementById('snl-banner-msg').textContent = 'Home at 100 in ' + snl.rolls + ' total rolls.';
+    b.classList.add('show');
+    snlUpdateTurn();
+    return;
+  }
+  snlEndTurn();
+}
+function snlEndTurn() {
+  snl.busy = false;
+  snl.turn = (snl.turn + 1) % snl.players.length;
+  snlUpdateTurn();
+}
+
+// =====================================================================
+// CARROM
+// =====================================================================
+const CRM_SIZE = 460, CRM_MIN = 42, CRM_MAX = 418;
+const CRM_COIN_R = 10.5, CRM_STRIKER_R = 13.5, CRM_POCKET_R = 21;
+const CRM_POCKETS = [[CRM_MIN + 8, CRM_MIN + 8], [CRM_MAX - 8, CRM_MIN + 8], [CRM_MIN + 8, CRM_MAX - 8], [CRM_MAX - 8, CRM_MAX - 8]];
+const CRM_FRICTION = 0.982;
+
+let crmDiff = 'normal';
+let crm = null, crmRaf = null, crmDrag = null;
+
+function crmSetDiff(d) {
+  crmDiff = d;
+  const map = {easy:0, normal:1, hard:2};
+  document.querySelectorAll('#crm-diff-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', i === map[d]));
+}
+function crmStart() {
+  document.getElementById('carrom-setup').style.display = 'none';
+  crmNewGame(); crmResumeLoop();
+}
+function crmNewGame() {
+  const pieces = [];
+  pieces.push({ x: CRM_SIZE / 2, y: CRM_SIZE / 2, vx: 0, vy: 0, r: CRM_COIN_R, type: 'queen' });
+  const inner = 24, outer = 46;
+  for (let i = 0; i < 6; i++) {
+    const a = (Math.PI * 2 * i) / 6;
+    pieces.push({ x: CRM_SIZE / 2 + Math.cos(a) * inner, y: CRM_SIZE / 2 + Math.sin(a) * inner, vx: 0, vy: 0, r: CRM_COIN_R, type: i % 2 ? 'white' : 'black' });
+  }
+  for (let i = 0; i < 12; i++) {
+    const a = (Math.PI * 2 * i) / 12 + 0.26;
+    pieces.push({ x: CRM_SIZE / 2 + Math.cos(a) * outer, y: CRM_SIZE / 2 + Math.sin(a) * outer, vx: 0, vy: 0, r: CRM_COIN_R, type: i % 2 ? 'white' : 'black' });
+  }
+  crm = {
+    pieces: pieces,
+    striker: { x: CRM_SIZE / 2, y: CRM_MAX - 46, vx: 0, vy: 0, r: CRM_STRIKER_R, alive: true },
+    turn: 'you', phase: 'idle', power: 0, aim: null,
+    scores: { you: 0, cpu: 0 }, shots: 0, over: false, queenBy: null
+  };
+  document.getElementById('crm-banner').classList.remove('show');
+  crmUpdateHud();
+  crmSay('Drag sideways to position, then pull back from the striker and release');
+  crmDraw();
+}
+function crmSay(t) { const el = document.getElementById('crm-status'); if (el) el.textContent = t; }
+function crmUpdateHud() {
+  document.getElementById('crm-score-you').textContent = crm.scores.you;
+  document.getElementById('crm-score-cpu').textContent = crm.scores.cpu;
+  document.getElementById('crm-shots').textContent = crm.shots;
+  document.getElementById('crm-side-you').classList.toggle('active', crm.turn === 'you');
+  document.getElementById('crm-side-cpu').classList.toggle('active', crm.turn === 'cpu');
+}
+function crmBaseY() { return crm.turn === 'you' ? CRM_MAX - 46 : CRM_MIN + 46; }
+function crmDraw() {
+  const cv = document.getElementById('crm-canvas'); if (!cv || !crm) return;
+  const g = cv.getContext('2d');
+  const grad = g.createLinearGradient(0, 0, CRM_SIZE, CRM_SIZE);
+  grad.addColorStop(0, '#5a3d21'); grad.addColorStop(1, '#3c2714');
+  g.fillStyle = grad; g.fillRect(0, 0, CRM_SIZE, CRM_SIZE);
+  const inner = g.createLinearGradient(0, 0, 0, CRM_SIZE);
+  inner.addColorStop(0, '#e6c9a0'); inner.addColorStop(1, '#d4b183');
+  g.fillStyle = inner; g.fillRect(CRM_MIN - 14, CRM_MIN - 14, CRM_MAX - CRM_MIN + 28, CRM_MAX - CRM_MIN + 28);
+  g.strokeStyle = 'rgba(90,55,20,.5)'; g.lineWidth = 2;
+  g.strokeRect(CRM_MIN - 6, CRM_MIN - 6, CRM_MAX - CRM_MIN + 12, CRM_MAX - CRM_MIN + 12);
+  // base lines
+  [CRM_MIN + 30, CRM_MAX - 30].forEach(y => {
+    g.strokeStyle = 'rgba(120,70,25,.55)'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(CRM_MIN + 34, y); g.lineTo(CRM_MAX - 34, y); g.stroke();
+  });
+  [CRM_MIN + 30, CRM_MAX - 30].forEach(x => {
+    g.strokeStyle = 'rgba(120,70,25,.3)'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(x, CRM_MIN + 34); g.lineTo(x, CRM_MAX - 34); g.stroke();
+  });
+  // centre circles
+  g.strokeStyle = 'rgba(120,70,25,.45)'; g.lineWidth = 2;
+  g.beginPath(); g.arc(CRM_SIZE / 2, CRM_SIZE / 2, 62, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = 'rgba(160,40,60,.15)';
+  g.beginPath(); g.arc(CRM_SIZE / 2, CRM_SIZE / 2, 22, 0, Math.PI * 2); g.fill();
+  // pockets
+  CRM_POCKETS.forEach(p => {
+    g.fillStyle = '#2a1a0c';
+    g.beginPath(); g.arc(p[0], p[1], CRM_POCKET_R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 2; g.stroke();
+  });
+  // pieces
+  crm.pieces.forEach(p => {
+    g.beginPath(); g.arc(p.x, p.y + 1.5, p.r, 0, Math.PI * 2);
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.fill();
+    const cg = g.createRadialGradient(p.x - 3, p.y - 3, 1, p.x, p.y, p.r);
+    if (p.type === 'white') { cg.addColorStop(0, '#fffdf6'); cg.addColorStop(1, '#d9cdb4'); }
+    else if (p.type === 'black') { cg.addColorStop(0, '#4a4a52'); cg.addColorStop(1, '#16161c'); }
+    else { cg.addColorStop(0, '#ff6b81'); cg.addColorStop(1, '#a01430'); }
+    g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fillStyle = cg; g.fill();
+    g.strokeStyle = 'rgba(0,0,0,.3)'; g.lineWidth = 1; g.stroke();
+  });
+  const s = crm.striker;
+  if (s.alive) {
+    g.beginPath(); g.arc(s.x, s.y + 2, s.r, 0, Math.PI * 2); g.fillStyle = 'rgba(0,0,0,.3)'; g.fill();
+    const sg = g.createRadialGradient(s.x - 4, s.y - 4, 2, s.x, s.y, s.r);
+    sg.addColorStop(0, '#ffffff'); sg.addColorStop(1, '#9fb6c9');
+    g.beginPath(); g.arc(s.x, s.y, s.r, 0, Math.PI * 2); g.fillStyle = sg; g.fill();
+    g.strokeStyle = 'rgba(40,60,80,.55)'; g.lineWidth = 1.5; g.stroke();
+  }
+  // aim guide
+  if (crm.aim && crm.phase === 'aim') {
+    g.save(); g.setLineDash([7, 7]); g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(s.x, s.y);
+    g.lineTo(s.x + crm.aim.dx * 4.5, s.y + crm.aim.dy * 4.5);
+    g.stroke(); g.restore();
+  }
+}
+function crmMoving() {
+  const all = crm.pieces.concat(crm.striker.alive ? [crm.striker] : []);
+  return all.some(p => Math.hypot(p.vx, p.vy) > 0.07);
+}
+function crmPhysics() {
+  const all = crm.pieces.concat(crm.striker.alive ? [crm.striker] : []);
+  all.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= CRM_FRICTION; p.vy *= CRM_FRICTION;
+    if (Math.hypot(p.vx, p.vy) < 0.07) { p.vx = 0; p.vy = 0; }
+    if (p.x - p.r < CRM_MIN) { p.x = CRM_MIN + p.r; p.vx = Math.abs(p.vx) * .82; }
+    if (p.x + p.r > CRM_MAX) { p.x = CRM_MAX - p.r; p.vx = -Math.abs(p.vx) * .82; }
+    if (p.y - p.r < CRM_MIN) { p.y = CRM_MIN + p.r; p.vy = Math.abs(p.vy) * .82; }
+    if (p.y + p.r > CRM_MAX) { p.y = CRM_MAX - p.r; p.vy = -Math.abs(p.vy) * .82; }
+  });
+  for (let i = 0; i < all.length; i++) {
+    for (let j = i + 1; j < all.length; j++) {
+      const a = all[i], b = all[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      let d = Math.hypot(dx, dy); const min = a.r + b.r;
+      if (d < min && d > 0) {
+        const nx = dx / d, ny = dy / d, overlap = (min - d) / 2;
+        a.x -= nx * overlap; a.y -= ny * overlap;
+        b.x += nx * overlap; b.y += ny * overlap;
+        const rvx = b.vx - a.vx, rvy = b.vy - a.vy;
+        const sep = rvx * nx + rvy * ny;
+        if (sep < 0) {
+          const imp = sep * 0.94;
+          a.vx += imp * nx; a.vy += imp * ny;
+          b.vx -= imp * nx; b.vy -= imp * ny;
+        }
+      }
+    }
+  }
+  // pockets
+  const pocketed = [];
+  CRM_POCKETS.forEach(pk => {
+    for (let i = crm.pieces.length - 1; i >= 0; i--) {
+      const p = crm.pieces[i];
+      if (Math.hypot(p.x - pk[0], p.y - pk[1]) < CRM_POCKET_R - 3) {
+        pocketed.push(p.type); crm.pieces.splice(i, 1);
+      }
+    }
+    if (crm.striker.alive && Math.hypot(crm.striker.x - pk[0], crm.striker.y - pk[1]) < CRM_POCKET_R - 3) {
+      crm.striker.alive = false; pocketed.push('striker');
+    }
+  });
+  if (pocketed.length) crm.pocketedThisShot = (crm.pocketedThisShot || []).concat(pocketed);
+}
+function crmLoop() {
+  if (!crm) return;
+  if (crm.phase === 'moving') {
+    for (let k = 0; k < 2; k++) crmPhysics();
+    if (!crmMoving()) crmResolveShot();
+  }
+  crmDraw();
+  crmRaf = requestAnimationFrame(crmLoop);
+}
+function crmResumeLoop() { if (!crmRaf && crm) crmRaf = requestAnimationFrame(crmLoop); }
+function crmPauseLoop() { if (crmRaf) { cancelAnimationFrame(crmRaf); crmRaf = null; } }
+function crmShoot(dx, dy, power) {
+  crm.phase = 'moving'; crm.aim = null; crm.shots++;
+  crm.pocketedThisShot = [];
+  const len = Math.hypot(dx, dy) || 1;
+  const speed = 6 + power * 15;
+  crm.striker.vx = (dx / len) * speed;
+  crm.striker.vy = (dy / len) * speed;
+  document.getElementById('crm-power').style.width = '0%';
+  crmUpdateHud();
+}
+function crmResolveShot() {
+  const mine = crm.turn === 'you' ? 'white' : 'black';
+  const list = crm.pocketedThisShot || [];
+  let again = false, msg = [];
+  const me = crm.turn === 'you' ? 'you' : 'cpu';
+  const foe = crm.turn === 'you' ? 'cpu' : 'you';
+  list.forEach(t => {
+    if (t === 'striker') { crm.scores[me] = Math.max(0, crm.scores[me] - 1); msg.push('striker pocketed, minus 1'); }
+    else if (t === 'queen') { crm.scores[me] += 3; again = true; crm.queenBy = me; msg.push('queen taken, plus 3'); }
+    else if (t === mine) { crm.scores[me] += 1; again = true; msg.push('coin pocketed'); }
+    else { crm.scores[foe] += 1; msg.push('opponent coin pocketed'); }
+  });
+  crm.striker.alive = true;
+  crm.striker.vx = 0; crm.striker.vy = 0;
+  const whites = crm.pieces.filter(p => p.type === 'white').length;
+  const blacks = crm.pieces.filter(p => p.type === 'black').length;
+  crmUpdateHud();
+  if (whites === 0 || blacks === 0) return crmFinish();
+  if (!again) crm.turn = (crm.turn === 'you' ? 'cpu' : 'you');
+  crm.striker.x = CRM_SIZE / 2; crm.striker.y = crmBaseY();
+  crm.phase = 'idle';
+  crmUpdateHud();
+  crmSay((msg.length ? msg.join(', ') + ' \u2014 ' : '') + (crm.turn === 'you' ? 'your shot' : 'CPU thinking...'));
+  if (crm.turn === 'cpu') setTimeout(crmCpuShot, 900);
+}
+function crmFinish() {
+  crm.over = true; crm.phase = 'done';
+  const b = document.getElementById('crm-banner');
+  const you = crm.scores.you, cpu = crm.scores.cpu;
+  document.getElementById('crm-banner-title').textContent = you > cpu ? 'You win!' : (cpu > you ? 'CPU wins' : 'Draw');
+  document.getElementById('crm-banner-msg').textContent = 'Final score ' + you + ' to ' + cpu + ' in ' + crm.shots + ' shots.';
+  b.classList.add('show');
+  crmSay('Game over');
+}
+function crmCpuShot() {
+  if (!crm || crm.over || crm.turn !== 'cpu') return;
+  const targets = crm.pieces.filter(p => p.type === 'black' || p.type === 'queen');
+  if (!targets.length) return;
+  const t = targets[Math.floor(Math.random() * targets.length)];
+  const noise = { easy: 0.30, normal: 0.16, hard: 0.06 }[crmDiff];
+  const sx = Math.max(CRM_MIN + 60, Math.min(CRM_MAX - 60, t.x + (Math.random() - .5) * 60));
+  crm.striker.x = sx; crm.striker.y = crmBaseY();
+  const dx = t.x - crm.striker.x, dy = t.y - crm.striker.y;
+  const ang = Math.atan2(dy, dx) + (Math.random() - .5) * noise;
+  const power = 0.55 + Math.random() * 0.4;
+  crmSay('CPU shoots');
+  crmShoot(Math.cos(ang), Math.sin(ang), power);
+}
+function crmPointer(e, kind) {
+  if (!crm || crm.over || crm.turn !== 'you' || crm.phase === 'moving') return;
+  const cv = document.getElementById('crm-canvas');
+  const rect = cv.getBoundingClientRect();
+  const scale = CRM_SIZE / rect.width;
+  const px = (e.clientX - rect.left) * scale, py = (e.clientY - rect.top) * scale;
+  const s = crm.striker;
+  if (kind === 'down') {
+    crmDrag = { mode: Math.hypot(px - s.x, py - s.y) < 48 ? 'aim' : 'move', x: px, y: py };
+    if (crmDrag.mode === 'aim') crm.phase = 'aim';
+    e.preventDefault();
+  } else if (kind === 'move' && crmDrag) {
+    if (crmDrag.mode === 'move') {
+      s.x = Math.max(CRM_MIN + 40, Math.min(CRM_MAX - 40, px));
+      s.y = crmBaseY();
+    } else {
+      const dx = s.x - px, dy = s.y - py;
+      const pw = Math.min(1, Math.hypot(dx, dy) / 130);
+      crm.aim = { dx: dx, dy: dy };
+      crm.power = pw;
+      document.getElementById('crm-power').style.width = (pw * 100) + '%';
+    }
+    e.preventDefault();
+  } else if (kind === 'up' && crmDrag) {
+    if (crmDrag.mode === 'aim' && crm.aim && crm.power > 0.06) {
+      crmShoot(crm.aim.dx, crm.aim.dy, crm.power);
+      crmSay('Shot away');
+    } else {
+      crm.phase = 'idle'; crm.aim = null;
+      document.getElementById('crm-power').style.width = '0%';
+    }
+    crmDrag = null;
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const cv = document.getElementById('crm-canvas'); if (!cv) return;
+  cv.addEventListener('pointerdown', e => crmPointer(e, 'down'));
+  cv.addEventListener('pointermove', e => crmPointer(e, 'move'));
+  window.addEventListener('pointerup', e => crmPointer(e, 'up'));
+});
+
+// =====================================================================
+// KOVAI QUIZ
+// (House questions are easy to edit -- change any q/a/e text below)
+// =====================================================================
+const TRV_BANK = [
+  // ---- CITY & KONGU ----
+  {c:'city', q:'Coimbatore is popularly known by which nickname?', a:['Manchester of South India','Detroit of India','Silicon Valley of India','Pink City'], k:0, e:'Its dozens of cotton mills earned it the Manchester tag. Textiles, pumps and wet grinders still drive the local economy.'},
+  {c:'city', q:'What is the Tamil name locals use for Coimbatore?', a:['Kovai','Kongu','Chera','Vellore'], k:0, e:'Kovai is the everyday Tamil name. The wider region is called Kongu Nadu.'},
+  {c:'city', q:'Which river flows along the southern edge of the city?', a:['Noyyal','Bhavani','Amaravathi','Vaigai'], k:0, e:'The Noyyal rises in the Vellingiri hills and joins the Kaveri near Karur, feeding a long chain of tanks on the way.'},
+  {c:'city', q:'Coimbatore ranks where among the cities of Tamil Nadu by size?', a:['Second largest','Largest','Fourth largest','Seventh largest'], k:0, e:'Only Chennai is bigger. Coimbatore is the state second city and a major industrial hub.'},
+  {c:'city', q:'Which mountain pass beside the city links Tamil Nadu with Kerala?', a:['Palghat Gap','Bolan Pass','Thal Ghat','Bhor Ghat'], k:0, e:'The Palghat Gap is a broad break in the Western Ghats. It gives Coimbatore its famous breezy evenings.'},
+  {c:'city', q:'Which of these carries a Geographical Indication tag from Coimbatore?', a:['Wet grinder','Silk saree','Brass lamp','Rose water'], k:0, e:'The Coimbatore Wet Grinder and Kovai Cora Cotton both hold GI recognition.'},
+  {c:'city', q:'Roughly how high above sea level is the city?', a:['About 420 metres','About 50 metres','About 1,200 metres','About 2,000 metres'], k:0, e:'Around 420 to 430 metres, which is why nights here are milder than most of the Tamil Nadu plains.'},
+  {c:'city', q:'Thudiyalur sits on the road heading towards which hill town gateway?', a:['Mettupalayam','Pollachi','Palani','Karur'], k:0, e:'MTP Road is short for Mettupalayam Road, the route north towards the Nilgiris.'},
+  {c:'city', q:'Which industry made Coimbatore a national name in the twentieth century?', a:['Cotton textiles','Shipbuilding','Diamond cutting','Tea broking'], k:0, e:'Mills opened from the late 1800s onward, and engineering firms grew up to service them.'},
+  {c:'city', q:'The historic region around Coimbatore is traditionally called what?', a:['Kongu Nadu','Chola Nadu','Pandya Nadu','Tondai Nadu'], k:0, e:'Kongu Nadu has its own dialect, cuisine and temple traditions, distinct from the delta districts.'},
+
+  // ---- FOOD ----
+  {c:'food', q:'Which humble rice and lentil dish is a Kongu region signature?', a:['Arisi paruppu sadam','Biryani','Pongal kanji','Puttu'], k:0, e:'Arisi paruppu sadam is rice cooked with toor dal and spices, usually served with a spoon of ghee and fried appalam.'},
+  {c:'food', q:'What is the local name for the thin fermented rice crepe eaten at breakfast?', a:['Dosai','Paratha','Appam roti','Thepla'], k:0, e:'Dosai with coconut chutney and sambar is the standard Coimbatore breakfast, usually before eight in the morning.'},
+  {c:'food', q:'Filter coffee in Coimbatore is traditionally served in what?', a:['Stainless steel tumbler and davara','Clay cup','Glass mug','Paper cup'], k:0, e:'The tumbler and davara set lets you cool the coffee by pouring it back and forth, which also builds the froth.'},
+  {c:'food', q:'Which spicy Kongu mutton dish is cooked slowly with pepper and curry leaves?', a:['Kongu mutton kola urundai','Rogan josh','Vindaloo','Nihari'], k:0, e:'Kola urundai are spiced minced meat balls, a Kongu wedding feast classic.'},
+  {c:'food', q:'Siruvani, near Coimbatore, is famous for what?', a:['Its drinking water','Its mangoes','Its pottery','Its silk'], k:0, e:'Siruvani water from the Western Ghats is renowned across Tamil Nadu for its taste, and it supplies much of the city.'},
+  {c:'food', q:'Which sweet is the classic gift brought back from the Coimbatore region?', a:['Halwa','Rasgulla','Petha','Sandesh'], k:0, e:'Wheat halwa, especially the Tirunelveli style widely sold here, is the standard box to carry home.'},
+  {c:'food', q:'What is served on a traditional Tamil feast plate instead of a plate?', a:['Banana leaf','Copper tray','Wooden board','Clay slab'], k:0, e:'The banana leaf is laid with the tip to your left, and each item has its own fixed position on it.'},
+  {c:'food', q:'Kootu, a common Kongu side dish, is mainly made of what?', a:['Vegetables and lentils','Meat and rice','Fish and coconut','Wheat and jaggery'], k:0, e:'Kootu is a mild vegetable and dal stew, often with a ground coconut paste, eaten with rice.'},
+  {c:'food', q:'Which drink is offered in almost every Coimbatore home on a hot afternoon?', a:['Buttermilk','Hot chocolate','Iced tea','Lassi'], k:0, e:'Neer mor is buttermilk thinned with water and seasoned with ginger, curry leaves and asafoetida.'},
+  {c:'food', q:'Idli is steamed from a batter of rice and which pulse?', a:['Urad dal','Chana dal','Rajma','Green peas'], k:0, e:'Rice and urad dal are soaked, ground and fermented overnight, which is what makes idli light and slightly sour.'},
+
+  // ---- TEMPLES & HERITAGE ----
+  {c:'temples', q:'Which hill temple on the western edge of the city is dedicated to Murugan?', a:['Marudhamalai','Meenakshi','Brihadeeswara','Ramanathaswamy'], k:0, e:'Marudhamalai sits on a hill about fifteen kilometres from the city centre, with a long stair climb or a bus to the top.'},
+  {c:'temples', q:'Perur Pateeswarar temple is dedicated to which deity?', a:['Shiva','Vishnu','Ganesha','Ayyappan'], k:0, e:'The Perur temple is centuries old and famous for its ornate Kanaka Sabha hall and stone carvings.'},
+  {c:'temples', q:'The Adiyogi bust near Coimbatore holds a Guinness record for being what?', a:['Largest bust sculpture in the world','Tallest statue in Asia','Heaviest bronze casting','Longest reclining figure'], k:0, e:'The 112 foot steel face at the Isha Yoga Center is recognised as the largest bust sculpture in the world.'},
+  {c:'temples', q:'Dhyanalinga at the Isha Yoga Center is meant primarily for what?', a:['Silent meditation','Weekly markets','Music festivals','Wedding ceremonies'], k:0, e:'It is a consecrated space kept in silence, open to visitors of any background.'},
+  {c:'temples', q:'The Vellingiri hills near Coimbatore are often called what?', a:['Kailash of the South','Nilgiri Crown','Ghats Gateway','Shiva Steps'], k:0, e:'Pilgrims climb the seven hills barefoot, usually a full day of walking each way.'},
+  {c:'temples', q:'Which festival brings kolam patterns and decorated cattle to Kongu villages?', a:['Pongal','Holi','Onam','Baisakhi'], k:0, e:'Pongal is the January harvest festival, and Mattu Pongal on the third day honours the cattle.'},
+  {c:'temples', q:'What is the traditional rice flour drawing at the doorstep called in Tamil?', a:['Kolam','Rangoli','Alpana','Mandana'], k:0, e:'Kolam is drawn fresh each morning at the threshold, traditionally so ants and birds can also feed on the flour.'},
+  {c:'temples', q:'Which early Tamil dynasty is linked to the founding of Coimbatore?', a:['Cholas','Mughals','Marathas','Kakatiyas'], k:0, e:'The area is associated with the early Cholas, and later passed through Chera, Pandya, Hoysala and Vijayanagara hands.'},
+  {c:'temples', q:'The temple car festival in Tamil Nadu involves what?', a:['Pulling a wooden chariot through the streets','Racing bullock carts','Floating lamps on a river','Flying kites'], k:0, e:'The ther is a tall wooden chariot pulled with ropes by hundreds of devotees along the temple street.'},
+  {c:'temples', q:'What is the correct etiquette at almost every temple here?', a:['Remove footwear before entering','Wear a hat inside','Take photos of the sanctum','Enter from the rear'], k:0, e:'Footwear comes off outside, and most sanctums do not allow photography.'},
+
+  // ---- HILLS & NATURE ----
+  {c:'nature', q:'The Nilgiri Mountain Railway from Mettupalayam is recognised as what?', a:['A UNESCO World Heritage site','The fastest train in India','A private heritage tram','A cable car system'], k:0, e:'It is part of the Mountain Railways of India World Heritage listing, and still uses a rack and pinion section to climb.'},
+  {c:'nature', q:'Which famous hill station is reached by that railway from Mettupalayam?', a:['Ooty','Munnar','Kodaikanal','Yercaud'], k:0, e:'The line climbs to Udhagamandalam, better known as Ooty, through Coonoor.'},
+  {c:'nature', q:'Coimbatore sits on the edge of which mountain range?', a:['Western Ghats','Eastern Ghats','Aravalli','Vindhya'], k:0, e:'The Western Ghats here are part of the Nilgiri Biosphere Reserve, a global biodiversity hotspot.'},
+  {c:'nature', q:'Which tiger reserve lies south of Coimbatore near Pollachi?', a:['Anamalai','Bandipur','Kanha','Sundarbans'], k:0, e:'The Anamalai Tiger Reserve, also called Indira Gandhi Wildlife Sanctuary, spreads across the Anaimalai hills.'},
+  {c:'nature', q:'Valparai, a few hours from the city, is best known for what?', a:['Tea estates','Salt pans','Sand dunes','Coal mines'], k:0, e:'Valparai is a plateau of tea and coffee estates, reached by a road with about forty hairpin bends.'},
+  {c:'nature', q:'Which large mammal is often seen crossing roads on the Coimbatore forest fringe?', a:['Asian elephant','Polar bear','Camel','Rhinoceros'], k:0, e:'Elephant corridors run right along the district edge, so night driving near forest boundaries is discouraged.'},
+  {c:'nature', q:'When does the northeast monsoon usually bring rain to Coimbatore?', a:['October to December','January to March','April to May','July to August'], k:0, e:'The city sits in a rain shadow for the southwest monsoon, so most rain arrives late in the year.'},
+  {c:'nature', q:'Which waterfall near Coimbatore is a popular short trip?', a:['Siruvani Falls','Jog Falls','Dudhsagar Falls','Athirappilly'], k:0, e:'Siruvani Falls sits inside the reserve forest west of the city, with limited entry to protect the catchment.'},
+  {c:'nature', q:'What makes Coimbatore evenings cooler than most plains cities?', a:['Breeze through the Palghat Gap','Sea breeze','High altitude snow','River fog'], k:0, e:'Wind funnels through the gap in the Ghats, which is also why the district hosts so many wind farms.'},
+  {c:'nature', q:'The Nilgiri Biosphere Reserve was notable for being what?', a:['Indias first biosphere reserve','Indias first zoo','Indias first national park','Indias first bird sanctuary'], k:0, e:'It was designated in 1986 as the first biosphere reserve in the country.'},
+
+  // ---- THUDINEST HOUSE ----
+  {c:'house', q:'Thudi Nest No. 2 is what kind of home?', a:['A compact container tiny home','A twelve storey hotel','A houseboat','A treehouse'], k:0, e:'It is a container style tiny home, compact by design and set up for an easy short stay.'},
+  {c:'house', q:'Which road is the house located on?', a:['MTP Road','Marine Drive','Ring Road','Beach Road'], k:0, e:'MTP Road is Mettupalayam Road, so shops, food and transport are all within a short walk.'},
+  {c:'house', q:'Which neighbourhood is Thudinest in?', a:['Thudiyalur','Gandhipuram','Peelamedu','Saibaba Colony'], k:0, e:'Thudiyalur is a northern suburb of Coimbatore, on the way out towards Mettupalayam and the hills.'},
+  {c:'house', q:'What time do quiet hours begin at the house?', a:['10 PM','6 PM','Midnight','2 AM'], k:0, e:'Please keep things quiet after 10 PM so neighbours and other guests can sleep.'},
+  {c:'house', q:'Which of these is provided free for guests?', a:['Wi-Fi and parking','Airport jet','Private chef','Helicopter transfer'], k:0, e:'Free Wi-Fi and free parking come with the stay, along with towels, soap and drinking water.'},
+  {c:'house', q:'What is close by on MTP Road for emergencies?', a:['VG Hospital','A shipyard','A ski resort','An airport runway'], k:0, e:'VG Hospital is nearby, along with restaurants and shops.'},
+  {c:'house', q:'Which of these does the house include?', a:['Attached bathroom and kitchenette','Bowling alley','Rooftop pool','Cinema hall'], k:0, e:'There is a bedroom, attached bathroom, living area and basic kitchen amenities.'},
+  {c:'house', q:'Where can you book the stay instantly?', a:['Airbnb','A travel agent only','At the railway station','By post'], k:0, e:'You can book on Airbnb, or reach the host directly on WhatsApp with any questions.'},
+  {c:'house', q:'Since the house sits on a main road, what should you expect?', a:['Some light traffic noise','Snowfall','Tidal flooding','Sandstorms'], k:0, e:'It is right on MTP Road, which makes it easy to reach but means a little passing traffic sound.'},
+  {c:'house', q:'What is the best way to use this game hub?', a:['Play together while you unwind','Play only at 3 AM loudly','Play instead of sleeping','Play outside the neighbours window'], k:0, e:'It is here to make a rainy evening or a long wait a bit more fun. Quiet hours still apply after 10 PM.'}
+];
+const TRV_CATNAMES = {city:'City & Kongu', food:'Food', temples:'Temples & Heritage', nature:'Hills & Nature', house:'Thudinest'};
+
+let trvCat = 'mixed';
+let trv = null, trvTimer = null;
+
+function trvSetCat(c) {
+  trvCat = c;
+  const order = ['mixed','city','food','temples','nature','house'];
+  document.querySelectorAll('#trv-cat-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', order[i] === c));
+}
+function trvStart() {
+  document.getElementById('trivia-setup').style.display = 'none';
+  trvNewGame();
+}
+function trvNewGame() {
+  const pool = TRV_BANK.filter(q => trvCat === 'mixed' || q.c === trvCat).slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  trv = { qs: pool.slice(0, 10), i: 0, score: 0, streak: 0, best: 0, right: 0, left: 20, locked: false };
+  document.getElementById('trv-result').classList.remove('show');
+  document.getElementById('trv-play').style.display = 'block';
+  trvRender();
+}
+function trvRender() {
+  const q = trv.qs[trv.i];
+  trv.locked = false; trv.left = 20;
+  document.getElementById('trv-qnum').textContent = trv.i + 1;
+  document.getElementById('trv-score').textContent = trv.score;
+  document.getElementById('trv-streak').textContent = trv.streak;
+  document.getElementById('trv-qcat').textContent = TRV_CATNAMES[q.c] || '';
+  document.getElementById('trv-qtext').textContent = q.q;
+  document.getElementById('trv-explain').classList.remove('show');
+  document.getElementById('trv-next').classList.remove('show');
+  const order = q.a.map((t, i) => ({ t: t, i: i }));
+  for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  trv.order = order;
+  const wrap = document.getElementById('trv-answers');
+  wrap.innerHTML = '';
+  order.forEach((o, idx) => {
+    const b = document.createElement('button');
+    b.className = 'trv-ans';
+    b.innerHTML = '<span class="trv-key">' + 'ABCD'[idx] + '</span><span></span>';
+    b.lastChild.textContent = o.t;
+    b.onclick = () => trvAnswer(idx);
+    wrap.appendChild(b);
+  });
+  document.getElementById('trv-timerfill').style.width = '100%';
+  trvResumeTimer();
+}
+function trvResumeTimer() {
+  trvPauseTimer();
+  if (!trv || trv.locked || document.getElementById('screen-trivia').style.display === 'none') return;
+  trvTimer = setInterval(() => {
+    trv.left -= 0.25;
+    document.getElementById('trv-timerfill').style.width = Math.max(0, (trv.left / 20) * 100) + '%';
+    if (trv.left <= 0) trvAnswer(-1);
+  }, 250);
+}
+function trvPauseTimer() { if (trvTimer) { clearInterval(trvTimer); trvTimer = null; } }
+function trvAnswer(idx) {
+  if (!trv || trv.locked) return;
+  trv.locked = true; trvPauseTimer();
+  const q = trv.qs[trv.i];
+  const btns = document.querySelectorAll('#trv-answers .trv-ans');
+  const correctIdx = trv.order.findIndex(o => o.i === q.k);
+  btns.forEach((b, i) => {
+    b.classList.add('locked');
+    if (i === correctIdx) b.classList.add('correct');
+    else if (i === idx) b.classList.add('wrong');
+  });
+  let gained = 0;
+  if (idx === correctIdx) {
+    trv.right++; trv.streak++; trv.best = Math.max(trv.best, trv.streak);
+    gained = 100 + Math.round(Math.max(0, trv.left) * 5) + (trv.streak - 1) * 25;
+    trv.score += gained;
+  } else { trv.streak = 0; }
+  document.getElementById('trv-score').textContent = trv.score;
+  document.getElementById('trv-streak').textContent = trv.streak;
+  const ex = document.getElementById('trv-explain');
+  ex.textContent = (idx === correctIdx ? 'Correct, plus ' + gained + ' points. ' : (idx === -1 ? 'Out of time. ' : 'Not quite. ')) + q.e;
+  ex.classList.add('show');
+  const nx = document.getElementById('trv-next');
+  nx.textContent = (trv.i === 9) ? 'See Results \u2192' : 'Next Question \u2192';
+  nx.classList.add('show');
+}
+function trvNext() {
+  if (trv.i === 9) return trvFinish();
+  trv.i++; trvRender();
+}
+function trvFinish() {
+  trvPauseTimer();
+  document.getElementById('trv-play').style.display = 'none';
+  document.getElementById('trv-result').classList.add('show');
+  document.getElementById('trv-final').textContent = trv.score;
+  const r = trv.right;
+  const rank = r >= 9 ? 'Kovai Local' : r >= 7 ? 'Frequent Visitor' : r >= 5 ? 'Curious Traveller' : r >= 3 ? 'Just Arrived' : 'First Day in Town';
+  document.getElementById('trv-rank').textContent = rank;
+  document.getElementById('trv-breakdown').innerHTML =
+    r + ' of 10 correct<br>Best streak: ' + trv.best + '<br>Category: ' + (trvCat === 'mixed' ? 'Mixed' : TRV_CATNAMES[trvCat]);
+}
+
+// =====================================================================
+// 2048
+// =====================================================================
+const TFE_COLORS = {
+  2:'#eee4da', 4:'#ede0c8', 8:'#f2b179', 16:'#f59563', 32:'#f67c5f', 64:'#f65e3b',
+  128:'#edcf72', 256:'#edcc61', 512:'#edc850', 1024:'#edc53f', 2048:'#edc22e'
+};
+let tfeSize = 4, tfe = null;
+
+function tfeSetSize(n) {
+  tfeSize = n;
+  const map = {3:0, 4:1, 5:2};
+  document.querySelectorAll('#tfe-size-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', i === map[n]));
+}
+function tfeStart() {
+  document.getElementById('g2048-setup').style.display = 'none';
+  tfeNewGame();
+}
+function tfeKey() { return 'thudinest2048Best' + tfeSize; }
+function tfeNewGame() {
+  tfe = { n: tfeSize, grid: [], score: 0, won: false, over: false, prev: null };
+  for (let r = 0; r < tfe.n; r++) tfe.grid.push(new Array(tfe.n).fill(0));
+  document.getElementById('tfe-banner').classList.remove('show');
+  document.getElementById('tfe-keepgoing').style.display = 'none';
+  document.getElementById('tfe-best').textContent = localStorage.getItem(tfeKey()) || '0';
+  tfeAdd(); tfeAdd(); tfeRender(true);
+}
+function tfeAdd() {
+  const free = [];
+  for (let r = 0; r < tfe.n; r++) for (let c = 0; c < tfe.n; c++) if (!tfe.grid[r][c]) free.push([r, c]);
+  if (!free.length) return;
+  const [r, c] = free[Math.floor(Math.random() * free.length)];
+  tfe.grid[r][c] = Math.random() < 0.9 ? 2 : 4;
+  tfe.newAt = r + ',' + c;
+}
+function tfeRender(fresh) {
+  const board = document.getElementById('tfe-board');
+  const n = tfe.n, pad = 3, gap = 3;
+  const cell = (100 - 2 * pad - gap * (n - 1)) / n;
+  board.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+  board.innerHTML = '';
+  for (let i = 0; i < n * n; i++) { const d = document.createElement('div'); d.className = 'tfe-cell'; board.appendChild(d); }
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    const v = tfe.grid[r][c]; if (!v) continue;
+    const t = document.createElement('div');
+    t.className = 'tfe-tile' + (tfe.newAt === r + ',' + c ? ' new' : '') + ((tfe.mergedAt || []).indexOf(r + ',' + c) >= 0 ? ' merged' : '');
+    t.style.left = (pad + c * (cell + gap)) + '%';
+    t.style.top = (pad + r * (cell + gap)) + '%';
+    t.style.width = cell + '%';
+    t.style.height = cell + '%';
+    t.style.background = TFE_COLORS[v] || '#3c3a32';
+    t.style.color = v > 4 ? '#fff8ef' : '#4a3f30';
+    const digits = String(v).length;
+    t.style.fontSize = (n === 5 ? 1.5 : n === 4 ? 1.85 : 2.3) / Math.max(1, digits * 0.42) + 'rem';
+    t.textContent = v;
+    board.appendChild(t);
+  }
+  document.getElementById('tfe-score').textContent = tfe.score;
+  tfe.newAt = null; tfe.mergedAt = [];
+}
+function tfeSlide(row) {
+  const n = row.length;
+  let arr = row.filter(v => v), gained = 0, merged = [];
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] === arr[i + 1]) { arr[i] *= 2; gained += arr[i]; merged.push(i); arr.splice(i + 1, 1); }
+  }
+  while (arr.length < n) arr.push(0);
+  return { row: arr, gained: gained, merged: merged };
+}
+function tfeMove(dir) {
+  if (!tfe || tfe.over) return;
+  const n = tfe.n;
+  const before = JSON.stringify(tfe.grid);
+  tfe.prev = { grid: JSON.parse(before), score: tfe.score };
+  const mergedAt = [];
+  const get = (i, j) => {
+    if (dir === 'left')  return tfe.grid[i][j];
+    if (dir === 'right') return tfe.grid[i][n - 1 - j];
+    if (dir === 'up')    return tfe.grid[j][i];
+    return tfe.grid[n - 1 - j][i];
+  };
+  const set = (i, j, v) => {
+    if (dir === 'left')  tfe.grid[i][j] = v;
+    else if (dir === 'right') tfe.grid[i][n - 1 - j] = v;
+    else if (dir === 'up')    tfe.grid[j][i] = v;
+    else tfe.grid[n - 1 - j][i] = v;
+  };
+  const coord = (i, j) => {
+    if (dir === 'left')  return i + ',' + j;
+    if (dir === 'right') return i + ',' + (n - 1 - j);
+    if (dir === 'up')    return j + ',' + i;
+    return (n - 1 - j) + ',' + i;
+  };
+  for (let i = 0; i < n; i++) {
+    const line = []; for (let j = 0; j < n; j++) line.push(get(i, j));
+    const res = tfeSlide(line);
+    for (let j = 0; j < n; j++) set(i, j, res.row[j]);
+    res.merged.forEach(j => mergedAt.push(coord(i, j)));
+    tfe.score += res.gained;
+  }
+  if (JSON.stringify(tfe.grid) === before) { tfe.prev = null; return; }
+  tfe.mergedAt = mergedAt;
+  tfeAdd();
+  tfeRender();
+  const best = Math.max(tfe.score, parseInt(localStorage.getItem(tfeKey()) || '0', 10));
+  localStorage.setItem(tfeKey(), best);
+  document.getElementById('tfe-best').textContent = best;
+  if (!tfe.won && tfe.grid.some(r => r.some(v => v >= 2048))) {
+    tfe.won = true;
+    document.getElementById('tfe-banner-title').textContent = 'You made 2048!';
+    document.getElementById('tfe-banner-msg').textContent = 'Score ' + tfe.score + '. Keep going for a bigger tile?';
+    document.getElementById('tfe-keepgoing').style.display = 'inline-block';
+    document.getElementById('tfe-banner').classList.add('show');
+    return;
+  }
+  if (!tfeCanMove()) {
+    tfe.over = true;
+    document.getElementById('tfe-banner-title').textContent = 'No moves left';
+    document.getElementById('tfe-banner-msg').textContent = 'Final score ' + tfe.score + '.';
+    document.getElementById('tfe-keepgoing').style.display = 'none';
+    document.getElementById('tfe-banner').classList.add('show');
+  }
+}
+function tfeCanMove() {
+  const n = tfe.n;
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    if (!tfe.grid[r][c]) return true;
+    if (c + 1 < n && tfe.grid[r][c] === tfe.grid[r][c + 1]) return true;
+    if (r + 1 < n && tfe.grid[r][c] === tfe.grid[r + 1][c]) return true;
+  }
+  return false;
+}
+function tfeKeepGoing() { document.getElementById('tfe-banner').classList.remove('show'); }
+function tfeUndo() {
+  if (!tfe || !tfe.prev) return;
+  tfe.grid = tfe.prev.grid; tfe.score = tfe.prev.score;
+  tfe.prev = null; tfe.over = false;
+  document.getElementById('tfe-banner').classList.remove('show');
+  tfeRender();
+}
+document.addEventListener('keydown', e => {
+  const scr = document.getElementById('screen-g2048');
+  if (!scr || scr.style.display === 'none' || !tfe) return;
+  const map = { ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down', a:'left', d:'right', w:'up', s:'down' };
+  const dir = map[e.key] || map[e.key.toLowerCase()];
+  if (dir) { e.preventDefault(); tfeMove(dir); }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  const board = document.getElementById('tfe-board'); if (!board) return;
+  let sx = 0, sy = 0, active = false;
+  board.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; active = true; });
+  board.addEventListener('pointerup', e => {
+    if (!active) return; active = false;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    tfeMove(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+  });
+});
+
+// =====================================================================
+// DOTS & BOXES
+// =====================================================================
+let dabMode = 'cpu', dabSize = 5, dab = null;
+const DAB_COLORS = ['#38bdf8', '#f472b6'];
+
+function dabSetMode(m) {
+  dabMode = m;
+  document.querySelectorAll('#dab-mode-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', i === (m === 'cpu' ? 0 : 1)));
+}
+function dabSetSize(n) {
+  dabSize = n;
+  const map = {4:0, 5:1, 6:2};
+  document.querySelectorAll('#dab-size-opts .ng-opt').forEach((b, i) => b.classList.toggle('active', i === map[n]));
+}
+function dabStart() {
+  document.getElementById('dots-setup').style.display = 'none';
+  dabNewGame();
+}
+function dabNewGame() {
+  const n = dabSize, b = n - 1;
+  dab = {
+    n: n, b: b, turn: 0, busy: false, over: false, lines: 0,
+    H: Array.from({length:n}, () => new Array(b).fill(false)),
+    V: Array.from({length:b}, () => new Array(n).fill(false)),
+    own: Array.from({length:b}, () => new Array(b).fill(null)),
+    scores: [0, 0]
+  };
+  document.getElementById('dab-banner').classList.remove('show');
+  document.getElementById('dab-name-0').textContent = 'You';
+  document.getElementById('dab-name-1').textContent = dabMode === 'cpu' ? 'CPU' : 'Player 2';
+  dabBuild(); dabUpdate();
+}
+function dabBuild() {
+  const board = document.getElementById('dab-board');
+  const n = dab.n, step = 100 / (n - 1);
+  board.innerHTML = '';
+  for (let r = 0; r < n - 1; r++) for (let c = 0; c < n - 1; c++) {
+    const d = document.createElement('div');
+    d.className = 'dab-box'; d.id = 'dab-box-' + r + '-' + c;
+    d.style.left = (c * step + step * 0.12) + '%';
+    d.style.top = (r * step + step * 0.12) + '%';
+    d.style.width = (step * 0.76) + '%';
+    d.style.height = (step * 0.76) + '%';
+    board.appendChild(d);
+  }
+  for (let r = 0; r < n; r++) for (let c = 0; c < n - 1; c++) {
+    const d = document.createElement('div');
+    d.className = 'dab-line'; d.id = 'dab-h-' + r + '-' + c;
+    d.style.left = (c * step + step * 0.13) + '%';
+    d.style.top = (r * step) + '%';
+    d.style.width = (step * 0.74) + '%';
+    d.style.height = '11px';
+    d.style.transform = 'translateY(-50%)';
+    d.onclick = () => dabPlay('H', r, c);
+    board.appendChild(d);
+  }
+  for (let r = 0; r < n - 1; r++) for (let c = 0; c < n; c++) {
+    const d = document.createElement('div');
+    d.className = 'dab-line'; d.id = 'dab-v-' + r + '-' + c;
+    d.style.top = (r * step + step * 0.13) + '%';
+    d.style.left = (c * step) + '%';
+    d.style.height = (step * 0.74) + '%';
+    d.style.width = '11px';
+    d.style.transform = 'translateX(-50%)';
+    d.onclick = () => dabPlay('V', r, c);
+    board.appendChild(d);
+  }
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    const d = document.createElement('div');
+    d.className = 'dab-dot';
+    d.style.left = (c * step) + '%';
+    d.style.top = (r * step) + '%';
+    d.style.width = '11px'; d.style.height = '11px';
+    board.appendChild(d);
+  }
+}
+function dabSides(r, c) {
+  return (dab.H[r][c] ? 1 : 0) + (dab.H[r + 1][c] ? 1 : 0) + (dab.V[r][c] ? 1 : 0) + (dab.V[r][c + 1] ? 1 : 0);
+}
+function dabFree() {
+  const out = [];
+  for (let r = 0; r < dab.n; r++) for (let c = 0; c < dab.n - 1; c++) if (!dab.H[r][c]) out.push(['H', r, c]);
+  for (let r = 0; r < dab.n - 1; r++) for (let c = 0; c < dab.n; c++) if (!dab.V[r][c]) out.push(['V', r, c]);
+  return out;
+}
+function dabBoxesFor(kind, r, c) {
+  const out = [];
+  if (kind === 'H') { if (r > 0) out.push([r - 1, c]); if (r < dab.b) out.push([r, c]); }
+  else { if (c > 0) out.push([r, c - 1]); if (c < dab.b) out.push([r, c]); }
+  return out;
+}
+function dabPlay(kind, r, c, isCpu) {
+  if (!dab || dab.over || dab.busy) return;
+  if (dabMode === 'cpu' && dab.turn === 1 && !isCpu) return;
+  const arr = kind === 'H' ? dab.H : dab.V;
+  if (arr[r][c]) return;
+  arr[r][c] = true; dab.lines++;
+  const el = document.getElementById('dab-' + kind.toLowerCase() + '-' + r + '-' + c);
+  el.classList.add('taken');
+  el.style.background = DAB_COLORS[dab.turn];
+  let claimed = 0;
+  dabBoxesFor(kind, r, c).forEach(([br, bc]) => {
+    if (dab.own[br][bc] === null && dabSides(br, bc) === 4) {
+      dab.own[br][bc] = dab.turn;
+      dab.scores[dab.turn]++;
+      claimed++;
+      const box = document.getElementById('dab-box-' + br + '-' + bc);
+      box.style.background = DAB_COLORS[dab.turn] + '33';
+      box.style.color = DAB_COLORS[dab.turn];
+      box.textContent = dab.turn === 0 ? 'A' : 'B';
+      box.classList.add('filled');
+    }
+  });
+  if (!claimed) dab.turn = 1 - dab.turn;
+  dabUpdate();
+  if (dab.scores[0] + dab.scores[1] === dab.b * dab.b) return dabFinish();
+  if (dabMode === 'cpu' && dab.turn === 1) { dab.busy = true; setTimeout(dabCpu, 520); }
+}
+function dabCpu() {
+  dab.busy = false;
+  if (dab.over) return;
+  const free = dabFree();
+  if (!free.length) return;
+  // 1. complete any box that is one line away
+  for (const mv of free) {
+    if (dabBoxesFor(mv[0], mv[1], mv[2]).some(([br, bc]) => dab.own[br][bc] === null && dabSides(br, bc) === 3))
+      return dabPlay(mv[0], mv[1], mv[2], true);
+  }
+  // 2. otherwise prefer a move that does not hand over a third side
+  const safe = free.filter(mv =>
+    !dabBoxesFor(mv[0], mv[1], mv[2]).some(([br, bc]) => dabSides(br, bc) === 2));
+  const pick = (safe.length ? safe : free)[Math.floor(Math.random() * (safe.length ? safe.length : free.length))];
+  dabPlay(pick[0], pick[1], pick[2], true);
+}
+function dabUpdate() {
+  document.getElementById('dab-score-0').textContent = dab.scores[0];
+  document.getElementById('dab-score-1').textContent = dab.scores[1];
+  document.getElementById('dab-lines').textContent = dab.lines;
+  document.getElementById('dab-side-0').classList.toggle('active', dab.turn === 0);
+  document.getElementById('dab-side-1').classList.toggle('active', dab.turn === 1);
+  const st = document.getElementById('dab-status');
+  if (!dab.over) {
+    const who = dab.turn === 0 ? 'Your turn' : (dabMode === 'cpu' ? 'CPU is thinking' : 'Player 2 turn');
+    st.textContent = who;
+    st.style.color = DAB_COLORS[dab.turn];
+  }
+}
+function dabFinish() {
+  dab.over = true;
+  const [a, b] = dab.scores;
+  const name1 = dabMode === 'cpu' ? 'CPU' : 'Player 2';
+  document.getElementById('dab-banner-title').textContent = a > b ? 'You win!' : (b > a ? name1 + ' wins' : 'Draw');
+  document.getElementById('dab-banner-msg').textContent = 'Boxes ' + a + ' to ' + b + ' in ' + dab.lines + ' lines.';
+  document.getElementById('dab-banner').classList.add('show');
+  document.getElementById('dab-status').textContent = 'Game over';
+}
+
 </script>
 </body>
 </html>
