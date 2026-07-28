@@ -377,6 +377,40 @@ body {
 .pong-btn:hover { opacity: 0.85; }
 .pong-hint { font-size: 0.7rem; color: rgba(255,255,255,0.22); text-align: center; line-height: 1.8; }
 
+/* ===== BRICK BREAKER SCREEN ===== */
+#screen-brick {
+  background: #0c0508;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start; padding: 52px 16px 16px;
+  gap: 10px;
+}
+.brick-title { font-size: 1.6rem; font-weight: 900; letter-spacing: 5px; color: #e2725b; }
+.brick-scorebar {
+  display: flex; gap: 32px; align-items: center;
+  font-size: 0.78rem; color: rgba(255,255,255,0.45); letter-spacing: 1px;
+}
+.bksc { text-align: center; }
+.bksc-num { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1; }
+#brick-canvas { display: block; max-width: min(800px, calc(100vw - 32px)); height: auto; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); touch-action: none; }
+.brick-touch-ctrl { display: flex; gap: 28px; margin-top: 2px; }
+.brick-ctrl-btn {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: rgba(226,115,87,0.12); border: 2px solid rgba(226,115,87,0.35);
+  color: #e2725b; font-size: 2rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s; user-select: none;
+}
+.brick-ctrl-btn:active, .brick-ctrl-btn.pressed { background: rgba(226,115,87,0.32); border-color: #e2725b; }
+#brick-msg { font-size: 0.88rem; color: rgba(255,255,255,0.5); text-align: center; min-height: 20px; }
+.brick-btn {
+  padding: 12px 36px; border: none; border-radius: 10px; background: #e2725b;
+  color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+  letter-spacing: 2px; transition: opacity 0.2s; touch-action: manipulation;
+}
+.brick-btn:hover { opacity: 0.85; }
+.brick-hint { font-size: 0.7rem; color: rgba(255,255,255,0.22); text-align: center; line-height: 1.8; }
+
 /* ===== SNAKE SCREEN ===== */
 #screen-snake {
   background: radial-gradient(ellipse at 50% 0%, #062a1a 0%, #04100a 100%);
@@ -1691,6 +1725,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .game-card.trivia  .game-card-title { color: #a78bfa; }
 .game-card.g2048   .game-card-title { color: #ef6c4d; }
 .game-card.dots    .game-card-title { color: #38bdf8; }
+.game-card.brick   .game-card-title { color: #e2725b; }
 
 /* shared setup overlay for the new games */
 .ng-overlay {
@@ -2321,6 +2356,11 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
       <span class="game-card-icon">&#9638;</span>
       <div class="game-card-title">Dots &amp; Boxes</div>
       <div class="game-card-desc">Pass and play or vs CPU<br>Close a box, go again</div>
+    </div>
+    <div class="game-card brick" onclick="showScreen('brick')">
+      <span class="game-card-icon">&#129521;</span>
+      <div class="game-card-title">Brick Breaker</div>
+      <div class="game-card-desc">Smash every brick &#183; 5 levels<br>Mouse, keyboard or touch</div>
     </div>
   </div>
 </div>
@@ -2986,6 +3026,33 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   </div>
 </div>
 
+<!-- ===== BRICK BREAKER SCREEN ===== -->
+<div id="screen-brick" class="screen" style="display:none">
+  <div class="brick-title">BRICK BREAKER</div>
+  <div class="brick-scorebar">
+    <div class="bksc">
+      <div style="text-transform:uppercase;letter-spacing:2px;font-size:0.7rem">Score</div>
+      <div class="bksc-num" id="brick-score">0</div>
+    </div>
+    <div class="bksc">
+      <div style="text-transform:uppercase;letter-spacing:2px;font-size:0.7rem">Lives</div>
+      <div class="bksc-num" id="brick-lives">3</div>
+    </div>
+    <div class="bksc">
+      <div style="text-transform:uppercase;letter-spacing:2px;font-size:0.7rem">Level</div>
+      <div class="bksc-num" id="brick-level">1</div>
+    </div>
+  </div>
+  <canvas id="brick-canvas" width="800" height="520"></canvas>
+  <div class="brick-touch-ctrl">
+    <button class="brick-ctrl-btn" id="brick-left-btn">&#9664;</button>
+    <button class="brick-ctrl-btn" id="brick-right-btn">&#9654;</button>
+  </div>
+  <div id="brick-msg">Press Start to play</div>
+  <button class="brick-btn" id="brick-start-btn" onclick="brickStart()">START</button>
+  <div class="brick-hint">Mouse / drag canvas &#183; A/D or &#8592;&#8594; &#183; or tap &#9664;&#9654; buttons above<br>Clear all bricks to advance &#183; don't let the ball fall!</div>
+</div>
+
 <script>
 // =====================================================================
 // NAVIGATION
@@ -3019,6 +3086,8 @@ function showScreen(name) {
   if (name === 'platformer') platResumeLoop(); else platPauseLoop();
   if (name === 'carrom') crmResumeLoop(); else crmPauseLoop();
   if (name === 'trivia') trvResumeTimer(); else trvPauseTimer();
+  if (name !== 'brick') stopBrickGame();
+  if (name === 'brick') resetBrickGame();
 }
 
 // =====================================================================
@@ -6724,6 +6793,269 @@ function dabFinish() {
   document.getElementById('dab-banner').classList.add('show');
   document.getElementById('dab-status').textContent = 'Game over';
 }
+
+// =====================================================================
+// BRICK BREAKER GAME
+// =====================================================================
+const BRICK_CW=800, BRICK_CH=520, BRICK_MAXLEVEL=5;
+const BRICK_ROW_COLORS=['#e2725b','#f0a15c','#f5c842','#8bc34a','#4fc3f7','#a78bfa','#f472b6','#ef4444'];
+
+let brickRunning=false, brickAF=null;
+let brickScore=0, brickLives=3, brickLevel=1, brickGameOver=false;
+let brickPaddle={x:BRICK_CW/2-55, y:BRICK_CH-30, w:110, h:14};
+let brickBall={x:BRICK_CW/2, y:BRICK_CH-30-9, vx:0, vy:0, r:8};
+let brickKeys={}, brickTouch={left:false,right:false};
+let brickBricks=[], brickParts=[], brickAC=null, brickFlash=0;
+
+function bSnd(freq,dur=0.08,vol=0.2,type='sine'){
+  try{
+    if(!brickAC) brickAC=new(window.AudioContext||window.webkitAudioContext)();
+    if(brickAC.state==='suspended') brickAC.resume();
+    const o=brickAC.createOscillator(),g=brickAC.createGain();
+    o.connect(g);g.connect(brickAC.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,brickAC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,brickAC.currentTime+dur);
+    o.start();o.stop(brickAC.currentTime+dur);
+  }catch(e){}
+}
+function bSndWall(){   bSnd(300,0.05,0.13); }
+function bSndPaddle(){ bSnd(440,0.07,0.2); }
+function bSndBrick(hp){ bSnd(hp>0?520:720,0.09,0.22); }
+function bSndLife(){   bSnd(180,0.25,0.26); setTimeout(()=>bSnd(140,0.22,0.2),150); }
+function bSndLevel(){  [500,650,820,1000].forEach((f,i)=>setTimeout(()=>bSnd(f,0.1,0.26),i*80)); }
+
+function bkSpawnParts(x,y,color,n=10){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, s=1.3+Math.random()*4;
+    brickParts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color});
+  }
+}
+
+function brickBallSpeed(){ return Math.min(4+(brickLevel-1)*0.7, 9); }
+
+function buildBricksForLevel(level){
+  const rows=Math.min(4+level,8), cols=10, margin=24, gap=6, top=54;
+  const areaW=BRICK_CW-margin*2;
+  const bw=(areaW-(cols-1)*gap)/cols, bh=20;
+  brickBricks=[];
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const hp=(level>=3 && r===0)?2:1;
+      brickBricks.push({
+        x:margin+c*(bw+gap), y:top+r*(bh+gap), w:bw, h:bh,
+        color:BRICK_ROW_COLORS[r%BRICK_ROW_COLORS.length], hp, alive:true
+      });
+    }
+  }
+}
+
+function brickPlacedOnPaddle(){
+  brickBall.x=brickPaddle.x+brickPaddle.w/2;
+  brickBall.y=brickPaddle.y-brickBall.r-1;
+  brickBall.vx=0; brickBall.vy=0;
+}
+
+function resetBrickGame(){
+  brickScore=0; brickLives=3; brickLevel=1; brickGameOver=false; brickParts=[]; brickFlash=0;
+  brickPaddle.x=BRICK_CW/2-brickPaddle.w/2;
+  buildBricksForLevel(brickLevel);
+  brickPlacedOnPaddle();
+  document.getElementById('brick-score').textContent='0';
+  document.getElementById('brick-lives').textContent='3';
+  document.getElementById('brick-level').textContent='1';
+  document.getElementById('brick-msg').textContent='Press Start to play';
+  document.getElementById('brick-start-btn').style.display='';
+  document.getElementById('brick-start-btn').textContent='START';
+  brickRunning=false; if(brickAF){cancelAnimationFrame(brickAF);brickAF=null;}
+  brickDrawIdle();
+}
+function brickLaunchBall(){
+  brickPlacedOnPaddle();
+  const speed=brickBallSpeed(), angle=(Math.random()-0.5)*Math.PI*0.5;
+  brickBall.vx=speed*Math.sin(angle);
+  brickBall.vy=-speed*Math.cos(angle);
+}
+function brickStart(){
+  if(brickAF){cancelAnimationFrame(brickAF);brickAF=null;}
+  if(brickGameOver || brickBricks.length===0){
+    brickScore=0; brickLives=3; brickLevel=1; brickGameOver=false;
+    document.getElementById('brick-score').textContent='0';
+    document.getElementById('brick-lives').textContent='3';
+    document.getElementById('brick-level').textContent='1';
+    buildBricksForLevel(brickLevel);
+  }
+  brickLaunchBall(); brickRunning=true;
+  document.getElementById('brick-start-btn').style.display='none';
+  document.getElementById('brick-msg').textContent='';
+  brickAF=requestAnimationFrame(brickLoop);
+}
+function stopBrickGame(){ brickRunning=false; if(brickAF){cancelAnimationFrame(brickAF);brickAF=null;} }
+function brickLoop(){ if(!brickRunning) return; updateBrick(); drawBrick(); brickAF=requestAnimationFrame(brickLoop); }
+
+function updateBrick(){
+  const pw=brickPaddle.w;
+  const left=brickKeys['a']||brickKeys['arrowleft']||brickTouch.left;
+  const right=brickKeys['d']||brickKeys['arrowright']||brickTouch.right;
+  if(left)  brickPaddle.x=Math.max(0,brickPaddle.x-8);
+  if(right) brickPaddle.x=Math.min(BRICK_CW-pw,brickPaddle.x+8);
+
+  brickBall.x+=brickBall.vx; brickBall.y+=brickBall.vy;
+
+  if(brickBall.x-brickBall.r<=0){brickBall.x=brickBall.r;brickBall.vx=Math.abs(brickBall.vx);bSndWall();}
+  if(brickBall.x+brickBall.r>=BRICK_CW){brickBall.x=BRICK_CW-brickBall.r;brickBall.vx=-Math.abs(brickBall.vx);bSndWall();}
+  if(brickBall.y-brickBall.r<=0){brickBall.y=brickBall.r;brickBall.vy=Math.abs(brickBall.vy);bSndWall();}
+
+  // Paddle collision
+  if(brickBall.vy>0 && brickBall.y+brickBall.r>=brickPaddle.y && brickBall.y-brickBall.r<=brickPaddle.y+brickPaddle.h &&
+     brickBall.x>=brickPaddle.x-brickBall.r && brickBall.x<=brickPaddle.x+pw+brickBall.r){
+    brickBall.y=brickPaddle.y-brickBall.r;
+    const hit=(brickBall.x-(brickPaddle.x+pw/2))/(pw/2);
+    const speed=brickBallSpeed();
+    brickBall.vx=speed*hit*0.9;
+    brickBall.vy=-Math.sqrt(Math.max(speed*speed-brickBall.vx*brickBall.vx, speed*speed*0.2));
+    bSndPaddle(); brickFlash=0.15;
+  }
+
+  // Brick collisions (one per frame to avoid tunneling artifacts)
+  for(const b of brickBricks){
+    if(!b.alive) continue;
+    const cx=Math.max(b.x,Math.min(brickBall.x,b.x+b.w));
+    const cy=Math.max(b.y,Math.min(brickBall.y,b.y+b.h));
+    const dx=brickBall.x-cx, dy=brickBall.y-cy;
+    if(dx*dx+dy*dy<=brickBall.r*brickBall.r){
+      const overlapX=Math.min(brickBall.x+brickBall.r-b.x, b.x+b.w-(brickBall.x-brickBall.r));
+      const overlapY=Math.min(brickBall.y+brickBall.r-b.y, b.y+b.h-(brickBall.y-brickBall.r));
+      if(overlapX<overlapY) brickBall.vx=-brickBall.vx; else brickBall.vy=-brickBall.vy;
+      b.hp--; bkSpawnParts(cx,cy,b.color,b.hp>0?6:12); bSndBrick(b.hp);
+      if(b.hp<=0){ b.alive=false; brickScore+=10*brickLevel; }
+      else { brickScore+=4*brickLevel; }
+      document.getElementById('brick-score').textContent=brickScore;
+      break;
+    }
+  }
+
+  // Particles
+  brickParts=brickParts.filter(p=>p.life>0);
+  brickParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vx*=0.88;p.vy*=0.88;p.life-=0.045;});
+  if(brickFlash>0) brickFlash=Math.max(0,brickFlash-0.012);
+
+  // Ball fell below paddle
+  if(brickBall.y-brickBall.r>BRICK_CH){
+    brickLives--; document.getElementById('brick-lives').textContent=Math.max(0,brickLives);
+    bSndLife(); brickFlash=0.4;
+    if(brickLives<=0){ brickGameOverEnd(); return; }
+    brickRunning=false;
+    document.getElementById('brick-msg').textContent='Life lost! Get ready...';
+    setTimeout(()=>{ if(brickGameOver) return; brickLaunchBall(); brickRunning=true; document.getElementById('brick-msg').textContent=''; brickAF=requestAnimationFrame(brickLoop); },900);
+    return;
+  }
+
+  // Level cleared?
+  if(brickBricks.every(b=>!b.alive)){
+    if(brickLevel>=BRICK_MAXLEVEL){ brickWinEnd(); return; }
+    brickLevel++;
+    document.getElementById('brick-level').textContent=brickLevel;
+    buildBricksForLevel(brickLevel);
+    bSndLevel(); brickRunning=false;
+    document.getElementById('brick-msg').textContent='Level '+brickLevel+'!';
+    setTimeout(()=>{ if(brickGameOver) return; brickLaunchBall(); brickRunning=true; document.getElementById('brick-msg').textContent=''; brickAF=requestAnimationFrame(brickLoop); },1100);
+  }
+}
+
+function brickGameOverEnd(){
+  brickRunning=false; brickGameOver=true; if(brickAF){cancelAnimationFrame(brickAF);brickAF=null;}
+  document.getElementById('brick-msg').textContent='Game over! Score: '+brickScore;
+  document.getElementById('brick-start-btn').style.display='';
+  document.getElementById('brick-start-btn').textContent='Play Again';
+}
+function brickWinEnd(){
+  brickRunning=false; brickGameOver=true; if(brickAF){cancelAnimationFrame(brickAF);brickAF=null;}
+  document.getElementById('brick-msg').textContent='You cleared all '+BRICK_MAXLEVEL+' levels! \u{1F389} Score: '+brickScore;
+  document.getElementById('brick-start-btn').style.display='';
+  document.getElementById('brick-start-btn').textContent='Play Again';
+}
+
+function brickDrawBricks(ctx){
+  for(const b of brickBricks){
+    if(!b.alive) continue;
+    ctx.fillStyle=b.hp>1?shadeColor(b.color,-25):b.color;
+    ctx.shadowColor=b.color; ctx.shadowBlur=6;
+    ctx.fillRect(b.x,b.y,b.w,b.h);
+  }
+  ctx.shadowBlur=0;
+}
+function shadeColor(hex,pct){
+  const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)+pct, g=(n>>8&0xff)+pct, b=(n&0xff)+pct;
+  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
+  return '#'+(r<<16|g<<8|b).toString(16).padStart(6,'0');
+}
+function brickDrawIdle(){
+  const canvas=document.getElementById('brick-canvas'); if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#0c0508'; ctx.fillRect(0,0,BRICK_CW,BRICK_CH);
+  brickDrawBricks(ctx);
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.fillRect(brickPaddle.x,brickPaddle.y,brickPaddle.w,brickPaddle.h);
+  ctx.beginPath(); ctx.arc(brickBall.x,brickBall.y,brickBall.r,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fill();
+}
+function drawBrick(){
+  const canvas=document.getElementById('brick-canvas'); if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#0c0508'; ctx.fillRect(0,0,BRICK_CW,BRICK_CH);
+  if(brickFlash>0){ ctx.fillStyle=`rgba(255,255,255,${brickFlash*0.14})`; ctx.fillRect(0,0,BRICK_CW,BRICK_CH); }
+
+  brickDrawBricks(ctx);
+
+  // Particles
+  brickParts.forEach(p=>{ ctx.fillStyle=p.color; ctx.globalAlpha=Math.max(p.life,0); ctx.fillRect(p.x-2,p.y-2,4,4); });
+  ctx.globalAlpha=1;
+
+  // Paddle
+  ctx.fillStyle='#e2725b'; ctx.shadowColor='#e2725b'; ctx.shadowBlur=18;
+  ctx.fillRect(brickPaddle.x,brickPaddle.y,brickPaddle.w,brickPaddle.h);
+
+  // Ball
+  ctx.shadowColor='#fff'; ctx.shadowBlur=20; ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.arc(brickBall.x,brickBall.y,brickBall.r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+// ── Input ──
+document.addEventListener('keydown',e=>{
+  brickKeys[e.key.toLowerCase()]=true;
+  if(['arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault();
+});
+document.addEventListener('keyup',e=>{ brickKeys[e.key.toLowerCase()]=false; });
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const canvas=document.getElementById('brick-canvas');
+  if(canvas){
+    canvas.addEventListener('mousemove',e=>{
+      const rect=canvas.getBoundingClientRect(),sx=canvas.width/rect.width;
+      brickPaddle.x=Math.max(0,Math.min(BRICK_CW-brickPaddle.w,(e.clientX-rect.left)*sx-brickPaddle.w/2));
+    });
+    canvas.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      const rect=canvas.getBoundingClientRect(),sx=canvas.width/rect.width;
+      brickPaddle.x=Math.max(0,Math.min(BRICK_CW-brickPaddle.w,(e.touches[0].clientX-rect.left)*sx-brickPaddle.w/2));
+    },{passive:false});
+  }
+  const lBtn=document.getElementById('brick-left-btn');
+  const rBtn=document.getElementById('brick-right-btn');
+  function bindBrickBtn(btn,key){
+    if(!btn) return;
+    btn.addEventListener('touchstart',e=>{e.preventDefault();brickTouch[key]=true;btn.classList.add('pressed');},{passive:false});
+    btn.addEventListener('touchend',  e=>{e.preventDefault();brickTouch[key]=false;btn.classList.remove('pressed');},{passive:false});
+    btn.addEventListener('mousedown', ()=>{brickTouch[key]=true; btn.classList.add('pressed');});
+    btn.addEventListener('mouseup',   ()=>{brickTouch[key]=false;btn.classList.remove('pressed');});
+    btn.addEventListener('mouseleave',()=>{brickTouch[key]=false;btn.classList.remove('pressed');});
+  }
+  bindBrickBtn(lBtn,'left'); bindBrickBtn(rBtn,'right');
+  buildBricksForLevel(brickLevel);
+  brickDrawIdle();
+});
 
 </script>
 </body>
