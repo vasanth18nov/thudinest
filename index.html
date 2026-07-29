@@ -454,6 +454,42 @@ body {
 .tet-ctrl-btn:active, .tet-ctrl-btn.pressed { background: rgba(92,124,250,0.32); border-color: #5c7cfa; }
 .tet-hint { font-size: 0.7rem; color: rgba(255,255,255,0.22); text-align: center; line-height: 1.8; margin-top: 10px; }
 
+@media (max-width: 640px) {
+  #screen-tetris { padding: 40px 6px 6px; }
+  .tet-title-bar { margin-bottom: 8px; }
+  .tet-title-bar h2 { font-size: 1.15rem; letter-spacing: 3px; }
+  .tet-layout { gap: 8px; }
+  #tetris-canvas { max-width: min(200px, 56vw); max-height: 48vh; width: auto; height: auto; }
+  .tet-sidebar { width: 100%; max-width: 280px; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .tet-sidebar .tet-panel { flex: 1; min-width: 110px; padding: 8px 10px; }
+  .tet-panel-title { margin-bottom: 5px; }
+  #tetris-next-canvas { width: 56px; height: 56px; }
+  .tet-stat { padding: 2px 0; font-size: 0.72rem; }
+  #tetris-msg { min-height: 14px; font-size: 0.75rem; margin-top: 0; }
+  .tet-btn { padding: 8px 20px; font-size: 0.78rem; }
+  .tet-touch-ctrl { gap: 8px; margin-top: 8px; }
+  .tet-ctrl-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+  .tet-hint { display: none; }
+}
+@media (max-height: 700px) {
+  #tetris-canvas { max-height: 42vh; }
+}
+@media (max-height: 480px) {
+  #screen-tetris { display: flex !important; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 10px; padding: 8px; overflow: hidden; }
+  .tet-title-bar, .tet-hint { display: none; }
+  .tet-layout { flex-direction: row; align-items: center; gap: 8px; }
+  #tetris-canvas { max-height: 92vh; max-width: 38vw; width: auto; height: auto; }
+  .tet-sidebar { flex-direction: column; width: auto; max-width: 120px; gap: 6px; }
+  .tet-sidebar .tet-panel { padding: 6px 8px; }
+  #tetris-next-canvas { width: 44px; height: 44px; }
+  .tet-stat { font-size: 0.62rem; padding: 1px 0; }
+  .tet-panel-title { font-size: 0.55rem; margin-bottom: 3px; }
+  .tet-btn { padding: 6px 10px; font-size: 0.65rem; }
+  #tetris-msg { font-size: 0.62rem; min-height: 10px; }
+  .tet-touch-ctrl { flex-direction: column; gap: 6px; margin-top: 0; }
+  .tet-ctrl-btn { width: 38px; height: 38px; font-size: 0.9rem; }
+}
+
 /* ===== SNAKE SCREEN ===== */
 #screen-snake {
   background: radial-gradient(ellipse at 50% 0%, #062a1a 0%, #04100a 100%);
