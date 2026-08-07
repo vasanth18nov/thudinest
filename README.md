@@ -38,10 +38,12 @@ The page uses beautiful gradient fallbacks until real photos are added.
 ## Bazooka Man (`/bazooka-man/`)
 
 A standalone, original 2D physics-puzzle game — plain HTML/CSS/vanilla JS,
-no build step, no dependencies. Aim a bazooka (click/tap-drag or keyboard),
-blast crates, explosive barrels, glass panels and enemy bots across 10
-levels, earn up to 3 stars per level. Progress and the mute setting are
-saved in the browser via `localStorage`; there is no server or database.
+no build step, no dependencies. Aim a bazooka (click/tap-drag or keyboard)
+and break through destructible brick walls, glass panels and explosive
+barrels to take out the people holed up in 1- and 2-tier buildings across
+10 levels, earning up to 3 stars per level. Progress and the mute setting
+are saved in the browser via `localStorage`; there is no server or
+database.
 
 **Local development** — this game (and the rest of the site) is plain
 static files, so any static file server works. From the repo root:

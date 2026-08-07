@@ -8,7 +8,11 @@ const Game = (() => {
   // be retuned without touching collision code.
   const MAX_PULL = 150;        // px, max drag distance
   const MIN_FIRE_PULL = 14;    // px, drags shorter than this cancel instead of firing
-  const MIN_SPEED = 300, MAX_SPEED = 950; // px/s launch speed range
+  // px/s launch speed range. Max horizontal range at a 45deg launch is
+  // MAX_SPEED^2 / Physics.GRAVITY =~ 972px, comfortably covering the full
+  // World.W (960) arena from the muzzle (~x100) with margin — level data in
+  // levels.js relies on this reach, so retune both together if you change it.
+  const MIN_SPEED = 320, MAX_SPEED = 1080;
   const SHOT = {
     standard: { radius: 76, damage: 55 },
     bounce: { radius: 66, damage: 48 },
@@ -50,6 +54,7 @@ const Game = (() => {
     level = LEVELS[levelIdx];
     entities = level.build();
     rockets = []; debris = []; explosionQueue = [];
+    Particles.clear();
     ammo = Object.assign({}, level.rockets);
     selectedAmmo = ammo.standard > 0 ? 'standard' : 'bounce';
     shotsUsed = 0;
@@ -132,6 +137,20 @@ const Game = (() => {
   function explodeAt(x, y, radius, damage) {
     Particles.explosion(x, y, radius);
     Audio2.explosion(Math.min(1.6, radius / 76));
+
+    // Ground-breaking dressing: a scorch/crater decal plus a spray of dirt
+    // chunks, for any explosion close enough to the ground to plausibly dig
+    // into it. Purely visual — doesn't affect collision.
+    if (y >= World.GROUND_Y - 34) {
+      Particles.crater(x, radius);
+      const chunks = reducedMotion ? 2 : 6;
+      for (let i = 0; i < chunks; i++) {
+        debris.push(Entities.createDebris(x, World.GROUND_Y, '#5a4632', {
+          speed: 100 + Math.random() * 180, size: 5 + Math.random() * 6, decay: 0.3 + Math.random() * 0.2,
+        }));
+      }
+    }
+
     for (const e of entities) {
       if (!e.alive || e.kind === 'platform') continue;
       const wasAlive = e.alive;
@@ -141,7 +160,7 @@ const Game = (() => {
   }
 
   function onEntityDestroyed(e) {
-    const colors = { crate: '#b8834a', barrel: '#e0433f', glass: '#8ecbe6', target: '#84cc16' };
+    const colors = { crate: '#b8834a', barrel: '#e0433f', glass: '#8ecbe6', wall: '#8f8f96', target: '#c0392b' };
     const cx = e.x + (e.w ? e.w / 2 : 0);
     const cy = e.y + (e.h ? e.h / 2 : 0);
     const pieces = reducedMotion ? 3 : 6;
@@ -264,6 +283,7 @@ const Game = (() => {
     c.fillRect(0, World.GROUND_Y, World.W, World.H - World.GROUND_Y);
     c.fillStyle = '#3d5230';
     c.fillRect(0, World.GROUND_Y, World.W, 6);
+    Particles.drawCraters(c);
 
     for (const e of entities) drawEntity(c, e);
     for (const d of debris) drawDebris(c, d);
@@ -322,17 +342,46 @@ const Game = (() => {
       c.beginPath(); c.moveTo(e.x + e.w * 0.25, e.y); c.lineTo(e.x + e.w * 0.55, e.y + e.h);
       c.strokeStyle = 'rgba(255,255,255,0.5)'; c.stroke();
       c.restore();
+    } else if (e.kind === 'wall') {
+      c.save(); c.translate(sx, sy);
+      c.fillStyle = '#8f8f96';
+      c.fillRect(e.x, e.y, e.w, e.h);
+      c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 1;
+      const rowH = Math.max(8, e.h / 4);
+      for (let ry = e.y + rowH; ry < e.y + e.h; ry += rowH) {
+        c.beginPath(); c.moveTo(e.x, ry); c.lineTo(e.x + e.w, ry); c.stroke();
+      }
+      c.strokeStyle = '#5f5f66'; c.lineWidth = 2;
+      c.strokeRect(e.x + 1, e.y + 1, e.w - 2, e.h - 2);
+      if (e.hp < e.maxHp * 0.6) drawCracks(c, e);
+      c.restore();
     } else if (e.kind === 'target') {
       c.save(); c.translate(e.x, e.y + Math.sin(performance.now() / 260) * 2);
       c.rotate(e.angle || 0);
-      c.fillStyle = '#84cc16';
-      c.beginPath(); c.arc(0, 0, e.r, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = '#4d7a0d'; c.lineWidth = 2; c.stroke();
-      c.fillStyle = '#0a0a1a';
-      c.beginPath(); c.arc(e.r * 0.3, -e.r * 0.15, e.r * 0.22, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = '#4d7a0d'; c.beginPath();
-      c.moveTo(0, -e.r); c.lineTo(0, -e.r - 8); c.stroke();
-      c.fillStyle = '#ffd23f'; c.beginPath(); c.arc(0, -e.r - 8, 3, 0, Math.PI * 2); c.fill();
+      const r = e.r;
+      // Legs
+      c.fillStyle = '#2e2a3a';
+      c.fillRect(-r * 0.32, r * 0.15, r * 0.26, r * 0.55);
+      c.fillRect(r * 0.06, r * 0.15, r * 0.26, r * 0.55);
+      // Torso
+      c.fillStyle = '#a13a2e';
+      c.beginPath();
+      c.moveTo(-r * 0.5, r * 0.25); c.lineTo(-r * 0.42, -r * 0.35);
+      c.lineTo(r * 0.42, -r * 0.35); c.lineTo(r * 0.5, r * 0.25);
+      c.closePath(); c.fill();
+      c.strokeStyle = '#6e2018'; c.lineWidth = 1.5; c.stroke();
+      // Arms (raised, alarmed pose)
+      c.strokeStyle = '#a13a2e'; c.lineWidth = r * 0.22; c.lineCap = 'round';
+      c.beginPath(); c.moveTo(-r * 0.4, -r * 0.1); c.lineTo(-r * 0.72, r * 0.1); c.stroke();
+      c.beginPath(); c.moveTo(r * 0.4, -r * 0.1); c.lineTo(r * 0.68, -r * 0.55); c.stroke();
+      // Head + bandana
+      c.fillStyle = '#e8b58a';
+      c.beginPath(); c.arc(0, -r * 0.62, r * 0.42, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = '#a8815f'; c.lineWidth = 1; c.stroke();
+      c.fillStyle = '#7a1f1f';
+      c.beginPath(); c.arc(0, -r * 0.62, r * 0.43, Math.PI * 1.05, Math.PI * 1.95); c.fill();
+      c.fillStyle = '#241a14';
+      c.fillRect(-r * 0.16, -r * 0.7, r * 0.24, r * 0.08);
       c.restore();
     }
   }
@@ -414,9 +463,11 @@ const Game = (() => {
     const muzzle = muzzlePoint(dir);
     let sx = muzzle.x, sy = muzzle.y, svx = dir.x * speed, svy = dir.y * speed;
     c.fillStyle = selectedAmmo === 'bounce' ? 'rgba(56,189,248,0.8)' : 'rgba(255,178,0,0.85)';
-    for (let i = 0; i < 26; i++) {
-      svy += Physics.GRAVITY * 0.028;
-      sx += svx * 0.028; sy += svy * 0.028;
+    // 46 steps @ 30ms covers ~1.38s of flight — enough for a full-power,
+    // 45deg max-range arc (~1.27s) to visibly land instead of cutting off mid-air.
+    for (let i = 0; i < 46; i++) {
+      svy += Physics.GRAVITY * 0.03;
+      sx += svx * 0.03; sy += svy * 0.03;
       if (sy > World.GROUND_Y || sx > World.W) break;
       if (i % 2 === 0) { c.beginPath(); c.arc(sx, sy, 2.5, 0, Math.PI * 2); c.fill(); }
     }

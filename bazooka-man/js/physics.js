@@ -6,7 +6,11 @@
 'use strict';
 
 const Physics = (() => {
-  const GRAVITY = 1500; // px/s^2, tuned for the WORLD_W x WORLD_H arena
+  // px/s^2. Max range = MAX_SPEED^2 / GRAVITY (at a 45 deg launch); this and
+  // Game's MIN/MAX_SPEED in main.js are tuned together so a full-power shot
+  // from the player's muzzle can reach the far edge of the World.W arena —
+  // see the range comment next to MAX_SPEED in main.js before changing either.
+  const GRAVITY = 1200;
 
   function vec(x, y) { return { x, y }; }
   function add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; }

@@ -43,7 +43,20 @@ const Entities = (() => {
     };
   }
 
-  // A "target" is the enemy bot the player is trying to destroy. Circular
+  // Structural building material (brick/concrete) — visually and numerically
+  // distinct from `crate` (a loose wooden obstacle): lower hp than it looks,
+  // tuned so one solid-ish hit reliably brings a wall down (see SHOT damage
+  // in main.js) rather than requiring the player to chip away at it.
+  function createWall(x, y, w, h, opts = {}) {
+    const hp = opts.hp ?? 30;
+    return {
+      kind: 'wall', id: uid(), x, y, w, h, hp, maxHp: hp,
+      isObjective: !!opts.isObjective, solid: true, alive: true,
+      shakeX: 0, shakeY: 0, shakeT: 0,
+    };
+  }
+
+  // A "target" is the person the player is trying to take out. Circular
   // hitbox; optionally patrols back and forth between moveRange.min/max.
   function createTarget(x, y, r, opts = {}) {
     return {
@@ -148,7 +161,7 @@ const Entities = (() => {
   }
 
   return {
-    createPlatform, createCrate, createBarrel, createGlass, createTarget,
+    createPlatform, createCrate, createBarrel, createGlass, createWall, createTarget,
     createRocket, createDebris,
     updateTarget, updateDebris, updateShake, applyExplosion,
   };

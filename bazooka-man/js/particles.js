@@ -5,10 +5,46 @@
 
 const Particles = (() => {
   let list = [];
+  let craters = [];
   let shakeMag = 0;
   let reducedMotion = false;
+  const MAX_CRATERS = 10; // oldest scorch marks fall off so the ground doesn't accumulate forever
 
   function setReducedMotion(v) { reducedMotion = v; }
+
+  // A persistent scorch/crater decal left on the ground by a near-ground
+  // explosion — unlike sparks/smoke this doesn't decay over time, it just
+  // caps how many are kept around. Crack angles are randomized once at
+  // creation (not per-frame) so the mark doesn't visually jitter.
+  function crater(x, radius) {
+    const cracks = [];
+    const count = 4 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      cracks.push({ angle: Math.random() * Math.PI * 2, len: radius * (0.4 + Math.random() * 0.5) });
+    }
+    craters.push({ x, rx: radius * 0.85, ry: radius * 0.26, cracks });
+    if (craters.length > MAX_CRATERS) craters.shift();
+  }
+
+  function drawCraters(ctx) {
+    for (const cr of craters) {
+      ctx.save();
+      ctx.translate(cr.x, World.GROUND_Y);
+      ctx.fillStyle = 'rgba(10,8,6,0.55)';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, cr.rx, cr.ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(10,8,6,0.4)';
+      ctx.lineWidth = 2;
+      for (const cr2 of cr.cracks) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(cr2.angle) * cr2.len, Math.sin(cr2.angle) * cr2.len * 0.3);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
 
   function spawnSpark(x, y) {
     const angle = Math.random() * Math.PI * 2;
@@ -82,8 +118,11 @@ const Particles = (() => {
     ctx.globalAlpha = 1;
   }
 
-  function clear() { list = []; shakeMag = 0; }
+  function clear() { list = []; craters = []; shakeMag = 0; }
   function count() { return list.length; }
 
-  return { explosion, addShake, getShakeOffset, update, draw, clear, count, setReducedMotion };
+  return {
+    explosion, addShake, getShakeOffset, update, draw, clear, count, setReducedMotion,
+    crater, drawCraters,
+  };
 })();
