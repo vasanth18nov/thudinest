@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a1a">
+<title>Bazooka Man | Thudinest Games</title>
+<meta name="description" content="Bazooka Man — a free browser physics-puzzle game. Aim, fire, and blast your way through 10 levels. No download, no account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="back-link" href="/">&larr; Back to thudinest.com</a>
+
+<!-- ===== MENU SCREEN ===== -->
+<section id="screen-menu" class="screen active">
+  <div class="menu-wrap">
+    <div class="menu-icon" aria-hidden="true">&#128165;</div>
+    <h1 class="game-title">Bazooka Man</h1>
+    <p class="game-sub">Aim &middot; Fire &middot; Blast the bots</p>
+    <div class="menu-stars" id="menu-total-stars">&#11088; 0 / 30</div>
+    <div class="menu-actions">
+      <button class="btn btn-primary" id="btn-play">&#9654; Play</button>
+      <button class="btn btn-ghost" id="btn-howto">&#10067; How to Play</button>
+    </div>
+    <button class="icon-toggle" id="btn-mute-menu" aria-label="Toggle sound" aria-pressed="false">&#128266;</button>
+  </div>
+</section>
+
+<!-- ===== LEVEL SELECT SCREEN ===== -->
+<section id="screen-levels" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" id="btn-levels-back" aria-label="Back to menu">&larr;</button>
+    <h2>Select Level</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="level-grid" id="level-grid"></div>
+</section>
+
+<!-- ===== GAME SCREEN ===== -->
+<section id="screen-game" class="screen">
+  <div class="hud">
+    <button class="hud-btn" id="btn-pause" aria-label="Pause">&#9646;&#9646;</button>
+    <div class="hud-mid">
+      <span class="hud-level-name" id="hud-level-name">Level</span>
+      <span class="hud-shots" id="hud-shots">Shots: 0</span>
+    </div>
+    <button class="hud-btn" id="btn-mute-game" aria-label="Toggle sound" aria-pressed="false">&#128266;</button>
+  </div>
+
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="game-canvas" aria-label="Bazooka Man game canvas"></canvas>
+
+    <div class="ammo-bar" id="ammo-bar">
+      <button class="ammo-btn active" id="ammo-standard" data-type="standard">
+        <span class="ammo-icon">&#128165;</span><span class="ammo-count" id="count-standard">0</span>
+      </button>
+      <button class="ammo-btn" id="ammo-bounce" data-type="bounce">
+        <span class="ammo-icon">&#128260;</span><span class="ammo-count" id="count-bounce">0</span>
+      </button>
+    </div>
+
+    <!-- Pause overlay -->
+    <div class="overlay" id="overlay-pause" hidden>
+      <div class="overlay-box">
+        <h2>Paused</h2>
+        <button class="btn btn-primary" id="btn-resume">&#9654; Resume</button>
+        <button class="btn btn-ghost" id="btn-restart-paused">&#8635; Restart Level</button>
+        <button class="btn btn-ghost" id="btn-quit-paused">&#8862; Level Select</button>
+      </div>
+    </div>
+
+    <!-- Win overlay -->
+    <div class="overlay" id="overlay-win" hidden>
+      <div class="overlay-box">
+        <h2>Target Down!</h2>
+        <div class="win-stars" id="win-stars">&#9734;&#9734;&#9734;</div>
+        <p class="win-shots" id="win-shots-used">Shots used: 0</p>
+        <button class="btn btn-primary" id="btn-next-level">Next Level &#8594;</button>
+        <button class="btn btn-ghost" id="btn-replay-win">&#8635; Replay</button>
+        <button class="btn btn-ghost" id="btn-quit-win">&#8862; Level Select</button>
+      </div>
+    </div>
+
+    <!-- Lose overlay -->
+    <div class="overlay" id="overlay-lose" hidden>
+      <div class="overlay-box">
+        <h2>Out of Rockets</h2>
+        <p>The target is still standing. Give it another shot.</p>
+        <button class="btn btn-primary" id="btn-retry-lose">&#8635; Try Again</button>
+        <button class="btn btn-ghost" id="btn-quit-lose">&#8862; Level Select</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How to play overlay (reachable from menu or in-game) -->
+<div class="overlay overlay-fixed" id="overlay-howto" hidden>
+  <div class="overlay-box howto-box">
+    <h2>How to Play</h2>
+    <ul class="howto-list">
+      <li><strong>Aim:</strong> click/tap and drag away from the bazooka, like a slingshot pulled backward.</li>
+      <li><strong>Power:</strong> the further you drag, the harder the shot — watch the power bar.</li>
+      <li><strong>Fire:</strong> let go to launch. Rockets fall under gravity and explode on impact.</li>
+      <li><strong>Keyboard:</strong> Up/Down aim the angle, Left/Right switch rocket type, hold Space to charge power and release to fire.</li>
+      <li><strong>Barrels</strong> explode everything nearby — chain a few together for big blasts.</li>
+      <li><strong>Bounce rockets</strong> skip off the ground and platforms before exploding — good for tricky angles.</li>
+      <li>Clear every bot with as few rockets as possible for 3 stars.</li>
+    </ul>
+    <button class="btn btn-primary" id="btn-howto-close">Got it</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/main.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
