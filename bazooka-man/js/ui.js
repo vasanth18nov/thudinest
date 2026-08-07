@@ -42,6 +42,7 @@ const UI = (() => {
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $(id).classList.add('active');
+    document.body.classList.toggle('in-game', id === 'screen-game');
     if (id === 'screen-game') requestAnimationFrame(() => Engine.fitCanvas());
   }
 

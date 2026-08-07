@@ -52,46 +52,48 @@
   </div>
 
   <div class="canvas-wrap" id="canvas-wrap">
-    <canvas id="game-canvas" aria-label="Bazooka Man game canvas"></canvas>
+    <div class="canvas-frame" id="canvas-frame">
+      <canvas id="game-canvas" aria-label="Bazooka Man game canvas"></canvas>
 
-    <div class="ammo-bar" id="ammo-bar">
-      <button class="ammo-btn active" id="ammo-standard" data-type="standard">
-        <span class="ammo-icon">&#128165;</span><span class="ammo-count" id="count-standard">0</span>
-      </button>
-      <button class="ammo-btn" id="ammo-bounce" data-type="bounce">
-        <span class="ammo-icon">&#128260;</span><span class="ammo-count" id="count-bounce">0</span>
-      </button>
-    </div>
-
-    <!-- Pause overlay -->
-    <div class="overlay" id="overlay-pause" hidden>
-      <div class="overlay-box">
-        <h2>Paused</h2>
-        <button class="btn btn-primary" id="btn-resume">&#9654; Resume</button>
-        <button class="btn btn-ghost" id="btn-restart-paused">&#8635; Restart Level</button>
-        <button class="btn btn-ghost" id="btn-quit-paused">&#8862; Level Select</button>
+      <div class="ammo-bar" id="ammo-bar">
+        <button class="ammo-btn active" id="ammo-standard" data-type="standard">
+          <span class="ammo-icon">&#128165;</span><span class="ammo-count" id="count-standard">0</span>
+        </button>
+        <button class="ammo-btn" id="ammo-bounce" data-type="bounce">
+          <span class="ammo-icon">&#128260;</span><span class="ammo-count" id="count-bounce">0</span>
+        </button>
       </div>
-    </div>
 
-    <!-- Win overlay -->
-    <div class="overlay" id="overlay-win" hidden>
-      <div class="overlay-box">
-        <h2>Target Down!</h2>
-        <div class="win-stars" id="win-stars">&#9734;&#9734;&#9734;</div>
-        <p class="win-shots" id="win-shots-used">Shots used: 0</p>
-        <button class="btn btn-primary" id="btn-next-level">Next Level &#8594;</button>
-        <button class="btn btn-ghost" id="btn-replay-win">&#8635; Replay</button>
-        <button class="btn btn-ghost" id="btn-quit-win">&#8862; Level Select</button>
+      <!-- Pause overlay -->
+      <div class="overlay" id="overlay-pause" hidden>
+        <div class="overlay-box">
+          <h2>Paused</h2>
+          <button class="btn btn-primary" id="btn-resume">&#9654; Resume</button>
+          <button class="btn btn-ghost" id="btn-restart-paused">&#8635; Restart Level</button>
+          <button class="btn btn-ghost" id="btn-quit-paused">&#8862; Level Select</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Lose overlay -->
-    <div class="overlay" id="overlay-lose" hidden>
-      <div class="overlay-box">
-        <h2>Out of Rockets</h2>
-        <p>The target is still standing. Give it another shot.</p>
-        <button class="btn btn-primary" id="btn-retry-lose">&#8635; Try Again</button>
-        <button class="btn btn-ghost" id="btn-quit-lose">&#8862; Level Select</button>
+      <!-- Win overlay -->
+      <div class="overlay" id="overlay-win" hidden>
+        <div class="overlay-box">
+          <h2>Target Down!</h2>
+          <div class="win-stars" id="win-stars">&#9734;&#9734;&#9734;</div>
+          <p class="win-shots" id="win-shots-used">Shots used: 0</p>
+          <button class="btn btn-primary" id="btn-next-level">Next Level &#8594;</button>
+          <button class="btn btn-ghost" id="btn-replay-win">&#8635; Replay</button>
+          <button class="btn btn-ghost" id="btn-quit-win">&#8862; Level Select</button>
+        </div>
+      </div>
+
+      <!-- Lose overlay -->
+      <div class="overlay" id="overlay-lose" hidden>
+        <div class="overlay-box">
+          <h2>Out of Rockets</h2>
+          <p>The target is still standing. Give it another shot.</p>
+          <button class="btn btn-primary" id="btn-retry-lose">&#8635; Try Again</button>
+          <button class="btn btn-ghost" id="btn-quit-lose">&#8862; Level Select</button>
+        </div>
       </div>
     </div>
   </div>

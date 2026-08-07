@@ -26,6 +26,10 @@ body {
   padding: 6px 10px; border-radius: 8px;
 }
 .back-link:hover, .back-link:focus-visible { color: #fff; background: rgba(255,255,255,0.08); }
+/* The in-game HUD occupies the same top-left corner (pause button, level
+   name) — hide the fixed back-link there instead of overlapping it. Pause
+   → Level Select is the way back to the hub while playing. */
+body.in-game .back-link { display: none; }
 
 .screen { display: none; min-height: 100vh; }
 .screen.active { display: block; }
@@ -121,11 +125,15 @@ body {
 .hud-shots { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.55); }
 
 .canvas-wrap {
-  position: relative; flex: 1; display: flex; align-items: center; justify-content: center;
+  flex: 1; display: flex; align-items: center; justify-content: center;
   padding: 6px; min-height: 0;
 }
+/* Shrink-wraps to the canvas's actual rendered size (set in px by
+   Engine.fitCanvas), so the ammo bar and overlays anchored to this frame
+   always sit on top of the canvas — never off in the flex gutter around it. */
+.canvas-frame { position: relative; line-height: 0; }
 #game-canvas {
-  background: #0a0a1a; border-radius: 14px; touch-action: none;
+  display: block; background: #0a0a1a; border-radius: 14px; touch-action: none;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-width: 100%;
 }
 

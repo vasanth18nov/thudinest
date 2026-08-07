@@ -34,8 +34,12 @@ const Engine = (() => {
   // The canvas keeps a fixed logical resolution (World.W x World.H) and is
   // scaled purely with CSS width/height, so game-object coordinates never
   // need to change with screen size — only the CSS->world pointer mapping does.
+  //
+  // Sized off #canvas-wrap (the flex layout container), not canvas.parentElement:
+  // the immediate parent (.canvas-frame) shrink-wraps to the canvas's own
+  // rendered size, so measuring *it* would be a circular dependency.
   function fitCanvas() {
-    const wrap = canvas.parentElement;
+    const wrap = document.getElementById('canvas-wrap');
     const maxW = wrap.clientWidth;
     const maxH = Math.min(wrap.clientHeight || maxW * (World.H / World.W), window.innerHeight * 0.72);
     const ratio = World.W / World.H;
