@@ -150,6 +150,10 @@ body {
   background: rgba(4,4,10,0.72); backdrop-filter: blur(6px);
   border-radius: 14px; padding: 20px;
 }
+/* The [hidden] attribute and the class rule above have equal specificity,
+   so without this the author rule's `display: flex` would always win and
+   the overlay would stay visible even while `hidden` is set from JS. */
+.overlay[hidden] { display: none; }
 .overlay-fixed { position: fixed; border-radius: 0; }
 .overlay-box {
   background: rgba(20,20,34,0.9); border: 1px solid rgba(255,255,255,0.12);
