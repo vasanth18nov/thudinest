@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Veranda · South on a Platter</title>
+<meta name="description" content="Veranda, Bangsar. Andhra, Kerala and Chettinad cooking on one leaf: chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full menu.">
+<meta name="theme-color" content="#0E3B2A">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Caveat:wght@600;700&display=swap">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+/* =========================================================
+   Veranda · South on a Platter
+   banana leaf green, turmeric, chili, and a lot of cream
+   ========================================================= */
+:root{
+  color-scheme:light;
+  --green-950:#061F16; --green-900:#0A2E21; --green-800:#0E3B2A; --green-700:#15523A; --green-600:#1E6B4A; --green-400:#5DB685;
+  --turmeric:#F5A623; --turmeric-2:#FFC24B; --turmeric-600:#D8890B;
+  --saffron:#FF7A1A;
+  --chili:#D7263D; --chili-700:#A8182B;
+  --masala:#7E2A12;
+  --cream:#FFF8EA; --cream-2:#F7E7C8; --paper:#FFFDF8;
+  --ink:#1D140D; --ink-2:#4A3C30; --ink-3:#76624F;
+  --brass:#C9A45C;
+  --line:rgba(29,20,13,.14); --line-2:rgba(29,20,13,.07);
+  --on-dark:#FFF3DA; --on-dark-2:rgba(255,243,218,.78); --on-dark-3:rgba(255,243,218,.55); --line-dark:rgba(255,243,218,.16);
+  --veg:#1F8A4C; --sea:#1B6FB5; --meat:#D7263D;
+  --r:22px; --r-lg:32px;
+  --shadow:0 24px 60px -28px rgba(29,20,13,.5);
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --f-body:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-hand:"Caveat","Comic Sans MS",cursive;
+  --nav-h:72px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 12px); overflow-x:clip}
+body{
+  margin:0; background:var(--cream); color:var(--ink); overflow-x:clip;
+  font-family:var(--f-body); font-size:16px; line-height:1.55; font-weight:400;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+img,video{max-width:100%; display:block}
+h1,h2,h3,h4{margin:0; font-weight:600; text-wrap:balance}
+p{margin:0}
+button{font:inherit; color:inherit}
+a{color:inherit}
+[hidden]{display:none!important}
+::selection{background:var(--turmeric); color:var(--ink)}
+:focus-visible{outline:3px solid var(--turmeric); outline-offset:3px; border-radius:6px}
+
+.wrap{width:100%; max-width:1240px; margin-inline:auto; padding-inline:clamp(16px,4vw,32px)}
+.skip{position:absolute; left:12px; top:-60px; z-index:100; background:var(--turmeric); color:var(--ink); padding:10px 16px; border-radius:999px; font-weight:700; text-decoration:none}
+.skip:focus{top:12px}
+
+/* ---------- shared type ---------- */
+.kicker{
+  display:inline-flex; align-items:center; gap:10px; margin-bottom:16px;
+  font-size:12.5px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; color:var(--chili);
+}
+.kicker::before{content:""; width:26px; height:2px; background:currentColor; border-radius:2px}
+.dark .kicker{color:var(--turmeric-2)}
+.h2{
+  font-family:var(--f-display); font-weight:600; font-size:clamp(40px,6.2vw,84px);
+  line-height:.95; letter-spacing:-.03em;
+}
+.h2 em{font-style:italic; font-weight:400; color:var(--chili)}
+.dark .h2 em,.red .h2 em{color:var(--turmeric-2)}
+.sec{padding-block:clamp(80px,10vw,140px)}
+.sec-head{display:flex; justify-content:space-between; align-items:end; gap:20px 56px; flex-wrap:wrap; margin-bottom:clamp(32px,5vw,60px)}
+.sec-head .lead{max-width:46ch; font-size:17.5px; color:var(--ink-2)}
+.dark .sec-head .lead{color:var(--on-dark-2)}
+.dark{background:var(--green-800); color:var(--on-dark); position:relative; isolation:isolate; overflow:hidden}
+.dark::before{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(50% 40% at 90% 10%,rgba(245,166,35,.16),transparent 70%),
+    radial-gradient(40% 40% at 0% 100%,rgba(93,182,133,.18),transparent 70%);
+}
+.dots::after{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background-image:radial-gradient(rgba(255,243,218,.14) 1.2px,transparent 1.7px);
+  background-size:26px 26px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 80%); mask-image:linear-gradient(180deg,#000,transparent 80%);
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  --bg:var(--turmeric); --fg:var(--ink); --hover:var(--saffron);
+  position:relative; isolation:isolate; overflow:hidden;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  height:54px; padding:0 26px; border-radius:999px; border:0; cursor:pointer;
+  background:var(--bg); color:var(--fg); text-decoration:none; font-weight:650; font-size:15.5px; letter-spacing:.01em;
+  box-shadow:0 14px 34px -14px color-mix(in srgb,var(--bg) 80%,transparent);
+  transition:transform .45s var(--spring), box-shadow .35s var(--ease), color .3s;
+}
+.btn::before{
+  content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:var(--hover);
+  transform:translateY(102%); transition:transform .45s var(--ease);
+}
+.btn:hover{transform:translateY(-3px)}
+.btn:hover::before{transform:none}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn .arr{display:inline-block; transition:transform .35s var(--ease)}
+.btn:hover .arr{transform:translateX(5px)}
+.btn-ghost{--bg:transparent; --fg:currentColor; --hover:rgba(255,243,218,.12); box-shadow:inset 0 0 0 1.5px currentColor}
+.btn-ghost.on-light{--hover:rgba(29,20,13,.06)}
+.btn-dark{--bg:var(--green-800); --fg:var(--cream); --hover:var(--green-600)}
+.btn-sm{height:44px; padding:0 18px; font-size:14.5px}
+.icon-btn{
+  width:46px; height:46px; border-radius:50%; border:1.5px solid currentColor; background:transparent; cursor:pointer;
+  display:inline-grid; place-items:center; transition:background .25s, color .25s, transform .35s var(--spring);
+}
+.icon-btn:hover{background:var(--turmeric); color:var(--ink); border-color:var(--turmeric); transform:scale(1.08)}
+.icon-btn svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
+/* ---------- progress + nav ---------- */
+.progress{
+  position:fixed; inset:0 0 auto 0; height:3px; z-index:70; pointer-events:none;
+  background:linear-gradient(90deg,var(--turmeric),var(--saffron),var(--chili));
+  transform-origin:0 50%; transform:scaleX(var(--p,0));
+}
+.nav{position:fixed; inset:0 0 auto 0; z-index:60; color:var(--on-dark); transition:background .35s, color .35s, box-shadow .35s}
+.nav.scrolled{
+  color:var(--ink); background:color-mix(in srgb,var(--cream) 84%,transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.5); backdrop-filter:blur(16px) saturate(1.5);
+  box-shadow:0 1px 0 var(--line-2),0 10px 30px -20px rgba(29,20,13,.35);
+}
+.nav-in{height:var(--nav-h); display:flex; align-items:center; gap:clamp(12px,2.4vw,32px)}
+.brand{display:inline-flex; background:var(--cream); border-radius:999px; padding:7px 16px 5px; text-decoration:none; box-shadow:0 8px 24px -14px rgba(0,0,0,.5); transition:transform .4s var(--spring)}
+.brand:hover{transform:rotate(-3deg) scale(1.04)}
+/* the logo file is a square with a white ground; show only the wordmark */
+.logo{display:block; position:relative; overflow:hidden; width:112px; aspect-ratio:371/154}
+.logo img{position:absolute; max-width:none; width:120.49%; left:-9.97%; top:-91.56%; mix-blend-mode:multiply}
+.links{display:flex; gap:clamp(14px,2vw,28px); margin-left:auto}
+.links a{
+  position:relative; text-decoration:none; font-weight:550; font-size:15px; padding:6px 0;
+}
+.links a::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:2px; border-radius:2px; background:var(--turmeric);
+  transform:scaleX(0); transition:transform .35s var(--ease);
+}
+.links a:hover::after,.links a.on::after{transform:scaleX(1)}
+.leaf-btn .n{
+  min-width:24px; height:24px; padding:0 7px; border-radius:999px; background:var(--chili); color:#fff;
+  display:inline-grid; place-items:center; font-size:12.5px; font-weight:800; font-variant-numeric:tabular-nums;
+}
+.burger{display:none; margin-left:auto; width:46px; height:46px; border:0; border-radius:50%; background:rgba(255,243,218,.14); cursor:pointer; place-items:center}
+.nav.scrolled .burger{background:rgba(29,20,13,.07)}
+.burger span{display:block; width:20px; height:2px; background:currentColor; border-radius:2px; box-shadow:0 -6px 0 currentColor,0 6px 0 currentColor}
+
+.mnav{
+  position:fixed; inset:0; z-index:80; background:var(--green-900); color:var(--on-dark);
+  display:flex; flex-direction:column; padding:calc(var(--nav-h) + 20px) clamp(20px,6vw,40px) 40px;
+  clip-path:circle(0 at calc(100% - 40px) 36px); transition:clip-path .6s var(--ease); visibility:hidden;
+}
+.mnav.open{clip-path:circle(150% at calc(100% - 40px) 36px); visibility:visible}
+.mnav a{font-family:var(--f-display); font-size:clamp(38px,11vw,60px); line-height:1.15; text-decoration:none; font-weight:500; opacity:0; translate:0 20px; transition:opacity .5s, translate .5s var(--ease), color .2s}
+.mnav.open a{opacity:1; translate:none}
+.mnav a:hover{color:var(--turmeric-2); font-style:italic}
+.mnav .x{position:absolute; top:13px; right:clamp(16px,4vw,32px); color:var(--on-dark)}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative; isolation:isolate; overflow:hidden;
+  background:var(--green-800); color:var(--on-dark);
+  padding:calc(var(--nav-h) + clamp(36px,6vw,80px)) 0 clamp(110px,12vw,170px);
+}
+.hero::before{
+  content:""; position:absolute; inset:0; z-index:-2;
+  background:
+    radial-gradient(55% 55% at 76% 42%,rgba(245,166,35,.30),transparent 70%),
+    radial-gradient(35% 45% at 4% 96%,rgba(215,38,61,.38),transparent 70%),
+    radial-gradient(30% 30% at 40% 0%,rgba(93,182,133,.22),transparent 70%);
+}
+.hero::after{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background-image:radial-gradient(rgba(255,243,218,.17) 1.3px,transparent 1.8px); background-size:30px 30px;
+  -webkit-mask-image:radial-gradient(70% 80% at 30% 40%,#000,transparent); mask-image:radial-gradient(70% 80% at 30% 40%,#000,transparent);
+}
+.hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(28px,5vw,72px); align-items:center}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:10px; padding:8px 16px 8px 12px; border-radius:999px;
+  background:rgba(255,243,218,.1); border:1px solid var(--line-dark);
+  font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--on-dark-2);
+}
+.pulse{width:9px; height:9px; border-radius:50%; background:var(--turmeric); box-shadow:0 0 0 0 rgba(245,166,35,.7); animation:pulse 2.2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px rgba(245,166,35,0)}100%{box-shadow:0 0 0 0 rgba(245,166,35,0)}}
+.display{
+  font-family:var(--f-display); font-weight:650; font-size:clamp(60px,9.6vw,142px);
+  line-height:.86; letter-spacing:-.045em; margin:22px 0 26px;
+}
+.display .line{display:block; overflow:hidden; padding:0 .04em .26em 0; margin-bottom:-.24em}
+.display .line>span{display:inline-block; animation:rise 1.1s var(--ease) both}
+.display .line:nth-child(2)>span{animation-delay:.14s}
+@keyframes rise{from{transform:translateY(108%) rotate(4deg)}}
+.display em{font-style:italic; font-weight:380; color:var(--turmeric-2); position:relative; letter-spacing:-.03em}
+.scribble{position:absolute; left:-2%; bottom:-.08em; width:104%; height:.2em; overflow:visible}
+.scribble path{fill:none; stroke:var(--chili); stroke-width:6; stroke-linecap:round; stroke-dasharray:600; stroke-dashoffset:600; animation:draw 1.4s .9s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hero .lede{font-size:clamp(17px,1.55vw,20px); color:var(--on-dark-2); max-width:47ch; animation:fadeUp 1s .35s var(--ease) both}
+.hero .lede b{color:var(--on-dark); font-weight:600}
+.cta{display:flex; gap:12px; flex-wrap:wrap; margin-top:32px; animation:fadeUp 1s .5s var(--ease) both}
+@keyframes fadeUp{from{opacity:0; translate:0 24px}}
+.stats{
+  display:grid; grid-template-columns:repeat(4,auto); justify-content:start; gap:18px clamp(20px,3vw,40px);
+  margin:44px 0 0; padding-top:26px; border-top:1px solid var(--line-dark); animation:fadeUp 1s .65s var(--ease) both;
+}
+.stats div{margin:0}
+.stats dt{font-family:var(--f-display); font-size:clamp(30px,3.2vw,44px); line-height:1; font-weight:600; color:var(--turmeric-2); letter-spacing:-.02em}
+.stats dd{margin:7px 0 0; font-size:13.5px; line-height:1.3; color:var(--on-dark-3); max-width:15ch}
+
+.hero-art{position:relative; width:min(100%,590px); aspect-ratio:1; justify-self:center; --mx:0; --my:0; animation:pop 1.2s .2s var(--ease) both}
+@keyframes pop{from{opacity:0; scale:.85; rotate:-8deg}}
+.platter{
+  position:absolute; inset:13%; border-radius:50%; overflow:hidden; background:var(--brass);
+  box-shadow:0 0 0 9px var(--brass),0 0 0 11px rgba(0,0,0,.22),0 0 0 30px rgba(255,243,218,.06),0 60px 90px -30px rgba(0,0,0,.85);
+  animation:spin 90s linear infinite; translate:calc(var(--mx) * -8px) calc(var(--my) * -8px);
+  transition:translate .6s var(--ease);
+}
+.platter img{position:absolute; max-width:none; width:106%; left:-5.2%; top:-26.4%}
+@keyframes spin{to{rotate:360deg}}
+.ring{position:absolute; inset:0; width:100%; height:100%; animation:spin 46s linear infinite reverse; pointer-events:none}
+.ring text{fill:var(--turmeric-2); font-family:var(--f-body); font-weight:700; font-size:8.4px; letter-spacing:.3em}
+.float{
+  position:absolute; margin:0; padding:7px 7px 0; background:var(--paper); border-radius:16px; color:var(--ink);
+  box-shadow:0 30px 60px -24px rgba(0,0,0,.75); transition:translate .6s var(--ease);
+}
+.float img{width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:11px}
+.float figcaption{font-family:var(--f-hand); font-size:clamp(17px,1.7vw,22px); line-height:1; text-align:center; padding:7px 4px 9px; font-weight:700}
+.float .bob{animation:bob 7s ease-in-out infinite}
+.f1{width:31%; left:-3%; top:1%; rotate:-9deg; translate:calc(var(--mx) * 16px) calc(var(--my) * 16px)}
+.f2{width:28%; right:-4%; bottom:-1%; rotate:8deg; translate:calc(var(--mx) * 22px) calc(var(--my) * 22px)}
+.f2 .bob{animation-delay:-3.5s}
+.float .bob{display:block}
+@keyframes bob{50%{transform:translateY(-12px)}}
+.badge{
+  position:absolute; right:3%; top:5%; width:25%; aspect-ratio:1; border-radius:50%;
+  background:var(--chili); color:var(--cream); display:grid; place-items:center; text-align:center;
+  font-family:var(--f-hand); font-size:clamp(17px,2vw,26px); line-height:.95; font-weight:700;
+  rotate:12deg; box-shadow:0 20px 40px -18px rgba(0,0,0,.7),inset 0 0 0 6px var(--chili),inset 0 0 0 8px rgba(255,243,218,.55);
+  translate:calc(var(--mx) * 28px) calc(var(--my) * 28px); transition:translate .6s var(--ease);
+  animation:wobble 5s ease-in-out infinite;
+}
+.badge b{display:block; font-family:var(--f-display); font-style:italic; font-weight:600; font-size:1.2em; color:var(--turmeric-2)}
+@keyframes wobble{50%{rotate:4deg}}
+.tag{
+  position:absolute; left:2%; bottom:13%; padding:11px 16px 10px; border-radius:14px;
+  background:var(--turmeric); color:var(--ink); font-weight:750; font-size:clamp(13px,1.3vw,16px); letter-spacing:.01em; line-height:1.15;
+  rotate:-7deg; box-shadow:0 16px 30px -14px rgba(0,0,0,.6);
+  translate:calc(var(--mx) * 12px) calc(var(--my) * 12px); transition:translate .6s var(--ease);
+}
+.tag small{display:block; font-weight:600; font-size:.78em; opacity:.7; letter-spacing:.08em; text-transform:uppercase}
+
+/* ---------- crossing bands ---------- */
+.bands{position:relative; z-index:5; margin:-58px 0 -18px; padding:34px 0; overflow:hidden; pointer-events:none}
+.band{width:106%; margin-left:-3%; padding:15px 0; overflow:hidden; pointer-events:auto}
+.band.b1{background:var(--turmeric); color:var(--ink); rotate:-2.2deg; position:relative; z-index:2; box-shadow:0 14px 30px -18px rgba(0,0,0,.5)}
+.band.b2{background:var(--chili); color:var(--cream); rotate:2deg; position:absolute; left:0; right:0; top:34px}
+.track{display:flex; width:max-content; animation:marq 42s linear infinite}
+.band.b2 .track{animation-direction:reverse; animation-duration:52s}
+.band:hover .track{animation-play-state:paused}
+.track span{
+  display:inline-flex; align-items:center; gap:28px; padding-right:28px; white-space:nowrap;
+  font-family:var(--f-display); font-style:italic; font-weight:500; font-size:clamp(22px,2.9vw,36px); line-height:1.1;
+}
+.track i{font-style:normal; color:var(--chili); font-size:.7em}
+.band.b2 .track i{color:var(--turmeric-2)}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ---------- regions ---------- */
+.rgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(14px,2vw,24px)}
+.rcard{
+  --acc:var(--turmeric);
+  position:relative; isolation:isolate; overflow:hidden; border-radius:var(--r-lg); aspect-ratio:3/4;
+  color:var(--cream); box-shadow:var(--shadow); transition:transform .6s var(--ease), box-shadow .6s var(--ease);
+}
+.rcard img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; transition:transform 1.4s var(--ease)}
+.rcard::after{content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(6,31,22,0) 28%,rgba(6,31,22,.55) 58%,rgba(6,31,22,.95))}
+.rcard:hover{transform:translateY(-10px) rotate(-.8deg); box-shadow:0 40px 70px -30px rgba(29,20,13,.65)}
+.rcard:nth-child(2):hover{transform:translateY(-10px) rotate(.8deg)}
+.rcard:hover img{transform:scale(1.09)}
+.rcard .num{
+  position:absolute; top:18px; left:18px; padding:6px 13px; border-radius:999px; background:var(--cream); color:var(--ink);
+  font-family:var(--f-display); font-weight:600; font-size:15px;
+}
+.rcard .body{position:absolute; inset:auto 0 0 0; padding:clamp(20px,2.4vw,30px)}
+.rcard h3{font-family:var(--f-display); font-size:clamp(32px,3.3vw,46px); line-height:.98; letter-spacing:-.025em}
+.rcard h3 em{font-weight:400; color:var(--acc)}
+.rcard p{margin:10px 0 18px; color:rgba(255,248,234,.84); font-size:15px; max-width:32ch}
+.rcard .go{
+  display:inline-flex; align-items:center; gap:8px; border:0; cursor:pointer; padding:10px 16px; border-radius:999px;
+  background:var(--acc); color:var(--ink); font-weight:700; font-size:14px; transition:gap .3s var(--ease), transform .4s var(--spring);
+}
+.rcard .go:hover{gap:14px; transform:scale(1.04)}
+.rcard.andhra{--acc:#FF6B5B}
+.rcard.kerala{--acc:var(--green-400)}
+
+/* ---------- chef's specials ---------- */
+.sgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+.scard{
+  display:flex; flex-direction:column; border-radius:var(--r); overflow:hidden;
+  background:var(--green-700); border:1px solid var(--line-dark);
+  transition:transform .55s var(--ease), box-shadow .55s var(--ease), border-color .4s;
+}
+.scard:hover{transform:translateY(-8px); box-shadow:0 36px 60px -30px rgba(0,0,0,.8); border-color:rgba(255,194,75,.45)}
+.media{position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--green-900)}
+.media img,.media video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.2s var(--ease), opacity .5s}
+.scard:hover .media img{transform:scale(1.07)}
+.media video.hov{opacity:0}
+.scard.playing .media video.hov{opacity:1}
+.media::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%); transform:translateX(-120%); transition:transform 1.1s var(--ease)}
+.scard:hover .media::after,.meal:hover .media::after{transform:translateX(120%)}
+.chip-top{
+  position:absolute; left:14px; top:14px; z-index:2; padding:6px 12px; border-radius:999px;
+  background:var(--cream); color:var(--ink); font-size:12px; font-weight:750; letter-spacing:.04em;
+}
+.play-hint{
+  position:absolute; right:14px; top:14px; z-index:2; width:36px; height:36px; border-radius:50%;
+  background:rgba(6,31,22,.55); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); display:grid; place-items:center; color:var(--cream);
+  transition:transform .4s var(--spring), background .3s;
+}
+.play-hint svg{width:13px; height:13px; fill:currentColor; margin-left:2px}
+.scard:hover .play-hint{transform:scale(1.15); background:var(--chili)}
+.sbody{padding:20px 20px 22px; display:grid; gap:10px; align-content:start; flex:1}
+.sbody h3{font-family:var(--f-display); font-size:clamp(28px,2.4vw,34px); line-height:1; letter-spacing:-.02em; color:var(--turmeric-2)}
+.sbody p{font-size:14.5px; color:var(--on-dark-2)}
+.olist{list-style:none; margin:6px 0 0; padding:14px 0 0; border-top:1px dashed var(--line-dark); display:grid; gap:10px}
+.olist li{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.olist .on{flex:1; min-width:0; font-weight:650; font-size:15px; line-height:1.2}
+.olist .on small{display:block; font-weight:400; font-size:12px; color:var(--on-dark-3); margin-top:2px}
+.olist .ov{font-family:var(--f-display); font-size:21px; font-weight:600; line-height:1; white-space:nowrap}
+.olist .ov small,.pr small,.money small{font-family:var(--f-body); font-size:10px; font-weight:700; letter-spacing:.06em; opacity:.6; margin-right:2px; vertical-align:.35em}
+.olist .ov em,.pr em{font-style:normal; font-size:.62em; opacity:.7}
+
+.meals-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:10px 30px; margin:clamp(56px,7vw,90px) 0 20px}
+.meals-head h3{font-family:var(--f-display); font-size:clamp(30px,3.6vw,48px); line-height:1; letter-spacing:-.02em}
+.meals-head h3 em{font-weight:400; color:var(--turmeric-2)}
+.meals-head p{color:var(--on-dark-2); max-width:52ch; font-size:15.5px}
+.meals-head p b{color:var(--turmeric-2)}
+.meals{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+.meal{
+  display:grid; grid-template-columns:44% 1fr; min-height:280px; border-radius:var(--r); overflow:hidden;
+  background:var(--cream); color:var(--ink); transition:transform .55s var(--ease), box-shadow .55s var(--ease);
+}
+.meal:hover{transform:translateY(-6px) rotate(-.4deg); box-shadow:0 34px 60px -30px rgba(0,0,0,.8)}
+.meal .media{aspect-ratio:auto; height:100%}
+.meal:hover .media img{transform:scale(1.08)}
+.mbody{padding:20px 20px 22px; display:grid; gap:9px; align-content:start}
+.mbody h4{font-family:var(--f-display); font-size:25px; line-height:1.02; letter-spacing:-.015em; color:var(--green-800)}
+.mbody p{font-size:14px; color:var(--ink-2)}
+.mbody .warn{color:var(--chili); font-weight:600; font-size:13px}
+.mbody .olist{border-top-color:var(--line)}
+.mbody .olist .on small{color:var(--ink-3)}
+
+/* ---------- add buttons ---------- */
+.adds{display:inline-flex; gap:5px; flex:none}
+.add{
+  height:32px; min-width:32px; padding:0; border-radius:999px; cursor:pointer;
+  border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+  display:inline-grid; place-items:center; font-size:18px; font-weight:500; line-height:1;
+  transition:background .25s, border-color .25s, color .25s, transform .45s var(--spring);
+}
+.add.lbl{padding:0 12px; font-size:12px; font-weight:750; letter-spacing:.04em}
+.add:hover{background:var(--turmeric); border-color:var(--turmeric); color:var(--ink)}
+.add:not(.lbl):hover{transform:rotate(90deg) scale(1.08)}
+.add.flash{background:var(--green-600); border-color:var(--green-600); color:#fff; transform:scale(1.18)}
+.dark .add,.red .add{background:rgba(255,243,218,.08); border-color:rgba(255,243,218,.3); color:var(--on-dark)}
+.dark .add:hover,.red .add:hover{background:var(--turmeric); border-color:var(--turmeric); color:var(--ink)}
+.dark .meal .add{background:var(--paper); border-color:var(--line); color:var(--ink)}
+.dark .meal .add:hover{background:var(--turmeric); border-color:var(--turmeric)}
+
+/* ---------- reels ---------- */
+.red{background:var(--chili); color:var(--cream); position:relative; isolation:isolate; overflow:hidden}
+.red::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:radial-gradient(45% 60% at 100% 0%,rgba(255,122,26,.55),transparent 70%),radial-gradient(40% 60% at 0% 100%,rgba(126,42,18,.6),transparent 70%);
+}
+.red .sec-head .lead{color:rgba(255,248,234,.86)}
+.red .kicker{color:var(--turmeric-2)}
+.scroller-ctl{display:flex; gap:10px; align-items:center}
+.rtrack,.strack{
+  display:flex; gap:18px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+  padding:14px max(clamp(16px,4vw,32px),calc((100vw - 1240px) / 2 + 32px)) 34px;
+  scroll-padding-inline:max(clamp(16px,4vw,32px),calc((100vw - 1240px) / 2 + 32px));
+}
+.rtrack::-webkit-scrollbar,.strack::-webkit-scrollbar{display:none}
+.reel{
+  position:relative; flex:0 0 clamp(230px,22vw,290px); aspect-ratio:3/4; scroll-snap-align:start;
+  border-radius:24px; overflow:hidden; background:#000; margin:0;
+  box-shadow:0 34px 60px -30px rgba(0,0,0,.7); transition:transform .6s var(--spring);
+}
+.reel:nth-child(even){margin-top:34px}
+.reel:hover{transform:translateY(-8px) rotate(-1.2deg) scale(1.02)}
+.reel:nth-child(even):hover{transform:translateY(-8px) rotate(1.2deg) scale(1.02)}
+.reel video{width:100%; height:100%; object-fit:cover}
+.reel figcaption{
+  position:absolute; left:12px; bottom:12px; max-width:calc(100% - 70px); padding:7px 13px; border-radius:999px;
+  background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); font-weight:650; font-size:13.5px;
+}
+.snd{
+  position:absolute; right:12px; bottom:12px; width:40px; height:40px; border-radius:50%; border:0; cursor:pointer;
+  background:rgba(255,248,234,.94); color:var(--ink); display:grid; place-items:center; transition:transform .4s var(--spring), background .25s;
+}
+.snd:hover{transform:scale(1.12); background:var(--turmeric)}
+.snd svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.snd .on{display:none} .snd[aria-pressed="true"] .on{display:block} .snd[aria-pressed="true"] .off{display:none}
+.ig{display:inline-flex; align-items:center; gap:8px; font-weight:700; text-decoration:none; border-bottom:2px solid var(--turmeric-2); padding-bottom:2px; transition:gap .3s var(--ease)}
+.ig:hover{gap:13px}
+
+/* ---------- story ---------- */
+.story-grid{display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(40px,7vw,100px); align-items:center}
+.story-art{position:relative; max-width:460px; width:100%; justify-self:center}
+.arch{position:relative; overflow:hidden; aspect-ratio:3/4.2; border-radius:999px 999px 30px 30px; border:10px solid var(--paper); box-shadow:var(--shadow); background:var(--green-900)}
+.arch video{width:100%; height:100%; object-fit:cover}
+.mortar{position:absolute; width:44%; aspect-ratio:1; right:-10%; bottom:-7%; border-radius:50%; overflow:hidden; border:8px solid var(--cream); box-shadow:var(--shadow); rotate:6deg; transition:rotate .6s var(--spring), scale .6s var(--spring)}
+.mortar:hover{rotate:-4deg; scale:1.06}
+.mortar img{width:100%; height:100%; object-fit:cover; object-position:50% 40%}
+.stamp{position:absolute; left:-12%; top:9%; width:128px; aspect-ratio:1; border-radius:50%; background:var(--turmeric); display:grid; place-items:center; box-shadow:0 18px 34px -16px rgba(0,0,0,.6)}
+.stamp svg{position:absolute; inset:0; animation:spin 22s linear infinite}
+.stamp text{fill:var(--ink); font-family:var(--f-body); font-weight:800; font-size:10.2px; letter-spacing:.24em}
+.stamp b{font-family:var(--f-display); font-size:32px; font-style:italic; font-weight:500; color:var(--chili)}
+.story-copy p{font-size:17.5px; color:var(--ink-2); max-width:54ch; margin-top:18px}
+.facts{list-style:none; padding:0; margin:30px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.facts li{
+  display:flex; gap:14px; align-items:flex-start; padding:16px; border-radius:18px; background:var(--paper);
+  border:1px solid var(--line-2); font-size:14.5px; line-height:1.4; color:var(--ink-2);
+  transition:transform .45s var(--spring), box-shadow .45s var(--ease), border-color .3s;
+}
+.facts li:hover{transform:translateY(-4px) rotate(-.6deg); box-shadow:0 20px 40px -26px rgba(29,20,13,.5); border-color:var(--turmeric)}
+.facts b{flex:none; font-family:var(--f-display); font-size:30px; line-height:.9; color:var(--chili); font-weight:600; min-width:48px}
+.facts span strong{color:var(--ink); font-weight:650}
+
+.heir-head{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:end; gap:10px 40px; margin:clamp(70px,9vw,120px) 0 24px}
+.heir-head h3{font-family:var(--f-display); font-size:clamp(30px,3.6vw,48px); line-height:1; letter-spacing:-.02em}
+.heir-head h3 em{font-weight:400; color:var(--chili)}
+.heir-head p{max-width:46ch; color:var(--ink-2)}
+.hgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+.heir{margin:0; border-radius:var(--r); overflow:hidden; background:var(--paper); border:1px solid var(--line-2); transition:transform .55s var(--spring), box-shadow .5s var(--ease)}
+.heir:nth-child(odd):hover{transform:translateY(-8px) rotate(-1.2deg)}
+.heir:nth-child(even):hover{transform:translateY(-8px) rotate(1.2deg)}
+.heir:hover{box-shadow:0 30px 50px -30px rgba(29,20,13,.6)}
+.heir .ph{overflow:hidden; aspect-ratio:4/5}
+.heir img{width:100%; height:100%; object-fit:cover; transition:transform 1.2s var(--ease)}
+.heir:hover img{transform:scale(1.06)}
+.heir figcaption{padding:14px 16px 16px}
+.heir figcaption b{display:block; font-family:var(--f-display); font-size:21px; font-weight:600; line-height:1.1}
+.heir figcaption span{font-size:13.5px; color:var(--ink-3); line-height:1.4; display:block; margin-top:4px}
+
+.team{
+  margin-top:clamp(40px,6vw,70px); display:grid; grid-template-columns:1.25fr 1fr; overflow:hidden;
+  border-radius:var(--r-lg); background:var(--green-800); color:var(--on-dark); box-shadow:var(--shadow);
+}
+.team .ph{overflow:hidden; min-height:320px}
+.team img{width:100%; height:100%; object-fit:cover; object-position:50% 35%; transition:transform 1.4s var(--ease)}
+.team:hover img{transform:scale(1.05)}
+.team .tb{padding:clamp(28px,4vw,52px); display:grid; gap:14px; align-content:center}
+.team .kicker{color:var(--turmeric-2); margin:0}
+.team h3{font-family:var(--f-display); font-size:clamp(32px,3.8vw,52px); line-height:1; letter-spacing:-.025em; font-weight:500; font-style:italic; color:var(--turmeric-2)}
+.team p{color:var(--on-dark-2); max-width:40ch}
+.team .btn{justify-self:start; margin-top:8px}
+
+/* ---------- sips & sweets ---------- */
+.warm{background:var(--cream-2)}
+.sip{
+  flex:0 0 clamp(210px,20vw,258px); scroll-snap-align:start; border-radius:var(--r); overflow:hidden; background:var(--paper);
+  box-shadow:0 20px 44px -30px rgba(29,20,13,.55); transition:transform .55s var(--spring), box-shadow .5s var(--ease); margin:0;
+}
+.sip:nth-child(odd):hover{transform:translateY(-10px) rotate(-1.5deg)}
+.sip:nth-child(even):hover{transform:translateY(-10px) rotate(1.5deg)}
+.sip:hover{box-shadow:0 36px 60px -32px rgba(29,20,13,.65)}
+.sip .ph{aspect-ratio:4/5; overflow:hidden}
+.sip img{width:100%; height:100%; object-fit:cover; transition:transform 1.2s var(--ease)}
+.sip:hover img{transform:scale(1.07)}
+.sip figcaption{display:flex; align-items:center; gap:10px; padding:14px 14px 15px 16px}
+.sip figcaption span{flex:1; min-width:0; font-weight:650; line-height:1.2}
+.sip figcaption em{display:block; font-style:normal; font-family:var(--f-display); font-weight:600; font-size:19px; color:var(--chili); margin-top:2px}
+.sip figcaption em small{font-family:var(--f-body); font-size:10px; font-weight:700; opacity:.7; margin-right:2px; vertical-align:.3em}
+
+/* ---------- full menu ---------- */
+.menu-sec{padding-top:clamp(80px,10vw,140px); padding-bottom:clamp(60px,8vw,100px)}
+.lens{display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:18px}
+.lens .lbl{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); font-weight:750; margin-right:6px}
+.lchip{
+  cursor:pointer; border:1.5px solid var(--line); background:var(--paper); color:var(--ink-2);
+  border-radius:999px; padding:7px 14px; font-size:13.5px; font-weight:600; transition:all .25s var(--ease);
+}
+.lchip:hover{border-color:var(--ink); color:var(--ink); transform:translateY(-2px)}
+.lchip[aria-pressed="true"]{background:var(--green-800); border-color:var(--green-800); color:var(--cream)}
+.lchip u{text-decoration:none; opacity:.6; font-variant-numeric:tabular-nums; margin-left:5px}
+.bar{
+  position:sticky; top:var(--nav-h); z-index:30; margin-inline:calc(-1 * clamp(16px,4vw,32px)); padding:12px clamp(16px,4vw,32px) 0;
+  background:color-mix(in srgb,var(--cream) 90%,transparent); -webkit-backdrop-filter:blur(16px) saturate(1.4); backdrop-filter:blur(16px) saturate(1.4);
+  border-bottom:1px solid var(--line-2);
+}
+.bar-row{display:flex; gap:10px 14px; align-items:center; flex-wrap:wrap}
+.search{
+  flex:1 1 260px; min-width:0; display:flex; align-items:center; gap:10px; height:48px; padding:0 18px;
+  border-radius:999px; background:var(--paper); border:1.5px solid var(--line); transition:border-color .25s, box-shadow .25s;
+}
+.search:focus-within{border-color:var(--turmeric); box-shadow:0 0 0 5px rgba(245,166,35,.2)}
+.search svg{width:18px; height:18px; flex:none; stroke:var(--ink-3); fill:none; stroke-width:2; stroke-linecap:round}
+.search input{flex:1; min-width:0; border:0; background:transparent; color:var(--ink); font:inherit; font-size:15.5px; height:100%; outline:none}
+.search input::placeholder{color:var(--ink-3)}
+.search kbd{font:inherit; font-size:12px; font-weight:700; color:var(--ink-3); border:1.5px solid var(--line); border-radius:7px; padding:1px 7px}
+.filters{display:flex; gap:6px; flex-wrap:wrap}
+.chip{
+  cursor:pointer; border:1.5px solid var(--line); background:var(--paper); color:var(--ink-2); height:44px;
+  border-radius:999px; padding:0 16px; font-size:14px; font-weight:650; display:inline-flex; align-items:center; gap:8px;
+  transition:all .25s var(--ease);
+}
+.chip:hover{border-color:var(--ink); color:var(--ink); transform:translateY(-2px)}
+.chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--cream)}
+.chip .mark{transform:none}
+.jump{display:flex; gap:8px; overflow-x:auto; padding:12px 0; scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 92%,transparent); mask-image:linear-gradient(90deg,#000 92%,transparent)}
+.jump::-webkit-scrollbar{display:none}
+.jump a{
+  flex:none; text-decoration:none; white-space:nowrap; color:var(--ink-3); padding:6px 12px; border-radius:999px;
+  font-size:13px; font-weight:650; transition:background .25s, color .25s;
+}
+.jump a:hover{color:var(--ink); background:rgba(29,20,13,.06)}
+.jump a.on{color:var(--ink); background:var(--turmeric)}
+.tally{font-size:15px; color:var(--ink-2); padding:18px 0 0}
+.tally b{color:var(--chili); font-weight:750; font-variant-numeric:tabular-nums}
+
+.msec{padding-top:44px; scroll-margin-top:calc(var(--nav-h) + 130px)}
+.mhead{
+  --bg:var(--green-800); --fg:var(--on-dark); --acc:var(--turmeric-2);
+  position:relative; display:grid; grid-template-columns:1fr minmax(170px,40%); min-height:clamp(150px,17vw,210px);
+  border-radius:var(--r); overflow:hidden; background:var(--bg); color:var(--fg); margin-bottom:14px; isolation:isolate;
+}
+.msec:nth-child(3n+2) .mhead{--bg:var(--masala); --acc:var(--turmeric-2)}
+.msec:nth-child(3n+3) .mhead{--bg:var(--turmeric); --fg:var(--ink); --acc:var(--chili-700)}
+.mhead .mt{padding:clamp(20px,3vw,32px); display:flex; flex-direction:column; justify-content:flex-end; gap:8px}
+.mhead .mk{font-size:12px; letter-spacing:.18em; text-transform:uppercase; font-weight:750; color:var(--acc)}
+.mhead h3{font-family:var(--f-display); font-size:clamp(30px,4.2vw,54px); line-height:.98; letter-spacing:-.025em}
+.mhead .ph{position:relative; overflow:hidden; clip-path:polygon(14% 0,100% 0,100% 100%,0 100%)}
+.mhead .ph img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.4s var(--ease)}
+.msec:hover .mhead .ph img{transform:scale(1.07)}
+.mnote{max-width:70ch; color:var(--ink-2); font-size:15.5px; margin:4px 4px 12px}
+.mnote b{color:var(--chili)}
+.mbanner{display:inline-block; background:var(--paper); border:1.5px dashed var(--turmeric); border-radius:14px; padding:10px 16px; font-size:14.5px; color:var(--ink-2); margin:2px 0 12px}
+.mbanner b{color:var(--ink)}
+
+.dishes{display:grid; grid-template-columns:1fr 1fr; column-gap:28px}
+.dish{padding:15px 14px; border-radius:16px; border-bottom:1px dashed var(--line); transition:background .3s var(--ease), border-color .3s}
+.dish:hover{background:var(--paper); border-bottom-color:transparent; box-shadow:0 14px 30px -24px rgba(29,20,13,.45)}
+.dish-top{display:flex; align-items:baseline; gap:10px}
+.mark{
+  width:13px; height:13px; flex:none; border:1.6px solid currentColor; border-radius:3px;
+  display:inline-grid; place-items:center; transform:translateY(1px);
+}
+.mark::after{content:""; width:5px; height:5px; border-radius:50%; background:currentColor}
+.mark.veg{color:var(--veg)} .mark.sea{color:var(--sea)} .mark.meat{color:var(--meat)}
+.nm{font-size:17px; font-weight:650; line-height:1.25; transition:color .25s}
+.dish:hover .nm{color:var(--chili)}
+.led{flex:1; min-width:14px; border-bottom:2px dotted var(--line); transform:translateY(-5px); transition:border-color .3s}
+.dish:hover .led{border-bottom-color:var(--turmeric)}
+.pr{font-family:var(--f-display); font-size:21px; font-weight:600; line-height:1; white-space:nowrap; font-variant-numeric:tabular-nums}
+.pr .sl{font-family:var(--f-body); font-size:12px; font-weight:500; opacity:.6}
+.pr.tbd{font-family:var(--f-body); font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:800; color:var(--chili)}
+.ds{font-size:14px; color:var(--ink-3); margin:4px 0 0 23px; max-width:52ch}
+.dish .adds{margin-left:4px}
+.plaque{display:inline-flex; gap:12px; border:1.5px solid var(--line); border-radius:10px; padding:5px 11px 4px; white-space:nowrap; background:var(--paper)}
+.plaque .col,.sticker .col{display:grid; justify-items:center}
+.plaque .sl,.sticker .sl{font-family:var(--f-body); font-size:9px; letter-spacing:.12em; text-transform:uppercase; font-weight:800; opacity:.6}
+.plaque .col{font-family:var(--f-display); font-size:19px; font-weight:600; line-height:1.1}
+.plaque small{font-family:var(--f-body); font-size:9px; font-weight:700; opacity:.6; margin-right:2px; vertical-align:.35em}
+/* the orange stickers the kitchen taped over printed prices */
+.sticker{
+  display:inline-grid; justify-items:center; background:#F7A93B; color:#2B1A06; padding:4px 11px 3px; border-radius:3px;
+  transform:rotate(-2deg); box-shadow:0 3px 8px rgba(0,0,0,.22); font-family:var(--f-hand); font-size:20px; line-height:1.1; white-space:nowrap;
+  transition:transform .35s var(--spring);
+}
+.dish:hover .sticker{transform:rotate(2deg) scale(1.06)}
+.sticker .row{display:flex; gap:12px}
+.plates{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px}
+.plate{background:var(--paper); border:1px solid var(--line-2); border-radius:18px; padding:18px 18px 16px; display:grid; gap:8px; align-content:start; transition:transform .45s var(--spring), box-shadow .45s}
+.plate:hover{transform:translateY(-4px); box-shadow:0 22px 40px -28px rgba(29,20,13,.55)}
+.plate h4{font-family:var(--f-display); font-size:24px; line-height:1.05; color:var(--green-800)}
+.plate p{font-size:14px; color:var(--ink-3)}
+.plate .olist{border-top-color:var(--line)}
+.plate .olist .on small{color:var(--ink-3)}
+.plate .warn{color:var(--chili); font-weight:600; font-size:13px}
+.empty{padding:70px 0; text-align:center; color:var(--ink-3)}
+.empty b{display:block; font-family:var(--f-display); font-size:32px; color:var(--ink); margin-bottom:6px; font-weight:500}
+
+/* ---------- gallery ---------- */
+.bento{display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:clamp(150px,17vw,230px); grid-auto-flow:dense; gap:14px}
+.tile{position:relative; overflow:hidden; border:0; padding:0; border-radius:20px; background:var(--green-700); cursor:zoom-in; isolation:isolate}
+.tile.w2{grid-column:span 2} .tile.h2{grid-row:span 2}
+.tile img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.2s var(--ease), filter .6s}
+.tile::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 55%,rgba(6,31,22,.75)); opacity:0; transition:opacity .45s}
+.tile:hover img{transform:scale(1.08)}
+.tile:hover::after{opacity:1}
+.tile .tc{
+  position:absolute; left:14px; bottom:12px; z-index:2; color:var(--cream); font-family:var(--f-display); font-style:italic; font-size:20px; font-weight:500;
+  opacity:0; translate:0 10px; transition:opacity .45s, translate .45s var(--ease);
+}
+.tile:hover .tc{opacity:1; translate:none}
+
+/* ---------- the printed book ---------- */
+.book{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:26px 18px}
+.page{border:0; padding:0; background:transparent; cursor:zoom-in; text-align:left; display:grid; gap:10px; align-content:start}
+.page .fr{
+  display:block; background:var(--paper); padding:7px; border-radius:6px; border:1px solid var(--line-2);
+  box-shadow:0 2px 6px rgba(29,20,13,.12); transition:transform .5s var(--spring), box-shadow .5s var(--ease);
+}
+.page:nth-child(odd):hover .fr{transform:translateY(-8px) rotate(-2deg)}
+.page:nth-child(even):hover .fr{transform:translateY(-8px) rotate(2deg)}
+.page:hover .fr{box-shadow:0 24px 40px -22px rgba(29,20,13,.6)}
+.page img{width:100%; aspect-ratio:3/5; object-fit:cover; object-position:center 40%; border-radius:3px}
+.page .st{font-size:14px; font-weight:700; line-height:1.25; display:block}
+.page .no{font-family:var(--f-display); color:var(--chili); margin-right:4px}
+.page .ss{font-size:12.5px; color:var(--ink-3); line-height:1.3; display:block; margin-top:2px}
+
+/* ---------- footer ---------- */
+footer{background:var(--green-950); color:var(--on-dark-2); position:relative; overflow:hidden; isolation:isolate; padding:clamp(80px,10vw,130px) 0 120px}
+footer::before{content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(50% 60% at 50% 0%,rgba(245,166,35,.18),transparent 70%)}
+.thanks{text-align:center; font-family:var(--f-display); font-style:italic; font-weight:400; font-size:clamp(40px,7.5vw,104px); line-height:.95; letter-spacing:-.03em; color:var(--turmeric-2)}
+.thanks span{color:var(--on-dark); font-style:normal; font-weight:600}
+footer .thanks,footer .thanks-sub{max-width:none}
+.thanks-sub{text-align:center; font-size:12.5px; letter-spacing:.24em; text-transform:uppercase; margin:18px 0 clamp(50px,7vw,80px)}
+.fg{display:grid; gap:34px; grid-template-columns:1.2fr 1fr 1fr 1fr; padding-top:44px; border-top:1px solid var(--line-dark)}
+footer h4{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--turmeric-2); margin:0 0 12px; font-weight:750}
+footer p{margin:0 0 8px; max-width:40ch; font-size:14.5px}
+footer .brand{margin-bottom:16px}
+.legend{display:grid; gap:8px; margin-bottom:12px}
+.legend span{display:inline-flex; align-items:center; gap:9px; font-size:14.5px}
+.legend .mark.veg{color:#56C27F} .legend .mark.sea{color:#6FB2EE} .legend .mark.meat{color:#FF6B7D}
+.colophon{margin-top:44px; padding-top:20px; border-top:1px solid var(--line-dark); font-size:13px; color:var(--on-dark-3); max-width:80ch}
+footer .ig{color:var(--on-dark)}
+
+/* ---------- leaf: floating tab, drawer, toast ---------- */
+.leaftab{
+  position:fixed; right:clamp(16px,3vw,32px); bottom:calc(18px + env(safe-area-inset-bottom,0px)); z-index:55;
+  display:inline-flex; align-items:center; gap:12px; padding:9px 20px 9px 9px; border-radius:999px; cursor:pointer;
+  border:0; background:var(--green-900); color:var(--cream); font-weight:650; font-size:15px;
+  box-shadow:0 18px 40px -16px rgba(6,31,22,.8),0 0 0 1px rgba(255,243,218,.12);
+  translate:0 140%; opacity:0; transition:translate .6s var(--spring), opacity .4s, background .25s;
+}
+.leaftab.show{translate:none; opacity:1}
+.leaftab:hover{background:var(--green-700)}
+.leaftab .lf{width:40px; height:40px; border-radius:50%; background:var(--turmeric); color:var(--ink); display:grid; place-items:center; font-family:var(--f-display); font-weight:700; font-size:17px; font-variant-numeric:tabular-nums}
+.leaftab .tot{color:var(--turmeric-2); font-variant-numeric:tabular-nums}
+
+.scrim{position:fixed; inset:0; z-index:85; background:rgba(6,31,22,.55); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); opacity:0; transition:opacity .4s}
+.scrim.open{opacity:1}
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; z-index:90; width:min(460px,100%); background:var(--cream); color:var(--ink);
+  display:flex; flex-direction:column; box-shadow:-30px 0 60px -30px rgba(0,0,0,.6);
+  transform:translateX(104%); transition:transform .55s var(--ease);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.drawer.open{transform:none}
+.dhd{display:flex; align-items:center; gap:12px; padding:22px 22px 16px; background:var(--green-800); color:var(--on-dark)}
+.dhd h3{font-family:var(--f-display); font-size:32px; line-height:1; font-weight:600; flex:1}
+.dhd h3 small{display:block; font-family:var(--f-body); font-size:12.5px; font-weight:500; color:var(--on-dark-3); margin-top:6px}
+.dhd .icon-btn{color:var(--on-dark); width:42px; height:42px}
+.lines{flex:1; min-height:0; overflow-y:auto; padding:8px 22px 12px}
+.line{display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px dashed var(--line); animation:fadeUp .4s var(--ease) both}
+.line .ln{flex:1; min-width:0; font-size:15px; font-weight:600; line-height:1.3}
+.line .ln em{font-style:normal; display:block; font-size:12px; font-weight:600; color:var(--ink-3); letter-spacing:.04em}
+.qty{display:inline-flex; align-items:center; gap:4px; flex:none; background:var(--paper); border:1.5px solid var(--line); border-radius:999px; padding:3px}
+.qty button{width:28px; height:28px; border-radius:50%; cursor:pointer; padding:0; line-height:1; border:0; background:transparent; font-size:17px; transition:background .2s}
+.qty button:hover{background:var(--turmeric)}
+.qty .q{min-width:20px; text-align:center; font-weight:750; font-variant-numeric:tabular-nums}
+.line .amt{font-family:var(--f-display); font-size:19px; font-weight:600; min-width:74px; text-align:right; font-variant-numeric:tabular-nums}
+.line .amt.ask{font-family:var(--f-body); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--chili); font-weight:800}
+.sums{padding:14px 22px 6px; border-top:1px solid var(--line); display:grid; gap:6px; background:var(--paper)}
+.sum{display:flex; justify-content:space-between; align-items:baseline; font-size:14px; color:var(--ink-3)}
+.sum b{font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.sum .note{color:var(--chili); font-size:13px}
+.sum.big{font-size:16px; color:var(--ink); padding-top:10px; margin-top:4px; border-top:1px dashed var(--line)}
+.sum.big b{font-family:var(--f-display); font-size:34px; color:var(--chili); line-height:1; font-weight:650}
+.heads{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px; color:var(--ink-3); padding:10px 0 4px}
+.heads b{color:var(--ink)}
+.dfoot{display:flex; gap:10px; flex-wrap:wrap; padding:12px 22px 20px; background:var(--paper)}
+.dfoot .btn{flex:1}
+.empty-leaf{padding:40px 10px; text-align:center; color:var(--ink-3)}
+.empty-leaf .bowl{font-size:44px; line-height:1; margin-bottom:10px}
+.empty-leaf b{display:block; font-family:var(--f-display); font-size:24px; color:var(--ink); font-weight:500; margin-bottom:6px}
+
+.fly{position:fixed; z-index:120; width:16px; height:16px; border-radius:50%; background:var(--turmeric); box-shadow:0 0 0 3px var(--chili); pointer-events:none}
+.toast{
+  position:fixed; left:50%; bottom:calc(92px + env(safe-area-inset-bottom,0px)); z-index:95; translate:-50% 20px; opacity:0;
+  background:var(--ink); color:var(--cream); padding:11px 18px; border-radius:999px; font-size:14px; font-weight:600;
+  box-shadow:0 16px 36px -16px rgba(0,0,0,.6); transition:opacity .3s, translate .45s var(--spring); pointer-events:none; white-space:nowrap; max-width:calc(100vw - 32px); overflow:hidden; text-overflow:ellipsis;
+}
+.toast.show{opacity:1; translate:-50% 0}
+.toast b{color:var(--turmeric-2)}
+
+/* ---------- lightbox ---------- */
+.lb{
+  position:fixed; inset:0; z-index:110; background:rgba(4,20,14,.95); color:var(--on-dark);
+  display:grid; grid-template-rows:auto 1fr auto; padding:14px clamp(12px,3vw,28px);
+  padding-top:calc(14px + env(safe-area-inset-top,0px)); padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  animation:lbIn .35s var(--ease);
+}
+@keyframes lbIn{from{opacity:0}}
+.lb-top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start}
+.lb-cap .t{font-family:var(--f-display); font-size:24px; line-height:1.1; display:block; font-weight:600}
+.lb-cap .s{font-size:13.5px; opacity:.65; display:block}
+.lb-stage{display:grid; place-items:center; min-height:0; padding:12px 0; overflow:hidden}
+.lb-stage img{max-height:100%; max-width:100%; width:auto; object-fit:contain; border-radius:6px; animation:lbImg .45s var(--ease); transition:transform .3s var(--ease)}
+@keyframes lbImg{from{opacity:0; scale:.96}}
+.lb-stage img.zoomable{cursor:zoom-in}
+.lb-stage img.z{cursor:zoom-out; transition:none}
+.lb-bot{display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap}
+.lb .icon-btn{color:var(--on-dark)}
+.lb-idx{font-family:var(--f-display); font-size:17px; letter-spacing:.08em; opacity:.8; min-width:74px; text-align:center; font-variant-numeric:tabular-nums}
+.lb-hint{font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:.5}
+
+/* ---------- reveal on scroll ---------- */
+.js [data-reveal]{opacity:0}
+.js [data-reveal].in{animation:reveal .95s var(--ease) var(--d,0s) both}
+@keyframes reveal{from{opacity:0; translate:0 34px}to{opacity:1; translate:none}}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .sgrid{grid-template-columns:repeat(2,1fr)}
+  .meals{grid-template-columns:1fr}
+  .meal{grid-template-columns:38% 1fr; min-height:240px}
+  .fg{grid-template-columns:1fr 1fr}
+  .hgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:900px){
+  :root{--nav-h:64px}
+  .links,.nav .leaf-btn{display:none}
+  .burger{display:grid}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-art{width:min(100%,470px); margin-top:10px}
+  .story-grid{grid-template-columns:1fr}
+  .story-art{max-width:380px; margin-bottom:30px}
+  .stamp{left:-3%; width:100px}
+  .mortar{right:-3%}
+  .team{grid-template-columns:1fr}
+  .team .ph{min-height:0; aspect-ratio:16/10}
+  .dishes{grid-template-columns:1fr}
+  .bento{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .rgrid{
+    grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:80%; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin-inline:calc(-1 * clamp(16px,4vw,32px)); padding:6px clamp(16px,4vw,32px) 24px; scrollbar-width:none;
+    scroll-padding-inline:clamp(16px,4vw,32px);
+  }
+  .rgrid::-webkit-scrollbar{display:none}
+  .rcard{scroll-snap-align:start}
+  .facts{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .stats{grid-template-columns:repeat(2,auto)}
+  .cta .btn{flex:1 1 auto}
+  .sgrid{grid-template-columns:1fr}
+  .meal{grid-template-columns:1fr}
+  .meal .media{aspect-ratio:16/10; height:auto}
+  .hgrid{grid-template-columns:1fr 1fr; gap:12px}
+  .heir figcaption b{font-size:18px}
+  .mhead{grid-template-columns:1fr 38%}
+  .mhead h3{font-size:28px}
+  .search kbd{display:none}
+  .chip{height:40px; padding:0 13px; font-size:13.5px}
+  .dish{padding:14px 6px}
+  .dish-top{flex-wrap:wrap}
+  .ds{margin-left:23px}
+  .fg{grid-template-columns:1fr}
+  .reel{flex-basis:72%}
+  .sip{flex-basis:66%}
+  .leaftab{left:50%; right:auto; translate:-50% 140%}
+  .leaftab.show{translate:-50% 0}
+  .bands{margin-top:-46px}
+}
+@media (hover:none){
+  .hover-only{display:none}
+  .tile .tc{opacity:1; translate:none}
+  .tile::after{opacity:1}
+  .play-hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js [data-reveal]{opacity:1}
+  *,*::before,*::after{animation-duration:.001ms!important; animation-iteration-count:1!important; animation-delay:0s!important; transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#menu">Skip to the menu</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Veranda, back to top"><span class="logo"><img src="logo.png" alt="Veranda, South on a Platter"></span></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#regions">Kitchens</a>
+      <a href="#specials">Specials</a>
+      <a href="#reels">Reels</a>
+      <a href="#menu">Menu</a>
+      <a href="#story">Story</a>
+      <a href="#gallery">Gallery</a>
+    </nav>
+    <button class="btn btn-sm leaf-btn" type="button" data-open-leaf>Your leaf <span class="n" data-leaf-count>0</span></button>
+    <button class="burger" type="button" id="burger" aria-label="Open navigation" aria-expanded="false" aria-controls="mnav"><span></span></button>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" aria-label="Sections">
+  <button class="icon-btn x" type="button" id="mnavClose" aria-label="Close navigation"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <a href="#regions" style="transition-delay:.08s">Kitchens</a>
+  <a href="#specials" style="transition-delay:.12s">Specials</a>
+  <a href="#reels" style="transition-delay:.16s">Reels</a>
+  <a href="#menu" style="transition-delay:.2s">Menu</a>
+  <a href="#story" style="transition-delay:.24s">Story</a>
+  <a href="#gallery" style="transition-delay:.28s">Gallery</a>
+  <a href="#book" style="transition-delay:.32s">The book</a>
+</div>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="pulse" aria-hidden="true"></span>Bangsar &middot; Andhra &middot; Kerala &middot; Chettinad</p>
+      <h1 class="display">
+        <span class="line"><span>South</span></span>
+        <span class="line"><span>on a <em>Platter<svg class="scribble" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M4 16 C 60 4, 120 22, 180 10 S 270 8, 296 14"/></svg></em></span></span>
+      </h1>
+      <p class="lede">The bold spices of Andhra, the coconut rich cooking of Kerala and the hand pounded masalas of Chettinad, served on one leaf. <b>Briyani made the way it is made for weddings in Karaikudi</b>, dosai from four in the afternoon, and a weekday thali that is one plate, no sharing.</p>
+      <div class="cta">
+        <a class="btn" href="#menu">Explore the menu <span class="arr" aria-hidden="true">&rarr;</span></a>
+        <a class="btn btn-ghost" href="#reels"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg> Watch the reels</a>
+      </div>
+      <dl class="stats">
+        <div><dt id="statDishes">122</dt><dd>dishes on one menu</dd></div>
+        <div><dt>14</dt><dd>Chettinad herbs &amp; spices in one masala</dd></div>
+        <div><dt>4pm</dt><dd>dosai, every day from</dd></div>
+        <div><dt>RM20</dt><dd>weekday thali, lunch only</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero-art" id="heroArt" aria-hidden="true">
+      <div class="platter"><img src="images/veranda.bangsar/DIOeTRoTIfE_1.jpg" alt="" fetchpriority="high"></div>
+      <svg class="ring" viewBox="0 0 200 200">
+        <defs><path id="ringPath" d="M100,100 m-89,0 a89,89 0 1,1 178,0 a89,89 0 1,1 -178,0"/></defs>
+        <text><textPath href="#ringPath" textLength="555">SOUTH ON A PLATTER &#10022; HAND POUNDED &#10022; WEDDING STYLE &#10022; ON ONE LEAF &#10022; </textPath></text>
+      </svg>
+      <figure class="float f1"><span class="bob"><img src="images/veranda.bangsar/C1LT88dxA8H_1.jpg" alt=""><figcaption>Chettinad briyani</figcaption></span></figure>
+      <figure class="float f2"><span class="bob"><img src="images/veranda.bangsar/DOhsxAKEycH_1.jpg" alt=""><figcaption>tea, pulled</figcaption></span></figure>
+      <div class="badge"><span>Chef Gaya's<b>Ghee Roast</b></span></div>
+      <div class="tag"><small>Weekday lunch</small>Thali &middot; RM 20</div>
+    </div>
+  </div>
+</section>
+
+<div class="bands" aria-hidden="true">
+  <div class="band b1"><div class="track" id="marquee1"></div></div>
+  <div class="band b2"><div class="track" id="marquee2"></div></div>
+</div>
+
+<!-- ============ REGIONS ============ -->
+<section class="sec" id="regions">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">Three kitchens</span>
+        <h2 class="h2">Three states,<br><em>one leaf.</em></h2>
+      </div>
+      <p class="lead" data-reveal style="--d:.1s">Andhra heat, Kerala coconut and Chettinad spice, cooked side by side. Pick a region and the menu below lights up with the dishes that come from it.</p>
+    </div>
+    <div class="rgrid">
+      <article class="rcard andhra" data-reveal>
+        <img src="images/veranda.bangsar/DXtwT-WidiZ_4.jpg" alt="Gutti Vankaya Kura, eggplant in a tamarind gravy, held in a kadai" loading="lazy">
+        <span class="num">01</span>
+        <div class="body">
+          <h3>Andhra <em>Pradesh</em></h3>
+          <p>Bolder and more intense. Sorrel leaf gongura, tamarind gravies and a Guntur chilli kick.</p>
+          <button class="go" type="button" data-lens="andhra">Trace <span data-count="andhra">0</span> dishes <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </article>
+      <article class="rcard kerala" data-reveal style="--d:.1s">
+        <img src="images/veranda.bangsar/C7yT0HRRWWE_1.jpg" alt="Fish in a coconut milk curry with ginger and chilli" loading="lazy">
+        <span class="num">02</span>
+        <div class="body">
+          <h3><em>Kerala</em></h3>
+          <p>Coconut milk, curry leaf and the slow simmer of a moilee from the coast, plus Thalassery dum briyani.</p>
+          <button class="go" type="button" data-lens="kerala">Trace <span data-count="kerala">0</span> dishes <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </article>
+      <article class="rcard chettinad" data-reveal style="--d:.2s">
+        <img src="images/veranda.bangsar/C1LT88dxA8H_1.jpg" alt="Chettinad style briyani with a boiled egg and raita" loading="lazy">
+        <span class="num">03</span>
+        <div class="body">
+          <h3>Chetti<em>nad</em></h3>
+          <p>Karaikudi's hand pounded masalas, and briyani cooked the way it is for weddings.</p>
+          <button class="go" type="button" data-lens="chettinad">Trace <span data-count="chettinad">0</span> dishes <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPECIALS ============ -->
+<section class="sec dark dots" id="specials">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">Chef's specials</span>
+        <h2 class="h2">Four preparations,<br><em>many proteins.</em></h2>
+      </div>
+      <p class="lead" data-reveal style="--d:.1s">Choose the preparation, then the protein.<span class="hover-only"> Hover a card with a play button to watch it being cooked.</span></p>
+    </div>
+    <div class="sgrid" id="sgrid"></div>
+
+    <div class="meals-head" data-reveal>
+      <h3>Set meals, <em>on their own calendar.</em></h3>
+      <p id="mealsNote"></p>
+    </div>
+    <div class="meals" id="meals"></div>
+  </div>
+</section>
+
+<!-- ============ REELS ============ -->
+<section class="sec red" id="reels" style="padding-bottom:clamp(60px,8vw,100px)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">Straight from the feed</span>
+        <h2 class="h2">Watch it<br><em>sizzle.</em></h2>
+      </div>
+      <div data-reveal style="--d:.1s; display:grid; gap:18px; justify-items:start">
+        <p class="lead">Short loops from the Veranda Instagram, playing as you scroll past. Clips with a speaker button have sound.</p>
+        <div class="scroller-ctl">
+          <button class="icon-btn" type="button" data-scroll="rtrack" data-dir="-1" aria-label="Previous reels"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="icon-btn" type="button" data-scroll="rtrack" data-dir="1" aria-label="Next reels"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          <a class="ig" href="https://www.instagram.com/veranda.bangsar/" target="_blank" rel="noopener">@veranda.bangsar <span aria-hidden="true">&nearr;</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="rtrack" id="rtrack"></div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="sec" id="story">
+  <div class="wrap">
+    <div class="story-grid">
+      <div class="story-art" data-reveal>
+        <div class="arch">
+          <video data-autoplay muted loop playsinline preload="none" src="images/veranda.bangsar/C2ZPFNqxoSZ.mp4#t=0.5" aria-label="Rice being layered into a brass pot for dum biryani"></video>
+        </div>
+        <div class="stamp" aria-hidden="true">
+          <svg viewBox="0 0 128 128"><defs><path id="stampPath" d="M64,64 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"/></defs>
+            <text><textPath href="#stampPath" textLength="298">HAND POUNDED &#10022; SLOW COOKED &#10022; </textPath></text></svg>
+          <b>&#10022;</b>
+        </div>
+        <div class="mortar"><img src="images/veranda.bangsar/C86KsWwR9QR_1.jpg" alt="A hand with a brass mortar and pestle" loading="lazy"></div>
+      </div>
+      <div class="story-copy">
+        <div data-reveal>
+          <span class="kicker">From the kitchen</span>
+          <h2 class="h2">Hand pounded.<br><em>Wedding style.</em></h2>
+        </div>
+        <p data-reveal style="--d:.08s" id="storyBriyani"></p>
+        <p data-reveal style="--d:.14s" id="storySweets"></p>
+        <ul class="facts">
+          <li data-reveal style="--d:.1s"><b>14</b><span><strong>Chettinad herbs and spices</strong> go into the Chettinad Masala, a Karaikudi classic.</span></li>
+          <li data-reveal style="--d:.16s"><b>24h</b><span><strong>Signature lamb ribs</strong> marinated over 24 hours, then grilled.</span></li>
+          <li data-reveal style="--d:.22s"><b>9</b><span><strong>Navaratnam Kurma</strong>: nine vegetables, fruits, paneer and nuts in one white gravy.</span></li>
+          <li data-reveal style="--d:.28s"><b>4pm</b><span><strong>Dosai</strong> come off the tawa every day from four in the afternoon.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="heir-head" data-reveal>
+      <h3>Heirlooms <em>on the shelf.</em></h3>
+      <p>Old copper and brass from South Indian kitchens, some of it from Chef Gaya's own family.</p>
+    </div>
+    <div class="hgrid" id="hgrid"></div>
+
+    <div class="team" data-reveal>
+      <div class="ph"><img src="images/veranda.bangsar/DHu8ui7xLVJ_1.jpg" alt="The Veranda kitchen team in chef whites at the entrance" loading="lazy"></div>
+      <div class="tb">
+        <span class="kicker">The kitchen team</span>
+        <h3>Nalvaravu, Swagatham, Suswagathaa.</h3>
+        <p>Welcome, in the words on the first page of the menu. Pull up a chair, the kaapi is on its way.</p>
+        <a class="btn" href="#menu">Start your leaf <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIPS & SWEETS ============ -->
+<section class="sec warm" id="sips" style="padding-bottom:clamp(60px,8vw,100px)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">Sips &amp; sweets</span>
+        <h2 class="h2">Save room<br>for <em>kaapi.</em></h2>
+      </div>
+      <div data-reveal style="--d:.1s; display:grid; gap:18px; justify-items:start">
+        <p class="lead">A coffee blend made just for Veranda, rose milk with pearl jellies, and the sweets Chettinad households make for special occasions.</p>
+        <div class="scroller-ctl">
+          <button class="icon-btn" type="button" data-scroll="strack" data-dir="-1" aria-label="Previous sips and sweets"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="icon-btn" type="button" data-scroll="strack" data-dir="1" aria-label="Next sips and sweets"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="strack" id="strack"></div>
+</section>
+
+<!-- ============ FULL MENU ============ -->
+<section class="menu-sec" id="menu">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">The full menu</span>
+        <h2 class="h2">Every dish,<br><em>one leaf.</em></h2>
+      </div>
+      <p class="lead" data-reveal style="--d:.1s">Search it, filter it, and tap <b>+</b> beside anything to build an order. Your leaf adds the 10% service charge and splits the bill.</p>
+    </div>
+
+    <div class="lens" id="lens" role="group" aria-label="Filter by region"></div>
+    <div class="bar" id="bar">
+      <div class="bar-row">
+        <label class="search" for="q">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+          <input id="q" type="search" placeholder="Search a dish, a spice, a region" autocomplete="off">
+          <kbd aria-hidden="true">/</kbd>
+        </label>
+        <div class="filters" role="group" aria-label="Filter by type">
+          <button class="chip" type="button" data-diet="all" aria-pressed="true">Everything</button>
+          <button class="chip" type="button" data-diet="veg" aria-pressed="false"><i class="mark veg"></i>Veg</button>
+          <button class="chip" type="button" data-diet="sea" aria-pressed="false"><i class="mark sea"></i>Sea</button>
+          <button class="chip" type="button" data-diet="meat" aria-pressed="false"><i class="mark meat"></i>Meat</button>
+        </div>
+      </div>
+      <nav class="jump" id="jump" aria-label="Jump to a menu section"></nav>
+    </div>
+    <p class="tally" id="tally" aria-live="polite"></p>
+    <div id="menuList"></div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="sec dark" id="gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">The room</span>
+        <h2 class="h2">Carved pillars,<br><em>patterned floors.</em></h2>
+      </div>
+      <p class="lead" data-reveal style="--d:.1s">Wooden beams, glass lanterns, tiled tables and a lot of brass. Tap any photo to see it large.</p>
+    </div>
+    <div class="bento" id="bento"></div>
+  </div>
+</section>
+
+<!-- ============ THE BOOK ============ -->
+<section class="sec" id="book">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <span class="kicker">Photographed at the table</span>
+        <h2 class="h2">The book<br><em>itself.</em></h2>
+      </div>
+      <p class="lead" data-reveal style="--d:.1s">All nineteen pages of the printed menu, orange stickers and all. Tap a page to read it full size, tap again to magnify, and use the arrow keys to turn pages.</p>
+    </div>
+    <div class="book" id="bookGrid"></div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <p class="thanks" data-reveal>Nandri<span>,</span> Dhanyavadalu<span>,</span> Nandi</p>
+    <p class="thanks-sub">Thank you, in three tongues</p>
+    <div class="fg">
+      <div>
+        <a class="brand" href="#top" aria-label="Veranda, back to top"><span class="logo"><img src="logo.png" alt="Veranda, South on a Platter" loading="lazy"></span></a>
+        <p>South Indian cooking from Andhra Pradesh, Kerala and Chettinad, in Bangsar.</p>
+        <p style="margin-top:14px"><a class="ig" href="https://www.instagram.com/veranda.bangsar/" target="_blank" rel="noopener">Follow @veranda.bangsar <span aria-hidden="true">&nearr;</span></a></p>
+      </div>
+      <div>
+        <h4>Reading the leaf</h4>
+        <div class="legend">
+          <span><i class="mark veg"></i>Vegetarian</span>
+          <span><i class="mark sea"></i>Seafood</span>
+          <span><i class="mark meat"></i>Meat or egg</span>
+        </div>
+        <p>Two prices means two sizes or two fish. Today's Price is set each morning by what came in.</p>
+      </div>
+      <div>
+        <h4>Good to know</h4>
+        <p>Dosai are served every day from 4pm onwards.</p>
+        <p>The thali is weekday lunch only, one plate per person.</p>
+        <p>The weekend briyani rotates. Ask what is on today.</p>
+        <p>Keyboard: <b>/</b> to search, <b>L</b> for your leaf, arrows to turn pages.</p>
+      </div>
+      <div>
+        <h4>Prices</h4>
+        <p>All prices in Malaysian Ringgit, subject to a 10 percent service charge.</p>
+        <p>Where the kitchen taped a new price over the printed one, the handwritten price is what you see here.</p>
+      </div>
+    </div>
+    <p class="colophon">
+      An unofficial menu reference, built from photographs of the printed Veranda menu taken on
+      22 September 2026 and from the restaurant's own Instagram photos. Dish names and descriptions are
+      transcribed from that menu. Prices change, so treat this as a guide and confirm at the table.
+    </p>
+  </div>
+</footer>
+
+<!-- ============ LEAF (order) ============ -->
+<button class="leaftab" id="leaftab" type="button" data-open-leaf aria-label="Open your leaf">
+  <span class="lf" data-leaf-count>0</span><span>Your leaf</span><span class="tot" id="tabTotal"></span>
+</button>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="leafTitle" hidden>
+  <div class="dhd">
+    <h3 id="leafTitle">Your leaf<small>Prices as printed, service charge added</small></h3>
+    <button class="icon-btn" type="button" data-act="close" aria-label="Close your leaf"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="lines" id="lines"></div>
+  <div class="sums" id="sums"></div>
+  <div class="dfoot">
+    <button class="btn btn-sm" type="button" data-act="suggest">Compose a meal &#10022;</button>
+    <button class="btn btn-sm btn-ghost on-light" type="button" data-act="clear">Clear</button>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   Paths to your local media. Change these two if you move the folders.
+   ========================================================= */
+const P = "images/veranda.bangsar/";   // food, room and reel files
+const BOOK = "Veranda%20Menu/img/";     // photographs of the printed menu pages
+
+/* ---------- the menu, transcribed from the printed book ---------- */
+const M = [
+ {id:"specials", t:"Chef's Specials", meta:"Four preparations, many proteins", feature:[
+   {n:"Chettinad Masala", d:"A Karaikudi classic, cooked with 14 varieties of Chettinad herbs and spices.", o:[["Chicken","25"],["Mutton","28"],["Prawns","40","Medium tiger prawns"]]},
+   {n:"Gongura", d:"An Andhra specialty, sorrel leaves cooked down to a tangy masala gravy.", o:[["Chicken","25"],["Mutton","28"]]},
+   {n:"Ghee Roast", d:"Chef Gaya's special. Dry roasted, hand pounded spices, grated coconut and yogurt slow cooked to perfection.", o:[["Prawns","40"],["Mutton","28"],["Paal Katti","18","Paneer"]]},
+   {n:"Moilee", d:"Simmered in a mildly spiced coconut milk based stew like curry hailing from the coasts of Kerala.", o:[["Fish","25 / 36","Tenggiri / Thread Fin"],["Prawns","40"]]}
+ ]},
+
+ {id:"thali", t:"Thali and weekend briyani", meta:"Set meals on their own calendar", feature:[
+   {n:"Thali Weekday Special", d:"Sweet, varieties of vegetables from three South Indian states, sambar, kara kolumbu, rasam, variety rice and white rice, with South Indian condiments.", o:[["Per plate","20"]], warn:"Weekday lunch only, not weekends or holidays. One plate per person, no sharing."},
+   {n:"Thalassery Briyani", d:"Keralan style dum briyani. Juicy chicken marinated overnight in a blend of freshly hand pounded spices and herbs masala mix, cooked with Seeraga Samba rice.", o:[["Weekend","25"]]},
+   {n:"Hyderabadi Chicken Briyani", d:"A fragrant dum briyani with marinated chicken, saffron and a special blend of Indian spices and herbs, cooked with basmati rice and served alongside Hyderabadi Kurma and raita.", o:[["Weekend","25"]]}
+ ], after:"<b>One of two each weekend.</b> The chef's selection varies weekly, so ask the service staff for today's briyani."},
+
+ {id:"small", t:"Soups and small plates", d:[
+   ["Nandu Rasam","Fresh crabs simmered in tangy Indian soup.","tbd","sea"],
+   ["Murungakai Soup","Moringa drumsticks in lightly seasoned soup.","10","veg"],
+   ["Cholam Kernalukal","Fried crunchy sweet corn kernels tossed in spices.","10","veg"],
+   ["Samosa","Crispy pastry filled with spiced potatoes and peas.","10","veg"],
+   ["Pookos 65","Crispy cauliflower fritters with aromatic spices.","15","veg"],
+   ["Onion Pakoda","Batter fried Indian onion fritters with special coating.","10","veg"],
+   ["Crispy Veg Patty","Golden patty filled with savory spiced vegetables.","15","veg"],
+   ["Chicken Lollypops","Deep fried chicken drumettes tossed in an Indo-Chinese sauce.","20","meat"],
+   ["Indian Chick Pops","Crispy chicken lollipops, marinated in a blend of traditional South Indian spices and herb.","20","meat"],
+   ["Malli 65","Also known as Green Chicken, a favourite of our young guests.","20","meat"],
+   ["Eraichi Kola Urundai","Indian meatballs made of fresh minced mutton.","25","meat"],
+   ["Poondu Meen Fry","Garlic and masala coated fried fish. Tenggiri or Indian Thread Fin.","25 / 36","sea"]
+ ]},
+
+ {id:"briyani", t:"Briyani and rice", meta:"Hand pounded, wedding style",
+  note:"A typical Chettinad style briyani, traditionally made for special occasions and especially weddings, meticulously crafted with hand pounded fresh spices and masalas.", d:[
+   ["Plain Briyani","Typical Chettinad style briyani served plain.","9","veg"],
+   ["Vegetable Briyani","Typical Chettinad style briyani with assorted vegetables.","18","veg"],
+   ["Saadam","Plain basmati rice.","5","veg"],
+   ["Chicken Briyani","Typical Chettinad style briyani with chicken.","24","meat"],
+   ["Mutton Briyani","Typical Chettinad style briyani with tender mutton pieces.","30","meat"],
+   ["Prawn / Fish Briyani","Typical Chettinad style briyani with an option of fish or medium sized tiger prawns.","45 / 35","sea"]
+ ]},
+
+ {id:"si-poultry", t:"South Indian poultry and egg", d:[
+   ["Kodi Guntur","Andhra style coconut chili chicken curry dish.","25","meat"],
+   ["Hyderabadi Kurma","A royal chicken dish, cooked in a rich and creamy gravy.","25","meat"],
+   ["Pepper Fry Chicken","A dry fried peppery chicken dish.","25","meat"],
+   ["Karakaralade Kozhi","Crispy chicken cooked with green chillies and garlic.","25","meat"],
+   ["Kadai Murgh","Spicy chicken in rich tomato onion gravy with peppers.","28","meat"],
+   ["Malli Kozhi Masala","Tender chicken in fragrant coriander mint gravy with spices.","28","meat"],
+   ["Guddu Kurma","Whole eggs immersed in a luscious kurma gravy.","16","meat"],
+   ["Egg Podimas","Eggs scrambled with onions, chilies, and South Indian spices.","15","meat"]
+ ]},
+
+ {id:"si-meat", t:"South Indian lean meat", d:[
+   ["Mutton Masala","A must try. A Veranda special.","28","meat"],
+   ["Mutton Sukka","Dry cooked with aromatic spices and pounded masala.","28","meat"],
+   ["Keema Hyderbadi","Minced mutton cooked in a tomato and onion based masala.","28","meat"],
+   ["Karakaralade Mutton","Crispy mutton cooked with green chillies and garlic.","28","meat"],
+   ["Nalli Roast","Mutton bone marrow masala, slow cooked to perfection.","48","meat"]
+ ]},
+
+ {id:"si-sea", t:"South Indian seafood", d:[
+   ["Varutha Kadal Meen","Marina beach. Grilled Indian style Tenggiri.","17","sea"],
+   ["Kanava 65","Crunchy squid rings with secret coating.","24","sea"],
+   ["Kanava Madras","Squids cooked in South Indian wet dry masala.","24","sea"],
+   ["Pompret Masala","Cooked in combination of fish masalas.","28","sea"],
+   ["Chepala Pulusu","Spicy Andhra Tenggiri or Indian Threadfin fish curry with chillis.","25 / 36","sea"],
+   ["Prawn Veppudu","Spicy medium sized tiger prawns stir fry, a flavourful delight.","40","sea"],
+   ["Royyalu 65","Marinated medium sized tiger prawns with sesame coating.","40","sea"],
+   ["Royyalu Munag Kura","Medium sized tiger prawns cooked with drumsticks in spicy curry.","40","sea"],
+   ["Nandu Masala","Crab in spicy shallot tomato gravy.","tbd","sea"],
+   ["Nandu Pepper Fry","Spicy crab cooked in pepper gravy.","tbd","sea"]
+ ]},
+
+ {id:"si-veg", t:"South Indian vegetables", d:[
+   ["Vendakai Pepper Fry","Crispy fried okra, coated in a peppery spice mix.","18","veg"],
+   ["Urulai Varuval","A South Indian potato dish made with spices and herbs.","17","veg"],
+   ["Mixed Vegetable Poriyal","Stir fried vegetables.","16","veg"],
+   ["Mushroom Pepper Fry","Sauteed mushrooms with onions, garlic, and black pepper.","17","veg"],
+   ["Avial","Kerala based mixed vegetable with grated coconut.","20","veg"],
+   ["Gutti Vankaya Kura","Tender eggplants cooked in Andhra tangy tamarind based sauce.","16","veg"],
+   ["Keerai Kootu","Spinach cooked along with flavourful lentils and garlic.","16","veg"],
+   ["Raita","Cool, refreshing yogurt with vegetables.","6","veg"],
+   ["Curd","Creamy yogurt.","4","veg"]
+ ]},
+
+ {id:"ni-veg", t:"North Indian vegetables", d:[
+   ["Malai Kofta","Fried balls of potato and paneer in a rich and creamy mild gravy.","17","veg"],
+   ["Aloo Gobi","Potatoes and cauliflower cooked with cumin and red chilli powder.","17","veg"],
+   ["Navaratnam Kurma","Combination of 9 vegetables, fruits, paneer and nuts in white gravy.","18","veg"],
+   ["Palak Paneer","Paneer in a smooth, creamy and delicious spinach gravy.","18","veg"],
+   ["Paneer Makhani","Paneer, ground spices, onions, tomatoes, cream.","20","veg"],
+   ["Channa Masala","A delicious, flavoursome and healthy Indian channa.","16","veg"],
+   ["Gobi Manchurian","Hugely popular Indo-Chinese appetizer made with cauliflower.","18","veg"],
+   ["Bendi Masala","Ladies finger with onion, green chilly and tomato.","18","veg"]
+ ]},
+
+ {id:"ni-meat", t:"North Indian meat and seafood", d:[
+   ["Tikka Butter Masala","Boneless chicken, ground spices, onions, tomatoes, cream.","28","meat"],
+   ["Mutton Vindaloo","Hot mutton cooked in mild vinegar and chilly flavour.","28","meat"],
+   ["Roghan Josh","Tender mutton cooked in 16 variety of ingredients.","28","meat"],
+   ["Grilled Lamb Ribs","Signature lamb ribs marinated over 24 hours and grilled to perfection.","tbd","meat"],
+   ["Chilly Fish","An Indo-Chinese favourite.","25","sea"],
+   ["Chilly Tiger Prawns","An Indo-Chinese favourite. Medium sized tiger prawns.","40","sea"],
+   ["Jingha Masala","Medium sized tiger prawns in chopped onion, tomato and masala.","40","sea"],
+   ["Kadai Prawns","Spicy prawns in tomato onion gravy with bell peppers.","tbd","sea"],
+   ["Chilly Crabs","An Indo-Chinese favourite.","tbd","sea"]
+ ]},
+
+ {id:"tandoor", t:"From the tandoor and tawa", d:[
+   ["Tandoori Chicken","Our very own oven roasted juicy chicken leg.","17","meat"],
+   ["Chicken Tikka","Boneless chicken marinated with ginger, garlic, chilly paste and yogurt.","18","meat"],
+   ["Murgh Malai Kebab","Rich creamy boneless chicken.","20","meat"],
+   ["Sheek Kebab","Minced lamb marinated with onion, ginger and garlic.","22","meat"],
+   ["Fish Tikka","Northern Red Snapper, sea fish, marinated with special home made paste.","40","sea"]
+ ]},
+
+ {id:"breads", t:"Breads", d:[
+   ["Plain Naan","Light and fluffy traditional Indian flatbread.","5","veg"],
+   ["Tandoor Roti","Light and fluffy traditional bread.","5","veg"],
+   ["Tandoori Parotta","Light and fluffy traditional bread.","5","veg"],
+   ["Garlic Naan","Indian flatbread with garlic.","6.50","veg"],
+   ["Butter Naan","Indian flatbread with butter.","6.50","veg"],
+   ["Cheese Naan","Indian flatbread with cheese.","9","veg"],
+   ["Cheese Garlic Naan","Indian flatbread with cheese and garlic.","10","veg"],
+   ["Kashmiri Naan","Indian flatbread with nuts and fruits.","11","veg"],
+   ["Appalam / Vadakkam","Crispy South Indian snack.","3","veg"]
+ ]},
+
+ {id:"dosai", t:"Dosai", meta:"From four in the afternoon",
+  after:"<b>Available every day from 4pm onwards.</b> Set prices include the accompaniments.", d:[
+   ["Sadha Dosai","South Indian crispy rice crepe.",{set:"25",ala:"10",hand:true},"veg"],
+   ["Veranda's Masala Dosai","Our version of masala dosai.",{set:"27",ala:"13"},"veg"],
+   ["Ghee Roast Dosai","Made with ghee, a very thin and crisp dosai.",{set:"26",ala:"11",hand:true},"veg"],
+   ["Parotta","Fluffy and soft layered bread.",{na:true,hand:true},"veg"]
+ ]},
+
+ {id:"desserts", t:"Desserts", meta:"Chettinad house sweets",
+  note:"The decadent desserts served during special occasions in Chettinad households, recreated with authentic recipes by Chef Gaya, who trained under master chefs in Karaikudi.", d:[
+   ["Kalyana Kesari","","6","veg"],
+   ["Paal Panniyaram","","6","veg"],
+   ["Kauni Arasi Halva","","9","veg"],
+   ["Ras-malai","","15","veg"],
+   ["Kulfi","","15","veg"],
+   ["Kaapimisu","","16.90","veg"]
+ ]},
+
+ {id:"sips", t:"Veranda sips", d:[
+   ["Sadha Tea","Our signature milk tea.","5","veg"],
+   ["Masala Teh-Neer","Our signature milk tea infused with hand pounded fragrant spices.","6","veg"],
+   ["Filter Kaapi","Coffee blend made just for Veranda, with a perfect ratio of Indian steamed milk and brown sugar.","7","veg"],
+   ["Bru Coffee","Classic instant coffee, rich, smooth, and aromatic.",{one:"7",hand:true},"veg"],
+   ["Ice Filter Kaapi","Indian steamed milk, coffee blend and brown sugar over ice.","12","veg"],
+   ["Bournvita","Chocolaty, creamy and malty Bournvita.","12","veg"],
+   ["Iced Bournvita","Chocolaty, creamy and malty Bournvita over ice.","15","veg"],
+   ["Rose Milk","Whipped frothy milk with rose syrup and a special addition of rose flavoured pearl jellies.","13","veg"],
+   ["Mango Lassi","A harmonious blend of ripe mangoes and luscious yogurt.","10","veg"],
+   ["Mooru","A thirst quencher made with fresh curd and tempered spices.","8","veg"],
+   ["Jal Jeera","Lemonade with roasted cumin, black salt, and pepper.","8","veg"],
+   ["Nannari Sharbat","An ancient cooling beverage topped with chia seeds.","10","veg"]
+ ]},
+
+ {id:"drinks", t:"Juices, sodas and beer", d:[
+   ["Orange","Cold pressed fresh juice.","15","veg"],
+   ["Watermelon","Cold pressed fresh juice.","14","veg"],
+   ["Pineapple","Cold pressed fresh juice.","15","veg"],
+   ["Lime Soda","","8","veg"],
+   ["Ice Lemon Tea","","8","veg"],
+   ["Mango Juice","","8","veg"],
+   ["Coke","","7","veg"],
+   ["Coke Zero","","7","veg"],
+   ["Sprite","","7","veg"],
+   ["Kingfisher","Beer.","20","veg"],
+   ["Tiger","Beer.","25","veg"],
+   ["Corona","Beer.","35","veg"]
+ ]}
+];
+
+const PAGES=[
+ ["IMG_1929","Cover","Veranda, South on a Platter"],
+ ["IMG_1911","Welcome","Nalvaravu, Swagatham Suswagathaa"],
+ ["IMG_1915","Soups and Small Plates","Rasam, soups and starters"],
+ ["IMG_1916","Chef's Specials","Chettinad Masala, Gongura, Ghee Roast, Moilee"],
+ ["IMG_1914","Thali","The weekday special plate"],
+ ["IMG_1912","Weekend Briyani","Thalassery and Hyderabadi dum briyani"],
+ ["IMG_1923","Briyani and Rice","Chettinad style briyani"],
+ ["IMG_1917","South Indian Poultry","Chicken and egg dishes"],
+ ["IMG_1918","South Indian Lean Meat","Mutton specialities"],
+ ["IMG_1920","South Indian Seafood","Fish, squid, prawn and crab"],
+ ["IMG_1921","South Indian Vegetables","Poriyal, kootu and avial"],
+ ["IMG_1919","North Indian Meat and Sea","Poultry, lean meat, Indo-Chinese"],
+ ["IMG_1922","North Indian Vegetables","Paneer, kofta and gravies"],
+ ["IMG_1924","Tandoor and Tawa","Tandoori chicken and kebabs"],
+ ["IMG_1925","Breads","Naan, roti and parotta"],
+ ["IMG_1926","Dosai","From 4pm, with the handwritten prices"],
+ ["IMG_1927","Desserts and Drinks","Chettinad sweets, juices, sodas"],
+ ["IMG_1928","Veranda Sips","Kaapi, tea, lassi and beer"],
+ ["IMG_1930","Thank you","Nandri, Dhanyavadalu, Nandi"]
+];
+
+
+/* ---------- which local photo goes with which part of the page ---------- */
+const SEC_IMG = {
+  "specials":   ["C9Q7tGZzIgV_1.jpg", "50% 55%"],
+  "thali":      ["C-HZUA3Rblm_1.jpg", "50% 50%"],
+  "small":      ["DVfSNJcEt25_1.jpg", "50% 45%"],
+  "briyani":    ["DG5PaiMRAsH_1.jpg", "50% 40%"],
+  "si-poultry": ["DY1Uofdmgfr_2.jpg", "50% 60%"],
+  "si-meat":    ["Db5pQrDjeEf_3.jpg", "50% 45%"],
+  "si-sea":     ["DQx3Z02E3-s_1.jpg", "50% 50%"],
+  "si-veg":     ["DXtwT-WidiZ_2.jpg", "50% 60%"],
+  "ni-veg":     ["DXtwT-WidiZ_3.jpg", "50% 60%"],
+  "ni-meat":    ["DOIShXtEv8U_1.jpg", "50% 65%"],
+  "tandoor":    ["C9eZ4dXRFzu_2.jpg", "50% 50%"],
+  "breads":     ["C9eZ4dXRFzu_7.jpg", "50% 50%"],
+  "dosai":      ["DXQWZb-DZIY_3.jpg", "50% 40%"],
+  "desserts":   ["DRq3Zg6Eis8_6.jpg", "50% 62%"],
+  "sips":       ["DKbV51ZxhHf_1.jpg", "50% 62%"],
+  "drinks":     ["DS1n-67Eg1K_1.jpg", "50% 45%"]
+};
+
+/* chef's specials: photo, and a cooking clip that plays on hover */
+const SPECIAL_MEDIA = {
+  "Chettinad Masala": {tag:"Karaikudi classic", img:"DSSVcYfEqws_1.jpg", alt:"A deep red masala with chilli and ginger in a black bowl"},
+  "Gongura":          {tag:"Andhra specialty", vid:"C6qHgd3xF2L.mp4", alt:"Gongura mutton being cooked"},
+  "Ghee Roast":       {tag:"Chef Gaya's special", img:"C9Q7tGZzIgV_1.jpg", hover:"C3rfYszRcjo.mp4", alt:"Tiger prawns in a roasted red masala on a banana leaf"},
+  "Moilee":           {tag:"Kerala coast", img:"C4eml7oRKOP_1.jpg", hover:"C1GnYYGRmmV.mp4", alt:"A mild coconut milk moilee in a pan"}
+};
+const MEAL_IMG = {
+  "Thali Weekday Special":      ["C-HZUA3Rblm_1.jpg", "Hands holding a thali of rice, curries, poriyal and appalam"],
+  "Thalassery Briyani":         ["DG5PaiMRAsH_1.jpg", "Dum briyani with a chicken leg and a boiled egg"],
+  "Hyderabadi Chicken Briyani": ["DGr6pz0xg18_2.jpg", "Chicken briyani with a boiled egg, close up"]
+};
+
+/* reels: every clip here is H.264, so all browsers can play them */
+const REELS = [
+  {src:"DcsgVOAjZGJ.mp4", cap:"Chicken Briyani"},
+  {src:"DcsgVTojS3q.mp4", cap:"Nandu Rasam"},
+  {src:"DcsgVeHDQK6.mp4", cap:"Tandoori Chicken"},
+  {src:"DC8SxnMzp9a.mp4", cap:"What to order: four picks", audio:true},
+  {src:"DcsgVKHDRcV.mp4", cap:"Filter Coffee"},
+  {src:"DFmFt8tz14W.mp4", cap:"Kaapi, poured from a height", audio:true},
+  {src:"DcsgU_AjXtg.mp4", cap:"Onion Pakoda"},
+  {src:"C02i-0PhPrp.mp4", cap:"Nalli Roast, on the stove", audio:true},
+  {src:"C6Npjq0xoQf.mp4", cap:"Pakoda, up close", audio:true}
+];
+
+/* sips and sweets: names must match the menu so prices stay in sync */
+const SIPS = [
+  ["Filter Kaapi",      "DKbV51ZxhHf_1.jpg"],
+  ["Rose Milk",         "DKbV51ZxhHf_5.jpg"],
+  ["Kalyana Kesari",    "DRq3Zg6Eis8_6.jpg"],
+  ["Mango Lassi",       "DKbV51ZxhHf_4.jpg"],
+  ["Paal Panniyaram",   "DRq3Zg6Eis8_3.jpg"],
+  ["Sadha Tea",         "DKbV51ZxhHf_2.jpg"],
+  ["Kauni Arasi Halva", "DRq3Zg6Eis8_4.jpg"],
+  ["Mooru",             "DKbV51ZxhHf_3.jpg"],
+  ["Kaapimisu",         "DWDote_DQyK_2.jpg"]
+];
+
+const HEIRLOOMS = [
+  ["DAX5hB9TfH__1.jpg", "Rasaavali", "Pure copper, with a long spout for serving rasam. About 50 years old."],
+  ["DAX5hB9TfH__4.jpg", "Idli steamer", "Heavy brass, passed to Chef Gaya by her uncle. In the family for over 50 years."],
+  ["DAX5hB9TfH__2.jpg", "Kerosene stove", "A vintage brass stove from Yugoslavia, once common in Indian homes."],
+  ["DAX5hB9TfH__3.jpg", "Milk canister", "The \"can\", used to keep milk or oil fresh."]
+];
+
+/* gallery: [file, caption, size]  size: w2 = two columns wide, h2 = two rows tall */
+const GALLERY = [
+  ["DCDspVeTUEj_2.jpg", "The dining room", "w2 h2", "A long dining room with wooden beams, lanterns and patterned tiles"],
+  ["DEqx7hhTEQU_1.jpg", "A festival thali", "h2", "A festive thali with flowers and sugarcane"],
+  ["Cz8V9zExDrs_1.jpg", "The front door", "h2", "Carved wooden pillars framing the entrance"],
+  ["C_hYNn7zuQv_1.jpg", "Malli 65", "", "Malli 65, green chicken with onion rings and lime"],
+  ["DPS_i4iEjPk_1.jpg", "Mango lassi", "", "Mango lassi with a cut mango"],
+  ["DUIRA5wEmek_1.jpg", "Crab, from above", "w2", "Crab in a red masala, seen from above, with lotus candles"],
+  ["DH7roUXRv1n_1.jpg", "Lantern light", "h2", "Glass lanterns hanging over a window table"],
+  ["C8brKRqxVcl_1.jpg", "From the tandoor", "", "Kebabs arranged in a star with onion and lime"],
+  ["DVfSNJcEt25_1.jpg", "Samosa", "", "Samosas with chutney on a banana leaf"],
+  ["DXtwT-WidiZ_1.jpg", "Three kadai", "w2", "Three kadai pans on patterned tiles"],
+  ["DWdvsn5jdE5_4.jpg", "Dinner for the table", "", "A table of dishes lit by a lotus candle"],
+  ["CyhuxYBRS_X_1.jpg", "Getting ready", "", "A black and white photo of a woman arranging flowers"]
+];
+
+const MARQUEE = ["Chettinad Masala","Gongura","Ghee Roast","Moilee","Thalassery Briyani","Nalli Roast","Filter Kaapi",
+  "Kalyana Kesari","Malli 65","Rose Milk","Chepala Pulusu","Kaapimisu","Avial","Masala Teh-Neer"];
+
+/* =========================================================
+   helpers
+   ========================================================= */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rm = v => { const [a,b] = String(v).split("."); return `<small>RM</small>${a}${b?`<em>.${b}</em>`:""}`; };
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+function priceHTML(p){
+  if(p==="tbd") return `<span class="pr tbd">Today's Price</span>`;
+  if(typeof p==="string"){
+    if(p.includes("/")){ const [x,y] = p.split("/").map(s=>s.trim());
+      return `<span class="pr">${rm(x)} <span class="sl">or</span> ${rm(y)}</span>`; }
+    return `<span class="pr">${rm(p)}</span>`;
+  }
+  if(p.na)  return `<span class="sticker"><span class="sl">Kitchen note</span>N/A</span>`;
+  if(p.one) return `<span class="sticker"><span class="sl">New price</span>RM ${p.one}</span>`;
+  if(p.hand) return `<span class="sticker"><span class="row">
+      <span class="col"><span class="sl">Set</span>RM ${p.set}</span>
+      <span class="col"><span class="sl">Ala carte</span>RM ${p.ala}</span></span></span>`;
+  return `<span class="plaque"><span class="col"><span class="sl">Set</span>${rm(p.set)}</span>
+      <span class="col"><span class="sl">A la carte</span>${rm(p.ala)}</span></span>`;
+}
+/* every price becomes one or more orderable options */
+function optsOf(p){
+  if(p==="tbd") return [{lab:"Today's price", amt:null}];
+  if(typeof p==="string"){
+    if(p.includes("/")){ const [x,y] = p.split("/").map(s=>s.trim());
+      return [{lab:"RM "+x, amt:+x}, {lab:"RM "+y, amt:+y}]; }
+    return [{lab:"", amt:+p}];
+  }
+  if(p.na)  return [];
+  if(p.one) return [{lab:"", amt:+p.one}];
+  return [{lab:"Set", amt:+p.set}, {lab:"A la carte", amt:+p.ala}];
+}
+function addsHTML(name, opts){
+  if(!opts.length) return "";
+  /* a today's-price dish already says so beside its name, so its button is a plain + */
+  return `<span class="adds">${opts.map(o => { const show = o.lab && o.amt!==null;
+    return `<button class="add${show?" lbl":""}" type="button"
+      data-n="${esc(name)}" data-l="${esc(o.lab)}" data-a="${o.amt===null?"":o.amt}"
+      aria-label="Add ${esc(name)}${o.lab?" ("+esc(o.lab)+")":""} to your leaf">${show?esc(o.lab):"+"}</button>`; }).join("")}</span>`;
+}
+/* options on a feature card (specials, set meals) */
+function featOpts(f){
+  return f.o.map(([on,ov,sub]) => {
+    const dual = String(ov).includes("/");
+    const os = dual ? ov.split("/").map(s => ({lab:"RM "+s.trim(), amt:+s.trim()})) : [{lab:"", amt:+ov}];
+    return `<li><span class="on">${esc(on)}${sub?`<small>${esc(sub)}</small>`:""}</span>
+      ${dual ? "" : `<span class="ov">${rm(ov)}</span>`}${addsHTML(f.n+" · "+on, os)}</li>`;
+  }).join("");
+}
+
+/* region tags, taken only from words the menu itself uses */
+const REGIONS = [["chettinad","Chettinad",/chettinad|karaikudi/], ["andhra","Andhra",/andhra/],
+  ["kerala","Kerala",/kerala|thalassery/], ["hyderabadi","Hyderabadi",/hyderabadi|hyderbadi/],
+  ["indochinese","Indo-Chinese",/indo-chinese/], ["tandoor","Tandoor",/tandoor|tawa/]];
+const tagsOf = t => REGIONS.filter(([,,re]) => re.test(t.toLowerCase())).map(r => r[0]).join(" ");
+
+const sec = id => M.find(s => s.id===id);
+const findDish = name => { for(const s of M) for(const d of (s.d||[])) if(d[0]===name) return d; return null; };
+
+/* =========================================================
+   render
+   ========================================================= */
+/* marquee */
+{
+  const row = MARQUEE.map(n => `<span>${esc(n)}<i>&#10022;</i></span>`).join("");
+  $("#marquee1").innerHTML = row + row;
+  const rev = [...MARQUEE].reverse().map(n => `<span>${esc(n)}<i>&#10022;</i></span>`).join("");
+  $("#marquee2").innerHTML = rev + rev;
+}
+
+/* chef's specials */
+$("#sgrid").innerHTML = sec("specials").feature.map((f,i) => {
+  const m = SPECIAL_MEDIA[f.n] || {};
+  const media = m.img
+    ? `<img src="${P+m.img}" alt="${esc(m.alt)}" loading="lazy">${m.hover && canHover ? `<video class="hov" muted loop playsinline preload="none" data-src="${P+m.hover}" aria-hidden="true"></video><span class="play-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>` : ""}`
+    : `<video data-autoplay muted loop playsinline preload="none" src="${P+m.vid}#t=2" aria-label="${esc(m.alt)}"></video>`;
+  return `<article class="scard" data-reveal style="--d:${i*0.08}s">
+    <div class="media"><span class="chip-top">${esc(m.tag||"Special")}</span>${media}</div>
+    <div class="sbody"><h3>${esc(f.n)}</h3><p>${esc(f.d)}</p><ul class="olist">${featOpts(f)}</ul></div>
+  </article>`;
+}).join("");
+
+/* set meals */
+{
+  const t = sec("thali");
+  $("#mealsNote").innerHTML = t.after;
+  $("#meals").innerHTML = t.feature.map((f,i) => {
+    const [img,alt] = MEAL_IMG[f.n] || [];
+    return `<article class="meal" data-reveal style="--d:${i*0.08}s">
+      <div class="media">${img?`<img src="${P+img}" alt="${esc(alt)}" loading="lazy">`:""}</div>
+      <div class="mbody"><h4>${esc(f.n)}</h4><p>${esc(f.d)}</p>
+        ${f.warn?`<p class="warn">${esc(f.warn)}</p>`:""}<ul class="olist">${featOpts(f)}</ul></div>
+    </article>`;
+  }).join("");
+}
+
+/* reels */
+{
+  const vp9ok = !!document.createElement("video").canPlayType('video/mp4; codecs="vp09.00.10.08"');
+  $("#rtrack").innerHTML = REELS.filter(r => !r.vp9 || vp9ok).map(r => `
+    <figure class="reel" data-reveal>
+      <video data-autoplay muted loop playsinline preload="none" src="${P+r.src}#t=0.1" aria-label="${esc(r.cap)}"></video>
+      <figcaption>${esc(r.cap)}</figcaption>
+      ${r.audio?`<button class="snd" type="button" aria-pressed="false" aria-label="Sound for ${esc(r.cap)}">
+        <svg class="off" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+        <svg class="on" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg></button>`:""}
+    </figure>`).join("");
+  /* a clip the browser still cannot decode is removed rather than left black */
+  $$("#rtrack video").forEach(v => v.addEventListener("error", () => v.closest(".reel")?.remove()));
+}
+
+/* story copy, straight from the menu */
+$("#storyBriyani").textContent = sec("briyani").note;
+$("#storySweets").textContent  = sec("desserts").note;
+
+/* heirlooms */
+$("#hgrid").innerHTML = HEIRLOOMS.map(([img,t,s],i) => `
+  <figure class="heir" data-reveal style="--d:${i*0.07}s">
+    <div class="ph"><img src="${P+img}" alt="${esc(t)}, ${esc(s)}" loading="lazy"></div>
+    <figcaption><b>${esc(t)}</b><span>${esc(s)}</span></figcaption>
+  </figure>`).join("");
+
+/* sips & sweets */
+$("#strack").innerHTML = SIPS.map(([name,img]) => {
+  const d = findDish(name); if(!d) return "";
+  const p = d[2], price = typeof p==="string" ? p : p.one;
+  return `<figure class="sip" data-reveal>
+    <div class="ph"><img src="${P+img}" alt="${esc(name)}${d[1]?`: ${esc(d[1])}`:""}" loading="lazy"></div>
+    <figcaption><span>${esc(name)}<em>${rm(price)}</em></span>${addsHTML(name, optsOf(p))}</figcaption>
+  </figure>`;
+}).join("");
+
+/* the full menu */
+function dishHTML([n,desc,p,diet], s){
+  const hay = (n+" "+desc).toLowerCase();
+  return `<div class="dish" data-diet="${diet}" data-hay="${esc(hay)}" data-tags="${tagsOf(n+" "+desc+" "+s.t)}">
+    <div class="dish-top"><i class="mark ${diet}" title="${diet==="veg"?"Vegetarian":diet==="sea"?"Seafood":"Meat or egg"}"></i>
+      <span class="nm">${esc(n)}</span><span class="led"></span>${priceHTML(p)}${addsHTML(n, optsOf(p))}</div>
+    ${desc?`<p class="ds">${esc(desc)}</p>`:""}
+  </div>`;
+}
+function plateHTML(f, s){
+  return `<article class="plate" data-diet="all" data-hay="${esc((f.n+" "+f.d).toLowerCase())}" data-tags="${tagsOf(f.n+" "+f.d+" "+s.t)}">
+    <h4>${esc(f.n)}</h4><p>${esc(f.d)}</p>${f.warn?`<p class="warn">${esc(f.warn)}</p>`:""}
+    <ul class="olist">${featOpts(f)}</ul></article>`;
+}
+$("#menuList").innerHTML = M.map(s => {
+  const count = (s.d?s.d.length:0) + (s.feature?s.feature.length:0);
+  const [img,pos] = SEC_IMG[s.id] || [];
+  return `<section class="msec" id="${s.id}">
+    <header class="mhead" data-reveal>
+      <div class="mt"><span class="mk">${esc(s.meta || `${count} ${count===1?"dish":"dishes"}`)}</span><h3>${esc(s.t)}</h3></div>
+      <div class="ph">${img?`<img src="${P+img}" alt="" loading="lazy" style="object-position:${pos}">`:""}</div>
+    </header>
+    ${s.note?`<p class="mnote">${esc(s.note)}</p>`:""}
+    ${s.after?`<p class="mbanner">${s.after}</p>`:""}
+    ${s.feature?`<div class="plates">${s.feature.map(f => plateHTML(f,s)).join("")}</div>`:""}
+    ${s.d?`<div class="dishes">${s.d.map(d => dishHTML(d,s)).join("")}</div>`:""}
+  </section>`;
+}).join("") + `<div class="empty" hidden id="empty"><b>Nothing on the leaf matches</b>Try another dish, spice or region.</div>`;
+
+$("#jump").innerHTML = M.map(s => `<a href="#${s.id}">${esc(s.t)}</a>`).join("");
+
+/* gallery */
+$("#bento").innerHTML = GALLERY.map(([img,cap,size,alt],i) =>
+  `<button class="tile ${size}" type="button" data-i="${i}" data-reveal style="--d:${(i%4)*0.06}s" aria-label="Open photo: ${esc(cap)}">
+    <img src="${P+img}" alt="${esc(alt)}" loading="lazy"><span class="tc">${esc(cap)}</span></button>`).join("");
+
+/* the printed book */
+$("#bookGrid").innerHTML = PAGES.map(([k,t,s],i) => `
+  <button class="page" type="button" data-i="${i}" data-reveal style="--d:${(i%6)*0.05}s">
+    <span class="fr"><img src="${BOOK+k}_t.jpg" alt="${esc(t)} page of the Veranda menu" loading="lazy"></span>
+    <span><span class="st"><span class="no">${String(i+1).padStart(2,"0")}</span>${esc(t)}</span><span class="ss">${esc(s)}</span></span>
+  </button>`).join("");
+
+/* =========================================================
+   filtering
+   ========================================================= */
+const q = $("#q"), chips = $$(".chip");
+const items = $$("#menuList .dish, #menuList .plate");
+const msecs = $$("#menuList .msec");
+let diet = "all", lens = "all";
+$("#statDishes").textContent = items.length;
+
+const counts = {};
+items.forEach(el => el.dataset.tags.split(" ").filter(Boolean).forEach(t => counts[t] = (counts[t]||0)+1));
+$$("[data-count]").forEach(el => el.textContent = counts[el.dataset.count] || 0);
+
+const lensEl = $("#lens");
+lensEl.innerHTML = `<span class="lbl">Trace a region</span>
+  <button class="lchip" type="button" data-r="all" aria-pressed="true">Everywhere</button>`
+  + REGIONS.filter(([k]) => counts[k]).map(([k,label]) =>
+    `<button class="lchip" type="button" data-r="${k}" aria-pressed="false">${label}<u>${counts[k]}</u></button>`).join("");
+const lchips = $$(".lchip", lensEl);
+
+function apply(){
+  const term = q.value.trim().toLowerCase(); let shown = 0;
+  items.forEach(el => {
+    const on = (diet==="all" || el.dataset.diet===diet || el.dataset.diet==="all")
+            && (lens==="all" || el.dataset.tags.split(" ").includes(lens))
+            && (!term || el.dataset.hay.includes(term));
+    el.hidden = !on; if(on) shown++;
+  });
+  msecs.forEach(s => { s.hidden = !$$(".dish,.plate", s).some(e => !e.hidden); });
+  $$("#jump a").forEach(a => { a.hidden = !!document.getElementById(a.getAttribute("href").slice(1))?.hidden; });
+  $("#empty").hidden = shown > 0;
+  const plain = diet==="all" && lens==="all" && !term, bits = [];
+  if(term) bits.push(`matching &ldquo;${esc(q.value.trim())}&rdquo;`);
+  if(diet!=="all") bits.push(`in ${chips.find(c => c.dataset.diet===diet).textContent.trim().toLowerCase()}`);
+  if(lens!=="all") bits.push(`that the menu ties to ${(REGIONS.find(r => r[0]===lens)||[])[1]}`);
+  $("#tally").innerHTML = plain
+    ? `<b>${items.length}</b> dishes, laid out the way the leaf is read: specials first, rice at the centre, sweets and sips last.`
+    : `<b>${shown}</b> ${shown===1?"dish":"dishes"} ${bits.join(", ")}.`;
+}
+function setLens(r){
+  lens = r; lchips.forEach(o => o.setAttribute("aria-pressed", String(o.dataset.r===r))); apply();
+}
+q.addEventListener("input", apply);
+chips.forEach(c => c.addEventListener("click", () => {
+  diet = c.dataset.diet; chips.forEach(o => o.setAttribute("aria-pressed", String(o===c))); apply();
+}));
+lchips.forEach(c => c.addEventListener("click", () => setLens(c.dataset.r)));
+$$("[data-lens]").forEach(b => b.addEventListener("click", () => {
+  setLens(b.dataset.lens);
+  $("#menu").scrollIntoView({behavior: reduceMotion ? "auto" : "smooth"});
+}));
+
+/* =========================================================
+   the leaf: a running order with the service charge in it
+   ========================================================= */
+let ORDER = {}, heads = 2, leafOpen = false;
+try{ const s = JSON.parse(localStorage.getItem("veranda-leaf")||"{}"); if(s && s.o){ ORDER = s.o; heads = s.h || 2; } }catch(e){}
+const save = () => { try{ localStorage.setItem("veranda-leaf", JSON.stringify({o:ORDER, h:heads})); }catch(e){} };
+const money = n => `<span class="money"><small>RM</small>${n.toFixed(2)}</span>`;
+const drawer = $("#drawer"), scrim = $("#scrim"), leaftab = $("#leaftab");
+
+function totals(){
+  let sub = 0, n = 0, ask = 0;
+  Object.values(ORDER).forEach(l => { n += l.q; if(l.a===null) ask += l.q; else sub += l.a*l.q; });
+  return {sub, svc:sub*0.1, tot:sub*1.1, n, ask};
+}
+function addLine(name, lab, amt){
+  const k = name+"|"+lab;
+  ORDER[k] = ORDER[k] || {n:name, l:lab, a:amt, q:0};
+  ORDER[k].q++; save(); paintTab(); if(leafOpen) paintSheet();
+}
+function setQty(k, d){
+  if(!ORDER[k]) return;
+  ORDER[k].q += d; if(ORDER[k].q <= 0) delete ORDER[k];
+  save(); paintTab(); paintSheet();
+}
+function paintTab(){
+  const t = totals();
+  $$("[data-leaf-count]").forEach(el => el.textContent = t.n);
+  $("#tabTotal").textContent = t.n ? `RM ${t.tot.toFixed(2)}` : "";
+}
+function paintSheet(){
+  const t = totals(), keys = Object.keys(ORDER);
+  $("#lines").innerHTML = keys.length ? keys.map(k => {
+    const l = ORDER[k];
+    return `<div class="line">
+      <span class="ln">${esc(l.n)}${l.l?`<em>${esc(l.l)}</em>`:""}</span>
+      <span class="qty">
+        <button type="button" data-k="${esc(k)}" data-d="-1" aria-label="One fewer ${esc(l.n)}">&minus;</button>
+        <span class="q">${l.q}</span>
+        <button type="button" data-k="${esc(k)}" data-d="1" aria-label="One more ${esc(l.n)}">+</button>
+      </span>
+      <span class="amt${l.a===null?" ask":""}">${l.a===null?"Ask":money(l.a*l.q)}</span>
+    </div>`; }).join("")
+    : `<div class="empty-leaf"><div class="bowl" aria-hidden="true">&#127859;</div><b>Nothing on the leaf yet</b>Tap the + beside any dish, or let the kitchen decide with Compose a meal.</div>`;
+  $("#sums").innerHTML = keys.length ? `
+    <div class="sum"><span>Food, ${t.n} ${t.n===1?"item":"items"}</span><b>${money(t.sub)}</b></div>
+    <div class="sum"><span>Service charge, 10 percent</span><b>${money(t.svc)}</b></div>
+    ${t.ask?`<div class="sum"><span class="note">Plus today's price on ${t.ask} ${t.ask===1?"item":"items"}, ask at the table</span></div>`:""}
+    <div class="sum big"><span>Total</span><b>${money(t.tot)}</b></div>
+    <div class="heads"><span>Split between</span>
+      <span class="qty">
+        <button type="button" data-h="-1" aria-label="Fewer people">&minus;</button>
+        <span class="q">${heads}</span>
+        <button type="button" data-h="1" aria-label="More people">+</button>
+      </span>
+      <span>${heads===1?"person":"people"} &middot; <b>RM ${(t.tot/heads).toFixed(2)}</b> each</span>
+    </div>` : "";
+  $("#sums").hidden = !keys.length;
+}
+let lastFocus = null;
+function openSheet(){
+  if(leafOpen) return closeSheet();
+  leafOpen = true; lastFocus = document.activeElement; paintSheet();
+  scrim.hidden = false; drawer.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add("open"); drawer.classList.add("open"); }));
+  document.body.style.overflow = "hidden";
+  $$("[data-open-leaf]").forEach(b => b.setAttribute("aria-expanded","true"));
+  setTimeout(() => $('[data-act="close"]', drawer).focus(), 60);
+}
+function closeSheet(){
+  if(!leafOpen) return;
+  leafOpen = false; scrim.classList.remove("open"); drawer.classList.remove("open");
+  document.body.style.overflow = "";
+  $$("[data-open-leaf]").forEach(b => b.setAttribute("aria-expanded","false"));
+  setTimeout(() => { if(!leafOpen){ scrim.hidden = true; drawer.hidden = true; } }, reduceMotion ? 0 : 550);
+  lastFocus?.focus?.();
+}
+$$("[data-open-leaf]").forEach(b => b.addEventListener("click", openSheet));
+scrim.addEventListener("click", closeSheet);
+drawer.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.k) return setQty(b.dataset.k, +b.dataset.d);
+  if(b.dataset.h){ heads = Math.max(1, Math.min(20, heads + +b.dataset.h)); save(); paintSheet(); return; }
+  const a = b.dataset.act;
+  if(a==="close") closeSheet();
+  if(a==="clear"){ ORDER = {}; save(); paintTab(); paintSheet(); }
+  if(a==="suggest") suggest();
+});
+
+/* a flying dot from the + to the leaf, then a small toast */
+let toastT;
+function toast(html){
+  const t = $("#toast"); t.innerHTML = html; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 1700);
+}
+function fly(from){
+  const target = leaftab.classList.contains("show") ? leaftab : ($(".nav .leaf-btn").offsetParent ? $(".nav .leaf-btn") : $("#burger"));
+  if(reduceMotion || !target) return;
+  const a = from.getBoundingClientRect(), b = target.getBoundingClientRect();
+  const d = document.createElement("span"); d.className = "fly";
+  d.style.left = (a.left + a.width/2 - 8) + "px"; d.style.top = (a.top + a.height/2 - 8) + "px";
+  document.body.append(d);
+  const dx = b.left + b.width/2 - (a.left + a.width/2), dy = b.top + b.height/2 - (a.top + a.height/2);
+  d.animate([
+    {transform:"translate(0,0) scale(1)"},
+    {transform:`translate(${dx*.45}px,${dy*.45 - 110}px) scale(1.35)`, offset:.45},
+    {transform:`translate(${dx}px,${dy}px) scale(.35)`, opacity:.3}
+  ], {duration:700, easing:"cubic-bezier(.45,0,.4,1)"}).onfinish = () => {
+    d.remove();
+    target.animate([{transform:"scale(1)"},{transform:"scale(1.14)"},{transform:"scale(1)"}], {duration:380, easing:"ease-out"});
+  };
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".add"); if(!b) return;
+  addLine(b.dataset.n, b.dataset.l, b.dataset.a==="" ? null : +b.dataset.a);
+  b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 320);
+  fly(b);
+  toast(`Added <b>${esc(b.dataset.n)}</b>${b.dataset.l?` &middot; ${esc(b.dataset.l)}`:""}`);
+});
+
+/* a balanced South Indian spread: rice, a gravy, a dry fry, bread, a sweet, a sip */
+function suggest(){
+  const pick = (id, min=0) => {
+    const s = document.getElementById(id); if(!s) return null;
+    const opts = $$(".dish:not([hidden]) .add, .plate:not([hidden]) .add", s).filter(b => b.dataset.a!=="" && +b.dataset.a >= min);
+    return opts.length ? opts[Math.floor(Math.random()*opts.length)] : null;
+  };
+  ORDER = {};
+  const gravy = ["si-poultry","si-meat","si-sea","ni-veg","ni-meat"][Math.floor(Math.random()*5)];
+  [["briyani", Math.max(1, Math.ceil(heads/2)), 0], [gravy,1,14], ["si-veg",1,14], ["small",1,0],
+   ["breads",heads,0], ["desserts",heads,0], ["sips",heads,0]].forEach(([id,qty,min]) => {
+    const b = pick(id, min); if(!b) return;
+    for(let i=0; i<qty; i++) addLine(b.dataset.n, b.dataset.l, +b.dataset.a);
+  });
+  paintSheet();
+}
+paintTab();
+
+/* =========================================================
+   lightbox (gallery + the printed book)
+   ========================================================= */
+let lb = null, lbList = [], cur = 0, lbOpener = null, lbZoom = false;
+function openLB(list, i, zoom){
+  lbList = list; cur = i; lbZoom = zoom; lbOpener = document.activeElement;
+  lb = document.createElement("div");
+  lb.className = "lb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true"); lb.setAttribute("aria-label","Photo viewer");
+  lb.innerHTML = `<div class="lb-top"><div class="lb-cap"><span class="t"></span><span class="s"></span></div>
+      <button class="icon-btn" data-a="x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="lb-stage"><img alt=""></div>
+    <div class="lb-bot">
+      <button class="icon-btn" data-a="p" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span class="lb-idx"></span>
+      <button class="icon-btn" data-a="n" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      ${zoom?`<span class="lb-hint">Tap the page to magnify</span>`:""}</div>`;
+  document.body.appendChild(lb); document.body.style.overflow = "hidden";
+  const im = $(".lb-stage img", lb);
+  lb.addEventListener("click", e => {
+    const a = e.target.closest("[data-a]")?.dataset.a;
+    if(e.target===im && lbZoom){
+      im.classList.toggle("z"); im.style.transform = im.classList.contains("z") ? "scale(2.6)" : "scale(1)"; return;
+    }
+    if(a==="x" || e.target===lb || e.target.classList.contains("lb-stage")) return closeLB();
+    if(a==="p") go(-1); if(a==="n") go(1);
+  });
+  const track = e => {
+    if(!im.classList.contains("z")) return;
+    const pt = e.touches ? e.touches[0] : e, r = im.getBoundingClientRect();
+    im.style.transformOrigin = `${Math.max(0,Math.min(100,(pt.clientX-r.left)/r.width*100))}% ${Math.max(0,Math.min(100,(pt.clientY-r.top)/r.height*100))}%`;
+  };
+  $(".lb-stage", lb).addEventListener("mousemove", track);
+  $(".lb-stage", lb).addEventListener("touchmove", e => { if(im.classList.contains("z")){ track(e); e.preventDefault(); } }, {passive:false});
+  renderLB(); $('[data-a="n"]', lb).focus();
+}
+function renderLB(){
+  const {src, t, s} = lbList[cur], im = $(".lb-stage img", lb);
+  im.src = src; im.alt = t; im.className = lbZoom ? "zoomable" : ""; im.style.transform = "scale(1)";
+  im.style.animation = "none"; im.offsetWidth; im.style.animation = "";
+  $(".lb-cap .t", lb).textContent = t; $(".lb-cap .s", lb).textContent = s || "";
+  $(".lb-idx", lb).textContent = `${String(cur+1).padStart(2,"0")} / ${String(lbList.length).padStart(2,"0")}`;
+}
+function go(d){ cur = (cur + d + lbList.length) % lbList.length; renderLB(); }
+function closeLB(){ if(!lb) return; lb.remove(); lb = null; document.body.style.overflow = leafOpen ? "hidden" : ""; lbOpener?.focus(); }
+
+const galleryList = GALLERY.map(([img,cap,,alt]) => ({src:P+img, t:cap, s:alt}));
+const bookList = PAGES.map(([k,t,s]) => ({src:`${BOOK+k}.jpg`, t, s}));
+$("#bento").addEventListener("click", e => { const b = e.target.closest(".tile"); if(b) openLB(galleryList, +b.dataset.i, false); });
+$("#bookGrid").addEventListener("click", e => { const b = e.target.closest(".page"); if(b) openLB(bookList, +b.dataset.i, true); });
+
+/* =========================================================
+   motion: reveal, videos, nav, progress, parallax
+   ========================================================= */
+/* reveal on scroll */
+if("IntersectionObserver" in window && !reduceMotion){
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),
+    {rootMargin:"0px 0px -8% 0px", threshold:.08});
+  $$("[data-reveal]").forEach(el => io.observe(el));
+} else {
+  $$("[data-reveal]").forEach(el => el.classList.add("in"));
+}
+
+/* muted clips play only while on screen */
+const vio = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if(e.isIntersecting && !reduceMotion){ v.play().catch(() => {}); }
+  else v.pause();
+}), {threshold:.35});
+$$("video[data-autoplay]").forEach(v => vio.observe(v));
+
+/* sound toggle on reels that have audio: only one clip speaks at a time */
+$("#rtrack").addEventListener("click", e => {
+  const b = e.target.closest(".snd"); if(!b) return;
+  const v = $("video", b.closest(".reel")), turnOn = v.muted;
+  $$("#rtrack video").forEach(o => { o.muted = true; });
+  $$("#rtrack .snd").forEach(o => o.setAttribute("aria-pressed","false"));
+  if(turnOn){ v.muted = false; v.play().catch(() => {}); b.setAttribute("aria-pressed","true"); }
+});
+
+/* specials: cooking clip on hover */
+$$(".scard").forEach(card => {
+  const v = $("video.hov", card); if(!v) return;
+  card.addEventListener("pointerenter", () => {
+    if(!v.src) v.src = v.dataset.src;
+    v.play().then(() => card.classList.add("playing")).catch(() => {});
+  });
+  card.addEventListener("pointerleave", () => { card.classList.remove("playing"); v.pause(); });
+});
+
+/* scroller arrows */
+$$("[data-scroll]").forEach(b => b.addEventListener("click", () => {
+  const t = document.getElementById(b.dataset.scroll);
+  t.scrollBy({left: +b.dataset.dir * Math.max(260, t.clientWidth * .7), behavior: reduceMotion ? "auto" : "smooth"});
+}));
+
+/* nav state, progress bar, floating leaf tab */
+const nav = $("#nav"), prog = $("#progress"), hero = $(".hero");
+let ticking = false;
+function onScroll(){
+  ticking = false;
+  const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
+  nav.classList.toggle("scrolled", y > 30);
+  prog.style.setProperty("--p", h > 0 ? Math.min(1, y/h) : 0);
+  leaftab.classList.toggle("show", y > hero.offsetHeight * .8);
+}
+addEventListener("scroll", () => { if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, {passive:true});
+addEventListener("resize", onScroll); onScroll();
+
+/* active links: top nav by page section, jump bar by menu section */
+const navLinks = $$(".links a");
+const nio = new IntersectionObserver(es => es.forEach(e => {
+  if(!e.isIntersecting) return;
+  navLinks.forEach(a => a.classList.toggle("on", a.getAttribute("href")==="#"+e.target.id));
+}), {rootMargin:"-45% 0px -50% 0px"});
+["top","regions","specials","reels","story","sips","menu","gallery","book"].forEach(id => nio.observe(document.getElementById(id)));
+const jumpLinks = $$("#jump a");
+const jio = new IntersectionObserver(es => es.forEach(e => {
+  if(!e.isIntersecting) return;
+  jumpLinks.forEach(a => {
+    const on = a.getAttribute("href")==="#"+e.target.id; a.classList.toggle("on", on);
+    if(on){ const j = $("#jump"); j.scrollTo({left: a.offsetLeft - j.clientWidth/2 + a.clientWidth/2, behavior:"smooth"}); }
+  });
+}), {rootMargin:"-40% 0px -55% 0px"});
+msecs.forEach(s => jio.observe(s));
+
+/* mobile nav */
+const mnav = $("#mnav"), burger = $("#burger");
+function setMnav(open){
+  mnav.classList.toggle("open", open); burger.setAttribute("aria-expanded", String(open));
+  document.body.style.overflow = open ? "hidden" : "";
+  if(open) $("#mnavClose").focus(); else burger.focus();
+}
+burger.addEventListener("click", () => setMnav(true));
+$("#mnavClose").addEventListener("click", () => setMnav(false));
+$$("a", mnav).forEach(a => a.addEventListener("click", () => setMnav(false)));
+
+/* hero parallax: the platter, photos and stickers drift with the pointer */
+if(canHover && !reduceMotion){
+  const art = $("#heroArt");
+  hero.addEventListener("pointermove", e => {
+    const r = hero.getBoundingClientRect();
+    art.style.setProperty("--mx", ((e.clientX - r.left)/r.width - .5) * 2);
+    art.style.setProperty("--my", ((e.clientY - r.top)/r.height - .5) * 2);
+  });
+  hero.addEventListener("pointerleave", () => { art.style.setProperty("--mx",0); art.style.setProperty("--my",0); });
+}
+
+/* keyboard */
+addEventListener("keydown", e => {
+  if(lb){
+    if(e.key==="Escape") closeLB();
+    else if(e.key==="ArrowLeft") go(-1);
+    else if(e.key==="ArrowRight") go(1);
+    return;
+  }
+  if(e.key==="Escape"){
+    if(mnav.classList.contains("open")) return setMnav(false);
+    if(leafOpen) return closeSheet();
+    if(document.activeElement===q && q.value){ q.value = ""; apply(); }
+    return;
+  }
+  if(e.target.closest("input,textarea,select,[contenteditable]")) return;
+  if(e.key==="/"){ e.preventDefault(); $("#lens").scrollIntoView({block:"start"}); q.focus({preventScroll:true}); }
+  else if(e.key==="l" || e.key==="L") openSheet();
+});
+
+apply();
+</script>
+</body>
+</html>
