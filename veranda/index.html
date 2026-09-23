@@ -6,7 +6,27 @@
 <title>Veranda · South on a Platter</title>
 <meta name="description" content="Veranda, Bangsar. Andhra, Kerala and Chettinad cooking on one leaf: chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full menu.">
 <meta name="theme-color" content="#0E3B2A">
-<link rel="icon" href="logo.png">
+<link rel="canonical" href="https://thudinest.com/veranda/">
+
+<!-- link previews (WhatsApp, iMessage, Facebook, Instagram DMs, Telegram, Slack, X). Image URLs must be absolute. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Veranda">
+<meta property="og:title" content="Veranda · South on a Platter">
+<meta property="og:description" content="Andhra, Kerala and Chettinad cooking in Bangsar. Chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full 122-dish menu.">
+<meta property="og:url" content="https://thudinest.com/veranda/">
+<meta property="og:image" content="https://thudinest.com/veranda/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Veranda, South on a Platter: a round South Indian thali on a deep green background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Veranda · South on a Platter">
+<meta name="twitter:description" content="Andhra, Kerala and Chettinad cooking in Bangsar. Chef's specials, wedding style briyani, dosai from 4pm and filter kaapi.">
+<meta name="twitter:image" content="https://thudinest.com/veranda/og-image.jpg">
+<meta name="twitter:image:alt" content="Veranda, South on a Platter: a round South Indian thali on a deep green background">
+
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Caveat:wght@600;700&display=swap">
@@ -96,6 +116,7 @@ a{color:inherit}
   display:inline-flex; align-items:center; justify-content:center; gap:10px;
   height:54px; padding:0 26px; border-radius:999px; border:0; cursor:pointer;
   background:var(--bg); color:var(--fg); text-decoration:none; font-weight:650; font-size:15.5px; letter-spacing:.01em;
+  box-shadow:0 14px 34px -16px rgba(0,0,0,.35);
   box-shadow:0 14px 34px -14px color-mix(in srgb,var(--bg) 80%,transparent);
   transition:transform .45s var(--spring), box-shadow .35s var(--ease), color .3s;
 }
@@ -127,7 +148,7 @@ a{color:inherit}
 }
 .nav{position:fixed; inset:0 0 auto 0; z-index:60; color:var(--on-dark); transition:background .35s, color .35s, box-shadow .35s}
 .nav.scrolled{
-  color:var(--ink); background:color-mix(in srgb,var(--cream) 84%,transparent);
+  color:var(--ink); background:rgba(255,248,234,.92); background:color-mix(in srgb,var(--cream) 84%,transparent);
   -webkit-backdrop-filter:blur(16px) saturate(1.5); backdrop-filter:blur(16px) saturate(1.5);
   box-shadow:0 1px 0 var(--line-2),0 10px 30px -20px rgba(29,20,13,.35);
 }
@@ -233,11 +254,10 @@ a{color:inherit}
 }
 .float img{width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:11px}
 .float figcaption{font-family:var(--f-hand); font-size:clamp(17px,1.7vw,22px); line-height:1; text-align:center; padding:7px 4px 9px; font-weight:700}
-.float .bob{animation:bob 7s ease-in-out infinite}
+.float{animation:bob 7s ease-in-out infinite}   /* bob moves transform; rotate and translate stay free */
 .f1{width:31%; left:-3%; top:1%; rotate:-9deg; translate:calc(var(--mx) * 16px) calc(var(--my) * 16px)}
 .f2{width:28%; right:-4%; bottom:-1%; rotate:8deg; translate:calc(var(--mx) * 22px) calc(var(--my) * 22px)}
-.f2 .bob{animation-delay:-3.5s}
-.float .bob{display:block}
+.f2{animation-delay:-3.5s}
 @keyframes bob{50%{transform:translateY(-12px)}}
 .badge{
   position:absolute; right:3%; top:5%; width:25%; aspect-ratio:1; border-radius:50%;
@@ -398,7 +418,13 @@ a{color:inherit}
 .reel:nth-child(even){margin-top:34px}
 .reel:hover{transform:translateY(-8px) rotate(-1.2deg) scale(1.02)}
 .reel:nth-child(even):hover{transform:translateY(-8px) rotate(1.2deg) scale(1.02)}
-.reel video{width:100%; height:100%; object-fit:cover}
+.reel video{width:100%; height:100%; object-fit:cover; cursor:pointer}
+.reel::after{
+  content:""; position:absolute; left:50%; top:50%; width:64px; height:64px; margin:-32px 0 0 -32px; border-radius:50%; pointer-events:none;
+  background:rgba(255,248,234,.94) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5l12 7-12 7z' fill='%231D140D'/%3E%3C/svg%3E") 55% 50%/24px no-repeat;
+  box-shadow:0 12px 30px -10px rgba(0,0,0,.6); opacity:0; transform:scale(.7); transition:opacity .3s, transform .4s var(--spring);
+}
+.reel.still::after{opacity:1; transform:none}
 .reel figcaption{
   position:absolute; left:12px; bottom:12px; max-width:calc(100% - 70px); padding:7px 13px; border-radius:999px;
   background:rgba(0,0,0,.45); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); font-weight:650; font-size:13.5px;
@@ -495,7 +521,7 @@ a{color:inherit}
 .lchip u{text-decoration:none; opacity:.6; font-variant-numeric:tabular-nums; margin-left:5px}
 .bar{
   position:sticky; top:var(--nav-h); z-index:30; margin-inline:calc(-1 * clamp(16px,4vw,32px)); padding:12px clamp(16px,4vw,32px) 0;
-  background:color-mix(in srgb,var(--cream) 90%,transparent); -webkit-backdrop-filter:blur(16px) saturate(1.4); backdrop-filter:blur(16px) saturate(1.4);
+  background:rgba(255,248,234,.95); background:color-mix(in srgb,var(--cream) 90%,transparent); -webkit-backdrop-filter:blur(16px) saturate(1.4); backdrop-filter:blur(16px) saturate(1.4);
   border-bottom:1px solid var(--line-2);
 }
 .bar-row{display:flex; gap:10px 14px; align-items:center; flex-wrap:wrap}
@@ -640,7 +666,7 @@ footer .ig{color:var(--on-dark)}
 .leaftab{
   position:fixed; right:clamp(16px,3vw,32px); bottom:calc(18px + env(safe-area-inset-bottom,0px)); z-index:55;
   display:inline-flex; align-items:center; gap:12px; padding:9px 20px 9px 9px; border-radius:999px; cursor:pointer;
-  border:0; background:var(--green-900); color:var(--cream); font-weight:650; font-size:15px;
+  border:0; background:var(--green-900); color:var(--cream); font-weight:650; font-size:15px; white-space:nowrap;
   box-shadow:0 18px 40px -16px rgba(6,31,22,.8),0 0 0 1px rgba(255,243,218,.12);
   translate:0 140%; opacity:0; transition:translate .6s var(--spring), opacity .4s, background .25s;
 }
@@ -777,6 +803,11 @@ footer .ig{color:var(--on-dark)}
   .bands{margin-top:-46px}
 }
 @media (hover:none){
+  /* touch screens keep :hover after a tap, which left cards lifted and tilted */
+  .rcard:hover,.rcard:nth-child(2):hover,.scard:hover,.meal:hover,.reel:hover,.reel:nth-child(even):hover,
+  .sip:nth-child(odd):hover,.sip:nth-child(even):hover,.heir:nth-child(odd):hover,.heir:nth-child(even):hover,
+  .facts li:hover,.plate:hover,.page:nth-child(odd):hover .fr,.page:nth-child(even):hover .fr{transform:none}
+  .rcard:hover img,.scard:hover .media img,.meal:hover .media img,.sip:hover img,.heir:hover img,.tile:hover img{transform:none}
   .hover-only{display:none}
   .tile .tc{opacity:1; translate:none}
   .tile::after{opacity:1}
@@ -810,7 +841,7 @@ footer .ig{color:var(--on-dark)}
   </div>
 </header>
 
-<div class="mnav" id="mnav" aria-label="Sections">
+<nav class="mnav" id="mnav" aria-label="Sections, full screen">
   <button class="icon-btn x" type="button" id="mnavClose" aria-label="Close navigation"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <a href="#regions" style="transition-delay:.08s">Kitchens</a>
   <a href="#specials" style="transition-delay:.12s">Specials</a>
@@ -819,7 +850,7 @@ footer .ig{color:var(--on-dark)}
   <a href="#story" style="transition-delay:.24s">Story</a>
   <a href="#gallery" style="transition-delay:.28s">Gallery</a>
   <a href="#book" style="transition-delay:.32s">The book</a>
-</div>
+</nav>
 
 <main>
 <!-- ============ HERO ============ -->
@@ -850,8 +881,8 @@ footer .ig{color:var(--on-dark)}
         <defs><path id="ringPath" d="M100,100 m-89,0 a89,89 0 1,1 178,0 a89,89 0 1,1 -178,0"/></defs>
         <text><textPath href="#ringPath" textLength="555">SOUTH ON A PLATTER &#10022; HAND POUNDED &#10022; WEDDING STYLE &#10022; ON ONE LEAF &#10022; </textPath></text>
       </svg>
-      <figure class="float f1"><span class="bob"><img src="images/veranda.bangsar/C1LT88dxA8H_1.jpg" alt=""><figcaption>Chettinad briyani</figcaption></span></figure>
-      <figure class="float f2"><span class="bob"><img src="images/veranda.bangsar/DOhsxAKEycH_1.jpg" alt=""><figcaption>tea, pulled</figcaption></span></figure>
+      <figure class="float f1"><img src="images/veranda.bangsar/C1LT88dxA8H_1.jpg" alt=""><figcaption>Chettinad briyani</figcaption></figure>
+      <figure class="float f2"><img src="images/veranda.bangsar/DOhsxAKEycH_1.jpg" alt=""><figcaption>tea, pulled</figcaption></figure>
       <div class="badge"><span>Chef Gaya's<b>Ghee Roast</b></span></div>
       <div class="tag"><small>Weekday lunch</small>Thali &middot; RM 20</div>
     </div>
@@ -952,7 +983,7 @@ footer .ig{color:var(--on-dark)}
     <div class="story-grid">
       <div class="story-art" data-reveal>
         <div class="arch">
-          <video data-autoplay muted loop playsinline preload="none" src="images/veranda.bangsar/C2ZPFNqxoSZ.mp4#t=0.5" aria-label="Rice being layered into a brass pot for dum biryani"></video>
+          <video data-autoplay muted loop playsinline preload="none" src="images/veranda.bangsar/C2ZPFNqxoSZ.mp4#t=0.5" poster="posters/C2ZPFNqxoSZ.jpg" aria-label="Rice being layered into a brass pot for dum biryani"></video>
         </div>
         <div class="stamp" aria-hidden="true">
           <svg viewBox="0 0 128 128"><defs><path id="stampPath" d="M64,64 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"/></defs>
@@ -1143,6 +1174,7 @@ footer .ig{color:var(--on-dark)}
    ========================================================= */
 const P = "images/veranda.bangsar/";   // food, room and reel files
 const BOOK = "Veranda%20Menu/img/";     // photographs of the printed menu pages
+const POSTER = "posters/";              // still frames shown before a clip plays, or if autoplay is blocked
 
 /* ---------- the menu, transcribed from the printed book ---------- */
 const M = [
@@ -1386,7 +1418,7 @@ const REELS = [
   {src:"DFmFt8tz14W.mp4", cap:"Kaapi, poured from a height", audio:true},
   {src:"DcsgU_AjXtg.mp4", cap:"Onion Pakoda"},
   {src:"C02i-0PhPrp.mp4", cap:"Nalli Roast, on the stove", audio:true},
-  {src:"C6Npjq0xoQf.mp4", cap:"Pakoda, up close", audio:true}
+  {src:"C6Npjq0xoQf.mp4", cap:"Five starters to try", audio:true}
 ];
 
 /* sips and sweets: names must match the menu so prices stay in sync */
@@ -1508,7 +1540,7 @@ $("#sgrid").innerHTML = sec("specials").feature.map((f,i) => {
   const m = SPECIAL_MEDIA[f.n] || {};
   const media = m.img
     ? `<img src="${P+m.img}" alt="${esc(m.alt)}" loading="lazy">${m.hover && canHover ? `<video class="hov" muted loop playsinline preload="none" data-src="${P+m.hover}" aria-hidden="true"></video><span class="play-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>` : ""}`
-    : `<video data-autoplay muted loop playsinline preload="none" src="${P+m.vid}#t=2" aria-label="${esc(m.alt)}"></video>`;
+    : `<video data-autoplay muted loop playsinline preload="none" src="${P+m.vid}#t=2" poster="${POSTER+m.vid.replace(".mp4",".jpg")}" aria-label="${esc(m.alt)}"></video>`;
   return `<article class="scard" data-reveal style="--d:${i*0.08}s">
     <div class="media"><span class="chip-top">${esc(m.tag||"Special")}</span>${media}</div>
     <div class="sbody"><h3>${esc(f.n)}</h3><p>${esc(f.d)}</p><ul class="olist">${featOpts(f)}</ul></div>
@@ -1534,11 +1566,11 @@ $("#sgrid").innerHTML = sec("specials").feature.map((f,i) => {
   const vp9ok = !!document.createElement("video").canPlayType('video/mp4; codecs="vp09.00.10.08"');
   $("#rtrack").innerHTML = REELS.filter(r => !r.vp9 || vp9ok).map(r => `
     <figure class="reel" data-reveal>
-      <video data-autoplay muted loop playsinline preload="none" src="${P+r.src}#t=0.1" aria-label="${esc(r.cap)}"></video>
-      <figcaption>${esc(r.cap)}</figcaption>
+      <video data-autoplay muted loop playsinline preload="none" src="${P+r.src}#t=0.1" poster="${POSTER+r.src.replace(".mp4",".jpg")}" aria-label="${esc(r.cap)}"></video>
       ${r.audio?`<button class="snd" type="button" aria-pressed="false" aria-label="Sound for ${esc(r.cap)}">
         <svg class="off" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
         <svg class="on" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg></button>`:""}
+      <figcaption>${esc(r.cap)}</figcaption>
     </figure>`).join("");
   /* a clip the browser still cannot decode is removed rather than left black */
   $$("#rtrack video").forEach(v => v.addEventListener("error", () => v.closest(".reel")?.remove()));
@@ -1582,7 +1614,8 @@ function plateHTML(f, s){
 $("#menuList").innerHTML = M.map(s => {
   const count = (s.d?s.d.length:0) + (s.feature?s.feature.length:0);
   const [img,pos] = SEC_IMG[s.id] || [];
-  return `<section class="msec" id="${s.id}">
+  /* "m-" keeps menu ids apart from the page sections (#specials, #sips) above */
+  return `<section class="msec" id="m-${s.id}">
     <header class="mhead" data-reveal>
       <div class="mt"><span class="mk">${esc(s.meta || `${count} ${count===1?"dish":"dishes"}`)}</span><h3>${esc(s.t)}</h3></div>
       <div class="ph">${img?`<img src="${P+img}" alt="" loading="lazy" style="object-position:${pos}">`:""}</div>
@@ -1594,7 +1627,7 @@ $("#menuList").innerHTML = M.map(s => {
   </section>`;
 }).join("") + `<div class="empty" hidden id="empty"><b>Nothing on the leaf matches</b>Try another dish, spice or region.</div>`;
 
-$("#jump").innerHTML = M.map(s => `<a href="#${s.id}">${esc(s.t)}</a>`).join("");
+$("#jump").innerHTML = M.map(s => `<a href="#m-${s.id}">${esc(s.t)}</a>`).join("");
 
 /* gallery */
 $("#bento").innerHTML = GALLERY.map(([img,cap,size,alt],i) =>
@@ -1782,7 +1815,7 @@ document.addEventListener("click", e => {
 /* a balanced South Indian spread: rice, a gravy, a dry fry, bread, a sweet, a sip */
 function suggest(){
   const pick = (id, min=0) => {
-    const s = document.getElementById(id); if(!s) return null;
+    const s = document.getElementById("m-" + id); if(!s) return null;
     const opts = $$(".dish:not([hidden]) .add, .plate:not([hidden]) .add", s).filter(b => b.dataset.a!=="" && +b.dataset.a >= min);
     return opts.length ? opts[Math.floor(Math.random()*opts.length)] : null;
   };
@@ -1859,21 +1892,32 @@ if("IntersectionObserver" in window && !reduceMotion){
   $$("[data-reveal]").forEach(el => el.classList.add("in"));
 }
 
-/* muted clips play only while on screen */
+/* muted clips play only while on screen. If the browser blocks autoplay
+   (iPhone Low Power Mode, data saver) a reel keeps its poster and shows a play button */
+const still = (v, on) => v.closest(".reel")?.classList.toggle("still", on);
 const vio = new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
-  if(e.isIntersecting && !reduceMotion){ v.play().catch(() => {}); }
+  if(e.isIntersecting && !reduceMotion && !v.dataset.userPaused){
+    v.play().then(() => still(v, false)).catch(() => still(v, true));
+  }
   else v.pause();
 }), {threshold:.35});
-$$("video[data-autoplay]").forEach(v => vio.observe(v));
+$$("video[data-autoplay]").forEach(v => { vio.observe(v); if(reduceMotion) still(v, true); });
 
-/* sound toggle on reels that have audio: only one clip speaks at a time */
+/* tap a reel to play or pause it; the speaker button toggles sound, one clip at a time */
 $("#rtrack").addEventListener("click", e => {
-  const b = e.target.closest(".snd"); if(!b) return;
+  const b = e.target.closest(".snd");
+  if(!b){
+    const r = e.target.closest(".reel"); if(!r) return;
+    const v = $("video", r);
+    if(v.paused){ delete v.dataset.userPaused; v.play().then(() => still(v, false)).catch(() => {}); }
+    else { v.pause(); v.dataset.userPaused = "1"; still(v, true); }
+    return;
+  }
   const v = $("video", b.closest(".reel")), turnOn = v.muted;
   $$("#rtrack video").forEach(o => { o.muted = true; });
   $$("#rtrack .snd").forEach(o => o.setAttribute("aria-pressed","false"));
-  if(turnOn){ v.muted = false; v.play().catch(() => {}); b.setAttribute("aria-pressed","true"); }
+  if(turnOn){ v.muted = false; delete v.dataset.userPaused; v.play().then(() => still(v, false)).catch(() => {}); b.setAttribute("aria-pressed","true"); }
 });
 
 /* specials: cooking clip on hover */
@@ -1917,7 +1961,10 @@ const jio = new IntersectionObserver(es => es.forEach(e => {
   if(!e.isIntersecting) return;
   jumpLinks.forEach(a => {
     const on = a.getAttribute("href")==="#"+e.target.id; a.classList.toggle("on", on);
-    if(on){ const j = $("#jump"); j.scrollTo({left: a.offsetLeft - j.clientWidth/2 + a.clientWidth/2, behavior:"smooth"}); }
+    if(on){
+      const j = $("#jump"), jr = j.getBoundingClientRect(), ar = a.getBoundingClientRect();
+      j.scrollBy({left: (ar.left + ar.width/2) - (jr.left + jr.width/2), behavior: reduceMotion ? "auto" : "smooth"});
+    }
   });
 }), {rootMargin:"-40% 0px -55% 0px"});
 msecs.forEach(s => jio.observe(s));
@@ -1944,8 +1991,18 @@ if(canHover && !reduceMotion){
   hero.addEventListener("pointerleave", () => { art.style.setProperty("--mx",0); art.style.setProperty("--my",0); });
 }
 
-/* keyboard */
+/* keyboard: Tab stays inside whichever overlay is open */
+function trapTab(box, e){
+  const f = $$('a[href],button:not([disabled]),input,[tabindex]:not([tabindex="-1"])', box).filter(el => el.offsetParent !== null);
+  if(!f.length) return;
+  const first = f[0], last = f[f.length-1];
+  if(!box.contains(document.activeElement)){ e.preventDefault(); first.focus(); }
+  else if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+}
 addEventListener("keydown", e => {
+  const overlay = lb || (leafOpen && drawer) || (mnav.classList.contains("open") && mnav);
+  if(e.key==="Tab" && overlay) return trapTab(overlay, e);
   if(lb){
     if(e.key==="Escape") closeLB();
     else if(e.key==="ArrowLeft") go(-1);
@@ -1958,6 +2015,7 @@ addEventListener("keydown", e => {
     if(document.activeElement===q && q.value){ q.value = ""; apply(); }
     return;
   }
+  if(overlay) return;   /* no "/" or "L" behind an open drawer or menu */
   if(e.target.closest("input,textarea,select,[contenteditable]")) return;
   if(e.key==="/"){ e.preventDefault(); $("#lens").scrollIntoView({block:"start"}); q.focus({preventScroll:true}); }
   else if(e.key==="l" || e.key==="L") openSheet();
