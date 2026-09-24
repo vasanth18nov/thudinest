@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Veranda · South on a Platter</title>
-<meta name="description" content="Veranda, Bangsar. Andhra, Kerala and Chettinad cooking on one leaf: chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full menu.">
+<meta name="description" content="Veranda, 23 Jalan Telawi 2, Bangsar. Andhra, Kerala and Chettinad cooking on one leaf: chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full menu. WhatsApp 011-6329 2032.">
 <meta name="theme-color" content="#0E3B2A">
 <link rel="canonical" href="https://thudinest.com/veranda/">
 
@@ -12,18 +12,43 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Veranda">
 <meta property="og:title" content="Veranda · South on a Platter">
-<meta property="og:description" content="Andhra, Kerala and Chettinad cooking in Bangsar. Chef's specials, wedding style briyani, dosai from 4pm, filter kaapi and the full 122-dish menu.">
+<meta property="og:description" content="Andhra, Kerala and Chettinad cooking at 23 Jalan Telawi 2, Bangsar. Chef's specials, wedding style briyani, dosai from 4pm and the full 122-dish menu. WhatsApp 011-6329 2032 to book.">
 <meta property="og:url" content="https://thudinest.com/veranda/">
-<meta property="og:image" content="https://thudinest.com/veranda/og-image.jpg">
+<meta property="og:image" content="https://thudinest.com/veranda/og-image.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Veranda, South on a Platter: a round South Indian thali on a deep green background">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Veranda · South on a Platter">
-<meta name="twitter:description" content="Andhra, Kerala and Chettinad cooking in Bangsar. Chef's specials, wedding style briyani, dosai from 4pm and filter kaapi.">
-<meta name="twitter:image" content="https://thudinest.com/veranda/og-image.jpg">
+<meta name="twitter:description" content="Andhra, Kerala and Chettinad cooking at 23 Jalan Telawi 2, Bangsar. Chef's specials, wedding style briyani, dosai from 4pm. WhatsApp 011-6329 2032.">
+<meta name="twitter:image" content="https://thudinest.com/veranda/og-image.jpg?v=2">
 <meta name="twitter:image:alt" content="Veranda, South on a Platter: a round South Indian thali on a deep green background">
+
+<!-- lets Google show the address and phone number for this page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Veranda",
+  "alternateName": "Veranda, South on a Platter",
+  "url": "https://thudinest.com/veranda/",
+  "image": "https://thudinest.com/veranda/og-image.jpg?v=2",
+  "servesCuisine": ["South Indian", "Andhra", "Kerala", "Chettinad"],
+  "telephone": "+60 11-6329 2032",
+  "acceptsReservations": true,
+  "hasMenu": "https://thudinest.com/veranda/#menu",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "23 (Ground Floor), Jalan Telawi 2, Bangsar",
+    "postalCode": "59100",
+    "addressLocality": "Kuala Lumpur",
+    "addressRegion": "Wilayah Persekutuan Kuala Lumpur",
+    "addressCountry": "MY"
+  },
+  "sameAs": ["https://www.instagram.com/veranda.bangsar/"]
+}
+</script>
 
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -645,6 +670,41 @@ a{color:inherit}
 .page .no{font-family:var(--f-display); color:var(--chili); margin-right:4px}
 .page .ss{font-size:12.5px; color:var(--ink-3); line-height:1.3; display:block; margin-top:2px}
 
+/* ---------- visit ---------- */
+.sunny{background:var(--turmeric); color:var(--ink); position:relative; isolation:isolate; overflow:hidden}
+.sunny::before{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(45% 60% at 100% 0%,rgba(255,122,26,.55),transparent 70%),radial-gradient(40% 55% at 0% 100%,rgba(255,215,120,.9),transparent 70%);
+}
+.sunny .kicker,.sunny .h2 em{color:var(--chili-700)}
+.visit-grid{display:grid; grid-template-columns:1fr 1.05fr; gap:clamp(36px,6vw,80px); align-items:center}
+.info{list-style:none; margin:34px 0 0; padding:0; display:grid; gap:12px}
+.info li{
+  display:flex; gap:16px; align-items:flex-start; padding:18px 20px; border-radius:20px;
+  background:rgba(255,248,234,.72); border:1px solid rgba(29,20,13,.08); transition:transform .45s var(--spring), background .3s;
+}
+.info li:hover{transform:translateX(6px); background:var(--cream)}
+.info .ic{flex:none; width:44px; height:44px; border-radius:50%; background:var(--green-800); color:var(--turmeric-2); display:grid; place-items:center}
+.info .ic svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.info .lbl{display:block; font-size:12px; letter-spacing:.18em; text-transform:uppercase; font-weight:800; color:var(--chili-700); margin:2px 0 4px}
+.info p{font-size:16.5px; line-height:1.45; font-weight:550}
+.info a{font-weight:750; text-decoration:underline; text-decoration-color:var(--chili); text-decoration-thickness:2px; text-underline-offset:3px}
+.info a:hover{color:var(--chili-700)}
+.info small{display:block; color:var(--ink-2); font-size:13.5px; font-weight:450; margin-top:4px}
+.visit-cta{animation:none}
+.btn-wa{--bg:#128C4B; --fg:#fff; --hover:#0B6E3A}
+.map{
+  position:relative; aspect-ratio:4/3.3; border-radius:28px; overflow:hidden; border:10px solid var(--cream); background:var(--cream-2);
+  box-shadow:0 40px 70px -34px rgba(29,20,13,.6); rotate:1.2deg; transition:rotate .6s var(--spring);
+}
+.map:hover{rotate:0deg}
+.map iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.hero-visit{display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px; margin-top:24px; font-size:15px; color:var(--on-dark-2); animation:fadeUp 1s .58s var(--ease) both}
+.hero-visit a,.hero-visit span{display:inline-flex; align-items:center; gap:8px}
+.hero-visit a{color:var(--on-dark); font-weight:600; text-decoration:none; border-bottom:1.5px solid rgba(255,194,75,.45); padding-bottom:1px; transition:color .25s, border-color .25s}
+.hero-visit a:hover{color:var(--turmeric-2); border-color:var(--turmeric-2)}
+.hero-visit svg{width:17px; height:17px; flex:none; fill:none; stroke:var(--turmeric-2); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
 /* ---------- footer ---------- */
 footer{background:var(--green-950); color:var(--on-dark-2); position:relative; overflow:hidden; isolation:isolate; padding:clamp(80px,10vw,130px) 0 120px}
 footer::before{content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(50% 60% at 50% 0%,rgba(245,166,35,.18),transparent 70%)}
@@ -661,6 +721,8 @@ footer .brand{margin-bottom:16px}
 .legend .mark.veg{color:#56C27F} .legend .mark.sea{color:#6FB2EE} .legend .mark.meat{color:#FF6B7D}
 .colophon{margin-top:44px; padding-top:20px; border-top:1px solid var(--line-dark); font-size:13px; color:var(--on-dark-3); max-width:80ch}
 footer .ig{color:var(--on-dark)}
+.faddr{font-style:normal; font-size:14.5px; line-height:1.6; margin:12px 0 0; color:var(--on-dark)}
+.faddr a{color:var(--turmeric-2); font-weight:650; text-underline-offset:3px}
 
 /* ---------- leaf: floating tab, drawer, toast ---------- */
 .leaftab{
@@ -766,6 +828,8 @@ footer .ig{color:var(--on-dark)}
   .stamp{left:-3%; width:100px}
   .mortar{right:-3%}
   .team{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .map{aspect-ratio:4/3.4; rotate:0deg}
   .team .ph{min-height:0; aspect-ratio:16/10}
   .dishes{grid-template-columns:1fr}
   .bento{grid-template-columns:repeat(2,1fr)}
@@ -806,7 +870,7 @@ footer .ig{color:var(--on-dark)}
   /* touch screens keep :hover after a tap, which left cards lifted and tilted */
   .rcard:hover,.rcard:nth-child(2):hover,.scard:hover,.meal:hover,.reel:hover,.reel:nth-child(even):hover,
   .sip:nth-child(odd):hover,.sip:nth-child(even):hover,.heir:nth-child(odd):hover,.heir:nth-child(even):hover,
-  .facts li:hover,.plate:hover,.page:nth-child(odd):hover .fr,.page:nth-child(even):hover .fr{transform:none}
+  .facts li:hover,.plate:hover,.page:nth-child(odd):hover .fr,.page:nth-child(even):hover .fr,.info li:hover{transform:none}
   .rcard:hover img,.scard:hover .media img,.meal:hover .media img,.sip:hover img,.heir:hover img,.tile:hover img{transform:none}
   .hover-only{display:none}
   .tile .tc{opacity:1; translate:none}
@@ -835,6 +899,7 @@ footer .ig{color:var(--on-dark)}
       <a href="#menu">Menu</a>
       <a href="#story">Story</a>
       <a href="#gallery">Gallery</a>
+      <a href="#visit">Visit</a>
     </nav>
     <button class="btn btn-sm leaf-btn" type="button" data-open-leaf>Your leaf <span class="n" data-leaf-count>0</span></button>
     <button class="burger" type="button" id="burger" aria-label="Open navigation" aria-expanded="false" aria-controls="mnav"><span></span></button>
@@ -850,6 +915,7 @@ footer .ig{color:var(--on-dark)}
   <a href="#story" style="transition-delay:.24s">Story</a>
   <a href="#gallery" style="transition-delay:.28s">Gallery</a>
   <a href="#book" style="transition-delay:.32s">The book</a>
+  <a href="#visit" style="transition-delay:.36s">Visit &amp; book</a>
 </nav>
 
 <main>
@@ -867,6 +933,11 @@ footer .ig{color:var(--on-dark)}
         <a class="btn" href="#menu">Explore the menu <span class="arr" aria-hidden="true">&rarr;</span></a>
         <a class="btn btn-ghost" href="#reels"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg> Watch the reels</a>
       </div>
+      <p class="hero-visit">
+        <a href="#visit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>23 Jalan Telawi 2, Bangsar</a>
+        <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Opens 11:30 am</span>
+        <a href="https://wa.me/601163292032?text=Hi%20Veranda%2C%20I%27d%20like%20to%20book%20a%20table." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>WhatsApp to book</a>
+      </p>
       <dl class="stats">
         <div><dt id="statDishes">122</dt><dd>dishes on one menu</dd></div>
         <div><dt>14</dt><dd>Chettinad herbs &amp; spices in one masala</dd></div>
@@ -1106,6 +1177,47 @@ footer .ig{color:var(--on-dark)}
     <div class="book" id="bookGrid"></div>
   </div>
 </section>
+
+<!-- ============ VISIT ============ -->
+<section class="sec sunny" id="visit">
+  <div class="wrap visit-grid">
+    <div class="visit-copy">
+      <div data-reveal>
+        <span class="kicker">Visit &amp; book</span>
+        <h2 class="h2">Find us on<br><em>Jalan Telawi.</em></h2>
+      </div>
+      <ul class="info">
+        <li data-reveal style="--d:.06s">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <div><span class="lbl">Address</span>
+          <p>23 (Ground Floor), Jalan Telawi 2<br>Bangsar, 59100 Kuala Lumpur<br>Wilayah Persekutuan Kuala Lumpur</p></div>
+        </li>
+        <li data-reveal style="--d:.12s">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          <div><span class="lbl">Hours</span>
+          <p>Opens 11:30 am &middot; <a href="https://www.google.com/maps/search/?api=1&amp;query=Veranda%20South%20on%20a%20Platter%2C%20Jalan%20Telawi%202%2C%20Bangsar" target="_blank" rel="noopener">today's hours on Google Maps</a>
+            <small>Dosai from 4pm every day. The thali is weekday lunch only.</small></p></div>
+        </li>
+        <li data-reveal style="--d:.18s">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg></span>
+          <div><span class="lbl">WhatsApp</span>
+          <p><a href="https://wa.me/601163292032" target="_blank" rel="noopener">011-6329 2032</a>
+            <small>Message to book a table or ask what's on today.</small></p></div>
+        </li>
+      </ul>
+      <div class="cta visit-cta" data-reveal style="--d:.24s">
+        <a class="btn btn-wa" href="https://wa.me/601163292032?text=Hi%20Veranda%2C%20I%27d%20like%20to%20book%20a%20table." target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>
+          Book on WhatsApp</a>
+        <a class="btn btn-ghost on-light" href="https://www.google.com/maps/dir/?api=1&amp;destination=Veranda%20South%20on%20a%20Platter%2C%20Jalan%20Telawi%202%2C%20Bangsar" target="_blank" rel="noopener">Get directions <span class="arr" aria-hidden="true">&nearr;</span></a>
+      </div>
+    </div>
+    <div class="map" data-reveal style="--d:.1s">
+      <iframe src="https://maps.google.com/maps?q=Veranda%20South%20on%20a%20Platter%2C%20Jalan%20Telawi%202%2C%20Bangsar&amp;z=17&amp;output=embed"
+        title="Map showing Veranda at 23 Jalan Telawi 2, Bangsar" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
 </main>
 
 <!-- ============ FOOTER ============ -->
@@ -1116,7 +1228,12 @@ footer .ig{color:var(--on-dark)}
     <div class="fg">
       <div>
         <a class="brand" href="#top" aria-label="Veranda, back to top"><span class="logo"><img src="logo.png" alt="Veranda, South on a Platter" loading="lazy"></span></a>
-        <p>South Indian cooking from Andhra Pradesh, Kerala and Chettinad, in Bangsar.</p>
+        <p>South Indian cooking from Andhra Pradesh, Kerala and Chettinad.</p>
+        <address class="faddr">
+          23 (Ground Floor), Jalan Telawi 2,<br>Bangsar, 59100 Kuala Lumpur<br>
+          WhatsApp <a href="https://wa.me/601163292032" target="_blank" rel="noopener">011-6329 2032</a><br>
+          Opens 11:30 am
+        </address>
         <p style="margin-top:14px"><a class="ig" href="https://www.instagram.com/veranda.bangsar/" target="_blank" rel="noopener">Follow @veranda.bangsar <span aria-hidden="true">&nearr;</span></a></p>
       </div>
       <div>
@@ -1955,7 +2072,7 @@ const nio = new IntersectionObserver(es => es.forEach(e => {
   if(!e.isIntersecting) return;
   navLinks.forEach(a => a.classList.toggle("on", a.getAttribute("href")==="#"+e.target.id));
 }), {rootMargin:"-45% 0px -50% 0px"});
-["top","regions","specials","reels","story","sips","menu","gallery","book"].forEach(id => nio.observe(document.getElementById(id)));
+["top","regions","specials","reels","story","sips","menu","gallery","book","visit"].forEach(id => nio.observe(document.getElementById(id)));
 const jumpLinks = $$("#jump a");
 const jio = new IntersectionObserver(es => es.forEach(e => {
   if(!e.isIntersecting) return;
