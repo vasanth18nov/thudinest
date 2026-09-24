@@ -12,5 +12,8 @@ Thumbs.db
 *.dmg
 *.zip
 
+# Exception: compressed hero/events loops for the Maya site (under 2 MB each)
+!mayarestaurants/assets/video/*.mp4
+
 # Wrangler local build cache
 worker/.wrangler/
