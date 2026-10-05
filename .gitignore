@@ -17,3 +17,7 @@ Thumbs.db
 
 # Wrangler local build cache
 worker/.wrangler/
+
+# Alisons Construction raw source photos (originals carry GPS EXIF);
+# the site uses the stripped, resized copies in AlisonsConstruction/assets/img
+AlisonsConstruction/images/
