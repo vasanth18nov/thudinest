@@ -11,7 +11,8 @@ Deployed via Netlify → add your Netlify URL here.
 - **Landing page** — Property details, photo gallery, amenities, house rules
 - **Game Hub** — Indian Rummy, Chess (Hard AI), Ping Pong with power-ups, and
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
-  physics-puzzle game — see below.
+  physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
+  batting game — see below.
 
 ## Adding Property Photos
 
@@ -69,11 +70,43 @@ a single `LEVELS` array; push a new object with a unique `id` and a
 the top of that file). Level count, the level-select grid, and saved
 progress all size themselves off that array automatically.
 
+## Floodlit Over (`/cricket/`)
+
+A standalone 3D cricket batting game: **Thudinest Coimbatore** bat a
+ten-wicket T20 innings (2, 5, 10 or 20 overs) under floodlights. The
+batting order opens with Vasanth, Harsha, Sabari, Thananjay and Anush.
+Read the length from the marker on the pitch, pick a shot with the arrow
+keys (or the on-screen pad on phones) and time the swing with Space.
+
+- Five bowlers (three pace, two spin) with their own deliveries, a
+  natural run-up, gather, delivery stride and follow-through
+- Ball-by-ball commentary on screen and spoken through the browser's
+  speech engine (toggle with V), plus crowd cheers for boundaries and
+  wickets
+- "Thudinest Sixer / Four / Wicket" pop-ups, Thudinest boundary boards
+  and outfield logos, and a full scorecard with a wagon wheel at the end
+
+It's a single file, `cricket/index.html`: plain HTML/CSS/JS with
+[three.js r149](https://threejs.org) loaded from the jsDelivr CDN, so it
+needs an internet connection the first time. Best scores are saved in the
+browser via `localStorage`; there is no server or database.
+
+**Local development** — from the repo root run
+`python3 -m http.server 8080` and open `http://localhost:8080/cricket/`.
+
+**Deployment** — commit and push; `/cricket/` is live at
+`https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
+game card in the Play hub's `.game-cards` list in the root `index.html`.
+
+**Changing the batting order** — edit the `LINEUP` array near the top of
+the script in `cricket/index.html` (name, shirt number, skin tone, look).
+
 ## Files
 
 ```
 index.html      ← main site (landing page + game hub, all in one)
 bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
+cricket/        ← Floodlit Over 3D cricket game (single self-contained page)
 images/         ← add your property photos here
 README.md       ← this file
 ```
