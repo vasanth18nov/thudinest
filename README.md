@@ -82,17 +82,30 @@ keys (or the on-screen pad on phones) and time the swing with Space.
 
 - Five bowlers (three pace, two spin) with their own deliveries, a
   natural run-up, gather, delivery stride and follow-through
-- Ball-by-ball broadcast-style commentary on screen, spoken in a native
-  English voice (British first, then Australian, Irish/NZ or US; Indian
-  English voices are skipped) through the browser's speech engine (toggle
-  with V), plus crowd cheers for boundaries and wickets
+- Live two-voice commentary: a lead caller who calls each ball as it
+  happens (run-up, the stroke, the result) and an analyst who follows up
+  (players' names, six distances, streaks, milestones). The voices are
+  natural British-English recordings rendered offline with the open
+  [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model (Apache-2.0)
+  and shipped as three small MP3 banks in `cricket/voice/`; the crowd ducks
+  under them. Toggle with V. If the banks cannot load, the browser's speech
+  engine reads the written commentary instead
+- Crowd cheers for boundaries and wickets, mixed below the commentary
+- Strokes with real footwork: the batter strides to the pitch of the ball
+  (or goes back and across) while it is in the air, the bat comes down
+  straight with the hands leading, and each shot has its own held finish
+- Defend mode (D or the DEFEND button) makes Swing play a defensive shot; a
+  well-timed defence is never out, only a mistimed one can edge or miss
+- A T20 field (four in the ring, four on the rope, slip or short leg), fair
+  catching (a clean, well-timed stroke along the ground can't be caught) and
+  return throws that go into the keeper's gloves
 - A loading percentage on the Start button; tapping it early shows a
   progress card and starts the innings at 100%. Textures and shaders are
   prepared in small steps before the first frame, so phones don't freeze
 - "Thudinest Sixer / Four / Wicket" pop-ups, Thudinest boundary boards
   and outfield logos, and a full scorecard with a wagon wheel at the end
 
-It's a single file, `cricket/index.html`: plain HTML/CSS/JS with
+It's one page, `cricket/index.html`, plus the voice banks in `cricket/voice/`: plain HTML/CSS/JS with
 [three.js r149](https://threejs.org) loaded from the jsDelivr CDN, so it
 needs an internet connection the first time. Best scores are saved in the
 browser via `localStorage`; there is no server or database.
@@ -113,7 +126,7 @@ matching name buttons inside `#squadGrid` in the start card.
 ```
 index.html      ← main site (landing page + game hub, all in one)
 bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
-cricket/        ← Floodlit Over 3D cricket game (single self-contained page)
+cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks)
 images/         ← add your property photos here
 README.md       ← this file
 ```

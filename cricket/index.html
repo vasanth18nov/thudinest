@@ -670,7 +670,7 @@ const PITCH = 20.12, STUMP_H = 0.711, STUMP_HW = 0.114;
 const FIELD_C = new V3(0, 0, -PITCH / 2);
 const BOUNDARY_R = 65, BOARD_R = 69;
 const DRAG_K = 0.0055, ROLL_C1 = 0.62, ROLL_C2 = 0.19;
-const SWING_T = 0.16, FOLLOW_T = 0.42, TOUCH_LAG = 0.03, RUN_T = 2.5;
+const SWING_T = 0.16, FOLLOW_T = 0.5, TOUCH_LAG = 0.03, RUN_T = 2.5;
 const PHI_BACK = -2.1, PHI_STANCE = -0.15;
 const DIFF = {
   easy: { perfect: 0.07, good: 0.125, edge: 0.19 },
@@ -746,7 +746,7 @@ const std = (color, roughness = 0.8, extra = {}) => new THREE.MeshStandardMateri
 function drawGrass(g, w, h) {
   g.fillStyle = '#2b6a2c'; g.fillRect(0, 0, w, h);
   const bands = 30;
-  for (let i = 0; i < bands; i++) if (i % 2) { g.fillStyle = 'rgba(214,255,190,0.055)'; g.fillRect(i * w / bands, 0, w / bands, h); }
+  for (let i = 0; i < bands; i++) if (i % 2) { g.fillStyle = 'rgba(214,255,190,0.085)'; g.fillRect(i * w / bands, 0, w / bands, h); }
   for (let j = 0; j < bands; j++) if (j % 2) { g.fillStyle = 'rgba(0,20,0,0.04)'; g.fillRect(0, j * h / bands, w, h / bands); }
   const m = w / 142;
   // the square: neighbouring practice strips around the match pitch
@@ -796,7 +796,7 @@ function drawPitch(g, w, h) {
 }
 {
   const grass = canvasTex(1024, 1024, drawGrass);
-  const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95 }));
+  const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a }));
   field.rotation.x = -Math.PI / 2; field.position.copy(FIELD_C); field.receiveShadow = true;
   scene.add(field);
   const apron = new THREE.Mesh(new THREE.RingGeometry(70.8, 76, 120), std(0x163222, 0.95));
@@ -804,7 +804,7 @@ function drawPitch(g, w, h) {
   scene.add(apron);
 
   const pitchTex = canvasTex(256, 2048, drawPitch);
-  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), new THREE.MeshStandardMaterial({ map: pitchTex, color: 0xd6cbb6, roughness: 0.92, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
+  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
   pitch.rotation.x = -Math.PI / 2; pitch.position.set(0, 0.006, FIELD_C.z); pitch.receiveShadow = true;
   scene.add(pitch);
 
@@ -1434,14 +1434,15 @@ function makeBatter() {
 }
 const rigA = makeBatter(), rigB = makeBatter();
 
+/* a T20 field: slip (short leg to spin), four in the ring, four out on the rope to turn the gaps into ones and twos */
 const FIELD_POS = [
-  { name: 'slip', pace: [160, 15.5], spin: [150, 3.6], close: true },
+  { name: 'slip', spinName: 'short leg', pace: [160, 15.5], spin: [-38, 3.1], close: true },
   { name: 'third man', pace: [132, 50], spin: [128, 48] },
   { name: 'point', pace: [96, 24], spin: [100, 20] },
-  { name: 'cover', pace: [58, 25.5], spin: [62, 22] },
+  { name: 'deep cover', pace: [56, 62], spin: [60, 58] },
   { name: 'mid-off', pace: [16, 27], spin: [18, 24] },
   { name: 'mid-on', pace: [-16, 27], spin: [-18, 24] },
-  { name: 'midwicket', pace: [-58, 25], spin: [-60, 22] },
+  { name: 'deep midwicket', pace: [-56, 62], spin: [-60, 58] },
   { name: 'square leg', pace: [-98, 23], spin: [-95, 21] },
   { name: 'fine leg', pace: [-145, 50], spin: [-140, 48] },
 ];
@@ -1539,14 +1540,13 @@ function updateWicket(w, dt, clock) {
 }
 
 /* ---------------------------------------------------------- ball & markers */
-/* The white ball wears a dark rim and keeps a minimum on-screen size in play, so it never melts into the clay. */
-const BALL_VIS = BALL_R * 1.8;
+/* drawn a touch larger than life so it reads at broadcast distances; the darker clay does the rest */
+const BALL_VIS = BALL_R * 1.5;
 const ball = new THREE.Group();
 {
   const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS, 22, 16), std(0xffffff, 0.35, { emissive: 0x6a6a66 }));
   s.castShadow = true; ball.add(s);
   ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.006, 0.0035, 4, 28), std(0x9a9a92, 0.6)));
-  ball.add(new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS * 1.22, 16, 12), new THREE.MeshBasicMaterial({ color: 0x0d0a07, side: THREE.BackSide })));
   scene.add(ball);
 }
 const ballShadow = new THREE.Mesh(GEO.blob, blobMat); ballShadow.rotation.x = -HALF_PI; scene.add(ballShadow);
@@ -1588,7 +1588,7 @@ const trail = (() => {
         const w = L > 1e-6 ? width * (1 - u) / L : 0;
         pos[i * 6] = p.x + side.x * w; pos[i * 6 + 1] = p.y + side.y * w; pos[i * 6 + 2] = p.z + side.z * w;
         pos[i * 6 + 3] = p.x - side.x * w; pos[i * 6 + 4] = p.y - side.y * w; pos[i * 6 + 5] = p.z - side.z * w;
-        alpha[i * 2] = alpha[i * 2 + 1] = i < n ? 0.62 * (1 - u) * (1 - u) : 0;
+        alpha[i * 2] = alpha[i * 2 + 1] = i < n ? 0.5 * (1 - u) * (1 - u) : 0;
       }
       geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true;
     },
@@ -1694,9 +1694,10 @@ const ZING = cols(0xff4a36, 0xff8a3a, 0xffd0a0);
 const FIREWORK = [cols(0xffc53d, 0xffe08a), cols(0x5ad1ff, 0xbfefff), cols(0xff4a36, 0xff9a7a), cols(0xf1ede1, 0xffffff)];
 
 /* -------------------------------------------------------------------- audio */
+/* The crowd sits under the commentary: a lower base level, and it ducks a further ~7 dB while a commentator speaks. */
 const Sound = (() => {
-  let ctx = null, master = null, crowdBus = null, bedGain = null, noise = null, muted = false;
-  const BED = 0.05;
+  let ctx = null, master = null, crowdBus = null, bedGain = null, noise = null, muted = false, voiceBus = null, voiceOut = null;
+  const BED = 0.05, CROWD = 0.62;
   const VOWELS = { ah: [760, 1200], oo: [330, 880], aw: [600, 950], ey: [520, 1750] };
   function init() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
@@ -1709,7 +1710,11 @@ const Sound = (() => {
       master.connect(comp); comp.connect(ctx.destination);
       const len = ctx.sampleRate * 2; noise = ctx.createBuffer(1, len, ctx.sampleRate);
       const d = noise.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-      crowdBus = ctx.createGain(); crowdBus.gain.value = 1;
+      crowdBus = ctx.createGain(); crowdBus.gain.value = CROWD;
+      voiceBus = ctx.createGain(); voiceBus.gain.value = 1.1;
+      const vComp = ctx.createDynamicsCompressor(); vComp.threshold.value = -22; vComp.ratio.value = 3; vComp.attack.value = 0.004; vComp.release.value = 0.18;
+      voiceOut = ctx.createGain(); voiceOut.gain.value = muted ? 0 : 1;
+      voiceBus.connect(vComp); vComp.connect(voiceOut); voiceOut.connect(ctx.destination);
       const dl = ctx.createDelay(0.5); dl.delayTime.value = 0.11;
       const fb = ctx.createGain(); fb.gain.value = 0.3;
       const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
@@ -1814,10 +1819,18 @@ const Sound = (() => {
     claps(3 + level * 1.5, 45 + 35 * level, 0.13, 0.5);
     swell(level, 5);
   }
+  function duck(active) {
+    if (!crowdBus) return;
+    const t = ctx.currentTime, g = crowdBus.gain;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(active ? CROWD * 0.45 : CROWD, t + (active ? 0.09 : 0.7));
+  }
   return {
-    init,
+    init, duck,
+    get ctx() { return ctx; },
+    get voiceBus() { return voiceBus; },
     get muted() { return muted; },
-    setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.9; },
+    setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.9; if (voiceOut) voiceOut.gain.value = m ? 0 : 1; },
     crack(q) { burst({ freq: 1500 + q * 1000, q: 1.3, dur: 0.09, gain: 0.45 + q * 0.45 }); tone(640 + q * 220, 0.07, 0.3 + q * 0.2); },
     edge() { burst({ freq: 2900, q: 3, dur: 0.05, gain: 0.3 }); tone(1300, 0.03, 0.12, 'triangle'); },
     block() { burst({ type: 'lowpass', freq: 900, q: 0.9, dur: 0.07, gain: 0.45 }); tone(420, 0.05, 0.2); },
@@ -1942,8 +1955,9 @@ function spliceSim(a, idx, b) {
   return { pts, air, n, boundaryIdx: off(b.boundaryIdx), boundaryKind: b.boundaryKind, stumpsIdx: null, restIdx: off(b.restIdx) };
 }
 const runsFor = (t, x, z) => {
+  // batters set off at once: a ball still being chased 2.5 s after the stroke is a quick single, the deep gives two
   const back = t + 0.45 + Math.hypot(x, z) / 27;
-  return back < 3.1 ? 0 : Math.min(3, 1 + Math.floor((back - 3.1) / 2.7));
+  return back < 2.4 ? 0 : Math.min(3, 1 + Math.floor((back - 2.4) / 2.5));
 };
 function findIntercept(sim, startIdx) {
   let best = null;
@@ -1966,7 +1980,8 @@ function findIntercept(sim, startIdx) {
   }
   return best;
 }
-function planPlay(sim0) {
+/* opts.noCatch: a clean, well-timed stroke along the ground (or a safe block) can be stopped but never caught */
+function planPlay(sim0, opts = {}) {
   let sim = sim0, startIdx = 10;
   const events = [];
   for (const f of fielders) { f.planPos.copy(f.pos); f.t0 = 0; }
@@ -1988,7 +2003,7 @@ function planPlay(sim0) {
       events.push({ kind: 'field', t: pt, f: pick, x: rx, y: BALL_R, z: rz, i: ri, dive: false, runs: runsFor(pt, rx, rz) });
       break;
     }
-    if (ev.air) {
+    if (ev.air && !opts.noCatch) {
       const sv = velAt(sim, ev.i, new V3()).length();
       let pc = ev.f.hands;
       if (ev.dive) pc *= 0.55;
@@ -2064,7 +2079,7 @@ function solveDelivery(d, p0) {
 /* --------------------------------------------------------------- shots */
 const SHOTS = {
   front: { '-1': { name: 'On drive', loft: 'Lofted on drive', th: -36 }, '0': { name: 'Straight drive', loft: 'Straight hit', th: 0 }, '1': { name: 'Cover drive', loft: 'Lofted cover drive', th: 44 } },
-  back: { '-1': { name: 'Pull', loft: 'Hook', th: -80 }, '0': { name: 'Back-foot punch', loft: 'Lofted punch', th: 10 }, '1': { name: 'Square cut', loft: 'Upper cut', th: 84 } },
+  back: { '-1': { name: 'Pull', loft: 'Hook', th: -80 }, '0': { name: 'Back-foot punch', loft: 'Lofted punch', th: 30 }, '1': { name: 'Square cut', loft: 'Upper cut', th: 74 } },
   block: { front: 'Forward defence', back: 'Back-foot defence' },
 };
 const GRADE_LABEL = { perfect: 'Perfect', good: 'Good timing', early: 'Early', late: 'Late', tooEarly: 'Too early', tooLate: 'Too late' };
@@ -2084,7 +2099,7 @@ const game = {
   bats: [], bowl: [], nextIn: 2, bowler: 0, prevBowler: -1, overRuns: 0, lastOut: false, lastOverMark: 0,
   rigS: rigA, rigN: rigB,
   del: null, flight: null, swing: null, play: null, outcome: null,
-  intent: { side: 0, foot: 'auto', loft: false }, shift: false,
+  intent: { side: 0, foot: 'auto', loft: false, defend: false }, shift: false,
   paused: false, slowT: 0, slowScale: 1, deadT: 0, markerOn: false, best: {}, active: false, resume: false, skip: false,
 };
 const cam = { view: 'batsman', mode: 'menu', pos: new V3(40, 18, 30), look: new V3(0, 1, -10), fov: 46, shake: 0, chaseDir: new V3(0, 0, -1), modeT: 0 };
@@ -2132,8 +2147,10 @@ function assignFielders() {
 function setFieldFor(d) {
   for (const f of fielders) {
     if (f.isBowler) continue;
-    if (f.isKeeper) { f.home.set(d.pace ? 0.3 : 1.0, 0, d.keeperZ); continue; }
+    // standing up to spin, the keeper crouches just outside off stump, clear of the batsman camera's view of the ball
+    if (f.isKeeper) { f.home.set(d.pace ? 0.3 : 0.62, 0, d.pace ? d.keeperZ : 1.05); continue; }
     const [a, r] = d.pace ? f.spot.pace : f.spot.spin;
+    f.name = d.pace ? f.spot.name : f.spot.spinName || f.spot.name;
     f.home.copy(polar(a, r));
   }
 }
@@ -2155,11 +2172,12 @@ function startInnings(resume) {
   Sound.applause(0.7, 3);
   const o1 = game.bats[game.rigS.batIdx].name, o2 = game.bats[game.rigN.batIdx].name;
   showCommentary('', 'Thudinest Coimbatore', `${game.overs} overs`, `${o1} and ${o2} walk out under the lights. ${game.bowl[game.bowler].name} has the ball.`, resume ? 'Welcome back' : 'Good evening, Coimbatore', '');
-  Voice.say(resume ? `Welcome back. Thudinest Coimbatore are ${game.runs} for ${game.wkts}, and the crowd is still very much here.` : fill(pickOne(LINES.welcome), { o1, o2, bw: game.bowl[game.bowler].short }), true);
+  if (Caller.failed) Voice.say(resume ? `Welcome back. Thudinest Coimbatore are ${game.runs} for ${game.wkts}, and the crowd is still very much here.` : fill(pickOne(LINES.welcome), { o1, o2, bw: game.bowl[game.bowler].short }), true);
+  else Comm.welcome(game.bats[game.rigS.batIdx], resume);
 }
 
 function enterBetween(first) {
-  game.state = 'between'; game.t = 0; game.skip = false;
+  game.state = 'between'; game.t = 0; game.skip = false; game.leadIn = first ? 4.6 : 1.9; // the first ball waits for the welcome
   const notes = [];
   if (game.lastOut && game.wkts < 10) {
     const idx = game.nextIn++;
@@ -2167,7 +2185,7 @@ function enterBetween(first) {
     setBatter(game.rigS, idx);
     notes.push(`New batter: ${game.bats[idx].name}`);
     Sound.applause(0.55, 2.5);
-    Voice.say(fill(pickOne(LINES.newBat), { name: game.bats[idx].name }));
+    if (Caller.failed) Voice.say(fill(pickOne(LINES.newBat), { name: game.bats[idx].name })); else Comm.newBatter(game.bats[idx]);
   }
   if (game.balls > 0 && game.balls % 6 === 0 && game.balls !== game.lastOverMark) {
     game.lastOverMark = game.balls;
@@ -2180,12 +2198,13 @@ function enterBetween(first) {
     const ol = fill(pickOne(LINES[kind]), { n: overRuns, bw: pb.short });
     showCommentary('', `End of over ${game.balls / 6}`, `${overRuns} run${overRuns === 1 ? '' : 's'}`, `${kind === 'overEnd' ? '' : `${ol} `}Thudinest Coimbatore ${game.runs}/${game.wkts}. ${nb.name} comes on to bowl.`,
       kind === 'maiden' ? 'Maiden over' : kind === 'pricey' ? 'Expensive over' : '', kind === 'maiden' ? 'good' : kind === 'pricey' ? 'big' : '');
-    Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} Thudinest Coimbatore are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
+    if (Caller.failed) Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} Thudinest Coimbatore are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
+    else Comm.overEnd(kind, nb, nb !== pb);
   }
   game.lastOut = false;
   game.del = makeDelivery(game.bowl[game.bowler]); setFieldFor(game.del);
-  game.swing = null; game.flight = null; game.play = null; game.outcome = null; game.markerOn = false; game.deadFlight = false;
-  game.intent = { side: 0, foot: 'auto', loft: false };
+  game.swing = null; game.flight = null; game.play = null; game.outcome = null; game.markerOn = false; game.deadFlight = false; game.runupSaid = false;
+  game.intent = { side: 0, foot: 'auto', loft: false, defend: game.intent.defend };
   resetWicket(wicket);
   marker.visible = false;
   cam.mode = 'view';
@@ -2234,7 +2253,7 @@ function trySwing(block, fromTouch) {
   const zc = foot === 'front' ? ZC.front : (kind === 'cut' || kind === 'pull') ? ZC.backH : ZC.backV;
   const cross = crossInfo(F.sim, zc);
   const W = Object.assign({}, DIFF[game.diff]);
-  if (block) { W.perfect *= 1.5; W.good *= 1.5; W.edge *= 1.5; }
+  if (block) { W.perfect *= 1.6; W.good *= 1.6; W.edge *= 1.6; }
   const loft = !block && (game.intent.loft || game.shift);
   const shuffle = side === 1 ? 0.18 : side === -1 ? -0.14 : 0;
   const Xs = BAT_X + shuffle, line = Xs + 0.36;
@@ -2257,6 +2276,17 @@ function trySwing(block, fromTouch) {
   }
   const grade = adt <= W.perfect ? 'perfect' : adt <= W.good ? 'good' : (sw.dt > 0 ? 'early' : 'late');
   const dx = cross.x - line;
+  if (block) {
+    // Defence: well timed, the bat smothers anything on or near the stumps and lets the rest go; only a
+    // mistimed block can find an edge. Balls this far wide or this high cannot hit the stumps anyway.
+    if (dx < lo || dx > hi) { sw.plan = { hit: false, grade, beaten: dx > 0 ? 'Left outside off' : 'Missed down the leg side', safe: true }; return; }
+    if (cross.y > maxY + 0.15) { sw.plan = { hit: false, grade, beaten: 'Over the bat', safe: true }; return; }
+    let bedge = null;
+    if (grade === 'late' && Math.random() < 0.5) bedge = dx > 0.25 ? 'outside' : 'inside';
+    else if (grade === 'early' && Math.random() < 0.35) bedge = 'inside';
+    sw.plan = { hit: true, grade, edge: bedge, safe: !bedge };
+    return;
+  }
   if (dx < lo || dx > hi) { sw.plan = { hit: false, grade, beaten: dx > 0 ? 'Beaten outside off' : 'Beaten on the inside' }; return; }
   if (cross.y > maxY + 0.15) { sw.plan = { hit: false, grade, beaten: 'Beaten by the bounce' }; return; }
   let edge = null;
@@ -2292,6 +2322,7 @@ function doHit(sw, plan) {
   else if (sw.block) {
     vOut = batCollision(vIn, clamp(sw.cross.x * 40, -20, 25) + randn() * 8, -24, 1.2, 0.12);
     if (vOut.length() > 9) vOut.setLength(9);
+    const hs = Math.hypot(vOut.x, vOut.z); vOut.y = Math.min(vOut.y, -0.16 * Math.max(hs, 2)); // a dead bat sends it into the pitch
   } else {
     const r = clamp(sw.dt / W.edge, -1, 1);
     const th = info.th + clamp(sw.cross.x * 45, -14, 16) - r * 30 + randn() * 3;
@@ -2300,15 +2331,16 @@ function doHit(sw, plan) {
     if (!sw.loft && sw.cross.y > 1.15) be += 7;
     const tier = { perfect: [19.5, 0.45], good: [16, 0.41], early: [10.5, 0.32], late: [10.5, 0.32] }[plan.grade];
     vOut = batCollision(vIn, th, be, tier[0] * rand(0.96, 1.04), tier[1]);
-    // shots along the ground stay down unless mistimed early (a chip that can carry to a fielder)
+    // strokes along the ground are hit down into the turf and skim away; only an early, mistimed one chips up
     const hs = Math.hypot(vOut.x, vOut.z), elev = Math.atan2(vOut.y, hs) / D2R;
-    const maxE = sw.loft ? 60 : plan.grade === 'early' ? 14 : 3;
+    const maxE = sw.loft ? 60 : plan.grade === 'early' ? 14 : plan.grade === 'late' ? 2 : -2;
     if (elev > maxE) vOut.y = Math.tan(maxE * D2R) * hs;
     if (elev < -8) vOut.y = -Math.tan(8 * D2R) * hs;
     if (vOut.length() > 44) vOut.setLength(44);
   }
   const sim = simulateHit(p0, vOut);
-  const plan2 = planPlay(sim);
+  const clean = !plan.edge && (sw.block ? !!plan.safe : !sw.loft && (plan.grade === 'perfect' || plan.grade === 'good'));
+  const plan2 = planPlay(sim, { noCatch: clean });
   const q = plan.edge ? 0.2 : sw.block ? 0.1 : { perfect: 1, good: 0.7, early: 0.35, late: 0.35 }[plan.grade];
   const last = plan2.events[plan2.events.length - 1];
   const runs = last && last.kind === 'field' ? last.runs : 0;
@@ -2332,6 +2364,7 @@ function doHit(sw, plan) {
   if (!sw.block || vOut.length() > 4) { cam.mode = 'chase'; cam.modeT = 0; }
   if (edgeName) showToast(edgeName);
   assignTasks();
+  Comm.contact(sw, plan, game.play);
 }
 
 function assignTasks() {
@@ -2616,6 +2649,7 @@ function commentFor(o, bat, bw) {
   else if (o.kind === 'playedon') { key = 'playedOn'; tone = 'out'; }
   else if (o.kind === 'field') key = o.runs === 1 ? 'one' : o.runs === 2 ? 'two' : o.runs >= 3 ? 'three' : sw && sw.block ? 'block' : o.dive && !o.f.isBowler && !o.f.isKeeper ? 'saved' : 'fielded';
   else if (!sw) key = d.length === 'bouncer' || d.length === 'short' ? 'duck' : 'left';
+  else if (sw.plan && sw.plan.safe && !sw.plan.hit) key = 'left';
   else if (sw.plan && sw.plan.beaten === 'Beaten on the inside') key = 'beatenIn';
   else if (sw.plan && sw.plan.beaten) key = 'beaten';
   else key = 'missed';
@@ -2653,6 +2687,189 @@ function showCommentary(tag, head, note, text, call = '', tone = '') {
   const el = $('comm'); el.dataset.tone = tone; el.classList.remove('fresh'); void el.offsetWidth; el.classList.add('fresh');
 }
 
+/* ------------------------------------------------------------ broadcast voice */
+/* Two commentators, recorded offline with an open neural voice (Kokoro, Apache-2.0): a lead caller who calls each
+   ball live, and an analyst who adds a line after it. The clips ship as three small MP3 banks that are decoded on
+   demand and played through the game's audio graph, so the crowd ducks under them. If the banks cannot load, the
+   browser's speech engine reads the written commentary instead. */
+const VOICE_INDEX = /*VOICE_INDEX*/{"files":["lead.mp3","colour.mp3","names.mp3"],"clips":{"runup_mason_1":[0,0,7797,1.441],"runup_mason_2":[0,7797,8637,1.619],"runup_mason_3":[0,16434,9117,1.723],"runup_ortega_1":[0,25551,8877,1.667],"runup_ortega_2":[0,34428,8757,1.65],"runup_ortega_3":[0,43185,9837,1.861],"runup_boateng_1":[0,53022,8277,1.542],"runup_boateng_2":[0,61299,9477,1.785],"runup_boateng_3":[0,70776,9597,1.821],"runup_iqbal_1":[0,80373,8157,1.518],"runup_iqbal_2":[0,88530,9117,1.717],"runup_iqbal_3":[0,97647,9117,1.724],"runup_thorne_1":[0,106764,7077,1.319],"runup_thorne_2":[0,113841,8397,1.572],"runup_thorne_3":[0,122238,8517,1.602],"call_drive_1":[0,130755,4557,0.797],"call_drive_2":[0,135312,7437,1.375],"call_drive_3":[0,142749,6357,1.171],"call_cover_1":[0,149106,6117,1.107],"call_cover_2":[0,155223,6957,1.273],"call_straight_1":[0,162180,8877,1.658],"call_straight_2":[0,171057,6717,1.248],"call_ondrive_1":[0,177774,9837,1.852],"call_ondrive_2":[0,187611,5997,1.09],"call_cut_1":[0,193608,5277,0.953],"call_cut_2":[0,198885,5397,0.965],"call_cut_3":[0,204282,8757,1.637],"call_pull_1":[0,213039,3717,0.625],"call_pull_2":[0,216756,7797,1.453],"call_pull_3":[0,224553,9477,1.781],"call_punch_1":[0,234030,5877,1.058],"call_punch_2":[0,239907,9477,1.778],"call_loft_1":[0,249384,5997,1.099],"call_loft_2":[0,255381,6717,1.231],"call_loft_3":[0,262098,4437,0.789],"call_loft_4":[0,266535,8997,1.694],"call_loft_5":[0,275532,8397,1.567],"call_air_1":[0,283929,4677,0.817],"call_air_2":[0,288606,5637,1.03],"call_air_3":[0,294243,5637,1.016],"call_edge_1":[0,299880,4197,0.736],"call_edge_2":[0,304077,5757,1.038],"call_edge_3":[0,309834,4797,0.849],"call_inedge_1":[0,314631,6597,1.223],"call_topedge_1":[0,321228,9717,1.841],"call_block_1":[0,330945,5637,1.017],"call_block_2":[0,336582,8397,1.563],"call_block_3":[0,344979,4437,0.79],"call_block_4":[0,349416,10797,2.049],"call_beaten_1":[0,360213,4317,0.764],"call_beaten_2":[0,364530,6117,1.119],"call_beaten_3":[0,370647,9477,1.792],"call_beaten_4":[0,380124,6477,1.191],"call_beatenin_1":[0,386601,8517,1.596],"call_beatenin_2":[0,395118,8757,1.64],"call_miss_1":[0,403875,7917,1.487],"call_miss_2":[0,411792,4797,0.863],"call_miss_3":[0,416589,10197,1.932],"call_left_1":[0,426786,6957,1.294],"call_left_2":[0,433743,7917,1.487],"call_left_3":[0,441660,6117,1.121],"call_duck_1":[0,447777,9957,1.885],"call_duck_2":[0,457734,11037,2.092],"fin_six_1":[0,468771,11757,2.242],"fin_six_2":[0,480528,9117,1.711],"fin_six_3":[0,489645,10197,1.937],"fin_six_4":[0,499842,5397,0.965],"fin_six_5":[0,505239,9837,1.861],"fin_four_1":[0,515076,6837,1.263],"fin_four_2":[0,521913,5637,1.014],"fin_four_3":[0,527550,9237,1.742],"fin_four_4":[0,536787,12597,2.422],"fin_four_5":[0,549384,11517,2.201],"fin_caught_1":[0,560901,5877,1.062],"fin_caught_2":[0,566778,4077,0.715],"fin_caught_3":[0,570855,6237,1.146],"fin_caught_4":[0,577092,10197,1.924],"fin_caught_5":[0,587289,5637,1.026],"fin_behind_1":[0,592926,6717,1.227],"fin_behind_2":[0,599643,11877,2.264],"fin_cab_1":[0,611520,6477,1.188],"fin_bowled_1":[0,617997,4557,0.808],"fin_bowled_2":[0,622554,5997,1.082],"fin_bowled_3":[0,628551,4077,0.716],"fin_bowled_4":[0,632628,8517,1.589],"fin_bowled_5":[0,641145,9597,1.81],"fin_playedon_1":[0,650742,5637,1.022],"fin_playedon_2":[0,656379,11517,2.193],"fin_dropped_1":[0,667896,5877,1.064],"fin_dropped_2":[0,673773,9117,1.716],"fin_dropped_3":[0,682890,5037,0.904],"fin_stop_1":[0,687927,5877,1.057],"fin_stop_2":[0,693804,8397,1.577],"fin_stop_3":[0,702201,9357,1.759],"fin_fielded_1":[0,711558,6837,1.252],"fin_fielded_2":[0,718395,9477,1.783],"fin_fielded_3":[0,727872,6237,1.139],"run_1_1":[0,734109,8637,1.616],"run_1_2":[0,742746,5877,1.079],"run_1_3":[0,748623,6237,1.146],"run_2_1":[0,754860,8397,1.566],"run_2_2":[0,763257,5517,1.006],"run_3_1":[0,768774,6717,1.241],"run_3_2":[0,775491,10317,1.961],"col_pressure_1":[1,0,10557,2.009],"col_pressure_2":[1,10557,7077,1.318],"col_btb_1":[1,17634,8037,1.491],"col_btb_2":[1,25671,5997,1.09],"col_streak3_1":[1,31668,8757,1.65],"col_streak4_1":[1,40425,11277,2.143],"col_streak5_1":[1,51702,14997,2.893],"col_pace_1":[1,66699,5877,1.073],"col_pace_2":[1,72576,7917,1.475],"col_maiden_1":[1,80493,12957,2.479],"col_expensive_1":[1,93450,10917,2.071],"col_overend_1":[1,104367,7317,1.352],"col_overend_2":[1,111684,6237,1.128],"col_golden_1":[1,117921,12717,2.435],"col_duck_1":[1,130638,6237,1.138],"col_beauty_1":[1,136875,12117,2.319],"col_timing_1":[1,148992,15117,2.928],"col_timing_2":[1,164109,7317,1.359],"col_power_1":[1,171426,5277,0.943],"col_power_2":[1,176703,10557,2.005],"col_lucky_1":[1,187260,8637,1.611],"col_lucky_2":[1,195897,6837,1.256],"col_welcome1_1":[1,202734,24357,4.758],"col_welcome2_1":[1,227091,18597,3.619],"col_welcomeback_1":[1,245688,11157,2.127],"col_end_1":[1,256845,21477,4.196],"col_allout_1":[1,278322,14757,2.85],"dist_60":[1,293079,8877,1.677],"dist_65":[1,301956,10197,1.932],"dist_70":[1,312153,9357,1.775],"dist_75":[1,321510,10797,2.047],"dist_80":[1,332307,8997,1.7],"dist_85":[1,341304,10197,1.921],"dist_90":[1,351501,9357,1.76],"dist_95":[1,360858,10197,1.931],"dist_100":[1,371055,10197,1.933],"dist_105":[1,381252,13197,2.527],"dist_110":[1,394449,12837,2.457],"bowl_attack_mason":[1,407286,11037,2.11],"bowl_wicket_mason":[1,418323,8757,1.644],"bowl_attack_ortega":[1,427080,11637,2.229],"bowl_wicket_ortega":[1,438717,9717,1.832],"bowl_attack_boateng":[1,448434,11157,2.114],"bowl_wicket_boateng":[1,459591,10077,1.907],"bowl_attack_iqbal":[1,469668,10677,2.034],"bowl_wicket_iqbal":[1,480345,9117,1.706],"bowl_attack_thorne":[1,489462,9957,1.879],"bowl_wicket_thorne":[1,499419,8997,1.683],"bat_six_kavin":[2,0,7437,1.382],"bat_four_kavin":[2,7437,8517,1.592],"bat_out_kavin":[2,15954,8037,1.505],"bat_new_kavin":[2,23991,10077,1.911],"bat_fifty_kavin":[2,34068,11757,2.253],"bat_hundred_kavin":[2,45825,11997,2.288],"bat_strike_kavin":[2,57822,11757,2.234],"bat_six_harsha":[2,69579,8037,1.503],"bat_four_harsha":[2,77616,8997,1.698],"bat_out_harsha":[2,86613,8277,1.553],"bat_new_harsha":[2,94890,10317,1.956],"bat_fifty_harsha":[2,105207,11997,2.294],"bat_hundred_harsha":[2,117204,12477,2.378],"bat_strike_harsha":[2,129681,11757,2.249],"bat_six_sabari":[2,141438,7557,1.401],"bat_four_sabari":[2,148995,8877,1.678],"bat_out_sabari":[2,157872,8157,1.517],"bat_new_sabari":[2,166029,10317,1.954],"bat_fifty_sabari":[2,176346,11757,2.239],"bat_hundred_sabari":[2,188103,12237,2.332],"bat_strike_sabari":[2,200340,11997,2.285],"bat_six_thananjay":[2,212337,9237,1.734],"bat_four_thananjay":[2,221574,10197,1.934],"bat_out_thananjay":[2,231771,10077,1.912],"bat_new_thananjay":[2,241848,11157,2.129],"bat_fifty_thananjay":[2,253005,13077,2.496],"bat_hundred_thananjay":[2,266082,13437,2.578],"bat_strike_thananjay":[2,279519,13077,2.505],"bat_six_vikrant":[2,292596,9837,1.865],"bat_four_vikrant":[2,302433,11157,2.132],"bat_out_vikrant":[2,313590,11157,2.132],"bat_new_vikrant":[2,324747,12717,2.429],"bat_fifty_vikrant":[2,337464,14037,2.703],"bat_hundred_vikrant":[2,351501,14277,2.758],"bat_strike_vikrant":[2,365778,13917,2.674],"bat_six_vasanth":[2,379695,8037,1.502],"bat_four_vasanth":[2,387732,9117,1.713],"bat_out_vasanth":[2,396849,9237,1.731],"bat_new_vasanth":[2,406086,10797,2.063],"bat_fifty_vasanth":[2,416883,12477,2.379],"bat_hundred_vasanth":[2,429360,12717,2.43],"bat_strike_vasanth":[2,442077,11997,2.295],"bat_six_pooja":[2,454074,7677,1.434],"bat_four_pooja":[2,461751,8997,1.697],"bat_out_pooja":[2,470748,8397,1.578],"bat_new_pooja":[2,479145,10317,1.953],"bat_fifty_pooja":[2,489462,11997,2.288],"bat_hundred_pooja":[2,501459,12477,2.387],"bat_strike_pooja":[2,513936,11397,2.178],"bat_six_jay":[2,525333,7917,1.479],"bat_four_jay":[2,533250,8517,1.599],"bat_out_jay":[2,541767,7557,1.404],"bat_new_jay":[2,549324,9717,1.844],"bat_fifty_jay":[2,559041,11757,2.235],"bat_hundred_jay":[2,570798,11997,2.299],"bat_strike_jay":[2,582795,10437,1.972],"bat_six_venkatesh":[2,593232,9237,1.745],"bat_four_venkatesh":[2,602469,10677,2.018],"bat_out_venkatesh":[2,613146,10677,2.026],"bat_new_venkatesh":[2,623823,12237,2.33],"bat_fifty_venkatesh":[2,636060,12957,2.496],"bat_hundred_venkatesh":[2,649017,13677,2.633],"bat_strike_venkatesh":[2,662694,13317,2.558],"bat_six_govind":[2,676011,8517,1.601],"bat_four_govind":[2,684528,9237,1.743],"bat_out_govind":[2,693765,9477,1.792],"bat_new_govind":[2,703242,11157,2.116],"bat_fifty_govind":[2,714399,12717,2.44],"bat_hundred_govind":[2,727116,12837,2.462],"bat_strike_govind":[2,739953,12357,2.364],"bat_six_sundarraj":[2,752310,9117,1.713],"bat_four_sundarraj":[2,761427,9957,1.881],"bat_out_sundarraj":[2,771384,9717,1.844],"bat_new_sundarraj":[2,781101,11517,2.208],"bat_fifty_sundarraj":[2,792618,13317,2.546],"bat_hundred_sundarraj":[2,805935,13557,2.608],"bat_strike_sundarraj":[2,819492,12477,2.39],"bat_six_durai":[2,831969,8157,1.532],"bat_four_durai":[2,840126,8997,1.69],"bat_out_durai":[2,849123,8637,1.615],"bat_new_durai":[2,857760,9837,1.863],"bat_fifty_durai":[2,867597,11997,2.287],"bat_hundred_durai":[2,879594,12237,2.334],"bat_strike_durai":[2,891831,11277,2.158],"bat_six_kumma":[2,903108,6837,1.259],"bat_four_kumma":[2,909945,8277,1.555],"bat_out_kumma":[2,918222,7557,1.4],"bat_new_kumma":[2,925779,9957,1.873],"bat_fifty_kumma":[2,935736,11277,2.145],"bat_hundred_kumma":[2,947013,11877,2.263],"bat_strike_kumma":[2,958890,11157,2.124]}}/*/VOICE_INDEX*/;
+const Caller = (() => {
+  const idx = VOICE_INDEX, banks = [], decoded = new Map(), last = {}, variants = {};
+  let state = idx ? 'idle' : 'off', cur = null, queue = [], on = true;
+  if (idx) for (const id of Object.keys(idx.clips)) { const p = id.replace(/_\d+$/, ''); (variants[p] = variants[p] || []).push(id); }
+  function load() {
+    if (state !== 'idle') return;
+    state = 'loading';
+    let chain = Promise.resolve();
+    idx.files.forEach((f, i) => {
+      chain = chain.then(() => fetch(`voice/${f}`).then((r) => { if (!r.ok) throw new Error(`voice ${r.status}`); return r.arrayBuffer(); })
+        .then((b) => { banks[i] = b; if (i === 0) state = 'ready'; }));
+    });
+    chain.catch(() => { if (!banks[0]) state = 'failed'; });
+  }
+  const has = (id) => !!(id && idx && idx.clips[id] && banks[idx.clips[id][0]]);
+  function decode(id) {
+    if (decoded.has(id)) return decoded.get(id);
+    const c = idx.clips[id], ctx = Sound.ctx;
+    const p = new Promise((res, rej) => ctx.decodeAudioData(banks[c[0]].slice(c[1], c[1] + c[2]), res, rej)).catch(() => null);
+    decoded.set(id, p);
+    if (decoded.size > 48) decoded.delete(decoded.keys().next().value);
+    return p;
+  }
+  /* a random take of a line, never the same one twice running */
+  function pick(prefix) {
+    if (idx && idx.clips[prefix]) return prefix;
+    const v = variants[prefix]; if (!v) return null;
+    let id = v[(Math.random() * v.length) | 0];
+    if (v.length > 1 && id === last[prefix]) id = v[(v.indexOf(id) + 1) % v.length];
+    last[prefix] = id;
+    return id;
+  }
+  const live = (x) => $('comm').classList.toggle('speaking', x);
+  /* ids play back to back; a higher priority cuts in (unless the current line is nearly done), a lower one waits
+     its turn and is dropped once stale */
+  function say(ids, o = {}) {
+    if (!on || Sound.muted || state !== 'ready' || !Sound.ctx) return false;
+    ids = ids.filter(has);
+    if (!ids.length) return false;
+    const now = performance.now(), delay = o.delay || 0;
+    const item = { ids, pri: o.pri || 1, until: now + (delay + (o.maxWait == null ? 2 : o.maxWait)) * 1000 };
+    ids.forEach(decode);
+    if (delay) setTimeout(() => offer(item), delay * 1000); else offer(item);
+    return true;
+  }
+  function offer(item) {
+    if (!on || Sound.muted || performance.now() > item.until) return;
+    if (cur) {
+      const left = cur.end - Sound.ctx.currentTime;
+      if (item.pri > cur.pri && left > 0.35) { stop(); start(item); }
+      else { queue.push(item); queue.sort((a, b) => b.pri - a.pri); }
+      return;
+    }
+    start(item);
+  }
+  async function start(item) {
+    const ctx = Sound.ctx, token = {};
+    cur = { pri: item.pri, srcs: [], end: ctx.currentTime + 30, token };
+    const bufs = await Promise.all(item.ids.map(decode));
+    if (!cur || cur.token !== token) return;
+    let t = ctx.currentTime + 0.02;
+    for (const b of bufs) {
+      if (!b) continue;
+      const src = ctx.createBufferSource(), g = ctx.createGain();
+      src.buffer = b; src.connect(g); g.connect(Sound.voiceBus); src.start(t);
+      cur.srcs.push({ src, g });
+      t += b.duration + 0.16;
+    }
+    cur.end = t;
+    Sound.duck(true); live(true);
+    setTimeout(() => { if (cur && cur.token === token) finish(); }, Math.max(0, t - ctx.currentTime) * 1000 + 40);
+  }
+  function stop() {
+    if (!cur) return;
+    const t = Sound.ctx.currentTime;
+    for (const { src, g } of cur.srcs) { g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + 0.06); try { src.stop(t + 0.08); } catch (e) { /* not started */ } }
+    cur = null;
+  }
+  function finish() {
+    cur = null;
+    const now = performance.now();
+    queue = queue.filter((q) => q.until > now);
+    const next = queue.shift();
+    if (next) start(next); else { Sound.duck(false); live(false); }
+  }
+  return {
+    load, say, pick, has,
+    get ready() { return state === 'ready'; },
+    get failed() { return state === 'failed' || state === 'off'; },
+    get on() { return on; },
+    set(v) { on = v; if (!v) { stop(); queue = []; if (Sound.ctx) Sound.duck(false); live(false); } },
+  };
+})();
+
+/* What the box says, and when: the lead calls the stroke and the result as they happen; the analyst follows up. */
+const Comm = (() => {
+  const P = (k) => Caller.pick(k);
+  const batId = (b) => b.name.split(' ')[0].toLowerCase();
+  const bwId = (bw) => bw.short.toLowerCase();
+  const chance = (p) => Math.random() < p;
+  const peak = (sim) => { let m = 0; for (let i = 1; i < sim.n * 3; i += 9) m = Math.max(m, sim.pts[i]); return m; };
+  function shotCall(sw) {
+    if (sw.kind === 'drive') return sw.side === 1 ? (chance(0.6) ? 'call_cover' : 'call_drive') : sw.side === -1 ? (chance(0.6) ? 'call_ondrive' : 'call_drive') : (chance(0.6) ? 'call_straight' : 'call_drive');
+    return { cut: 'call_cut', pull: 'call_pull', punch: 'call_punch' }[sw.kind] || null;
+  }
+  /* a line that needs a bank still on its way is retried for a few seconds */
+  function soon(ids, o, tries = 16) {
+    if (Caller.failed) return;
+    if (ids.every((id) => !id || Caller.has(id)) && Caller.say(ids, o)) return;
+    if (tries > 0) setTimeout(() => soon(ids, o, tries - 1), 350);
+  }
+  return {
+    runup(d, first) { if (chance(first ? 0.75 : 0.35)) Caller.say([P(`runup_${bwId(d.bw)}`)], { pri: 0, maxWait: 0.5 }); },
+    contact(sw, plan, play) {
+      const evs = play.events, last = evs[evs.length - 1], kind = last && last.kind, high = peak(play.sim) > 3.2;
+      let call = null;
+      if (plan.edge === 'top') call = 'call_topedge';
+      else if (plan.edge === 'inside') call = 'call_inedge';
+      else if (plan.edge) call = 'call_edge';
+      else if (sw.block) call = chance(0.45) ? 'call_block' : null;
+      else if (kind === 'boundary' && last.runs === 6) call = 'call_loft';
+      else if (high && (kind === 'catch' || evs.some((e) => e.kind === 'drop'))) call = 'call_air';
+      else if (high) call = chance(0.5) ? 'call_air' : 'call_loft';
+      else if (kind === 'boundary' || play.q >= 0.7 || chance(0.5)) call = shotCall(sw);
+      if (call) Caller.say([P(call)], { pri: 2, maxWait: 0.3 });
+    },
+    boundary(six) { Caller.say([P(six ? 'fin_six' : 'fin_four')], { pri: 3, maxWait: 0.6 }); },
+    caught(f) { Caller.say([P(f.isKeeper ? 'fin_behind' : f.isBowler ? 'fin_cab' : 'fin_caught')], { pri: 3, maxWait: 0.6 }); },
+    dropped() { Caller.say([P('fin_dropped')], { pri: 3, maxWait: 0.6 }); },
+    fielded(ev) {
+      if (ev.dive && !ev.f.isKeeper && !ev.f.isBowler) Caller.say([P('fin_stop')], { pri: 2, maxWait: 0.6 });
+      else if (ev.runs > 0) Caller.say([P(`run_${Math.min(3, ev.runs)}`)], { pri: 2, maxWait: 0.9 });
+      else if (chance(0.3)) Caller.say([P('fin_fielded')], { pri: 1, maxWait: 0.6 });
+    },
+    bowled(playedOn) { Caller.say([P(playedOn ? 'fin_playedon' : 'fin_bowled')], { pri: 3, maxWait: 0.4 }); },
+    noHit(kind) {
+      const id = { beaten: 'call_beaten', beatenIn: 'call_beatenin', left: 'call_left', duck: 'call_duck', miss: 'call_miss' }[kind];
+      if (chance({ left: 0.45, beaten: 1, beatenIn: 1, duck: 0.8, miss: 0.85 }[kind])) Caller.say([P(id)], { pri: 2, maxWait: 0.4 });
+    },
+    after(o, bat, bw) {
+      const ids = [], n = game.log.length;
+      const streak = (() => { let k = 0; for (let i = n - 1; i >= 0 && game.log[i].boundary; i--) k++; return k; })();
+      const dots = (() => { let k = 0; for (let i = n - 1; i >= 0 && !game.log[i].out && game.log[i].runs === 0; i--) k++; return k; })();
+      if (o.kind === 'six' || o.kind === 'four') {
+        if (streak >= 3) ids.push(`col_streak${Math.min(5, streak)}_1`);
+        else if (streak === 2) ids.push(P('col_btb'));
+        else if (game.play && game.play.edge) ids.push(P('col_lucky'));
+        else if (o.kind === 'six' ? chance(0.7) : chance(0.5)) ids.push(`bat_${o.kind}_${batId(bat)}`);
+        else if (game.swing && game.swing.plan && game.swing.plan.grade === 'perfect') ids.push(P(chance(0.5) ? 'col_timing' : 'col_power'));
+        if (o.kind === 'six' && game.play) {
+          const m = Math.round(sixCarry(game.play.sim) / 5) * 5;
+          if (m >= 60 && chance(0.65)) ids.push(`dist_${Math.min(110, m)}`);
+        }
+      } else if (o.out) {
+        if (bat.runs === 0) ids.push(bat.balls === 1 ? 'col_golden_1' : 'col_duck_1');
+        else if (chance(0.75)) ids.push(`bat_out_${batId(bat)}`);
+        if (chance(0.3)) ids.push(`bowl_wicket_${bwId(bw)}`);
+      } else if (o.runs === 0) {
+        const sw = game.swing;
+        if (sw && sw.plan && sw.plan.beaten && sw.plan.beaten !== 'Left outside off' && chance(0.3)) ids.push(P('col_beauty'));
+        else if (dots >= 3 && chance(0.35)) ids.push(P('col_pressure'));
+        else if (game.del.kmh >= 147 && chance(0.3)) ids.push(P('col_pace'));
+      }
+      if (ids.length) Caller.say(ids.slice(0, 2), { pri: 1, delay: 0.3, maxWait: 3.5 });
+    },
+    overEnd(kind, nb, changed) {
+      const ids = [kind === 'maiden' ? 'col_maiden_1' : kind === 'pricey' ? 'col_expensive_1' : chance(0.5) ? P('col_overend') : null];
+      if (changed && chance(0.75)) ids.push(`bowl_attack_${bwId(nb)}`);
+      Caller.say(ids.filter(Boolean), { pri: 1, delay: 0.4, maxWait: 3 });
+    },
+    newBatter(b) { soon([`bat_new_${batId(b)}`], { pri: 1, delay: 0.3, maxWait: 3 }, 4); },
+    milestone(b, m) { soon([`bat_${m === 50 ? 'fifty' : 'hundred'}_${batId(b)}`], { pri: 3, maxWait: 2 }, 4); },
+    welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : ['col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
+    end(allOut) { soon([allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
+  };
+})();
+
 /* -------------------------------------------------------------- outcomes */
 function finishBall(o) {
   if (game.outcome) return;
@@ -2671,13 +2888,14 @@ function finishBall(o) {
     game.fow.push(`${game.wkts}-${game.runs} (${bat.short}, ${oversText()})`);
     game.rigS.walkDelay = 1.1;
   } else {
-    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - o.runs < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); Voice.say(m === 50 ? `Raise the bat, ${bat.name}! A magnificent fifty, and Coimbatore rises as one.` : `A hundred! Take a bow, ${bat.name}. An innings of the very highest class.`); }, 900); }
+    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - o.runs < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); if (Caller.failed) Voice.say(m === 50 ? `Raise the bat, ${bat.name}! A magnificent fifty, and Coimbatore rises as one.` : `A hundred! Take a bow, ${bat.name}. An innings of the very highest class.`); else Comm.milestone(bat, m); }, 900); }
     if (o.runs % 2 === 1) swapEnds();
   }
   game.log.push({ runs: o.runs, out: !!o.out, boundary: !!o.boundary, end: o.end || null });
   const c = commentFor(o, bat, bw);
   showCommentary(tag, `${bw.short} to ${bat.short}`, deliveryNote(game.del), c.text, c.call, c.tone);
-  Voice.say(c.call ? [{ t: c.call, mood: c.tone === 'good' ? 'lift' : 'roar' }, { t: c.text }] : `${bw.short} to ${bat.short}. ${c.text}`, true);
+  if (Caller.failed) Voice.say(c.call ? [{ t: c.call, mood: c.tone === 'good' ? 'lift' : 'roar' }, { t: c.text }] : `${bw.short} to ${bat.short}. ${c.text}`, true);
+  else Comm.after(o, bat, bw);
   renderScore();
   drawScreen(o.out ? { text: 'WICKET', bg: '#ff4a36', fg: '#ffffff' } : o.runs === 6 ? { text: 'SIXER', bg: '#ffc53d', fg: '#1b1404' } : (o.runs === 4 && o.boundary) ? { text: 'FOUR', bg: '#ffc53d', fg: '#1b1404' } : null);
 }
@@ -2693,6 +2911,7 @@ function onEvent(ev) {
     led.mat.map = six ? led.six : led.four; led.flash = 3.5;
     umpire.signal = six ? 'six' : 'four'; umpire.sigT = 0;
     if (six) game.fireworks = 3;
+    Comm.boundary(six);
     const bi = P.sim.boundaryIdx * 3;
     finishBall({ runs: ev.runs, boundary: true, kind: six ? 'six' : 'four', end: { x: P.sim.pts[bi], z: P.sim.pts[bi + 2] } });
   } else if (ev.kind === 'catch') {
@@ -2702,10 +2921,11 @@ function onEvent(ev) {
     led.mat.map = led.out; led.flash = 3;
     umpire.signal = 'out'; umpire.sigT = 0;
     ev.f.pose = 'celebrate';
+    Comm.caught(ev.f);
     finishBall({ runs: 0, out: true, kind: 'caught', f: ev.f, card: caughtCard(ev.f, bw), end: { x: ev.x, z: ev.z } });
   } else if (ev.kind === 'drop') {
     showToast(ev.f.isKeeper ? 'Dropped by the keeper!' : ev.f.isBowler ? 'Dropped by the bowler!' : `Dropped at ${ev.f.name}!`);
-    Sound.groan();
+    Sound.groan(); Comm.dropped();
   } else if (ev.kind === 'misfield') {
     showToast(`Misfield at ${ev.f.name}`);
   } else if (ev.kind === 'field') {
@@ -2715,12 +2935,13 @@ function onEvent(ev) {
     const where = ev.f.isKeeper ? 'gathered by the keeper' : ev.f.isBowler ? 'stopped by the bowler' : `fielded at ${ev.f.name}`;
     showCallout(label, `${P.shot} · ${where}`, ev.runs ? 'k-runs' : 'k-dot');
     if (ev.runs >= 2) Sound.applause(0.3, 1.5);
+    Comm.fielded(ev);
     finishBall({ runs: ev.runs, kind: 'field', f: ev.f, dive: !!ev.dive, end: { x: ev.x, z: ev.z } });
   } else if (ev.kind === 'bowled') {
     const v = velAt(P.sim, Math.max(0, Math.round(ev.t / H) - 1), new V3());
     breakWicket(wicket, v, sampleAt(P.sim, ev.t, tmp).x);
     showCallout('Wicket', 'Dragged on to the stumps', 'k-out', true);
-    Sound.wicket();
+    Sound.wicket(); Comm.bowled(true);
     led.mat.map = led.out; led.flash = 3;
     umpire.signal = 'out'; umpire.sigT = 0;
     finishBall({ runs: 0, out: true, kind: 'playedon', card: `b ${bw.short}` });
@@ -2805,22 +3026,24 @@ function updateShotHUD() {
   const sw = game.swing;
   const side = sw ? sw.side : game.intent.side;
   const footSel = sw ? sw.foot : game.intent.foot;
-  const loft = sw ? sw.loft : (game.intent.loft || game.shift);
+  const defend = sw ? sw.block : game.intent.defend;
+  const loft = !defend && (sw ? sw.loft : (game.intent.loft || game.shift));
   const showFoot = footSel === 'auto' ? (game.markerOn ? resolveFoot() : 'front') : footSel;
-  const s = SHOTS[showFoot][side];
-  const name = sw && sw.block ? SHOTS.block[sw.foot] : (loft ? s.loft : s.name);
+  const s = SHOTS[showFoot][defend ? 0 : side];
+  const name = defend ? SHOTS.block[sw ? sw.foot : showFoot] : (loft ? s.loft : s.name);
   $('shotName').textContent = name; $('tShotName').textContent = name;
-  $('dialArrow').style.transform = `rotate(${sw && sw.block ? 0 : s.th}deg)`;
+  $('dialArrow').style.transform = `rotate(${defend ? 0 : s.th}deg)`;
   const footTxt = footSel === 'auto' ? (game.markerOn ? `Auto · ${showFoot} foot` : 'Auto footwork') : footSel === 'front' ? 'Front foot' : 'Back foot';
   const tf = $('tagFoot'); tf.textContent = footTxt; tf.classList.toggle('hot', footSel !== 'auto');
-  const tl = $('tagLoft'); tl.textContent = loft ? 'In the air' : 'Along the ground'; tl.classList.toggle('hot', loft);
-  $('tShotTags').textContent = `${footTxt} · ${loft ? 'In the air' : 'Along the ground'}`;
+  const air = defend ? 'Defend mode' : loft ? 'In the air' : 'Along the ground';
+  const tl = $('tagLoft'); tl.textContent = air; tl.classList.toggle('hot', loft || defend);
+  $('tShotTags').textContent = `${footTxt} · ${air}`;
   $('kLeft').classList.toggle('on', side === -1); $('kRight').classList.toggle('on', side === 1);
   $('kUp').classList.toggle('on', footSel === 'front' && side === 0); $('kDown').classList.toggle('on', footSel === 'back');
-  $('kShift').classList.toggle('on', loft);
+  $('kShift').classList.toggle('on', loft); $('kBlock').classList.toggle('on', defend);
   document.querySelectorAll('.touch [data-k]').forEach((b) => {
     const k = b.dataset.k;
-    b.classList.toggle('on', (k === 'left' && side === -1) || (k === 'right' && side === 1) || (k === 'up' && footSel === 'front' && side === 0) || (k === 'down' && footSel === 'back') || (k === 'loft' && loft));
+    b.classList.toggle('on', (k === 'left' && side === -1) || (k === 'right' && side === 1) || (k === 'up' && footSel === 'front' && side === 0) || (k === 'down' && footSel === 'back') || (k === 'loft' && loft) || (k === 'block' && defend));
   });
 }
 
@@ -2850,7 +3073,8 @@ function endInnings() {
   }
   $('fowLine').textContent = (game.fow.length ? `Fall of wickets: ${game.fow.join(', ')}. ` : '') + (dnb.length ? `Did not bat: ${dnb.join(', ')}.` : '');
   drawWagon();
-  Voice.say(allOut ? `And that is the end of the innings. Thudinest Coimbatore are all out for ${game.runs}. What a night of cricket.` : `And that is the innings. Thudinest Coimbatore finish on ${game.runs} for ${game.wkts}. What a night of cricket under the Coimbatore lights.`);
+  if (!Caller.failed) Comm.end(allOut);
+  else Voice.say(allOut ? `And that is the end of the innings. Thudinest Coimbatore are all out for ${game.runs}. What a night of cricket.` : `And that is the innings. Thudinest Coimbatore finish on ${game.runs} for ${game.wkts}. What a night of cricket under the Coimbatore lights.`);
   setTimeout(() => { if (game.state === 'over') $('endPanel').hidden = false; }, 600);
   renderScore();
 }
@@ -2890,8 +3114,8 @@ function spineToward(P, chest) {
   P.lean = clamp(Math.atan2(v.dot(f), Math.max(0.05, v.y)) - P.tilt, -0.25, 0.8);
   P.side = clamp(-Math.atan2(v.dot(l), Math.max(0.05, v.y)), -0.45, 0.45);
 }
-/* Plans one shot: the bat's swing frame so the sweet spot meets the ball, plus body poses at contact and at the finish. */
-function planSwingPose(sw, b) {
+/* The swing frame: Q1 turns the bat so that, swinging about the pivot Pv, its sweet spot meets the ball at C. */
+function planFrame(sw) {
   const C = sw.C, kind = sw.kind, horiz = kind === 'cut' || kind === 'pull', front = sw.foot === 'front';
   const dy = (front ? 1.2 : 1.32) - C.y;
   let Rss, tau;
@@ -2909,14 +3133,15 @@ function planSwingPose(sw, b) {
   const mm = new V3().crossVectors(a, k).negate();
   sw.Q1 = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(k, a, mm));
   sw.Pv = C.clone().addScaledVector(a, Rss);
-  sw.R1 = Rss;
-  sw.phiF = { drive: sw.loft ? 3.3 : 2.9, punch: 1.7, cut: 2.1, pull: 2.7, block: 0.3 }[kind];
-  const cur = b.cur;
-  sw.pose0 = copyPose(newPose(), cur);
-  sw.Q0 = cur.Q.clone(); sw.pv0 = cur.pivot.clone(); sw.R0 = cur.Rss; sw.phi0 = Math.min(cur.phi, -0.6);
+  sw.R1 = Rss; sw.tau = tau; sw.horiz = horiz;
+}
+/* Where the body is when bat meets ball: feet, hips and spine, the chest over the line of the stroke. */
+function bodyAtContact(sw) {
+  const C = sw.C, kind = sw.kind, horiz = sw.horiz, front = sw.foot === 'front', tau = sw.tau;
   const chest = sw.Pv.clone().add(horiz ? new V3(-0.06, -0.1, 0.17) : new V3(-0.28, -0.04, 0.05).lerp(new V3(-0.06, -0.1, 0.17), clamp(tau / 1.4, 0, 1) * 0.5));
   const P = newPose(), Xs = sw.Xs;
   if (front) {
+    // a long, balanced stride to the pitch of the ball, front knee bent, head over it
     P.fL.set(clamp(C.x - 0.24, Xs - 0.4, Xs + 0.85), 0, C.z + 0.02);
     P.fR.set(Xs, 0, -0.72);
     P.yL = HALF_PI + 0.55 + sw.side * 0.2; P.yR = HALF_PI + 0.1;
@@ -2924,8 +3149,10 @@ function planSwingPose(sw, b) {
     P.yaw = HALF_PI + 0.18 + (sw.side === -1 ? 0.25 : 0);
     P.tilt = 0.18;
   } else {
+    // back and across: the back foot goes back towards the stumps, the front foot follows
     const backZ = clamp(chest.z + 0.28, -0.7, -0.22);
-    P.fR.set(Xs + (kind === 'pull' ? 0.14 : 0.06), 0, backZ);
+    const across = kind === 'cut' ? clamp(C.x - (Xs + 0.62), 0, 0.42) * 0.75 : 0; // step across to the wide ones
+    P.fR.set(Xs + (kind === 'pull' ? 0.14 : 0.06) + across, 0, backZ);
     P.fL.set(Xs - 0.05, 0, backZ - 0.42);
     P.yL = HALF_PI + 0.25; P.yR = HALF_PI - 0.05;
     P.pel.set(lerp(P.fL.x, P.fR.x, 0.6), 0.91, lerp(P.fL.z, P.fR.z, 0.62));
@@ -2935,14 +3162,67 @@ function planSwingPose(sw, b) {
   P.pel.x = lerp(P.pel.x, chest.x, 0.25);
   P.pel.z = lerp(P.pel.z, chest.z, 0.25);
   spineToward(P, chest);
+  if (kind === 'cut') { P.lean = Math.min(P.lean, 0.56); P.side = clamp(P.side - 0.12, -0.45, 0.45); } // reach with the arms, stay tall
   P.twist = { drive: 0.05, punch: 0, cut: -0.25, pull: 0.45, block: -0.05 }[kind];
+  return P;
+}
+/* How each stroke finishes: bat angle past contact (phi), how far the swing plane wraps round the body, where the
+   hands travel, how close they come in (the elbows fold), and how the body follows the ball. */
+const FINISH = {
+  drive: { phi: 3.85, wrap: 0.5, lift: [0.0, -0.06, -0.08], R: 0.76, hold: 0.55 },
+  loft: { phi: 4.05, wrap: 0.42, lift: [0.02, 0.0, -0.1], R: 0.8, hold: 0.6 },
+  punch: { phi: 1.55, wrap: 0.08, lift: [0.04, 0.06, -0.08], R: 0.9, hold: 0.45 },
+  cut: { phi: 2.6, wrap: -0.3, lift: [0.02, 0.16, 0.08], R: 0.8, hold: 0.4 },
+  pull: { phi: 3.05, wrap: 1.0, lift: [-0.04, 0.08, 0.12], R: 0.82, hold: 0.4 },
+  block: { phi: -0.14, wrap: 0, lift: [0, -0.03, 0.06], R: 0.95, hold: 0.7 },
+};
+/* Plans one shot from wherever the batter already is (usually mid- or post-stride): bat frame, contact pose, finish. */
+function planSwingPose(sw, b) {
+  planFrame(sw);
+  const kind = sw.kind, front = sw.foot === 'front', cur = b.cur;
+  sw.fin = FINISH[kind === 'drive' && sw.loft ? 'loft' : kind];
+  sw.pose0 = copyPose(newPose(), cur);
+  sw.Q0 = cur.Q.clone(); sw.pv0 = cur.pivot.clone(); sw.R0 = cur.Rss; sw.phi0 = Math.min(cur.phi, -0.6);
+  const P = bodyAtContact(sw);
   sw.poseC = P;
   const F = copyPose(newPose(), P);
-  F.twist += { drive: 0.55, punch: 0.25, cut: 0.35, pull: 0.7, block: 0 }[kind];
-  F.yaw += kind === 'block' ? 0 : 0.25;
-  F.yR += kind === 'block' ? 0 : 0.4;
-  if (front && kind !== 'block') { F.fR.z -= 0.08; F.pel.z -= 0.05; }
+  if (kind === 'block') { F.lean += 0.04; F.pel.y -= 0.01; }
+  else {
+    F.twist += { drive: 0.42, punch: 0.18, cut: 0.32, pull: 0.62 }[kind];
+    F.yaw += { drive: 0.22, punch: 0.1, cut: -0.05, pull: 0.3 }[kind];
+    if (front) {
+      // weight through onto the front knee, back toe trailing up onto its point
+      F.pel.y -= 0.03; F.pel.z -= 0.06; F.lean += 0.06;
+      F.fR.z -= 0.1; F.fR.y = 0.05; F.yR += 0.55;
+    } else if (kind === 'pull') { F.yR += 0.5; F.yL += 0.35; }
+    else { F.yR += 0.25; if (kind === 'cut') F.lean = Math.min(F.lean, 0.3); }
+  }
   sw.poseF = F;
+  sw.Qf = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, sw.fin.wrap).multiply(sw.Q1);
+  sw.PvF = sw.Pv.clone().add(new V3(...sw.fin.lift));
+}
+/* The stride the batter commits to while the ball is in the air, so the swing itself is just hands and bat. */
+const _stride = newPose();
+function strideFor() {
+  const F = game.flight; if (!F || !game.del) return null;
+  const defend = game.intent.defend, foot = resolveFoot(), side = defend ? 0 : game.intent.side;
+  const kind = defend ? 'block' : foot === 'front' ? 'drive' : side === 1 ? 'cut' : side === -1 ? 'pull' : 'punch';
+  const key = `${foot}|${side}|${kind}`;
+  if (F.stride && F.stride.key === key) return F.stride;
+  const zc = foot === 'front' ? ZC.front : (kind === 'cut' || kind === 'pull') ? ZC.backH : ZC.backV;
+  const cross = crossInfo(F.sim, zc);
+  if (!cross) return (F.stride = null);
+  const Xs = BAT_X + (side === 1 ? 0.18 : side === -1 ? -0.14 : 0), line = Xs + 0.36;
+  const lo = side === -1 ? -0.8 : -0.6, hi = side === 1 ? 1.05 : 0.8, maxY = foot === 'back' ? 2.05 : 1.4;
+  const sw = { foot, side, kind, loft: !!game.intent.loft, block: defend, Xs, thVis: defend ? 0 : SHOTS[foot][side].th,
+    C: new V3(clamp(cross.x, line + lo, line + hi), clamp(cross.y, 0.05, maxY), zc) };
+  planFrame(sw);
+  const P = bodyAtContact(sw), T = copyPose(newPose(), P);
+  // hips and feet commit; the shoulders stay closed and the bat stays up until the downswing
+  T.yaw = lerp(HALF_PI + 0.06, P.yaw, 0.5); T.twist = -0.18; T.lean = P.lean * 0.75 + 0.06; T.side = P.side * 0.5;
+  const t1 = cross.t - (foot === 'front' ? 0.17 : 0.2), t0 = Math.max(0.08, Math.min(t1 - 0.22, cross.t - (foot === 'front' ? 0.62 : 0.52)));
+  F.stride = { key, pose: T, t0, t1, front: foot === 'front' };
+  return F.stride;
 }
 function applyBody(b) {
   const r = b.rig, C = b.cur;
@@ -2981,6 +3261,24 @@ function placeBat(b, exact, dt) {
   b.batAxis.copy(Y_AXIS).applyQuaternion(b.bat.quaternion);
   b.gripRel.copy(b.batAxis).multiplyScalar(0.5).add(b.bat.position).sub(_g1);
 }
+/* Both hands stay on the handle: pull the bat back within arm's reach of each shoulder by the given weight
+   (zero at the instant of contact, where the sweet spot must sit exactly on the ball). */
+const _rs = new V3(), _rh = new V3(), _rd = new V3();
+function keepInReach(b, weight) {
+  if (weight <= 0) return;
+  const r = b.rig, a = b.batAxis, reach = LIMB.upper + LIMB.fore - 0.015;
+  for (let it = 0; it < 3; it++) {
+    let worst = 0;
+    for (let i = 0; i < 2; i++) {
+      r.arms[i].sh.getWorldPosition(_rs);
+      _rh.copy(b.bat.position).addScaledVector(a, i === 0 ? 0.62 : 0.49);
+      const over = _rs.distanceTo(_rh) - reach;
+      if (over > worst) { worst = over; _rd.subVectors(_rs, _rh).normalize(); }
+    }
+    if (worst <= 0.002) break;
+    b.bat.position.addScaledVector(_rd, worst * weight);
+  }
+}
 function armsIK(b) {
   const r = b.rig, a = b.batAxis;
   _v7.copy(b.bat.position).addScaledVector(a, 0.62);
@@ -3000,30 +3298,62 @@ function batInHand(b) {
   b.batAxis.copy(Y_AXIS).applyQuaternion(b.bat.quaternion);
   b.bat.position.copy(_v9).addScaledVector(b.batAxis, -0.56);
 }
-const STANCE_T = newPose();
+const STANCE_T = newPose(), _relaxP = newPose();
 function updateStriker(b, dt) {
   const st = game.state, sw = b === game.rigS ? game.swing : null, C = b.cur, r = b.rig, snapping = b.snap;
   r.root.position.set(0, 0, 0); r.root.rotation.set(0, 0, 0);
   const ready = (st === 'runup' && game.del && game.t > game.del.runT - 0.55) || st === 'flight';
   if (sw) {
-    const ts = game.clock - sw.animStart;
+    const ts = game.clock - sw.animStart, fin = sw.fin;
     const u = clamp(ts / SWING_T, 0, 1), v = clamp((ts - SWING_T) / FOLLOW_T, 0, 1);
+    const relax = smooth(clamp((ts - SWING_T - FOLLOW_T - fin.hold) / 0.9, 0, 1));
     if (ts <= SWING_T) {
       blendPose(C, sw.pose0, sw.poseC, smooth(u));
       const lift = Math.sin(Math.PI * u);
       if (sw.pose0.fL.distanceTo(sw.poseC.fL) > 0.12) C.fL.y = 0.11 * lift;
       if (sw.pose0.fR.distanceTo(sw.poseC.fR) > 0.12) C.fR.y = 0.09 * lift;
-    } else blendPose(C, sw.poseC, sw.poseF, smooth(v));
-    const w = smooth(u);
-    C.Q.copy(sw.Q0).slerp(sw.Q1, w);
-    C.pivot.lerpVectors(sw.pv0, sw.Pv, w);
-    C.Rss = lerp(sw.R0, sw.R1, w);
-    C.phi = ts <= SWING_T ? sw.phi0 * (1 - u * u) : sw.phiF * (1 - (1 - v) * (1 - v));
+      // hands lead and the swing plane settles early; the bat stays cocked and releases late through the ball
+      const eh = 1 - Math.pow(1 - u, 2.2);
+      C.Q.copy(sw.Q0).slerp(sw.Q1, 1 - (1 - u) * (1 - u));
+      C.pivot.lerpVectors(sw.pv0, sw.Pv, eh);
+      C.Rss = lerp(sw.R0, sw.R1, eh);
+      C.phi = sw.phi0 * (1 - Math.pow(u, 2.4));
+    } else {
+      blendPose(C, sw.poseC, sw.poseF, smooth(v));
+      // the bat flows on past the ball and decelerates into the finish, wrapping round as the hands fold in
+      const e = 1 - Math.pow(1 - v, 2.6), w = smooth(v);
+      C.Q.copy(sw.Q1).slerp(sw.Qf, w);
+      C.pivot.lerpVectors(sw.Pv, sw.PvF, w);
+      C.Rss = lerp(sw.R1, fin.R, w);
+      C.phi = fin.phi * e;
+    }
+    if (relax > 0) {
+      // after holding the finish, stand up and let the bat come down by the side while watching the ball
+      copyPose(_relaxP, sw.poseF); _relaxP.pel.y = Math.min(0.92, sw.poseF.pel.y + 0.1);
+      _relaxP.fL.y = 0; _relaxP.fR.y = 0; _relaxP.lean = 0.12; _relaxP.twist = sw.poseF.twist * 0.4; _relaxP.side = 0;
+      blendPose(C, C, _relaxP, relax);
+    }
     applyBody(b);
+    if (relax > 0) {
+      r.spine.localToWorld(_v1.set(0, 0.3, 0));
+      _v2.set(_v1.x + 0.2, _v1.y - 0.05, _v1.z + 0.05);
+      C.pivot.lerp(_v2, relax); C.Q.slerp(Q_ID, relax); C.phi = lerp(C.phi, 0.25, relax); C.Rss = lerp(C.Rss, 0.95, relax);
+    }
   } else {
-    const shuffle = b === game.rigS && game.active ? (game.intent.side === 1 ? 0.18 : game.intent.side === -1 ? -0.14 : 0) : 0;
+    const iside = game.intent.defend ? 0 : game.intent.side;
+    const shuffle = b === game.rigS && game.active ? (iside === 1 ? 0.18 : iside === -1 ? -0.14 : 0) : 0;
     stanceTarget(STANCE_T, BAT_X + shuffle, ready);
-    if (b.snap) copyPose(C, STANCE_T); else blendPose(C, C, STANCE_T, 1 - Math.exp(-(ready ? 9 : 5) * dt));
+    let target = STANCE_T, rate = ready ? 9 : 5;
+    const S = st === 'flight' && b === game.rigS && game.active ? strideFor() : null;
+    if (S) {
+      const sp = clamp((game.flight.t - S.t0) / (S.t1 - S.t0), 0, 1);
+      blendPose(_stride, STANCE_T, S.pose, smooth(sp));
+      const lift = Math.sin(Math.PI * sp);
+      if (S.front) _stride.fL.y = 0.1 * lift; else _stride.fR.y = 0.07 * lift;
+      target = _stride; rate = 24;
+    }
+    if (b.snap) copyPose(C, target); else blendPose(C, C, target, 1 - Math.exp(-rate * dt));
+    if (S) { C.fL.y = target.fL.y; C.fR.y = target.fR.y; }
     applyBody(b);
     r.spine.localToWorld(_v1.set(0, 0.3, 0));
     _v2.set(_v1.x + 0.22, _v1.y, _v1.z + 0.04);
@@ -3037,6 +3367,8 @@ function updateStriker(b, dt) {
   }
   r.blob.position.set(C.pel.x, 0.016, C.pel.z);
   placeBat(b, !!sw || snapping, dt);
+  if (sw) { const ts = game.clock - sw.animStart; keepInReach(b, ts < SWING_T ? Math.pow(1 - ts / SWING_T, 1.5) : clamp((ts - SWING_T) / 0.04, 0, 1)); }
+  else keepInReach(b, 1);
   armsIK(b);
   let tgt;
   if ((st === 'flight' || st === 'inplay' || st === 'dead') && ball.position.z < C.pel.z + 0.3) tgt = ball.position;
@@ -3340,7 +3672,8 @@ function updateFielders(dt) {
     const run = clamp(moveSpeed / 6.5, 0, 1);
     stepPhase(r, moveSpeed, run, dt);
     if (f.isKeeper) {
-      const down = (st === 'runup' || (st === 'flight' && game.t < 0.25)) ? 1.4 : 0;
+      const upToSpin = game.del && !game.del.pace, kT = game.flight && game.flight.sim.keeperT;
+      const down = (st === 'runup' || (st === 'flight' && (upToSpin ? !(kT && game.flight.t > kT - 0.28) : game.t < 0.25))) ? 1.4 : 0;
       f.crouch = damp(f.crouch, down, 6, dt);
       poseRun(r, run, f.crouch);
       r.arms.forEach((A) => { A.sh.rotation.x = -0.9 - f.crouch * 0.25; A.el.rotation.x = -0.6; });
@@ -3349,12 +3682,19 @@ function updateFielders(dt) {
         const ay = clamp((ball.position.y - 0.8) * 1.2, -0.6, 1.4);
         r.arms.forEach((A) => { A.sh.rotation.x = -1.2 - ay * reach; A.el.rotation.x = -0.3; });
       }
+      if (P && P.throwing) {
+        // gloves up and out for the return, then the ball tucked in at the chest
+        const T = P.throwing, left = T.total - (T.segs.slice(0, T.i).reduce((a, g) => a + g.T, 0) + T.t);
+        const up = T.done ? 0 : clamp(1 - left / 0.9, 0, 1);
+        const ay = T.done ? 0 : clamp((ball.position.y - 1.0) * 0.9, -0.5, 0.9) * up;
+        r.arms.forEach((A) => { A.sh.rotation.x = T.done ? -0.95 : lerp(-0.9, -1.45 - ay, up); A.el.rotation.x = T.done ? -1.25 : lerp(-0.6, -0.25, up); });
+      }
     } else {
       f.crouch = damp(f.crouch, run > 0.15 ? 0 : crouchT, 8, dt);
       poseRun(r, run, f.crouch);
       if (run < 0.15 && f.crouch > 0.2) r.arms.forEach((A) => { A.sh.rotation.x = -0.75; A.el.rotation.x = -0.5; });
       if (task && (task.kind === 'catch' || task.kind === 'drop') && Math.abs(P.t - task.evT) < 0.45) r.arms.forEach((A) => { A.sh.rotation.x = -2.5; A.el.rotation.x = -0.25; });
-      if (P && P.throwing && P.holder === f && P.throwing.t < 0.35) { r.arms[1].sh.rotation.x = -2.8 + P.throwing.t * 9; r.arms[1].el.rotation.x = -0.4; }
+      if (P && P.throwing && P.throwing.by === f && P.throwing.i === 0 && P.throwing.t < 0.35) { r.arms[1].sh.rotation.x = -2.8 + P.throwing.t * 9; r.arms[1].el.rotation.x = -0.4; }
       if (f.pose === 'celebrate') celebrate(r, game.clock);
     }
     if (watching && Math.abs(f.tilt) < 0.3) lookAtBall(r);
@@ -3391,7 +3731,7 @@ function updateGame(dt) {
   if (st === 'between') {
     bowler.rig.root.updateMatrixWorld(true);
     bowler.handMarker.getWorldPosition(ball.position);
-    if (game.t > 1.9) startRunup();
+    if (game.t > (game.leadIn || 1.9)) startRunup();
   } else if (st === 'runup') {
     bowler.rig.root.updateMatrixWorld(true);
     bowler.handMarker.getWorldPosition(ball.position);
@@ -3402,6 +3742,7 @@ function updateGame(dt) {
       markerMats.forEach(([m]) => m.color.setHex(LEN_COLOR[d.length]));
       updateShotHUD();
     }
+    if (!game.runupSaid && game.t > d.runT - (d.pace ? 1.3 : 1.0)) { game.runupSaid = true; Comm.runup(d, game.balls % 6 === 0); }
     if (game.t >= d.runT) release();
   } else if (st === 'flight') {
     const F = game.flight, S = F.sim;
@@ -3425,12 +3766,14 @@ function updateGame(dt) {
       umpire.signal = 'out'; umpire.sigT = 0;
       game.slowT = 0.9; game.slowScale = 0.28;
       cam.mode = 'stumps'; cam.modeT = 0;
+      Comm.bowled(false);
       finishBall({ runs: 0, out: true, kind: 'bowled', card: `b ${game.bowl[game.bowler].short}` });
       game.flight = F; game.deadFlight = true;
       return;
     }
     if (!F.kept && S.keeperT !== null && F.t >= S.keeperT) {
       F.kept = true; Sound.glove();
+      { const pl = sw && sw.plan; Comm.noHit(!sw ? (game.del.length === 'bouncer' || game.del.length === 'short' ? 'duck' : 'left') : pl && pl.beaten === 'Left outside off' ? 'left' : pl && pl.beaten === 'Beaten on the inside' ? 'beatenIn' : pl && pl.beaten ? 'beaten' : 'miss'); }
       const sub = sw ? (sw.plan && sw.plan.beaten) || (sw.plan && sw.plan.grade === 'tooEarly' ? 'Through too early' : 'Played and missed') : (game.del.length === 'bouncer' ? 'Ducked under the bouncer' : 'Left alone');
       showCallout('Dot ball', sub, 'k-dot');
       finishBall({ runs: 0, kind: 'keeper' });
@@ -3447,19 +3790,10 @@ function updateGame(dt) {
       const P = game.play;
       P.t += dt;
       while (P.ei < P.events.length && P.t >= P.events[P.ei].t) { onEvent(P.events[P.ei]); P.ei++; }
-      if (P.holder) {
-        if (P.throwAt && P.t >= P.throwAt && !P.throwing) {
-          P.holder.rig.root.updateMatrixWorld(true);
-          const from = P.holder.handMarker.getWorldPosition(new V3()), to = new V3(0.35, 1.0, 0.7);
-          P.throwing = { from, to, t: 0, T: Math.max(0.35, from.distanceTo(to) / 27), h: from.distanceTo(to) * 0.1 };
-        }
-        if (P.throwing) {
-          const T = P.throwing; T.t += dt;
-          const u = clamp(T.t / T.T, 0, 1);
-          ball.position.lerpVectors(T.from, T.to, u); ball.position.y += Math.sin(u * Math.PI) * T.h;
-          if (u >= 1 && !T.done) { T.done = true; Sound.glove(); }
-        } else { P.holder.rig.root.updateMatrixWorld(true); P.holder.handMarker.getWorldPosition(ball.position); }
-      } else {
+      if (P.throwAt && P.holder && P.t >= P.throwAt && !P.throwing) startThrow(P);
+      if (P.throwing && !P.throwing.done) flyThrow(P, dt);
+      else if (P.holder) { P.holder.rig.root.updateMatrixWorld(true); P.holder.handMarker.getWorldPosition(ball.position); }
+      else {
         sampleAt(P.sim, P.t, ball.position);
         if (ballPrev.y > 0.3 && ball.position.y < 0.08 && P.t > 0.15 && P.t < 5) Sound.bounce();
       }
@@ -3479,6 +3813,46 @@ function updateGame(dt) {
   ballPrev.copy(ball.position);
 }
 
+/* Return throws go into the keeper's gloves: a flat throw from the infield, one bounce from the deep. The keeper
+   comes up to the stumps to take it, and the last stretch of flight is steered onto the glove so the catch is clean. */
+const KEEPER_TAKE = new V3(0.3, 0, 0.72);
+function startThrow(P) {
+  const f = P.holder;
+  f.rig.root.updateMatrixWorld(true);
+  const from = f.handMarker.getWorldPosition(new V3());
+  const to = new V3(KEEPER_TAKE.x - 0.05, 1.05, KEEPER_TAKE.z - 0.45);
+  const d = Math.hypot(to.x - from.x, to.z - from.z);
+  const segs = [];
+  if (d < 30) segs.push({ p0: from, p1: to, T: Math.max(0.28, d / 25) });
+  else {
+    const dir = new V3(to.x - from.x, 0, to.z - from.z).normalize();
+    const b = to.clone().addScaledVector(dir, -7); b.y = BALL_R;
+    segs.push({ p0: from, p1: b, T: Math.max(0.4, Math.hypot(b.x - from.x, b.z - from.z) / 27) });
+    segs.push({ p0: b.clone(), p1: to, T: 7 / 17, last: true });
+  }
+  segs[segs.length - 1].last = true;
+  const total = segs.reduce((a, g) => a + g.T, 0);
+  P.throwing = { by: f, segs, i: 0, t: 0, total, done: false };
+  P.holder = null;
+  const dk = keeper.pos.distanceTo(KEEPER_TAKE);
+  keeper.tasks.push({ start: P.t, arrive: P.t + Math.max(0.15, Math.min(total - 0.1, dk / 5)), from: keeper.pos.clone(), to: KEEPER_TAKE.clone(), dive: false, face: new V3(from.x, 0, from.z), kind: 'receive', evT: P.t + total });
+}
+function flyThrow(P, dt) {
+  const T = P.throwing; T.t += dt;
+  let g = T.segs[T.i];
+  while (T.t > g.T && T.i < T.segs.length - 1) { T.t -= g.T; T.i++; g = T.segs[T.i]; Sound.bounce(); }
+  const t = Math.min(T.t, g.T), u = t / g.T;
+  const vy = (g.p1.y - g.p0.y + 0.5 * G * g.T * g.T) / g.T;
+  ball.position.set(lerp(g.p0.x, g.p1.x, u), g.p0.y + vy * t - 0.5 * G * t * t, lerp(g.p0.z, g.p1.z, u));
+  if (g.last) {
+    // ease the end of the flight onto wherever the keeper's glove actually is
+    keeper.rig.root.updateMatrixWorld(true);
+    keeper.handMarker.getWorldPosition(_v1).sub(g.p1);
+    ball.position.addScaledVector(_v1, smooth(clamp((u - 0.55) / 0.45, 0, 1)));
+  }
+  if (g.last && T.t >= g.T) { T.done = true; P.holder = keeper; Sound.glove(); }
+}
+
 /* ----------------------------------------------------------------- input */
 function setSide(s) { if (!game.swing && game.active) { game.intent.side = s; updateShotHUD(); } }
 function act(k, touch) {
@@ -3487,9 +3861,18 @@ function act(k, touch) {
   else if (k === 'right') setSide(1);
   else if (k === 'up') { if (!game.swing && game.active) { game.intent.side = 0; game.intent.foot = 'front'; updateShotHUD(); } }
   else if (k === 'down') { if (!game.swing && game.active) { game.intent.foot = 'back'; updateShotHUD(); } }
-  else if (k === 'loft') { if (!game.swing && game.active) { game.intent.loft = !game.intent.loft; updateShotHUD(); } }
-  else if (k === 'swing') trySwing(false, touch);
-  else if (k === 'block') trySwing(true, touch);
+  else if (k === 'loft') { if (!game.swing && game.active) { game.intent.loft = !game.intent.loft; if (game.intent.loft) game.intent.defend = false; updateShotHUD(); } }
+  else if (k === 'swing') trySwing(game.intent.defend, touch);
+  else if (k === 'block') {
+    // while the ball is on its way, Defend plays the defensive shot now; otherwise it switches defend mode on or off
+    if (game.state === 'flight' && !game.swing) trySwing(true, touch);
+    else if (!game.swing && game.active) {
+      game.intent.defend = !game.intent.defend;
+      if (game.intent.defend) game.intent.loft = false;
+      updateShotHUD();
+      showToast(game.intent.defend ? 'Defend mode on: Swing plays a defensive shot' : 'Defend mode off');
+    }
+  }
 }
 window.addEventListener('keydown', (e) => {
   const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
@@ -3525,7 +3908,7 @@ function toggleMute() {
 }
 $('muteBtn').addEventListener('click', () => { Sound.init(); toggleMute(); canvas.focus({ preventScroll: true }); });
 function toggleVoice() {
-  Voice.set(!Voice.on);
+  Voice.set(!Voice.on); Caller.set(Voice.on);
   $('icoVoice').hidden = !Voice.on; $('icoVoiceOff').hidden = Voice.on;
   $('voiceBtn').setAttribute('aria-label', Voice.on ? 'Turn commentary voice off' : 'Turn commentary voice on');
   showToast(Voice.on ? 'Commentary voice on' : 'Commentary voice off');
@@ -3685,12 +4068,7 @@ function frame(now) {
   const loose = ball.visible && (game.state === 'flight' || game.state === 'inplay') && !(game.play && game.play.holder);
   if (loose && spd > 6) trail.push(bp, game.clock);
   ballTrailPrev.copy(bp);
-  // in play the ball stays at least ~1.3% of the view tall (7-12 px), however far it is from the camera
-  const viewH = canvas.clientHeight || window.innerHeight;
-  const pxPerM = viewH / (2 * Math.max(0.5, camera.position.distanceTo(bp)) * Math.tan(camera.fov * D2R / 2));
-  const want = loose ? clamp(clamp(viewH * 0.013, 7, 12) / (2 * BALL_VIS * pxPerM), 1, 2.4) : 1;
-  ball.scale.setScalar(damp(ball.scale.x, want, 14, rdt));
-  trail.update(game.clock, BALL_VIS * ball.scale.x * 0.95);
+  trail.update(game.clock, BALL_VIS * 0.8);
   ball.rotation.x += rdt * 25; ball.rotation.y += rdt * 9;
 
   if (marker.visible) {
@@ -3730,7 +4108,7 @@ function boot(data) {
   data = data || {};
   if (data.view) setView(data.view);
   if (data.muted) toggleMute();
-  if (data.voice === false) { Voice.set(false); $('icoVoice').hidden = true; $('icoVoiceOff').hidden = false; }
+  if (data.voice === false) { Voice.set(false); Caller.set(false); $('icoVoice').hidden = true; $('icoVoiceOff').hidden = false; }
   if (data.overs && [2, 5, 10, 20].includes(data.overs)) game.overs = data.overs;
   if (data.diff && DIFF[data.diff]) game.diff = data.diff;
   document.querySelectorAll('[data-ov]').forEach((x) => x.classList.toggle('on', +x.dataset.ov === game.overs));
@@ -3767,6 +4145,7 @@ function boot(data) {
   }
   warmUp().catch((e) => console.warn('Warm-up skipped:', e)).then(() => {
     requestAnimationFrame(frame);
+    if (VOICE_INDEX) Caller.load();
     Loader.done(() => { if (xiReady()) startInnings(game.resume); else $('startPanel').hidden = false; });
     refreshStartPanel();
   });
