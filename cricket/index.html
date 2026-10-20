@@ -9,7 +9,8 @@
 <style>body { margin: 0; } [hidden] { display: none !important; } .home-link { color: var(--gold); text-decoration: none; font-weight: 600; } .home-link:hover { text-decoration: underline; }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap">
+<link rel="preload" as="script" href="three.min.js">
+<script>(function () { var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap'; document.head.appendChild(l); })();</script>
 <style>
 /* Layout: full-bleed WebGL stadium under a broadcast-style HUD pinned to the corners; on touch screens the HUD compacts to a top strip and a thumb bar so the pitch stays clear. */
 :root {
@@ -220,6 +221,34 @@ body.is-touch .bottom { display: none; }
 .btn { font: 800 20px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; padding: 15px 26px; border-radius: 4px; border: 0; cursor: pointer; background: var(--gold); color: var(--gold-ink); }
 .btn:hover { filter: brightness(1.06); }
 .btn:disabled { cursor: default; filter: saturate(0.4) brightness(0.8); }
+.btn.ghost { background: transparent; color: var(--gold); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.bug-chase { padding: 5px 12px; background: rgba(255, 197, 61, 0.14); border-bottom: 1px solid var(--rule); font: 700 12px/1.2 var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conf { display: flex; align-items: center; gap: 8px; margin-top: 8px; font: 600 10px/1 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.conf i, .tconf { position: relative; display: block; width: 92px; height: 6px; border-radius: 3px; background: rgba(241, 237, 225, 0.12); overflow: hidden; flex: none; }
+.conf i b, .tconf b { position: absolute; inset: 0 auto 0 0; width: 35%; border-radius: 3px; background: var(--amber); transition: width 400ms ease, background-color 400ms ease; }
+.conf em { font: 800 13px/1 var(--font-display); font-style: normal; color: var(--chalk); font-variant-numeric: tabular-nums; min-width: 3.2ch; }
+.tconf { width: 40px; height: 5px; align-self: center; }
+.end-chase { margin: 8px 0 0; font: 800 22px/1.15 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; color: var(--gold); }
+.end-chase:empty { display: none; }
+.end-actions { justify-content: flex-end; }
+.end-hint { margin-top: 10px; }
+.sim-card, .result-card { width: min(520px, 100%); }
+.sim-bar { height: 8px; margin-top: 14px; border-radius: 4px; background: rgba(241, 237, 225, 0.1); overflow: hidden; }
+.sim-bar i { display: block; height: 100%; width: 0; background: var(--gold); transition: width 120ms linear; }
+.sim-feed { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 6px; min-height: 9.5em; }
+.sim-feed li { font: 500 14px/1.3 var(--font-ui); color: var(--muted); }
+.sim-feed li b { color: var(--chalk); font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.sim-feed li.out b { color: var(--zing); }
+.sim-feed li.six b, .sim-feed li.four b { color: var(--gold); }
+.result-title { margin: 10px 0 0; font: 900 clamp(34px, 8vw, 52px)/0.95 var(--font-display); text-transform: uppercase; color: var(--gold); text-wrap: balance; }
+.result-card.lost .result-title { color: var(--chalk); }
+.result-sub { margin: 8px 0 0; font: 500 16px/1.4 var(--font-ui); color: var(--muted); }
+.result-sub:empty { display: none; }
+.inns { display: grid; gap: 8px; margin-top: 18px; }
+.inn { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; background: rgba(241, 237, 225, 0.03); }
+.inn span { flex: 1; min-width: 0; font: 700 15px/1.2 var(--font-ui); letter-spacing: 0.06em; text-transform: uppercase; }
+.inn b { font: 900 30px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.inn em { font: 600 13px/1 var(--font-ui); font-style: normal; color: var(--muted); }
 /* while loading, the start button doubles as a progress bar */
 .btn.loading { --p: 0; background: linear-gradient(90deg, var(--gold) calc(var(--p) * 100%), rgba(255, 197, 61, 0.38) calc(var(--p) * 100%)); font-variant-numeric: tabular-nums; min-width: 12ch; }
 .load-card { width: min(420px, 100%); text-align: center; }
@@ -229,11 +258,19 @@ body.is-touch .bottom { display: none; }
 .load-track i { display: block; height: 100%; background: var(--gold); transform-origin: left center; transform: scaleX(0); }
 .load-step { margin: 12px 0 0; font: 600 13px/1.3 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .squad { margin-top: 20px; }
+.fmt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.fmt button { text-align: left; padding: 10px 12px 11px; border-radius: 6px; border: 1px solid var(--rule); background: rgba(241, 237, 225, 0.04); color: var(--muted); cursor: pointer; }
+.fmt button b { display: block; font: 800 21px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--chalk); }
+.fmt button small { display: block; margin-top: 5px; font: 500 12px/1.25 var(--font-ui); }
+.fmt button.on { border-color: var(--gold); background: rgba(255, 197, 61, 0.1); }
+.fmt button.on b { color: var(--gold); }
+.fmt button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 /* wide screens: intro and controls on the left, team and match setup on the right, so Start stays above the fold */
 @media (min-width: 980px) {
   .start-card { width: min(1000px, 100%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 40px; align-items: start; }
   .start-setup { padding-top: 4px; }
   .start-setup .squad { margin-top: 0; }
+  .start-setup .fmt { margin-bottom: 14px; }
 }
 .squad-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
 .squad-note { font: 500 13px/1.2 var(--font-ui); color: var(--muted); }
@@ -286,6 +323,9 @@ body.is-touch .bottom { display: none; }
   .comm-call { display: inline; font-size: 14px; line-height: 1; letter-spacing: 0.02em; margin: 0 5px 0 0; }
   .comm-head { padding-right: 16px; }
   .comm-eq { top: 6px; right: 8px; height: 8px; }
+  .bug-chase { padding: 3px 8px; font-size: 10px; }
+  .end-chase { font-size: 18px; }
+  .end-actions .btn { font-size: 16px; padding: 13px 16px; flex: 1 1 auto; }
   .callout.branded::before { width: 320px; height: 320px; margin: -160px 0 0 -160px; }
   .bug-score { font-size: 34px; padding: 6px 9px 4px; }
   .bug-score .slash, .bug-score .wk { font-size: 24px; }
@@ -327,6 +367,9 @@ body.is-touch .bottom { display: none; }
 @media (max-width: 520px) {
   .ctl-list { grid-template-columns: minmax(0, 1fr); }
   .squad-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .fmt button { padding: 8px 10px 9px; }
+  .fmt button b { font-size: 18px; }
+  .fmt button small { font-size: 11px; }
   .pl { padding: 6px 7px; gap: 6px; font-size: 13px; }
   .pl i { width: 18px; height: 18px; font-size: 12px; }
   .end-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; }
@@ -356,7 +399,8 @@ body.is-touch .bottom { display: none; }
   <div class="top">
     <div class="left-col">
     <section class="bug" aria-label="Scoreboard">
-      <div class="bug-head"><span>Thudinest Coimbatore</span><small>Batting</small></div>
+      <div class="bug-head"><span id="bugTeam">Thudinest Coimbatore</span><small id="bugTag">Batting</small></div>
+      <div class="bug-chase" id="bugChase" hidden></div>
       <div class="bug-main">
         <div class="bug-score"><span id="runs">0</span><span class="slash">/</span><span class="wk" id="wkts">0</span></div>
         <div class="bug-cell"><span class="lbl">Overs</span><b><span id="overs">0.0</span><small id="oversOf"> /5</small></b></div>
@@ -424,6 +468,7 @@ body.is-touch .bottom { display: none; }
         <div class="lbl">Shot</div>
         <div class="shot-name" id="shotName">Straight drive</div>
         <div class="tags"><span class="tag" id="tagFoot">Auto footwork</span><span class="tag" id="tagLoft">Along the ground</span></div>
+        <div class="conf" id="conf" title="Confidence grows with well-timed shots: wider timing and more power on lofted shots"><span>Confidence</span><i><b id="confBar"></b></i><em id="confPct">35%</em></div>
       </div>
     </div>
     <div class="keys" id="keys">
@@ -439,7 +484,7 @@ body.is-touch .bottom { display: none; }
   </div>
 
   <div class="touch" id="touch">
-    <div class="tshot"><b id="tShotName">Straight drive</b><span id="tShotTags">Auto footwork · Along the ground</span></div>
+    <div class="tshot"><b id="tShotName">Straight drive</b><i class="tconf" aria-label="Confidence"><b id="tConfBar"></b></i><span id="tShotTags">Auto footwork · Along the ground</span></div>
     <div class="touch-row">
       <div class="pad">
         <button type="button" class="k-up" data-k="up" aria-label="Straight, front foot">↑</button>
@@ -459,9 +504,9 @@ body.is-touch .bottom { display: none; }
 <div class="scrim" id="startPanel">
   <div class="card start-card" role="dialog" aria-labelledby="startTitle">
     <div class="start-intro">
-    <p class="eyebrow">Thudinest Coimbatore · Day–night T20</p>
+    <p class="eyebrow" id="startEyebrow">Thudinest Coimbatore · Day–night T20</p>
     <h1 id="startTitle">Floodlit <span>Over</span></h1>
-    <p class="lede">Thudinest Coimbatore bat first under the lights, with <span id="openers">Kavin and Harsha</span> opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.</p>
+    <p class="lede"><span id="ledeLead">Thudinest Coimbatore bat first under the lights, with </span><span id="openers">Kavin and Harsha</span><span id="ledeTail"> opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.</span></p>
     <ul class="ctl-list">
       <li><kbd>←</kbd><span><b>Leg side</b> · on drive, pull</span></li>
       <li><kbd>→</kbd><span><b>Off side</b> · cover drive, cut</span></li>
@@ -476,6 +521,10 @@ body.is-touch .bottom { display: none; }
     </ul>
     </div>
     <div class="start-setup">
+    <div class="fmt" role="group" aria-label="Match format">
+      <button type="button" data-fmt="t20" class="on" aria-pressed="true"><b>T20</b><small>Floodlights · colours · white ball</small></button>
+      <button type="button" data-fmt="test" aria-pressed="false"><b>Test match</b><small>Daytime · whites · red ball</small></button>
+    </div>
     <div class="squad">
       <div class="squad-head"><span class="lbl">Playing XI</span><span class="squad-note" id="squadNote">Tap a name to swap them in or out · 11 of 13</span></div>
       <div class="squad-grid" id="squadGrid" role="group" aria-label="Choose the playing eleven">
@@ -535,6 +584,7 @@ body.is-touch .bottom { display: none; }
     <p class="eyebrow" id="endEyebrow">Innings complete</p>
     <div class="end-score"><b id="endScore">0/0</b><span id="endOvers">(5.0 ov)</span></div>
     <p class="end-line" id="endLine"></p>
+    <p class="end-chase" id="chaseLine"></p>
     <div class="end-grid">
       <div><canvas class="wagon" id="wagon" width="360" height="360"></canvas><div class="wagon-cap">Wagon wheel</div></div>
       <dl class="stats">
@@ -548,10 +598,36 @@ body.is-touch .bottom { display: none; }
       <table class="sc"><thead><tr><th>Batter</th><th></th><th class="n">R</th><th class="n">B</th></tr></thead><tbody id="scBody"></tbody></table>
     </div>
     <p class="fine" id="fowLine"></p>
-    <div class="card-row">
-      <span class="fine" style="margin:0">Press <b>R</b> or Enter to bat again.</span>
-      <button class="btn" id="restartBtn" type="button">Restart</button>
+    <div class="card-row end-actions">
+      <button class="btn ghost" id="simBtn" type="button">Computer plays their innings</button>
+      <button class="btn" id="chaseBtn" type="button">Bat for the World XI</button>
     </div>
+    <p class="fine end-hint">Pass the device to a friend to bat for the World XI, or let the computer play their innings and see the result.</p>
+  </div>
+</div>
+
+<div class="scrim" id="simPanel" hidden>
+  <div class="card sim-card" role="dialog" aria-labelledby="simScore">
+    <p class="eyebrow">World XI chasing <span id="simTarget">0</span> · computer batting</p>
+    <div class="end-score"><b id="simScore">0/0</b><span id="simOvers">(0.0 ov)</span></div>
+    <p class="end-chase" id="simNeed"></p>
+    <div class="sim-bar"><i id="simBar"></i></div>
+    <ol class="sim-feed" id="simFeed"></ol>
+    <div class="card-row"><span class="fine" style="margin:0">Thudinest Coimbatore are bowling.</span><button class="btn ghost" id="simSkip" type="button">Skip to result</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="resultPanel" hidden>
+  <div class="card result-card" id="resultCard" role="dialog" aria-labelledby="resultTitle">
+    <p class="eyebrow" id="resultEyebrow">Result</p>
+    <h2 class="result-title" id="resultTitle">Match result</h2>
+    <p class="result-sub" id="resultSub"></p>
+    <div class="inns">
+      <div class="inn"><span id="inn1Team">Thudinest Coimbatore</span><b id="inn1Score">0/0</b><em id="inn1Ov"></em></div>
+      <div class="inn"><span id="inn2Team">World XI</span><b id="inn2Score">0/0</b><em id="inn2Ov"></em></div>
+    </div>
+    <p class="fine" id="resultStars"></p>
+    <div class="card-row"><span class="fine" style="margin:0">Press Enter for a new match.</span><button class="btn" id="newMatchBtn" type="button">New match</button></div>
   </div>
 </div>
 
@@ -624,9 +700,27 @@ window.__load = (() => {
   };
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
-(function () {
+/* Paint first, then run: the engine starts downloading at once (the preload in the head) but only executes after the
+   start screen and its loading bar are on screen, so a phone never sits on a blank page while the stadium is built. */
+(() => {
+  let started = false;
+  const fail = () => { const f = document.getElementById('fatal'); if (f) { f.hidden = false; document.getElementById('fatalMsg').textContent = 'Something went wrong while building the stadium. Please reload the page.'; } };
+  const go = () => {
+    if (started) return;
+    started = true;
+    const s = document.createElement('script');
+    s.src = 'three.min.js';
+    s.onload = s.onerror = () => { if (window.__gameMain) window.__gameMain().catch((e) => { console.error(e); fail(); }); };
+    document.body.appendChild(s);
+  };
+  // two frames: the first may be produced before the start screen is laid out; the second has certainly painted it
+  requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(go, 0)));
+  setTimeout(go, 3000); // a page opened in a background tab gets no frames until it is shown
+})();
+</script>
+<script>
+window.__gameMain = async function () {
 'use strict';
 const $ = (id) => document.getElementById(id);
 const fatal = (msg) => { if (window.__load) window.__load.stop(); $('fatal').hidden = false; $('fatalMsg').textContent = msg; $('startPanel').hidden = true; };
@@ -692,7 +786,10 @@ try {
   fatal('This browser could not start WebGL, which the stadium needs. Turn on hardware acceleration or try another browser.');
   return;
 }
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+/* phones and tablets get a lighter profile: 1.5x resolution, standard (not physical) cloth, a smaller shadow map and grass
+   texture. Shaders compile far faster on mobile GPUs and frames stay smooth; on a phone screen the look barely changes. */
+const LITE = !!((window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (navigator.deviceMemory && navigator.deviceMemory <= 4));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, LITE ? 1.5 : 2));
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -717,32 +814,35 @@ function canvasTex(w, h, draw, opts = {}) {
 const std = (color, roughness = 0.8, extra = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness, metalness: 0 }, extra));
 
 /* ---------------------------------------------------------------------- sky */
-{
-  const mat = new THREE.ShaderMaterial({
+const skyMat = new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
-    uniforms: { cTop: { value: new THREE.Color(0x040817) }, cMid: { value: new THREE.Color(0x18264e) }, cHor: { value: new THREE.Color(0xb86c5c) } },
+    uniforms: { cTop: { value: new THREE.Color(0x040817) }, cMid: { value: new THREE.Color(0x18264e) }, cHor: { value: new THREE.Color(0xb86c5c) }, uStars: { value: 1 } },
     vertexShader: 'varying vec3 vDir;\nvoid main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: [
-      'uniform vec3 cTop; uniform vec3 cMid; uniform vec3 cHor; varying vec3 vDir;',
+      'uniform vec3 cTop; uniform vec3 cMid; uniform vec3 cHor; uniform float uStars; varying vec3 vDir;',
       'float hash(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }',
       'void main(){',
       '  float h = vDir.y;',
       '  vec3 c = mix(cHor, cMid, smoothstep(-0.04, 0.2, h));',
       '  c = mix(c, cTop, smoothstep(0.2, 0.78, h));',
       '  float s = step(0.9978, hash(floor(vDir * 380.0))) * smoothstep(0.18, 0.55, h);',
-      '  c += vec3(s * 0.55);',
+      '  c += vec3(s * 0.55 * uStars);',
       '  gl_FragColor = vec4(c, 1.0);',
       '  #include <tonemapping_fragment>',
       '  #include <encodings_fragment>',
       '}',
     ].join('\n'),
   });
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(900, 32, 20), mat);
+{
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(900, 32, 20), skyMat);
   sky.renderOrder = -1;
   scene.add(sky);
 }
+await Loader.step(0.33, 'Building the stadium', 0.35);
 
 /* -------------------------------------------------------------- field & pitch */
+/* materials the match format retunes: night T20 under lights, or a Test in daylight */
+const stadium = {};
 function drawGrass(g, w, h) {
   g.fillStyle = '#2b6a2c'; g.fillRect(0, 0, w, h);
   const bands = 30;
@@ -795,8 +895,9 @@ function drawPitch(g, w, h) {
   g.fillStyle = eg; g.fillRect(0, 0, w, h);
 }
 {
-  const grass = canvasTex(1024, 1024, drawGrass);
-  const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a }));
+  const grass = canvasTex(LITE ? 512 : 1024, LITE ? 512 : 1024, drawGrass);
+  stadium.fieldMat = new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a });
+  const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), stadium.fieldMat);
   field.rotation.x = -Math.PI / 2; field.position.copy(FIELD_C); field.receiveShadow = true;
   scene.add(field);
   const apron = new THREE.Mesh(new THREE.RingGeometry(70.8, 76, 120), std(0x163222, 0.95));
@@ -804,7 +905,8 @@ function drawPitch(g, w, h) {
   scene.add(apron);
 
   const pitchTex = canvasTex(256, 2048, drawPitch);
-  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
+  stadium.pitchMat = new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
+  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), stadium.pitchMat);
   pitch.rotation.x = -Math.PI / 2; pitch.position.set(0, 0.006, FIELD_C.z); pitch.receiveShadow = true;
   scene.add(pitch);
 
@@ -910,9 +1012,9 @@ const led = {};
       }
     }
   }, { repeat: [16, 1] });
-  const crowdMat = new THREE.MeshLambertMaterial({ map: crowdTex, emissive: 0xffffff, emissiveMap: crowdTex, emissiveIntensity: 0.32, side: THREE.DoubleSide });
-  const concrete = new THREE.MeshLambertMaterial({ color: 0x1b2131, side: THREE.DoubleSide });
-  const roofMat = new THREE.MeshLambertMaterial({ color: 0x0e121c, side: THREE.DoubleSide });
+  const crowdMat = stadium.crowdMat = new THREE.MeshLambertMaterial({ map: crowdTex, emissive: 0xffffff, emissiveMap: crowdTex, emissiveIntensity: 0.32, side: THREE.DoubleSide });
+  const concrete = stadium.concrete = new THREE.MeshLambertMaterial({ color: 0x1b2131, side: THREE.DoubleSide });
+  const roofMat = stadium.roof = new THREE.MeshLambertMaterial({ color: 0x0e121c, side: THREE.DoubleSide });
   const ribbonTex = canvasTex(512, 32, (g, w, h) => {
     const gr = g.createLinearGradient(0, 0, w, 0);
     gr.addColorStop(0, '#2350b8'); gr.addColorStop(0.5, '#5ad1ff'); gr.addColorStop(1, '#2350b8');
@@ -935,8 +1037,8 @@ const led = {};
   ring([[104, 25], [104, 31]], concrete);
   ring([[107, 34.5], [86, 31.5]], roofMat);
 
-  // sightscreens (black for the white ball) and the end blocks behind them
-  const black = std(0x07080c, 0.95);
+  // sightscreens (black for the white ball, white for the red) and the end blocks behind them
+  const black = stadium.sightMat = std(0x07080c, 0.95);
   for (const end of [-1, 1]) {
     const z = FIELD_C.z + end * 72.6;
     const ss = new THREE.Mesh(new THREE.BoxGeometry(21, 9, 0.6), black);
@@ -961,8 +1063,8 @@ const led = {};
     }
   });
   const pylonMat = std(0x2a2f3b, 0.7, { metalness: 0.3 });
-  const lampMat = new THREE.MeshBasicMaterial({ map: lampTex, toneMapped: false });
-  const glowMat = new THREE.SpriteMaterial({ map: glowTex, color: 0xfff0d2, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false, opacity: 0.9 });
+  const lampMat = stadium.lampMat = new THREE.MeshBasicMaterial({ map: lampTex, toneMapped: false });
+  const glowMat = stadium.glowMat = new THREE.SpriteMaterial({ map: glowTex, color: 0xfff0d2, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false, opacity: 0.9 });
   for (let k = 0; k < 4; k++) {
     const a = Math.PI / 4 + k * Math.PI / 2, r = 98;
     const x = FIELD_C.x + r * Math.sin(a), z = FIELD_C.z + r * Math.cos(a);
@@ -985,21 +1087,23 @@ const screenTex = new THREE.CanvasTexture(screenCanvas); screenTex.encoding = TH
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(26, 13), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
   scr.position.set(0, 26, FIELD_C.z - 93.9); scene.add(scr);
 }
-
+await Loader.step(0.35, 'Dressing the players', 0.37);
 /* ------------------------------------------------------------------- lights */
+const LIGHTS = {};
 {
-  scene.add(new THREE.HemisphereLight(0xa9bce8, 0x1c3a1c, 0.75));
-  const key = new THREE.DirectionalLight(0xfff1dc, 2.5);
+  const hemi = LIGHTS.hemi = new THREE.HemisphereLight(0xa9bce8, 0x1c3a1c, 0.75);
+  scene.add(hemi);
+  const key = LIGHTS.key = new THREE.DirectionalLight(0xfff1dc, 2.5);
   key.position.set(16, 42, 12); key.target.position.set(0, 0, -9);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(LITE ? 1024 : 2048, LITE ? 1024 : 2048);
   const sc = key.shadow.camera; sc.left = -17; sc.right = 17; sc.top = 17; sc.bottom = -17; sc.near = 5; sc.far = 110;
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key, key.target);
-  const fill = new THREE.DirectionalLight(0xc8d4ff, 0.9);
+  const fill = LIGHTS.fill = new THREE.DirectionalLight(0xc8d4ff, 0.9);
   fill.position.set(-30, 34, -48); fill.target.position.set(0, 0, -6);
   scene.add(fill, fill.target);
-  const rim = new THREE.DirectionalLight(0xffe2c0, 0.6);
+  const rim = LIGHTS.rim = new THREE.DirectionalLight(0xffe2c0, 0.6);
   rim.position.set(-20, 30, 40); scene.add(rim);
 }
 
@@ -1175,6 +1279,13 @@ const KIT = {
   bat: { shirt: 0x2350b8, pants: 0x1b3a80, helmet: 0x14254f, trim: 0xffc53d },
   field: { shirt: 0x8e1f42, pants: 0x5f1530, cap: 0x761634, trim: 0xf1ede1 },
 };
+/* each side's kit: T20 colours, or Test whites (cream shirts and trousers, the side's colour on the trim, cap and name) */
+const TEAM_KITS = {
+  home: { t20: { shirt: 0x2350b8, pants: 0x1b3a80, trim: 0xffc53d, text: '#ffc53d', cap: 0x1b3a80, helmet: 0x14254f },
+    test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0x1b3a80, text: '#1b3a80', cap: 0x1b3a80, helmet: 0x14254f } },
+  away: { t20: { shirt: 0x8e1f42, pants: 0x5f1530, trim: 0xf1ede1, text: '#f1ede1', cap: 0x761634, helmet: 0x4a1024 },
+    test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0x761634, text: '#761634', cap: 0x761634, helmet: 0x4a1024 } },
+};
 const SKINS = [0x8d5a3b, 0x6b4128, 0xc68e6a, 0xa86f4c, 0xe0b08f, 0x5a3622];
 /* fine knit bump shared by every shirt and trouser */
 const fabricTex = canvasTex(64, 64, (g, w, h) => {
@@ -1187,8 +1298,8 @@ const fabricTex = canvasTex(64, 64, (g, w, h) => {
   g.putImageData(img, 0, 0);
 }, { repeat: [18, 18] });
 fabricTex.encoding = THREE.LinearEncoding;
-const cloth = (color, rough = 0.8) => new THREE.MeshPhysicalMaterial({ color, roughness: rough, metalness: 0, sheen: 0.55, sheenRoughness: 0.5, sheenColor: new THREE.Color(0x9aa2b4), bumpMap: fabricTex, bumpScale: 0.05 });
-const padMat = new THREE.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.62, sheen: 0.3, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide });
+const cloth = (color, rough = 0.8) => LITE ? new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0 }) : new THREE.MeshPhysicalMaterial({ color, roughness: rough, metalness: 0, sheen: 0.55, sheenRoughness: 0.5, sheenColor: new THREE.Color(0x9aa2b4), bumpMap: fabricTex, bumpScale: 0.05 });
+const padMat = LITE ? std(0xf4f2ec, 0.62, { side: THREE.DoubleSide }) : new THREE.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.62, sheen: 0.3, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide });
 const strapMat = std(0x262a33, 0.7), shoeMat = std(0xf3f3ef, 0.5), soleMat = std(0x2a2d33, 0.9), metalMat = std(0x30343c, 0.35, { metalness: 0.7 });
 const beltMat = std(0x16181d, 0.55), eyeMat = std(0xf3f1ea, 0.3), irisMat = std(0x1a120e, 0.4), lipMat = std(0x6a3a32, 0.6);
 const willowMat = std(0xe8d3a0, 0.5), gloveMat = std(0xf6f4ee, 0.7), kGloveMat = std(0xd9a441, 0.6);
@@ -1204,7 +1315,7 @@ const gripMat = std(0xffffff, 0.9, { map: gripTex });
 /* ------------------------------------------------------------------ rigs */
 function makeRig(o) {
   const mats = { shirt: cloth(o.shirt, 0.8), pants: cloth(o.pants, 0.85), skin: std(o.skin, 0.52) };
-  const trimMat = std(o.trim || o.shirt, 0.6);
+  const trimMat = mats.trim = std(o.trim || o.shirt, 0.6);
   const add = (parent, geo, mat, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = !!o.cast; parent.add(m); return m; };
   const root = new THREE.Group(); root.rotation.order = 'YXZ';
   const pelvis = new THREE.Group(); pelvis.position.y = 1.0; root.add(pelvis);
@@ -1238,10 +1349,10 @@ function makeRig(o) {
   else if (o.beard === 'stubble') add(head, GEOM.beard, stubbleMat, 0, 0.062, 0.02).scale.set(1.07, 0.95, 1.07);
   if (o.beard === 'full' || o.beard === 'moustache') add(head, GEOM.moustache, hairMat, 0, 0.059, 0.1);
   if (o.head === 'helmet') {
-    add(head, GEOM.helmet, new THREE.MeshPhysicalMaterial({ color: o.helmet, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 }));
+    add(head, GEOM.helmet, (mats.helmet = LITE ? std(o.helmet, 0.3) : new THREE.MeshPhysicalMaterial({ color: o.helmet, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })));
     add(head, GEOM.grille, metalMat);
     const band = add(head, GEOM.helmetBand, trimMat, 0, 0.17, -0.008); band.rotation.set(HALF_PI, 0, Math.PI * 0.85); band.scale.set(0.98, 1.08, 1);
-  } else if (o.head === 'cap') add(head, GEOM.cap, std(o.cap, 0.72));
+  } else if (o.head === 'cap') add(head, GEOM.cap, (mats.cap = std(o.cap, 0.72)));
   else if (o.head === 'hat') add(head, GEOM.hat, std(0xf0ead9, 0.8));
   if (o.head !== 'helmet' && o.hair !== 'bald') add(head, o.hair === 'side' ? GEOM.hairSide : GEOM.hairCrop, hairMat);
   const arms = [1, -1].map((side) => {
@@ -1290,7 +1401,7 @@ function drawDecal(rig, name, num, color) {
 function drawFront(rig) {
   const g = rig.frontCanvas.getContext('2d');
   g.clearRect(0, 0, 256, 88);
-  g.fillStyle = '#ffc53d'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = rig.frontColor || '#ffc53d'; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.font = `900 58px ${DISPLAY}`; g.fillText(rig.frontText, 128, 47, 246);
   rig.frontTex.needsUpdate = true;
 }
@@ -1401,6 +1512,11 @@ const SQUAD = [
 const XI_SIZE = 11;
 let xiPicked = SQUAD.map((_, i) => i < XI_SIZE);
 const xiList = () => SQUAD.filter((_, i) => xiPicked[i]);
+const homeAttack = () => xiList().slice(6, 11).map((p, i) => Object.assign({}, p, { kind: HOME_BOWL[i][0], style: HOME_BOWL[i][1] }));
+const homeKeeper = () => xiList()[5];
+const fieldTeam = () => (game.batTeam === 'home' ? 'away' : 'home');
+const teamKit = (team) => TEAM_KITS[team][game.format];
+const batTeamName = () => TEAMS[game.batTeam].name;
 const ATTACK = [
   Object.assign(person('D. Mason', 8, 4, { hair: 'side', hairColor: 'brown', build: 1.05 }), { kind: 'fast', style: 'Right-arm fast' }),
   Object.assign(person('R. Ortega', 15, 3, { beard: 'full' }), { kind: 'fastmed', style: 'Right-arm fast-medium' }),
@@ -1410,6 +1526,11 @@ const ATTACK = [
 ];
 const OUTFIELD = [person('F. Lund', 3, 4, { hairColor: 'brown' }), person('G. Pereira', 10, 3, { beard: 'stubble' }), person('I. Kowalski', 17, 4, { hair: 'side', hairColor: 'brown' }), person('O. Mensah', 22, 5, { hair: 'bald' }), person('V. Rao', 44, 1, { beard: 'moustache' })];
 const KEEPER_P = person('H. Ashby', 1, 2, { beard: 'stubble', hairColor: 'brown' });
+/* Thudinest Coimbatore (the picked XI) bat first; the World XI chase. When the World XI bat, the five lower-order
+   players of the picked XI bowl and the sixth keeps wicket. */
+const WORLD_XI = [OUTFIELD[0], OUTFIELD[1], OUTFIELD[2], OUTFIELD[3], OUTFIELD[4], KEEPER_P, ATTACK[4], ATTACK[3], ATTACK[1], ATTACK[2], ATTACK[0]];
+const TEAMS = { home: { name: 'Thudinest Coimbatore', front: 'THUDINEST' }, away: { name: 'World XI', front: 'WORLD XI' } };
+const HOME_BOWL = [['fast', 'Right-arm fast'], ['fastmed', 'Right-arm fast-medium'], ['off', 'Right-arm off-spin'], ['leg', 'Right-arm leg-spin'], ['fast', 'Right-arm fast']];
 
 function newPose(withBat) {
   const p = { pel: new V3(), yaw: HALF_PI, tilt: 0, lean: 0, side: 0, twist: 0, fL: new V3(), fR: new V3(), yL: HALF_PI, yR: HALF_PI };
@@ -1434,7 +1555,18 @@ function makeBatter() {
 }
 const rigA = makeBatter(), rigB = makeBatter();
 
-/* a T20 field: slip (short leg to spin), four in the ring, four out on the rope to turn the gaps into ones and twos */
+/* a T20 field: slip (short leg to spin), four in the ring, four out on the rope to turn the gaps into ones and twos;
+   a Test field: a slip cordon and gully waiting for the edge (short leg and silly point to the spinners) */
+const FIELD_SETS = {
+  t20: {
+    pace: [['slip', 160, 15.5, 1], ['third man', 132, 50], ['point', 96, 24], ['deep cover', 56, 62], ['mid-off', 16, 27], ['mid-on', -16, 27], ['deep midwicket', -56, 62], ['square leg', -98, 23], ['fine leg', -145, 50]],
+    spin: [['short leg', -38, 3.1, 1], ['third man', 128, 48], ['point', 100, 20], ['deep cover', 60, 58], ['mid-off', 18, 24], ['mid-on', -18, 24], ['deep midwicket', -60, 58], ['square leg', -95, 21], ['fine leg', -140, 48]],
+  },
+  test: {
+    pace: [['first slip', 161, 15.6, 1], ['second slip', 154, 15.9, 1], ['gully', 130, 17, 1], ['point', 96, 24], ['cover', 54, 27], ['mid-off', 16, 28], ['mid-on', -16, 28], ['square leg', -98, 24], ['fine leg', -148, 54]],
+    spin: [['short leg', -38, 3.1, 1], ['silly point', 58, 3.4, 1], ['point', 100, 21], ['cover', 58, 23], ['mid-off', 18, 25], ['mid-on', -18, 25], ['midwicket', -60, 23], ['deep square leg', -95, 56], ['long-on', -12, 70]],
+  },
+};
 const FIELD_POS = [
   { name: 'slip', spinName: 'short leg', pace: [160, 15.5], spin: [-38, 3.1], close: true },
   { name: 'third man', pace: [132, 50], spin: [128, 48] },
@@ -1466,13 +1598,14 @@ const bowler = addFielder(makeRig(fieldKit(ATTACK[0], { head: 'bare', cast: true
   { name: 'bowler', isBowler: true, speed: 6.2, reaction: 0.45, reach: 0.9, dive: 1.2, hands: 0.85, relT: 9 });
 const slots = fielders.filter((f) => !f.isKeeper && !f.isBowler);
 for (const f of fielders) { f.handMarker = new THREE.Object3D(); f.rig.arms[f.isKeeper ? 0 : 1].wrist.add(f.handMarker); }
-drawDecal(keeper.rig, KEEPER_P.short, KEEPER_P.num, '#f1ede1');
+drawDecal(keeper.rig, KEEPER_P.short, KEEPER_P.num, TEAM_KITS.away.t20.text);
 
 const umpire = makeRig({ shirt: 0x2b8f8a, pants: 0x1d2128, skin: SKINS[2], head: 'hat', trim: 0x1d2128, cast: true, longSleeves: true, hairColor: 'grey', beard: 'moustache' });
 umpire.root.position.set(-0.55, 0, -PITCH - 2.3); scene.add(umpire.root);
 umpire.signal = null; umpire.sigT = 0;
 const legUmp = makeRig({ shirt: 0x2b8f8a, pants: 0x1d2128, skin: SKINS[5], head: 'hat', trim: 0x1d2128, longSleeves: true, hairColor: 'grey' });
 legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.add(legUmp.root);
+await Loader.step(0.37, 'Setting the field', 0.38);
 
 /* ------------------------------------------------------------------ wickets */
 function makeWicket(z) {
@@ -1544,9 +1677,11 @@ function updateWicket(w, dt, clock) {
 const BALL_VIS = BALL_R * 1.5;
 const ball = new THREE.Group();
 {
-  const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS, 22, 16), std(0xffffff, 0.35, { emissive: 0x6a6a66 }));
+  ball.mat = std(0xffffff, 0.35, { emissive: 0x6a6a66 });
+  ball.seamMat = std(0x9a9a92, 0.6);
+  const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS, 22, 16), ball.mat);
   s.castShadow = true; ball.add(s);
-  ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.006, 0.0035, 4, 28), std(0x9a9a92, 0.6)));
+  ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.006, 0.0035, 4, 28), ball.seamMat));
   scene.add(ball);
 }
 const ballShadow = new THREE.Mesh(GEO.blob, blobMat); ballShadow.rotation.x = -HALF_PI; scene.add(ballShadow);
@@ -1563,14 +1698,16 @@ const trail = (() => {
   for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
   geo.setIndex(idx);
   const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Vector3(0.45, 0.84, 1.0) } },
     vertexShader: 'attribute float alpha; varying float vA; void main() { vA = alpha; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-    fragmentShader: 'varying float vA; void main() { gl_FragColor = vec4(0.45, 0.84, 1.0, vA); }',
+    fragmentShader: 'uniform vec3 uColor; varying float vA; void main() { gl_FragColor = vec4(uColor, vA); }',
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
   }));
   mesh.frustumCulled = false; mesh.renderOrder = 3; mesh.visible = false; scene.add(mesh);
   const side = new V3(), tan = new V3(), view = new V3();
   let n = 0;
   return {
+    color: mesh.material.uniforms.uColor.value,
     push(p, t) {
       if (n && pts[0].distanceToSquared(p) > 9) n = 0; // the ball jumped (new delivery), so start afresh
       for (let i = Math.min(n, N - 1); i > 0; i--) { pts[i].copy(pts[i - 1]); ts[i] = ts[i - 1]; }
@@ -2036,15 +2173,16 @@ function makeDelivery(bw) {
   const d = { pace, bw };
   if (pace) {
     const fm = k === 'fastmed';
-    d.length = weighted([['yorker', fm ? 8 : 13], ['full', fm ? 30 : 22], ['good', fm ? 38 : 33], ['short', fm ? 17 : 20], ['bouncer', fm ? 7 : 12]]);
+    d.length = isTest() ? weighted([['yorker', 4], ['full', 30], ['good', 46], ['short', 13], ['bouncer', 7]])
+      : weighted([['yorker', fm ? 8 : 13], ['full', fm ? 30 : 22], ['good', fm ? 38 : 33], ['short', fm ? 17 : 20], ['bouncer', fm ? 7 : 12]]);
     const R = { yorker: [-1.05, -1.7], full: [-2.6, -4.2], good: [-5.0, -7.0], short: [-8.0, -9.6], bouncer: [-10.2, -11.6] }[d.length];
     d.landZ = rand(R[0], R[1]);
     d.kmh = (fm ? rand(124, 137) : rand(135, 149)) + (d.length === 'bouncer' ? 3 : d.length === 'yorker' ? 1.5 : 0);
-    d.landX = d.length === 'yorker' ? rand(-0.08, 0.12) : rand(-0.2, 0.42);
-    const s = Math.random(), mag = fm ? rand(1.0, 2.6) : rand(0.6, 2.0);
+    d.landX = d.length === 'yorker' ? rand(-0.08, 0.12) : isTest() ? rand(-0.05, 0.45) : rand(-0.2, 0.42);
+    const s = Math.random(), mag = (fm ? rand(1.0, 2.6) : rand(0.6, 2.0)) * (isTest() ? 1.3 : 1);
     d.swingAx = s < (fm ? 0.42 : 0.33) ? mag : s < (fm ? 0.8 : 0.62) ? -mag : 0;
     d.variation = d.swingAx > 0 ? 'Outswinger' : d.swingAx < 0 ? 'Inswinger' : 'Seam up';
-    if (Math.random() < 0.1 && d.length !== 'bouncer') { d.kmh *= 0.8; d.variation = 'Slower ball'; }
+    if (Math.random() < (isTest() ? 0.03 : 0.1) && d.length !== 'bouncer') { d.kmh *= 0.8; d.variation = 'Slower ball'; }
     d.turn = 0; d.seam = rand(-0.5, 0.5); d.e = 0.6; d.fr = 0.9;
     d.runT = fm ? 2.2 : 2.3; d.runL = fm ? 6.0 : 6.5;
   } else {
@@ -2094,7 +2232,7 @@ const dirVel = (speed, thDeg, beDeg) => new V3(Math.sin(thDeg * D2R) * Math.cos(
 
 /* ------------------------------------------------------------------- game */
 const game = {
-  state: 'menu', t: 0, clock: 0, overs: 5, total: 30, diff: 'normal',
+  state: 'menu', t: 0, clock: 0, overs: 5, total: 30, diff: 'normal', format: 't20', innings: 1, batTeam: 'home', target: 0, first: null,
   runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [],
   bats: [], bowl: [], nextIn: 2, bowler: 0, prevBowler: -1, overRuns: 0, lastOut: false, lastOverMark: 0,
   rigS: rigA, rigN: rigB,
@@ -2104,25 +2242,50 @@ const game = {
 };
 const cam = { view: 'batsman', mode: 'menu', pos: new V3(40, 18, 30), look: new V3(0, 1, -10), fov: 46, shake: 0, chaseDir: new V3(0, 0, -1), modeT: 0 };
 const tmp = new V3();
-const bestKey = (ov) => 'floodlit-over-v2-best-' + ov;
-for (const k of [2, 5, 10, 20]) { const b = parseInt(storage.get(bestKey(k)), 10); if (!isNaN(b)) game.best[k] = b; }
+/* T20: a fixed number of overs; Test: a session, a day, or bat until all out (0 overs = no limit) */
+const FORMATS = { t20: { overs: [2, 5, 10, 20], def: 5 }, test: { overs: [15, 30, 90, 0], def: 30 } };
+const isTest = () => game.format === 'test';
+const bestKey = (fmt, ov) => (fmt === 't20' ? 'floodlit-over-v2-best-' : 'floodlit-over-test-best-') + ov;
+const bestId = () => `${game.format}:${game.overs}`;
+for (const fmt of ['t20', 'test']) for (const k of FORMATS[fmt].overs) { const b = parseInt(storage.get(bestKey(fmt, k)), 10); if (!isNaN(b)) game.best[`${fmt}:${k}`] = b; }
+const oversName = (fmt = game.format, ov = game.overs) => fmt === 't20' ? `${ov} overs` : ov ? `a ${ov}-over Test session` : 'a Test innings';
 
 function setBatter(b, idx) {
   b.batIdx = idx;
   const p = game.bats[idx];
   b.rig.mats.skin.color.setHex(p.skin);
-  drawDecal(b.rig, p.short, p.num, '#ffc53d');
+  drawDecal(b.rig, p.short, p.num, teamKit(game.batTeam).text);
 }
-const freshBats = () => xiList().map((p, i) => Object.assign({}, p, { runs: 0, balls: 0, fours: 0, sixes: 0, out: false, how: '', batted: i < 2 }));
+const freshBats = () => (game.batTeam === 'away' ? WORLD_XI : xiList()).map((p, i) => Object.assign({}, p, { runs: 0, balls: 0, fours: 0, sixes: 0, out: false, how: '', batted: i < 2, conf: i < 2 ? 40 : 30 }));
 function newInnings() {
   game.bats = freshBats();
-  game.bowl = ATTACK.map((p) => Object.assign({}, p, { balls: 0, runs: 0, wkts: 0 }));
-  Object.assign(game, { runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [], nextIn: 2, overRuns: 0, prevBowler: -1, bowler: 0, lastOut: false, lastOverMark: 0 });
+  game.bowl = (game.batTeam === 'away' ? homeAttack() : ATTACK).map((p) => Object.assign({}, p, { balls: 0, runs: 0, wkts: 0 }));
+  Object.assign(game, { runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [], nextIn: 2, overRuns: 0, prevBowler: -1, bowler: 0, lastOut: false, lastOverMark: 0, spells: null, overBowlers: [] });
   game.rigS = rigA; game.rigN = rigB;
   setBatter(rigA, 0); setBatter(rigB, 1);
   newOver();
 }
 function newOver() {
+  const recent = (game.overBowlers || []).slice(-2);
+  if (isTest()) {
+    const T = game.spells || (game.spells = { ends: [null, null], left: [0, 0] });
+    const end = Math.floor(game.balls / 6) % 2;
+    if (T.ends[end] === null || T.left[end] <= 0) {
+      const other = T.ends[1 - end], prev = T.ends[end];
+      let pool = game.bowl.map((_, i) => i).filter((i) => i !== other && i !== prev);
+      const quicks = pool.filter((i) => game.bowl[i].kind === 'fast' || game.bowl[i].kind === 'fastmed');
+      if (game.balls < 60 && quicks.length) pool = quicks; // the new ball goes to the seamers
+      T.ends[end] = pool[(Math.random() * pool.length) | 0];
+      T.left[end] = 4 + ((Math.random() * 4) | 0);
+    }
+    T.left[end]--;
+    game.bowler = T.ends[end];
+    game.prevBowler = game.bowler;
+    game.overRuns = 0;
+    game.newSpell = !recent.includes(game.bowler); (game.overBowlers = game.overBowlers || []).push(game.bowler);
+    assignFielders();
+    return;
+  }
   const maxOv = Math.max(1, Math.ceil(game.overs / 5));
   const all = game.bowl.map((_, i) => i).filter((i) => i !== game.prevBowler);
   let pool = all.filter((i) => Math.floor(game.bowl[i].balls / 6) < maxOv);
@@ -2130,28 +2293,42 @@ function newOver() {
   game.bowler = pool[(Math.random() * pool.length) | 0];
   game.prevBowler = game.bowler;
   game.overRuns = 0;
+  game.newSpell = !recent.includes(game.bowler); (game.overBowlers = game.overBowlers || []).push(game.bowler);
   assignFielders();
 }
+/* the fielding side: keeper plus everyone but this over's bowler, spread over the nine fielding positions */
+function fieldingSide() {
+  if (game.batTeam === 'away') { const xi = xiList(); return { keeper: xi[5], others: xi.filter((_, i) => i !== 5) }; }
+  return { keeper: KEEPER_P, others: OUTFIELD.concat(game.bowl) };
+}
 function assignFielders() {
-  const bw = game.bowl[game.bowler];
+  const bw = game.bowl[game.bowler], text = teamKit(fieldTeam()).text, side = fieldingSide();
   bowler.person = bw;
   bowler.rig.mats.skin.color.setHex(bw.skin);
-  drawDecal(bowler.rig, bw.short, bw.num, '#f1ede1');
-  const pool = OUTFIELD.concat(game.bowl.filter((_, i) => i !== game.bowler));
+  drawDecal(bowler.rig, bw.short, bw.num, text);
+  keeper.person = side.keeper; keeper.rig.mats.skin.color.setHex(side.keeper.skin);
+  drawDecal(keeper.rig, side.keeper.short, side.keeper.num, text);
+  const pool = side.others.filter((p) => p.name !== bw.name);
   slots.forEach((f, i) => {
     const p = pool[i % pool.length];
     f.person = p; f.rig.mats.skin.color.setHex(p.skin);
-    drawDecal(f.rig, p.short, p.num, '#f1ede1');
+    drawDecal(f.rig, p.short, p.num, text);
   });
 }
+const CLOSE_F = { speed: 4.5, reaction: 0.12, reach: 0.9, dive: 1.4, hands: 0.86 }, RING_F = { speed: 7.2, reaction: 0.32, reach: 1.0, dive: 1.5, hands: 0.9 };
 function setFieldFor(d) {
+  const set = FIELD_SETS[game.format][d.pace ? 'pace' : 'spin'];
+  let si = 0;
   for (const f of fielders) {
     if (f.isBowler) continue;
+    if (!f.isKeeper) {
+      const [name, a, r, close] = set[si++];
+      f.name = name; f.close = !!close; Object.assign(f, close ? CLOSE_F : RING_F);
+      f.home.copy(polar(a, r));
+      continue;
+    }
     // standing up to spin, the keeper crouches just outside off stump, clear of the batsman camera's view of the ball
-    if (f.isKeeper) { f.home.set(d.pace ? 0.3 : 0.62, 0, d.pace ? d.keeperZ : 1.05); continue; }
-    const [a, r] = d.pace ? f.spot.pace : f.spot.spin;
-    f.name = d.pace ? f.spot.name : f.spot.spinName || f.spot.name;
-    f.home.copy(polar(a, r));
+    f.home.set(d.pace ? 0.3 : 0.62, 0, d.pace ? d.keeperZ : 1.05);
   }
 }
 const swapEnds = () => { const t = game.rigS; game.rigS = game.rigN; game.rigN = t; };
@@ -2161,7 +2338,7 @@ function placeNonStriker(b) { b.mode = 'ns'; b.run = null; b.walkDelay = 0; b.po
 function startInnings(resume) {
   Sound.init();
   if (!resume) newInnings();
-  game.total = game.overs * 6;
+  game.total = game.overs ? game.overs * 6 : Infinity;
   game.active = true; game.resume = false;
   $('startPanel').hidden = true; $('endPanel').hidden = true;
   canvas.focus({ preventScroll: true });
@@ -2170,9 +2347,14 @@ function startInnings(resume) {
   enterBetween(true);
   for (const f of fielders) if (!f.isBowler) f.pos.copy(f.home);
   Sound.applause(0.7, 3);
-  const o1 = game.bats[game.rigS.batIdx].name, o2 = game.bats[game.rigN.batIdx].name;
-  showCommentary('', 'Thudinest Coimbatore', `${game.overs} overs`, `${o1} and ${o2} walk out under the lights. ${game.bowl[game.bowler].name} has the ball.`, resume ? 'Welcome back' : 'Good evening, Coimbatore', '');
-  if (Caller.failed) Voice.say(resume ? `Welcome back. Thudinest Coimbatore are ${game.runs} for ${game.wkts}, and the crowd is still very much here.` : fill(pickOne(LINES.welcome), { o1, o2, bw: game.bowl[game.bowler].short }), true);
+  const o1 = game.bats[game.rigS.batIdx].name, o2 = game.bats[game.rigN.batIdx].name, bw0 = game.bowl[game.bowler];
+  const chase = game.innings === 2;
+  showCommentary('', batTeamName(), isTest() ? (game.overs ? `Test match · ${game.overs} overs` : 'Test match') : `${game.overs} overs`,
+    chase ? `${o1} and ${o2} walk out for the World XI, needing ${game.target} to win. ${bw0.name} opens the bowling for Thudinest Coimbatore.`
+      : isTest() ? `${o1} and ${o2} walk out in the sunshine, in whites, to face the red ball. ${bw0.name} has the new ball.` : `${o1} and ${o2} walk out under the lights. ${bw0.name} has the ball.`,
+    resume ? 'Welcome back' : chase ? `Target ${game.target}` : isTest() ? 'Good morning, Coimbatore' : 'Good evening, Coimbatore', chase ? 'big' : '');
+  if (Caller.failed) Voice.say(resume ? `Welcome back. ${batTeamName()} are ${game.runs} for ${game.wkts}.` : chase ? `The World Eleven need ${game.target} to win.` : fill(pickOne(LINES.welcome), { o1, o2, bw: bw0.short }), true);
+  else if (chase && !resume) Comm.chase();
   else Comm.welcome(game.bats[game.rigS.batIdx], resume);
 }
 
@@ -2196,12 +2378,13 @@ function enterBetween(first) {
     const nb = game.bowl[game.bowler];
     const kind = overRuns === 0 ? 'maiden' : overRuns >= 15 ? 'pricey' : 'overEnd';
     const ol = fill(pickOne(LINES[kind]), { n: overRuns, bw: pb.short });
-    showCommentary('', `End of over ${game.balls / 6}`, `${overRuns} run${overRuns === 1 ? '' : 's'}`, `${kind === 'overEnd' ? '' : `${ol} `}Thudinest Coimbatore ${game.runs}/${game.wkts}. ${nb.name} comes on to bowl.`,
+    showCommentary('', `End of over ${game.balls / 6}`, `${overRuns} run${overRuns === 1 ? '' : 's'}`, `${kind === 'overEnd' ? '' : `${ol} `}${batTeamName()} ${game.runs}/${game.wkts}${game.innings === 2 ? `, need ${Math.max(0, game.target - game.runs)}` : ''}. ${nb.name} comes on to bowl.`,
       kind === 'maiden' ? 'Maiden over' : kind === 'pricey' ? 'Expensive over' : '', kind === 'maiden' ? 'good' : kind === 'pricey' ? 'big' : '');
-    if (Caller.failed) Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} Thudinest Coimbatore are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
-    else Comm.overEnd(kind, nb, nb !== pb);
+    if (Caller.failed) Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} ${batTeamName()} are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
+    else Comm.overEnd(kind, nb, game.newSpell);
   }
   game.lastOut = false;
+  if (first) game.saidSlips = false;
   game.del = makeDelivery(game.bowl[game.bowler]); setFieldFor(game.del);
   game.swing = null; game.flight = null; game.play = null; game.outcome = null; game.markerOn = false; game.deadFlight = false; game.runupSaid = false;
   game.intent = { side: 0, foot: 'auto', loft: false, defend: game.intent.defend };
@@ -2254,6 +2437,9 @@ function trySwing(block, fromTouch) {
   const cross = crossInfo(F.sim, zc);
   const W = Object.assign({}, DIFF[game.diff]);
   if (block) { W.perfect *= 1.6; W.good *= 1.6; W.edge *= 1.6; }
+  // a confident batter picks the ball up earlier: the timing windows widen by up to 15%
+  const cf = confOf(game.bats[game.rigS.batIdx]) / 100;
+  W.perfect *= 0.9 + 0.25 * cf; W.good *= 0.9 + 0.25 * cf; W.edge *= 0.95 + 0.15 * cf;
   const loft = !block && (game.intent.loft || game.shift);
   const shuffle = side === 1 ? 0.18 : side === -1 ? -0.14 : 0;
   const Xs = BAT_X + shuffle, line = Xs + 0.36;
@@ -2293,8 +2479,8 @@ function trySwing(block, fromTouch) {
   if (dx > hi - 0.08) edge = 'outside';
   else if (dx < lo + 0.07) edge = 'inside';
   else if (cross.y > maxY) edge = 'top';
-  else if (!block && grade === 'late' && dx > -0.05 && Math.random() < 0.3) edge = 'outside';
-  else if (!block && grade === 'early' && Math.random() < 0.22) edge = 'leading';
+  else if (!block && grade === 'late' && dx > -0.05 && Math.random() < 0.3 * (1.25 - 0.5 * cf)) edge = 'outside';
+  else if (!block && grade === 'early' && Math.random() < 0.22 * (1.25 - 0.5 * cf)) edge = 'leading';
   sw.plan = { hit: true, grade, edge };
 }
 function resolveSwing() {
@@ -2330,7 +2516,9 @@ function doHit(sw, plan) {
     if (plan.grade === 'early') be += 10;
     if (!sw.loft && sw.cross.y > 1.15) be += 7;
     const tier = { perfect: [19.5, 0.45], good: [16, 0.41], early: [10.5, 0.32], late: [10.5, 0.32] }[plan.grade];
-    vOut = batCollision(vIn, th, be, tier[0] * rand(0.96, 1.04), tier[1]);
+    // confidence puts more into the stroke, most of all into the lofted ones: they carry further and clear the rope
+    const cf = confOf(game.bats[game.rigS.batIdx]) / 100, power = sw.loft ? 0.9 + 0.2 * cf : 0.97 + 0.06 * cf;
+    vOut = batCollision(vIn, th, be, tier[0] * power * rand(0.96, 1.04), tier[1]);
     // strokes along the ground are hit down into the turf and skim away; only an early, mistimed one chips up
     const hs = Math.hypot(vOut.x, vOut.z), elev = Math.atan2(vOut.y, hs) / D2R;
     const maxE = sw.loft ? 60 : plan.grade === 'early' ? 14 : plan.grade === 'late' ? 2 : -2;
@@ -2620,7 +2808,7 @@ function deliveryNote(d) {
   const v = d.variation && d.variation !== 'Seam up' ? `, ${d.variation.toLowerCase()}` : '';
   return `${Math.round(d.kmh)} km/h · ${len} ${line}${v}`;
 }
-const nameOf = (f) => (f.isKeeper ? KEEPER_P.short : f.person ? f.person.short : f.name);
+const nameOf = (f) => (f.person ? f.person.short : f.name);
 const posOf = (f) => (f.isKeeper ? 'the keeper' : f.isBowler ? 'the bowler' : f.name);
 const atOf = (f) => (f.isKeeper ? 'behind the stumps' : f.isBowler ? 'in the follow-through' : `at ${f.name}`);
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
@@ -2656,6 +2844,7 @@ function commentFor(o, bat, bw) {
   const drop = P && P.events.find((e) => e.kind === 'drop');
   if (drop && key === 'saved') key = 'fielded';
   let [call, text] = deal(key);
+  for (let k = 0; k < 4 && isTest() && /night|lights/i.test(call + text); k++) [call, text] = deal(key);
   call = fill(call, v); text = fill(text, v);
   if (call && !tone) tone = 'good';
   if (drop) {
@@ -2692,7 +2881,7 @@ function showCommentary(tag, head, note, text, call = '', tone = '') {
    ball live, and an analyst who adds a line after it. The clips ship as three small MP3 banks that are decoded on
    demand and played through the game's audio graph, so the crowd ducks under them. If the banks cannot load, the
    browser's speech engine reads the written commentary instead. */
-const VOICE_INDEX = /*VOICE_INDEX*/{"files":["lead.mp3","colour.mp3","names.mp3"],"clips":{"runup_mason_1":[0,0,7797,1.441],"runup_mason_2":[0,7797,8637,1.619],"runup_mason_3":[0,16434,9117,1.723],"runup_ortega_1":[0,25551,8877,1.667],"runup_ortega_2":[0,34428,8757,1.65],"runup_ortega_3":[0,43185,9837,1.861],"runup_boateng_1":[0,53022,8277,1.542],"runup_boateng_2":[0,61299,9477,1.785],"runup_boateng_3":[0,70776,9597,1.821],"runup_iqbal_1":[0,80373,8157,1.518],"runup_iqbal_2":[0,88530,9117,1.717],"runup_iqbal_3":[0,97647,9117,1.724],"runup_thorne_1":[0,106764,7077,1.319],"runup_thorne_2":[0,113841,8397,1.572],"runup_thorne_3":[0,122238,8517,1.602],"call_drive_1":[0,130755,4557,0.797],"call_drive_2":[0,135312,7437,1.375],"call_drive_3":[0,142749,6357,1.171],"call_cover_1":[0,149106,6117,1.107],"call_cover_2":[0,155223,6957,1.273],"call_straight_1":[0,162180,8877,1.658],"call_straight_2":[0,171057,6717,1.248],"call_ondrive_1":[0,177774,9837,1.852],"call_ondrive_2":[0,187611,5997,1.09],"call_cut_1":[0,193608,5277,0.953],"call_cut_2":[0,198885,5397,0.965],"call_cut_3":[0,204282,8757,1.637],"call_pull_1":[0,213039,3717,0.625],"call_pull_2":[0,216756,7797,1.453],"call_pull_3":[0,224553,9477,1.781],"call_punch_1":[0,234030,5877,1.058],"call_punch_2":[0,239907,9477,1.778],"call_loft_1":[0,249384,5997,1.099],"call_loft_2":[0,255381,6717,1.231],"call_loft_3":[0,262098,4437,0.789],"call_loft_4":[0,266535,8997,1.694],"call_loft_5":[0,275532,8397,1.567],"call_air_1":[0,283929,4677,0.817],"call_air_2":[0,288606,5637,1.03],"call_air_3":[0,294243,5637,1.016],"call_edge_1":[0,299880,4197,0.736],"call_edge_2":[0,304077,5757,1.038],"call_edge_3":[0,309834,4797,0.849],"call_inedge_1":[0,314631,6597,1.223],"call_topedge_1":[0,321228,9717,1.841],"call_block_1":[0,330945,5637,1.017],"call_block_2":[0,336582,8397,1.563],"call_block_3":[0,344979,4437,0.79],"call_block_4":[0,349416,10797,2.049],"call_beaten_1":[0,360213,4317,0.764],"call_beaten_2":[0,364530,6117,1.119],"call_beaten_3":[0,370647,9477,1.792],"call_beaten_4":[0,380124,6477,1.191],"call_beatenin_1":[0,386601,8517,1.596],"call_beatenin_2":[0,395118,8757,1.64],"call_miss_1":[0,403875,7917,1.487],"call_miss_2":[0,411792,4797,0.863],"call_miss_3":[0,416589,10197,1.932],"call_left_1":[0,426786,6957,1.294],"call_left_2":[0,433743,7917,1.487],"call_left_3":[0,441660,6117,1.121],"call_duck_1":[0,447777,9957,1.885],"call_duck_2":[0,457734,11037,2.092],"fin_six_1":[0,468771,11757,2.242],"fin_six_2":[0,480528,9117,1.711],"fin_six_3":[0,489645,10197,1.937],"fin_six_4":[0,499842,5397,0.965],"fin_six_5":[0,505239,9837,1.861],"fin_four_1":[0,515076,6837,1.263],"fin_four_2":[0,521913,5637,1.014],"fin_four_3":[0,527550,9237,1.742],"fin_four_4":[0,536787,12597,2.422],"fin_four_5":[0,549384,11517,2.201],"fin_caught_1":[0,560901,5877,1.062],"fin_caught_2":[0,566778,4077,0.715],"fin_caught_3":[0,570855,6237,1.146],"fin_caught_4":[0,577092,10197,1.924],"fin_caught_5":[0,587289,5637,1.026],"fin_behind_1":[0,592926,6717,1.227],"fin_behind_2":[0,599643,11877,2.264],"fin_cab_1":[0,611520,6477,1.188],"fin_bowled_1":[0,617997,4557,0.808],"fin_bowled_2":[0,622554,5997,1.082],"fin_bowled_3":[0,628551,4077,0.716],"fin_bowled_4":[0,632628,8517,1.589],"fin_bowled_5":[0,641145,9597,1.81],"fin_playedon_1":[0,650742,5637,1.022],"fin_playedon_2":[0,656379,11517,2.193],"fin_dropped_1":[0,667896,5877,1.064],"fin_dropped_2":[0,673773,9117,1.716],"fin_dropped_3":[0,682890,5037,0.904],"fin_stop_1":[0,687927,5877,1.057],"fin_stop_2":[0,693804,8397,1.577],"fin_stop_3":[0,702201,9357,1.759],"fin_fielded_1":[0,711558,6837,1.252],"fin_fielded_2":[0,718395,9477,1.783],"fin_fielded_3":[0,727872,6237,1.139],"run_1_1":[0,734109,8637,1.616],"run_1_2":[0,742746,5877,1.079],"run_1_3":[0,748623,6237,1.146],"run_2_1":[0,754860,8397,1.566],"run_2_2":[0,763257,5517,1.006],"run_3_1":[0,768774,6717,1.241],"run_3_2":[0,775491,10317,1.961],"col_pressure_1":[1,0,10557,2.009],"col_pressure_2":[1,10557,7077,1.318],"col_btb_1":[1,17634,8037,1.491],"col_btb_2":[1,25671,5997,1.09],"col_streak3_1":[1,31668,8757,1.65],"col_streak4_1":[1,40425,11277,2.143],"col_streak5_1":[1,51702,14997,2.893],"col_pace_1":[1,66699,5877,1.073],"col_pace_2":[1,72576,7917,1.475],"col_maiden_1":[1,80493,12957,2.479],"col_expensive_1":[1,93450,10917,2.071],"col_overend_1":[1,104367,7317,1.352],"col_overend_2":[1,111684,6237,1.128],"col_golden_1":[1,117921,12717,2.435],"col_duck_1":[1,130638,6237,1.138],"col_beauty_1":[1,136875,12117,2.319],"col_timing_1":[1,148992,15117,2.928],"col_timing_2":[1,164109,7317,1.359],"col_power_1":[1,171426,5277,0.943],"col_power_2":[1,176703,10557,2.005],"col_lucky_1":[1,187260,8637,1.611],"col_lucky_2":[1,195897,6837,1.256],"col_welcome1_1":[1,202734,24357,4.758],"col_welcome2_1":[1,227091,18597,3.619],"col_welcomeback_1":[1,245688,11157,2.127],"col_end_1":[1,256845,21477,4.196],"col_allout_1":[1,278322,14757,2.85],"dist_60":[1,293079,8877,1.677],"dist_65":[1,301956,10197,1.932],"dist_70":[1,312153,9357,1.775],"dist_75":[1,321510,10797,2.047],"dist_80":[1,332307,8997,1.7],"dist_85":[1,341304,10197,1.921],"dist_90":[1,351501,9357,1.76],"dist_95":[1,360858,10197,1.931],"dist_100":[1,371055,10197,1.933],"dist_105":[1,381252,13197,2.527],"dist_110":[1,394449,12837,2.457],"bowl_attack_mason":[1,407286,11037,2.11],"bowl_wicket_mason":[1,418323,8757,1.644],"bowl_attack_ortega":[1,427080,11637,2.229],"bowl_wicket_ortega":[1,438717,9717,1.832],"bowl_attack_boateng":[1,448434,11157,2.114],"bowl_wicket_boateng":[1,459591,10077,1.907],"bowl_attack_iqbal":[1,469668,10677,2.034],"bowl_wicket_iqbal":[1,480345,9117,1.706],"bowl_attack_thorne":[1,489462,9957,1.879],"bowl_wicket_thorne":[1,499419,8997,1.683],"bat_six_kavin":[2,0,7437,1.382],"bat_four_kavin":[2,7437,8517,1.592],"bat_out_kavin":[2,15954,8037,1.505],"bat_new_kavin":[2,23991,10077,1.911],"bat_fifty_kavin":[2,34068,11757,2.253],"bat_hundred_kavin":[2,45825,11997,2.288],"bat_strike_kavin":[2,57822,11757,2.234],"bat_six_harsha":[2,69579,8037,1.503],"bat_four_harsha":[2,77616,8997,1.698],"bat_out_harsha":[2,86613,8277,1.553],"bat_new_harsha":[2,94890,10317,1.956],"bat_fifty_harsha":[2,105207,11997,2.294],"bat_hundred_harsha":[2,117204,12477,2.378],"bat_strike_harsha":[2,129681,11757,2.249],"bat_six_sabari":[2,141438,7557,1.401],"bat_four_sabari":[2,148995,8877,1.678],"bat_out_sabari":[2,157872,8157,1.517],"bat_new_sabari":[2,166029,10317,1.954],"bat_fifty_sabari":[2,176346,11757,2.239],"bat_hundred_sabari":[2,188103,12237,2.332],"bat_strike_sabari":[2,200340,11997,2.285],"bat_six_thananjay":[2,212337,9237,1.734],"bat_four_thananjay":[2,221574,10197,1.934],"bat_out_thananjay":[2,231771,10077,1.912],"bat_new_thananjay":[2,241848,11157,2.129],"bat_fifty_thananjay":[2,253005,13077,2.496],"bat_hundred_thananjay":[2,266082,13437,2.578],"bat_strike_thananjay":[2,279519,13077,2.505],"bat_six_vikrant":[2,292596,9837,1.865],"bat_four_vikrant":[2,302433,11157,2.132],"bat_out_vikrant":[2,313590,11157,2.132],"bat_new_vikrant":[2,324747,12717,2.429],"bat_fifty_vikrant":[2,337464,14037,2.703],"bat_hundred_vikrant":[2,351501,14277,2.758],"bat_strike_vikrant":[2,365778,13917,2.674],"bat_six_vasanth":[2,379695,8037,1.502],"bat_four_vasanth":[2,387732,9117,1.713],"bat_out_vasanth":[2,396849,9237,1.731],"bat_new_vasanth":[2,406086,10797,2.063],"bat_fifty_vasanth":[2,416883,12477,2.379],"bat_hundred_vasanth":[2,429360,12717,2.43],"bat_strike_vasanth":[2,442077,11997,2.295],"bat_six_pooja":[2,454074,7677,1.434],"bat_four_pooja":[2,461751,8997,1.697],"bat_out_pooja":[2,470748,8397,1.578],"bat_new_pooja":[2,479145,10317,1.953],"bat_fifty_pooja":[2,489462,11997,2.288],"bat_hundred_pooja":[2,501459,12477,2.387],"bat_strike_pooja":[2,513936,11397,2.178],"bat_six_jay":[2,525333,7917,1.479],"bat_four_jay":[2,533250,8517,1.599],"bat_out_jay":[2,541767,7557,1.404],"bat_new_jay":[2,549324,9717,1.844],"bat_fifty_jay":[2,559041,11757,2.235],"bat_hundred_jay":[2,570798,11997,2.299],"bat_strike_jay":[2,582795,10437,1.972],"bat_six_venkatesh":[2,593232,9237,1.745],"bat_four_venkatesh":[2,602469,10677,2.018],"bat_out_venkatesh":[2,613146,10677,2.026],"bat_new_venkatesh":[2,623823,12237,2.33],"bat_fifty_venkatesh":[2,636060,12957,2.496],"bat_hundred_venkatesh":[2,649017,13677,2.633],"bat_strike_venkatesh":[2,662694,13317,2.558],"bat_six_govind":[2,676011,8517,1.601],"bat_four_govind":[2,684528,9237,1.743],"bat_out_govind":[2,693765,9477,1.792],"bat_new_govind":[2,703242,11157,2.116],"bat_fifty_govind":[2,714399,12717,2.44],"bat_hundred_govind":[2,727116,12837,2.462],"bat_strike_govind":[2,739953,12357,2.364],"bat_six_sundarraj":[2,752310,9117,1.713],"bat_four_sundarraj":[2,761427,9957,1.881],"bat_out_sundarraj":[2,771384,9717,1.844],"bat_new_sundarraj":[2,781101,11517,2.208],"bat_fifty_sundarraj":[2,792618,13317,2.546],"bat_hundred_sundarraj":[2,805935,13557,2.608],"bat_strike_sundarraj":[2,819492,12477,2.39],"bat_six_durai":[2,831969,8157,1.532],"bat_four_durai":[2,840126,8997,1.69],"bat_out_durai":[2,849123,8637,1.615],"bat_new_durai":[2,857760,9837,1.863],"bat_fifty_durai":[2,867597,11997,2.287],"bat_hundred_durai":[2,879594,12237,2.334],"bat_strike_durai":[2,891831,11277,2.158],"bat_six_kumma":[2,903108,6837,1.259],"bat_four_kumma":[2,909945,8277,1.555],"bat_out_kumma":[2,918222,7557,1.4],"bat_new_kumma":[2,925779,9957,1.873],"bat_fifty_kumma":[2,935736,11277,2.145],"bat_hundred_kumma":[2,947013,11877,2.263],"bat_strike_kumma":[2,958890,11157,2.124]}}/*/VOICE_INDEX*/;
+const VOICE_INDEX = /*VOICE_INDEX*/{"files":["lead.mp3","colour.mp3","names.mp3"],"clips":{"runup_mason_1":[0,0,7797,1.441],"runup_mason_2":[0,7797,8637,1.619],"runup_mason_3":[0,16434,9117,1.723],"runup_ortega_1":[0,25551,8877,1.667],"runup_ortega_2":[0,34428,8757,1.65],"runup_ortega_3":[0,43185,9837,1.861],"runup_boateng_1":[0,53022,8277,1.542],"runup_boateng_2":[0,61299,9477,1.785],"runup_boateng_3":[0,70776,9597,1.821],"runup_iqbal_1":[0,80373,8157,1.518],"runup_iqbal_2":[0,88530,9117,1.717],"runup_iqbal_3":[0,97647,9117,1.724],"runup_thorne_1":[0,106764,7077,1.319],"runup_thorne_2":[0,113841,8397,1.572],"runup_thorne_3":[0,122238,8517,1.602],"call_drive_1":[0,130755,4557,0.797],"call_drive_2":[0,135312,7437,1.375],"call_drive_3":[0,142749,6357,1.171],"call_cover_1":[0,149106,6117,1.107],"call_cover_2":[0,155223,6957,1.273],"call_straight_1":[0,162180,8877,1.658],"call_straight_2":[0,171057,6717,1.248],"call_ondrive_1":[0,177774,9837,1.852],"call_ondrive_2":[0,187611,5997,1.09],"call_cut_1":[0,193608,5277,0.953],"call_cut_2":[0,198885,5397,0.965],"call_cut_3":[0,204282,8757,1.637],"call_pull_1":[0,213039,3717,0.625],"call_pull_2":[0,216756,7797,1.453],"call_pull_3":[0,224553,9477,1.781],"call_punch_1":[0,234030,5877,1.058],"call_punch_2":[0,239907,9477,1.778],"call_loft_1":[0,249384,5997,1.099],"call_loft_2":[0,255381,6717,1.231],"call_loft_3":[0,262098,4437,0.789],"call_loft_4":[0,266535,8997,1.694],"call_loft_5":[0,275532,8397,1.567],"call_air_1":[0,283929,4677,0.817],"call_air_2":[0,288606,5637,1.03],"call_air_3":[0,294243,5637,1.016],"call_edge_1":[0,299880,4197,0.736],"call_edge_2":[0,304077,5757,1.038],"call_edge_3":[0,309834,4797,0.849],"call_inedge_1":[0,314631,6597,1.223],"call_topedge_1":[0,321228,9717,1.841],"call_block_1":[0,330945,5637,1.017],"call_block_2":[0,336582,8397,1.563],"call_block_3":[0,344979,4437,0.79],"call_block_4":[0,349416,10797,2.049],"call_beaten_1":[0,360213,4317,0.764],"call_beaten_2":[0,364530,6117,1.119],"call_beaten_3":[0,370647,9477,1.792],"call_beaten_4":[0,380124,6477,1.191],"call_beatenin_1":[0,386601,8517,1.596],"call_beatenin_2":[0,395118,8757,1.64],"call_miss_1":[0,403875,7917,1.487],"call_miss_2":[0,411792,4797,0.863],"call_miss_3":[0,416589,10197,1.932],"call_left_1":[0,426786,6957,1.294],"call_left_2":[0,433743,7917,1.487],"call_left_3":[0,441660,6117,1.121],"call_duck_1":[0,447777,9957,1.885],"call_duck_2":[0,457734,11037,2.092],"fin_six_1":[0,468771,11757,2.242],"fin_six_2":[0,480528,9117,1.711],"fin_six_3":[0,489645,10197,1.937],"fin_six_4":[0,499842,5397,0.965],"fin_six_5":[0,505239,9837,1.861],"fin_four_1":[0,515076,6837,1.263],"fin_four_2":[0,521913,5637,1.014],"fin_four_3":[0,527550,9237,1.742],"fin_four_4":[0,536787,12597,2.422],"fin_four_5":[0,549384,11517,2.201],"fin_caught_1":[0,560901,5877,1.062],"fin_caught_2":[0,566778,4077,0.715],"fin_caught_3":[0,570855,6237,1.146],"fin_caught_4":[0,577092,10197,1.924],"fin_caught_5":[0,587289,5637,1.026],"fin_behind_1":[0,592926,6717,1.227],"fin_behind_2":[0,599643,11877,2.264],"fin_cab_1":[0,611520,6477,1.188],"fin_bowled_1":[0,617997,4557,0.808],"fin_bowled_2":[0,622554,5997,1.082],"fin_bowled_3":[0,628551,4077,0.716],"fin_bowled_4":[0,632628,8517,1.589],"fin_bowled_5":[0,641145,9597,1.81],"fin_playedon_1":[0,650742,5637,1.022],"fin_playedon_2":[0,656379,11517,2.193],"fin_dropped_1":[0,667896,5877,1.064],"fin_dropped_2":[0,673773,9117,1.716],"fin_dropped_3":[0,682890,5037,0.904],"fin_stop_1":[0,687927,5877,1.057],"fin_stop_2":[0,693804,8397,1.577],"fin_stop_3":[0,702201,9357,1.759],"fin_fielded_1":[0,711558,6837,1.252],"fin_fielded_2":[0,718395,9477,1.783],"fin_fielded_3":[0,727872,6237,1.139],"run_1_1":[0,734109,8637,1.616],"run_1_2":[0,742746,5877,1.079],"run_1_3":[0,748623,6237,1.146],"run_2_1":[0,754860,8397,1.566],"run_2_2":[0,763257,5517,1.006],"run_3_1":[0,768774,6717,1.241],"run_3_2":[0,775491,10317,1.961],"fin_slips_1":[0,785808,11517,2.207],"fin_slips_2":[0,797325,5997,1.091],"fin_gully_1":[0,803322,6957,1.273],"res_home_1":[0,810279,17037,3.289],"res_home_2":[0,827316,15717,3.041],"res_away_1":[0,843033,14997,2.896],"res_away_2":[0,858030,16437,3.18],"res_tie_1":[0,874467,13797,2.653],"col_pressure_1":[1,0,10557,2.009],"col_pressure_2":[1,10557,7077,1.318],"col_btb_1":[1,17634,8037,1.491],"col_btb_2":[1,25671,5997,1.09],"col_streak3_1":[1,31668,8757,1.65],"col_streak4_1":[1,40425,11277,2.143],"col_streak5_1":[1,51702,14997,2.893],"col_pace_1":[1,66699,5877,1.073],"col_pace_2":[1,72576,7917,1.475],"col_maiden_1":[1,80493,12957,2.479],"col_expensive_1":[1,93450,10917,2.071],"col_overend_1":[1,104367,7317,1.352],"col_overend_2":[1,111684,6237,1.128],"col_golden_1":[1,117921,12717,2.435],"col_duck_1":[1,130638,6237,1.138],"col_beauty_1":[1,136875,12117,2.319],"col_timing_1":[1,148992,15117,2.928],"col_timing_2":[1,164109,7317,1.359],"col_power_1":[1,171426,5277,0.943],"col_power_2":[1,176703,10557,2.005],"col_lucky_1":[1,187260,8637,1.611],"col_lucky_2":[1,195897,6837,1.256],"col_welcome1_1":[1,202734,24357,4.758],"col_welcome2_1":[1,227091,18597,3.619],"col_welcomeback_1":[1,245688,11157,2.127],"col_end_1":[1,256845,21477,4.196],"col_allout_1":[1,278322,14757,2.85],"dist_60":[1,293079,8877,1.677],"dist_65":[1,301956,10197,1.932],"dist_70":[1,312153,9357,1.775],"dist_75":[1,321510,10797,2.047],"dist_80":[1,332307,8997,1.7],"dist_85":[1,341304,10197,1.921],"dist_90":[1,351501,9357,1.76],"dist_95":[1,360858,10197,1.931],"dist_100":[1,371055,10197,1.933],"dist_105":[1,381252,13197,2.527],"dist_110":[1,394449,12837,2.457],"bowl_attack_mason":[1,407286,11037,2.11],"bowl_wicket_mason":[1,418323,8757,1.644],"bowl_attack_ortega":[1,427080,11637,2.229],"bowl_wicket_ortega":[1,438717,9717,1.832],"bowl_attack_boateng":[1,448434,11157,2.114],"bowl_wicket_boateng":[1,459591,10077,1.907],"bowl_attack_iqbal":[1,469668,10677,2.034],"bowl_wicket_iqbal":[1,480345,9117,1.706],"bowl_attack_thorne":[1,489462,9957,1.879],"bowl_wicket_thorne":[1,499419,8997,1.683],"col_test_welcome_1":[1,508416,29637,5.826],"col_test_end_1":[1,538053,16557,3.206],"col_test_allout_1":[1,554610,18957,3.685],"col_test_leave_1":[1,573567,14517,2.788],"col_test_leave_2":[1,588084,14397,2.765],"col_test_block_1":[1,602481,14277,2.754],"col_test_block_2":[1,616758,14517,2.789],"col_test_swing_1":[1,631275,13317,2.547],"col_test_slips_1":[1,644592,14277,2.757],"col_test_maiden_1":[1,658869,14157,2.719],"col_chase_1":[1,673026,13797,2.651],"col_chase_2":[1,686823,16557,3.215],"res_draw_1":[1,703380,15597,3.014],"col_conf_1":[1,718977,11877,2.273],"col_conf_2":[1,730854,13317,2.554],"col_nervy_1":[1,744171,11517,2.205],"bat_six_kavin":[2,0,7437,1.382],"bat_four_kavin":[2,7437,8517,1.592],"bat_out_kavin":[2,15954,8037,1.505],"bat_new_kavin":[2,23991,10077,1.911],"bat_fifty_kavin":[2,34068,11757,2.253],"bat_hundred_kavin":[2,45825,11997,2.288],"bat_strike_kavin":[2,57822,11757,2.234],"bat_six_harsha":[2,69579,8037,1.503],"bat_four_harsha":[2,77616,8997,1.698],"bat_out_harsha":[2,86613,8277,1.553],"bat_new_harsha":[2,94890,10317,1.956],"bat_fifty_harsha":[2,105207,11997,2.294],"bat_hundred_harsha":[2,117204,12477,2.378],"bat_strike_harsha":[2,129681,11757,2.249],"bat_six_sabari":[2,141438,7557,1.401],"bat_four_sabari":[2,148995,8877,1.678],"bat_out_sabari":[2,157872,8157,1.517],"bat_new_sabari":[2,166029,10317,1.954],"bat_fifty_sabari":[2,176346,11757,2.239],"bat_hundred_sabari":[2,188103,12237,2.332],"bat_strike_sabari":[2,200340,11997,2.285],"bat_six_thananjay":[2,212337,9237,1.734],"bat_four_thananjay":[2,221574,10197,1.934],"bat_out_thananjay":[2,231771,10077,1.912],"bat_new_thananjay":[2,241848,11157,2.129],"bat_fifty_thananjay":[2,253005,13077,2.496],"bat_hundred_thananjay":[2,266082,13437,2.578],"bat_strike_thananjay":[2,279519,13077,2.505],"bat_six_vikrant":[2,292596,9837,1.865],"bat_four_vikrant":[2,302433,11157,2.132],"bat_out_vikrant":[2,313590,11157,2.132],"bat_new_vikrant":[2,324747,12717,2.429],"bat_fifty_vikrant":[2,337464,14037,2.703],"bat_hundred_vikrant":[2,351501,14277,2.758],"bat_strike_vikrant":[2,365778,13917,2.674],"bat_six_vasanth":[2,379695,8037,1.502],"bat_four_vasanth":[2,387732,9117,1.713],"bat_out_vasanth":[2,396849,9237,1.731],"bat_new_vasanth":[2,406086,10797,2.063],"bat_fifty_vasanth":[2,416883,12477,2.379],"bat_hundred_vasanth":[2,429360,12717,2.43],"bat_strike_vasanth":[2,442077,11997,2.295],"bat_six_pooja":[2,454074,7677,1.434],"bat_four_pooja":[2,461751,8997,1.697],"bat_out_pooja":[2,470748,8397,1.578],"bat_new_pooja":[2,479145,10317,1.953],"bat_fifty_pooja":[2,489462,11997,2.288],"bat_hundred_pooja":[2,501459,12477,2.387],"bat_strike_pooja":[2,513936,11397,2.178],"bat_six_jay":[2,525333,7917,1.479],"bat_four_jay":[2,533250,8517,1.599],"bat_out_jay":[2,541767,7557,1.404],"bat_new_jay":[2,549324,9717,1.844],"bat_fifty_jay":[2,559041,11757,2.235],"bat_hundred_jay":[2,570798,11997,2.299],"bat_strike_jay":[2,582795,10437,1.972],"bat_six_venkatesh":[2,593232,9237,1.745],"bat_four_venkatesh":[2,602469,10677,2.018],"bat_out_venkatesh":[2,613146,10677,2.026],"bat_new_venkatesh":[2,623823,12237,2.33],"bat_fifty_venkatesh":[2,636060,12957,2.496],"bat_hundred_venkatesh":[2,649017,13677,2.633],"bat_strike_venkatesh":[2,662694,13317,2.558],"bat_six_govind":[2,676011,8517,1.601],"bat_four_govind":[2,684528,9237,1.743],"bat_out_govind":[2,693765,9477,1.792],"bat_new_govind":[2,703242,11157,2.116],"bat_fifty_govind":[2,714399,12717,2.44],"bat_hundred_govind":[2,727116,12837,2.462],"bat_strike_govind":[2,739953,12357,2.364],"bat_six_sundarraj":[2,752310,9117,1.713],"bat_four_sundarraj":[2,761427,9957,1.881],"bat_out_sundarraj":[2,771384,9717,1.844],"bat_new_sundarraj":[2,781101,11517,2.208],"bat_fifty_sundarraj":[2,792618,13317,2.546],"bat_hundred_sundarraj":[2,805935,13557,2.608],"bat_strike_sundarraj":[2,819492,12477,2.39],"bat_six_durai":[2,831969,8157,1.532],"bat_four_durai":[2,840126,8997,1.69],"bat_out_durai":[2,849123,8637,1.615],"bat_new_durai":[2,857760,9837,1.863],"bat_fifty_durai":[2,867597,11997,2.287],"bat_hundred_durai":[2,879594,12237,2.334],"bat_strike_durai":[2,891831,11277,2.158],"bat_six_kumma":[2,903108,6837,1.259],"bat_four_kumma":[2,909945,8277,1.555],"bat_out_kumma":[2,918222,7557,1.4],"bat_new_kumma":[2,925779,9957,1.873],"bat_fifty_kumma":[2,935736,11277,2.145],"bat_hundred_kumma":[2,947013,11877,2.263],"bat_strike_kumma":[2,958890,11157,2.124]}}/*/VOICE_INDEX*/;
 const Caller = (() => {
   const idx = VOICE_INDEX, banks = [], decoded = new Map(), last = {}, variants = {};
   let state = idx ? 'idle' : 'off', cur = null, queue = [], on = true;
@@ -2820,7 +3009,10 @@ const Comm = (() => {
       if (call) Caller.say([P(call)], { pri: 2, maxWait: 0.3 });
     },
     boundary(six) { Caller.say([P(six ? 'fin_six' : 'fin_four')], { pri: 3, maxWait: 0.6 }); },
-    caught(f) { Caller.say([P(f.isKeeper ? 'fin_behind' : f.isBowler ? 'fin_cab' : 'fin_caught')], { pri: 3, maxWait: 0.6 }); },
+    caught(f) {
+      const id = f.isKeeper ? 'fin_behind' : f.isBowler ? 'fin_cab' : /slip/.test(f.name) ? 'fin_slips' : f.name === 'gully' ? 'fin_gully' : 'fin_caught';
+      Caller.say([P(id)], { pri: 3, maxWait: 0.6 });
+    },
     dropped() { Caller.say([P('fin_dropped')], { pri: 3, maxWait: 0.6 }); },
     fielded(ev) {
       if (ev.dive && !ev.f.isKeeper && !ev.f.isBowler) Caller.say([P('fin_stop')], { pri: 2, maxWait: 0.6 });
@@ -2832,8 +3024,10 @@ const Comm = (() => {
       const id = { beaten: 'call_beaten', beatenIn: 'call_beatenin', left: 'call_left', duck: 'call_duck', miss: 'call_miss' }[kind];
       if (chance({ left: 0.45, beaten: 1, beatenIn: 1, duck: 0.8, miss: 0.85 }[kind])) Caller.say([P(id)], { pri: 2, maxWait: 0.4 });
     },
-    after(o, bat, bw) {
+    after(o, bat, bw, cc) {
       const ids = [], n = game.log.length;
+      if (cc && cc.before < 75 && cc.after >= 75) { Caller.say([P('col_conf')], { pri: 1, delay: 0.3, maxWait: 3.5 }); return; }
+      if (cc && cc.before >= 20 && cc.after < 20 && chance(0.6)) { Caller.say(['col_nervy_1'], { pri: 1, delay: 0.3, maxWait: 3.5 }); return; }
       const streak = (() => { let k = 0; for (let i = n - 1; i >= 0 && game.log[i].boundary; i--) k++; return k; })();
       const dots = (() => { let k = 0; for (let i = n - 1; i >= 0 && !game.log[i].out && game.log[i].runs === 0; i--) k++; return k; })();
       if (o.kind === 'six' || o.kind === 'four') {
@@ -2852,21 +3046,27 @@ const Comm = (() => {
         if (chance(0.3)) ids.push(`bowl_wicket_${bwId(bw)}`);
       } else if (o.runs === 0) {
         const sw = game.swing;
-        if (sw && sw.plan && sw.plan.beaten && sw.plan.beaten !== 'Left outside off' && chance(0.3)) ids.push(P('col_beauty'));
+        if (isTest() && !sw && o.kind === 'keeper' && chance(0.35)) ids.push(P('col_test_leave'));
+        else if (isTest() && sw && sw.block && sw.plan && sw.plan.safe && chance(0.22)) ids.push(P('col_test_block'));
+        else if (isTest() && sw && sw.plan && sw.plan.beaten && Math.abs(game.del.swingAx) > 1.6 && chance(0.4)) ids.push('col_test_swing_1');
+        else if (sw && sw.plan && sw.plan.beaten && sw.plan.beaten !== 'Left outside off' && chance(0.3)) ids.push(P('col_beauty'));
         else if (dots >= 3 && chance(0.35)) ids.push(P('col_pressure'));
         else if (game.del.kmh >= 147 && chance(0.3)) ids.push(P('col_pace'));
       }
+      if (isTest() && !game.saidSlips && game.balls === 2 && game.del.pace && !ids.length) { game.saidSlips = true; ids.push('col_test_slips_1'); }
       if (ids.length) Caller.say(ids.slice(0, 2), { pri: 1, delay: 0.3, maxWait: 3.5 });
     },
     overEnd(kind, nb, changed) {
-      const ids = [kind === 'maiden' ? 'col_maiden_1' : kind === 'pricey' ? 'col_expensive_1' : chance(0.5) ? P('col_overend') : null];
+      const ids = [kind === 'maiden' ? (isTest() ? 'col_test_maiden_1' : 'col_maiden_1') : kind === 'pricey' ? 'col_expensive_1' : chance(0.5) ? P('col_overend') : null];
       if (changed && chance(0.75)) ids.push(`bowl_attack_${bwId(nb)}`);
       Caller.say(ids.filter(Boolean), { pri: 1, delay: 0.4, maxWait: 3 });
     },
     newBatter(b) { soon([`bat_new_${batId(b)}`], { pri: 1, delay: 0.3, maxWait: 3 }, 4); },
     milestone(b, m) { soon([`bat_${m === 50 ? 'fifty' : 'hundred'}_${batId(b)}`], { pri: 3, maxWait: 2 }, 4); },
-    welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : ['col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
-    end(allOut) { soon([allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
+    welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : [isTest() ? 'col_test_welcome_1' : 'col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
+    chase() { soon([P('col_chase')], { pri: 2, maxWait: 4 }); },
+    result(r) { soon([P(r.winner === 'home' ? 'res_home' : r.winner === 'away' ? 'res_away' : r.tie ? 'res_tie' : 'res_draw')], { pri: 3, maxWait: 4 }, 6); },
+    end(allOut) { soon([isTest() ? (allOut ? 'col_test_allout_1' : 'col_test_end_1') : allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
   };
 })();
 
@@ -2892,14 +3092,35 @@ function finishBall(o) {
     if (o.runs % 2 === 1) swapEnds();
   }
   game.log.push({ runs: o.runs, out: !!o.out, boundary: !!o.boundary, end: o.end || null });
+  const cc = o.out ? null : updateConfidence(bat, o);
   const c = commentFor(o, bat, bw);
+  if (cc && cc.before < 75 && cc.after >= 75) c.text += ` ${bat.short} is looking very confident now.`;
+  else if (cc && cc.before >= 20 && cc.after < 20) c.text += ` ${bat.short} looks a little unsettled.`;
   showCommentary(tag, `${bw.short} to ${bat.short}`, deliveryNote(game.del), c.text, c.call, c.tone);
   if (Caller.failed) Voice.say(c.call ? [{ t: c.call, mood: c.tone === 'good' ? 'lift' : 'roar' }, { t: c.text }] : `${bw.short} to ${bat.short}. ${c.text}`, true);
-  else Comm.after(o, bat, bw);
+  else Comm.after(o, bat, bw, cc);
   renderScore();
   drawScreen(o.out ? { text: 'WICKET', bg: '#ff4a36', fg: '#ffffff' } : o.runs === 6 ? { text: 'SIXER', bg: '#ffc53d', fg: '#1b1404' } : (o.runs === 4 && o.boundary) ? { text: 'FOUR', bg: '#ffc53d', fg: '#1b1404' } : null);
 }
-const caughtCard = (f, bw) => f.isKeeper ? `c †${KEEPER_P.short} b ${bw.short}` : f.isBowler ? `c & b ${bw.short}` : `c ${f.person ? f.person.short : f.name} b ${bw.short}`;
+const confOf = (b) => (b && Number.isFinite(b.conf) ? b.conf : 35);
+/* how the last ball changed the striker's confidence: timing, boundaries and leaves build it; misses and edges dent it */
+function updateConfidence(bat, o) {
+  const sw = game.swing, P = game.play, before = confOf(bat);
+  let d = 0;
+  if (sw && sw.plan) {
+    const g = sw.plan.grade;
+    if (sw.plan.hit) {
+      if (P && P.edge) d -= 9;
+      else if (sw.block) d += g === 'perfect' || g === 'good' ? 3 : -2;
+      else d += { perfect: 12, good: 7, early: -4, late: -4 }[g] || 0;
+    } else if (!sw.plan.safe) d -= 10;
+  } else if (o.kind === 'keeper') d += isTest() ? 3 : 1;
+  if (o.runs === 4) d += 5;
+  if (o.runs === 6) d += 8;
+  bat.conf = clamp(before + d, 0, 100);
+  return { before, after: bat.conf };
+}
+const caughtCard = (f, bw) => f.isKeeper ? `c †${keeper.person.short} b ${bw.short}` : f.isBowler ? `c & b ${bw.short}` : `c ${f.person ? f.person.short : f.name} b ${bw.short}`;
 const caughtLine = (f) => f.isKeeper ? 'Caught behind' : f.isBowler ? 'Caught and bowled' : `Caught at ${f.name}`;
 
 function onEvent(ev) {
@@ -2952,8 +3173,16 @@ function onEvent(ev) {
 /* ------------------------------------------------------------------- HUD */
 function oversText(b = game.balls) { return `${Math.floor(b / 6)}.${b % 6}`; }
 function renderScore() {
+  $('bugTeam').textContent = batTeamName();
+  updateConfMeter();
+  const ch = $('bugChase');
+  if (game.innings === 2 && game.target) {
+    const need = game.target - game.runs, left = game.total - game.balls;
+    ch.hidden = false;
+    ch.textContent = need <= 0 ? 'Target reached' : Number.isFinite(left) ? `Target ${game.target} · need ${need} off ${left} ball${left === 1 ? '' : 's'}` : `Target ${game.target} · need ${need}`;
+  } else ch.hidden = true;
   $('runs').textContent = game.runs; $('wkts').textContent = game.wkts;
-  $('overs').textContent = oversText(); $('oversOf').textContent = ` /${game.overs}`;
+  $('overs').textContent = oversText(); $('oversOf').textContent = game.overs ? ` /${game.overs}` : '';
   $('rr').textContent = game.balls ? (game.runs / (game.balls / 6)).toFixed(2) : '0.00';
   const s = game.bats[game.rigS.batIdx], n = game.bats[game.rigN.batIdx];
   if (s && n) {
@@ -2989,7 +3218,8 @@ function drawScreen(flash) {
     game.screenFlash = 3;
   } else {
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-    g.fillStyle = '#ffc53d'; g.font = `800 30px ${DISPLAY}`; g.fillText('THUDINEST COIMBATORE', 26, 46);
+    g.fillStyle = '#ffc53d'; g.font = `800 30px ${DISPLAY}`; g.fillText(batTeamName().toUpperCase(), 26, 46, 460);
+    if (game.innings === 2 && game.target) { g.textAlign = 'right'; g.fillStyle = '#9aa5bc'; g.font = `600 22px ${UI}`; g.fillText(`TARGET ${game.target}`, 486, 228); g.textAlign = 'left'; }
     g.fillStyle = '#f1ede1'; g.font = `900 128px ${DISPLAY}`; g.fillText(`${game.runs}/${game.wkts}`, 22, 176);
     g.fillStyle = '#9aa5bc'; g.font = `600 22px ${UI}`; g.fillText('OVERS', 352, 96);
     g.fillStyle = '#f1ede1'; g.font = `800 66px ${DISPLAY}`; g.fillText(oversText(), 352, 160);
@@ -3022,7 +3252,15 @@ function showTiming(grade, dt, W) {
   void W;
 }
 function hideTiming() { $('timing').classList.remove('show'); timingTimer = 0; }
+function updateConfMeter() {
+  const b = game.bats && game.rigS ? game.bats[game.rigS.batIdx] : null, c = Math.round(confOf(b));
+  const col = c >= 65 ? 'var(--mint)' : c >= 35 ? 'var(--amber)' : 'var(--zing)';
+  for (const id of ['confBar', 'tConfBar']) { const el = $(id); el.style.width = `${Math.max(4, c)}%`; el.style.backgroundColor = col; }
+  $('confPct').textContent = `${c}%`;
+  $('conf').title = `${b ? b.short : 'Batter'}: confidence ${c}%. Well-timed shots raise it: wider timing and more power on lofted shots.`;
+}
 function updateShotHUD() {
+  updateConfMeter();
   const sw = game.swing;
   const side = sw ? sw.side : game.intent.side;
   const footSel = sw ? sw.foot : game.intent.foot;
@@ -3050,15 +3288,19 @@ function updateShotHUD() {
 function endInnings() {
   game.state = 'over'; game.active = false;
   setTimeout(() => { if (game.state === 'over') cam.mode = 'menu'; }, 1200);
-  const prev = game.best[game.overs];
+  if (game.innings === 2) { finishMatch(inningsSummary(), null); return; }
+  game.first = inningsSummary();
+  game.target = game.runs + 1;
+  const prev = game.best[bestId()];
   const isBest = prev === undefined || game.runs > prev;
-  if (isBest) { game.best[game.overs] = game.runs; storage.set(bestKey(game.overs), String(game.runs)); }
+  if (isBest) { game.best[bestId()] = game.runs; storage.set(bestKey(game.format, game.overs), String(game.runs)); }
   const allOut = game.wkts >= 10;
-  $('endEyebrow').textContent = isBest && game.runs > 0 ? 'New best score' : allOut ? 'All out' : 'Innings complete';
+  $('endEyebrow').textContent = `${isBest && game.runs > 0 ? 'New best score · ' : ''}Innings break · Thudinest Coimbatore`;
+  $('chaseLine').textContent = `World XI need ${game.target} to win${game.overs ? ` from ${game.overs * 6} balls` : ''}.`;
   $('endScore').textContent = allOut ? `${game.runs}` : `${game.runs}/${game.wkts}`;
   $('endOvers').textContent = allOut ? `all out (${oversText()} ov)` : `(${oversText()} ov)`;
   const top = game.bats.filter((b) => b.batted).sort((a, b) => b.runs - a.runs)[0];
-  const bestNote = isBest && game.runs > 0 ? 'That is a new best.' : `Best for ${game.overs} overs: ${game.best[game.overs]}.`;
+  const bestNote = isBest && game.runs > 0 ? 'That is a new best.' : `Best for ${oversName()}: ${game.best[bestId()]}.`;
   $('endLine').textContent = `${top ? `Top score: ${top.name} ${top.runs}${top.out ? '' : '*'} off ${top.balls}. ` : ''}${bestNote}`;
   $('stRR').textContent = game.balls ? (game.runs / (game.balls / 6)).toFixed(2) : '0.00';
   $('st4').textContent = game.fours; $('st6').textContent = game.sixes; $('stDots').textContent = game.dots;
@@ -3723,6 +3965,235 @@ function updateUmpire(dt) {
   if (game.state === 'flight' || game.state === 'inplay') lookAtBall(legUmp);
 }
 
+/* ------------------------------------------------------------------ match */
+/* A match is two innings: Thudinest Coimbatore set a target, then the World XI chase it, either batted by a player
+   (pass the device to a friend) or by the computer, ball by ball. Then the result. */
+const scoreText = (inn) => (inn.wkts >= 10 ? `${inn.runs} all out` : `${inn.runs}/${inn.wkts}`);
+function inningsSummary() {
+  const top = game.bats.filter((b) => b.batted).sort((a, b) => b.runs - a.runs || a.balls - b.balls)[0];
+  const best = game.bowl.filter((b) => b.balls).sort((a, b) => b.wkts - a.wkts || a.runs - b.runs)[0];
+  return { team: game.batTeam, name: batTeamName(), runs: game.runs, wkts: game.wkts, balls: game.balls,
+    top: top ? { name: top.name, runs: top.runs, balls: top.balls, out: top.out } : null,
+    best: best ? { name: best.name, wkts: best.wkts, runs: best.runs, balls: best.balls } : null };
+}
+function matchResult(first, second) {
+  const t = first.runs + 1, r = second.runs, w = second.wkts, limit = game.overs ? game.overs * 6 : Infinity;
+  if (r >= t) {
+    const wl = 10 - w, bl = limit - second.balls;
+    return { winner: 'away', text: `World XI won by ${wl} wicket${wl === 1 ? '' : 's'}`, sub: Number.isFinite(bl) && bl > 0 ? `With ${bl} ball${bl === 1 ? '' : 's'} to spare.` : '' };
+  }
+  if (isTest() && w < 10) return { draw: true, text: 'Match drawn', sub: `The World XI finished ${t - r} short of the target, with ${10 - w} wicket${10 - w === 1 ? '' : 's'} in hand.` };
+  if (r === t - 1) return { tie: true, text: 'Match tied', sub: 'Scores level at the end. What a finish.' };
+  const m = t - 1 - r;
+  return { winner: 'home', text: `Thudinest Coimbatore won by ${m} run${m === 1 ? '' : 's'}`, sub: second.wkts >= 10 ? 'The World XI were bowled out.' : '' };
+}
+function finishMatch(second) {
+  game.state = 'over'; game.active = false;
+  const first = game.first, res = game.result = matchResult(first, second);
+  $('resultEyebrow').textContent = `${isTest() ? 'Test match' : 'T20'} result`;
+  $('resultTitle').textContent = res.text; $('resultSub').textContent = res.sub;
+  $('resultCard').classList.toggle('lost', res.winner === 'away');
+  for (const [k, inn] of [['1', first], ['2', second]]) {
+    $(`inn${k}Team`).textContent = inn.name; $(`inn${k}Score`).textContent = scoreText(inn); $(`inn${k}Ov`).textContent = `(${oversText(inn.balls)} ov)`;
+  }
+  const tops = [first.top, second.top].filter(Boolean).sort((a, b) => b.runs - a.runs)[0];
+  const best = [first.best, second.best].filter(Boolean).sort((a, b) => b.wkts - a.wkts || a.runs - b.runs)[0];
+  $('resultStars').textContent = [tops ? `Top score: ${tops.name} ${tops.runs}${tops.out ? '' : '*'} (${tops.balls})` : '', best ? `Best bowling: ${best.name} ${best.wkts}-${best.runs}` : ''].filter(Boolean).join(' · ');
+  if (res.winner === 'home') { Sound.six(); game.fireworks = 5; } else if (res.winner === 'away') Sound.applause(0.6, 3); else Sound.four();
+  if (!Caller.failed) Comm.result(res);
+  else Voice.say(`${res.text}.`, true);
+  setTimeout(() => { $('simPanel').hidden = true; $('endPanel').hidden = true; $('resultPanel').hidden = false; }, 700);
+  renderScore();
+}
+/* the computer bats for the World XI: per-ball odds from the format, the difficulty, the batter's place in the order,
+   how well set they are, and the asking rate */
+function simulateChase() {
+  const t20 = !isTest(), target = game.target, limit = game.overs ? game.overs * 6 : Infinity;
+  const base = t20 ? [0.37, 0.36, 0.075, 0.01, 0.11, 0.045] : [0.7, 0.17, 0.04, 0.01, 0.06, 0.006], RUNS = [0, 1, 2, 3, 4, 6];
+  const baseW = t20 ? 0.045 : 0.017, baseRR = t20 ? 7.6 : 3.3, strength = { easy: 0.85, normal: 1, hard: 1.12 }[game.diff];
+  const bats = WORLD_XI.map((p) => ({ name: p.name, short: p.short, runs: 0, balls: 0, out: false }));
+  const bowl = homeAttack().map((p) => ({ name: p.name, short: p.short, balls: 0, runs: 0, wkts: 0 }));
+  const keeperP = homeKeeper(), catchers = xiList().filter((_, i) => i !== 5);
+  const balls = [];
+  let runs = 0, wkts = 0, n = 0, s = 0, ns = 1, next = 2, bw = 0, prev = -1;
+  const ends = [null, null], spell = [0, 0];
+  while (wkts < 10 && n < limit && runs < target) {
+    if (n % 6 === 0) {
+      if (t20) {
+        const maxOv = Math.max(1, Math.ceil(game.overs / 5));
+        let pool = bowl.map((_, i) => i).filter((i) => i !== prev && bowl[i].balls / 6 < maxOv);
+        if (!pool.length) pool = bowl.map((_, i) => i).filter((i) => i !== prev);
+        bw = pool[(Math.random() * pool.length) | 0];
+      } else {
+        const e = (n / 6) % 2;
+        if (ends[e] === null || spell[e] <= 0) { const pool = bowl.map((_, i) => i).filter((i) => i !== ends[1 - e] && i !== ends[e]); ends[e] = pool[(Math.random() * pool.length) | 0]; spell[e] = 4 + ((Math.random() * 4) | 0); }
+        spell[e]--; bw = ends[e];
+      }
+      prev = bw;
+    }
+    const bt = bats[s], q = (s < 7 ? 1 : s < 8 ? 0.78 : 0.55) * Math.min(1.35, 1 + bt.runs / 110);
+    let a = 0;
+    if (Number.isFinite(limit)) a = clamp(((target - runs) / Math.max(1, limit - n) * 6 - baseRR) / baseRR, -0.5, 1.3);
+    if (wkts >= 7) a *= 0.6;
+    const p = base.slice();
+    p[4] *= q * strength * (1 + 0.6 * a); p[5] *= q * strength * (1 + 0.9 * a);
+    p[0] *= (1 - 0.3 * Math.max(0, a)) / Math.max(0.7, strength);
+    const w = clamp(baseW * Math.pow(1 / q, 0.8) / strength * (1 + 0.8 * Math.max(0, a)) * (a < 0 ? 1 + 0.3 * a : 1), 0.004, 0.25);
+    const sum = p.reduce((x, y) => x + y, 0);
+    let r = Math.random(), out = r < w, got = 0;
+    if (!out) { r = (r - w) / (1 - w) * sum; for (let k = 0; k < 6; k++) { r -= p[k]; if (r <= 0) { got = RUNS[k]; break; } if (k === 5) got = 6; } }
+    n++; bt.balls++; bowl[bw].balls++;
+    const tag = `${Math.floor((n - 1) / 6)}.${(n - 1) % 6 + 1}`;
+    if (out) {
+      wkts++; bt.out = true; bowl[bw].wkts++;
+      const k = Math.random(), bwl = bowl[bw].short;
+      bt.how = k < 0.2 ? `b ${bwl}` : k < 0.34 ? `c †${keeperP.short} b ${bwl}` : k < 0.4 ? `c & b ${bwl}` : `c ${catchers[(Math.random() * catchers.length) | 0].short} b ${bwl}`;
+      balls.push({ runs, wkts, kind: 'out', text: `${tag} ${bt.short} ${bt.how} ${bt.runs}` });
+      if (next <= 10) s = next++;
+    } else {
+      runs += got; bt.runs += got; bowl[bw].runs += got;
+      balls.push({ runs, wkts, kind: got === 6 ? 'six' : got === 4 ? 'four' : '', text: got >= 4 ? `${tag} ${got === 6 ? 'SIX' : 'FOUR'} · ${bt.short} ${bt.runs}*` : '' });
+      if (got % 2 === 1) [s, ns] = [ns, s];
+    }
+    if (n % 6 === 0) [s, ns] = [ns, s];
+  }
+  const top = bats.filter((b) => b.balls).sort((x, y) => y.runs - x.runs)[0];
+  const best = bowl.filter((b) => b.balls).sort((x, y) => y.wkts - x.wkts || x.runs - y.runs)[0];
+  return { runs, wkts, balls: n, perBall: balls, team: 'away', name: 'World XI',
+    top: top ? { name: top.name, runs: top.runs, balls: top.balls, out: top.out } : null,
+    best: best ? { name: best.name, wkts: best.wkts, runs: best.runs, balls: best.balls } : null };
+}
+let simRun = null;
+function playComputerChase() {
+  $('endPanel').hidden = true;
+  const sim = simulateChase(), feed = $('simFeed');
+  feed.textContent = '';
+  $('simTarget').textContent = game.target;
+  $('simPanel').hidden = false;
+  if (!Caller.failed) Comm.chase();
+  const dur = clamp(sim.balls * (isTest() ? 0.022 : 0.1), 6, 13) * 1000, t0 = performance.now();
+  let i = 0, lastNoise = 0;
+  const show = (k) => {
+    const e = sim.perBall[k - 1] || { runs: 0, wkts: 0 }, left = (game.overs ? game.overs * 6 : Infinity) - k, need = game.target - e.runs;
+    $('simScore').textContent = e.wkts >= 10 ? `${e.runs} all out` : `${e.runs}/${e.wkts}`;
+    $('simOvers').textContent = `(${oversText(k)} ov)`;
+    const over = k >= sim.perBall.length && need > 0;
+    $('simNeed').textContent = need <= 0 ? 'Target reached' : over ? (need === 1 ? 'Scores level' : e.wkts >= 10 ? 'All out' : 'Innings over') : Number.isFinite(left) ? `Need ${need} off ${left} ball${left === 1 ? '' : 's'}` : `Need ${need} to win`;
+    $('simBar').style.width = `${clamp(e.runs / game.target, 0, 1) * 100}%`;
+  };
+  simRun = { skip: false };
+  const run = simRun;
+  const step = () => {
+    if (run !== simRun) return;
+    const want = run.skip ? sim.perBall.length : Math.min(sim.perBall.length, Math.floor((performance.now() - t0) / dur * sim.perBall.length));
+    for (; i < want; i++) {
+      const e = sim.perBall[i];
+      if (!e.text) continue;
+      const li = document.createElement('li'); li.className = e.kind;
+      const sp = e.text.indexOf(' ');
+      const b = document.createElement('b'); b.textContent = e.text.slice(0, sp); li.appendChild(b); li.appendChild(document.createTextNode(e.text.slice(sp + 1)));
+      feed.insertBefore(li, feed.firstChild);
+      while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+      const now = performance.now();
+      if (!run.skip && now - lastNoise > 1300 && (e.kind === 'out' || e.kind === 'six')) { lastNoise = now; if (e.kind === 'out') Sound.ooh(); else Sound.applause(0.5, 1.2); }
+    }
+    show(i);
+    if (i >= sim.perBall.length) { simRun = null; setTimeout(() => finishMatch(sim), run.skip ? 100 : 900); return; }
+    requestAnimationFrame(step);
+  };
+  show(0);
+  requestAnimationFrame(step);
+}
+function playHumanChase() {
+  $('endPanel').hidden = true;
+  game.innings = 2; game.batTeam = 'away';
+  startInnings(false);
+  applyLook(game.format);
+}
+/* back to the start screen for a fresh match */
+function newMatch() {
+  simRun = null;
+  for (const id of ['resultPanel', 'endPanel', 'simPanel']) $(id).hidden = true;
+  Object.assign(game, { innings: 1, batTeam: 'home', target: 0, first: null, result: null, active: false, resume: false, state: 'menu' });
+  menuReset(); applyLook(game.format);
+  refreshStartPanel(); renderScore();
+  $('startPanel').hidden = false;
+}
+$('chaseBtn').addEventListener('click', playHumanChase);
+$('simBtn').addEventListener('click', playComputerChase);
+$('simSkip').addEventListener('click', () => { if (simRun) simRun.skip = true; });
+$('newMatchBtn').addEventListener('click', newMatch);
+
+/* -------------------------------------------------------------- the look */
+/* Night T20: floodlights, coloured kits, a white ball and black sightscreens. A Test: daylight, whites, a red ball and
+   white sightscreens. Only colours and intensities change, so no shader has to be rebuilt. */
+const LOOKS = {
+  night: { bg: 0x0a1124, fog: [0x1a2142, 170, 460], hemi: [0xa9bce8, 0x1c3a1c, 0.75], key: [0xfff1dc, 2.5], fill: [0xc8d4ff, 0.9], rim: [0xffe2c0, 0.6],
+    sky: [0x040817, 0x18264e, 0xb86c5c, 1], crowd: 0.32, concrete: 0x1b2131, roof: 0x0e121c, sight: 0x07080c, lamps: 0xffffff, glow: 0.9, exposure: 1.05, grass: 0x9cb39a, pitch: 0xa39782 },
+  day: { bg: 0x9cc1e8, fog: [0xc6d8ea, 260, 950], hemi: [0xd6e8ff, 0x3f5f36, 0.85], key: [0xfff3e0, 2.7], fill: [0xdfe9ff, 0.45], rim: [0xfff0dc, 0.35],
+    sky: [0x2b66b8, 0x6fa4dc, 0xd8e6f0, 0], crowd: 0.07, concrete: 0x8a909c, roof: 0x5c6270, sight: 0xf3f3ef, lamps: 0x5a5d66, glow: 0, exposure: 1.0, grass: 0x8fa88d, pitch: 0x9c9080 },
+};
+function applyLook(fmt) {
+  const L = LOOKS[fmt === 'test' ? 'day' : 'night'], KB = TEAM_KITS[game.batTeam][fmt], KF = TEAM_KITS[fieldTeam()][fmt];
+  scene.background.setHex(L.bg); scene.fog.color.setHex(L.fog[0]); scene.fog.near = L.fog[1]; scene.fog.far = L.fog[2];
+  LIGHTS.hemi.color.setHex(L.hemi[0]); LIGHTS.hemi.groundColor.setHex(L.hemi[1]); LIGHTS.hemi.intensity = L.hemi[2];
+  for (const k of ['key', 'fill', 'rim']) { LIGHTS[k].color.setHex(L[k][0]); LIGHTS[k].intensity = L[k][1]; }
+  const u = skyMat.uniforms; u.cTop.value.setHex(L.sky[0]); u.cMid.value.setHex(L.sky[1]); u.cHor.value.setHex(L.sky[2]); u.uStars.value = L.sky[3];
+  stadium.crowdMat.emissiveIntensity = L.crowd; stadium.concrete.color.setHex(L.concrete); stadium.roof.color.setHex(L.roof);
+  stadium.sightMat.color.setHex(L.sight); stadium.lampMat.color.setHex(L.lamps); stadium.glowMat.opacity = L.glow;
+  stadium.fieldMat.color.setHex(L.grass); stadium.pitchMat.color.setHex(L.pitch);
+  renderer.toneMappingExposure = L.exposure;
+  for (const b of [rigA, rigB]) {
+    const r = b.rig, m = r.mats;
+    m.shirt.color.setHex(KB.shirt); m.pants.color.setHex(KB.pants); m.trim.color.setHex(KB.trim);
+    if (m.helmet) m.helmet.color.setHex(KB.helmet);
+    r.frontColor = KB.text; r.frontText = TEAMS[game.batTeam].front; if (r.frontCanvas) drawFront(r);
+    if (r.decalInfo) drawDecal(r, r.decalInfo[0], r.decalInfo[1], KB.text);
+  }
+  for (const f of fielders) {
+    const r = f.rig, m = r.mats;
+    m.shirt.color.setHex(KF.shirt); m.pants.color.setHex(KF.pants); m.trim.color.setHex(KF.trim);
+    if (m.cap) m.cap.color.setHex(KF.cap);
+    if (r.decalInfo) drawDecal(r, r.decalInfo[0], r.decalInfo[1], KF.text);
+  }
+  if (fmt === 'test') { ball.mat.color.setHex(0xa8141c); ball.mat.emissive.setHex(0x260306); ball.seamMat.color.setHex(0xf1ead6); trail.color.set(1.0, 0.86, 0.8); }
+  else { ball.mat.color.setHex(0xffffff); ball.mat.emissive.setHex(0x6a6a66); ball.seamMat.color.setHex(0x9a9a92); trail.color.set(0.45, 0.84, 1.0); }
+  drawScreen(null);
+}
+const FORMAT_TEXT = {
+  t20: { eyebrow: 'Thudinest Coimbatore · Day–night T20', lead: 'Thudinest Coimbatore bat first under the lights, with ', tail: ' opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.', tag: 'Batting' },
+  test: { eyebrow: 'Thudinest Coimbatore · Test match', lead: 'A Test match in the sunshine: whites, the red ball and a slip cordon. Thudinest Coimbatore bat first, with ', tail: ' opening. Leave the good ones, defend straight and put away the bad balls. Ten wickets, with ball-by-ball commentary.', tag: 'Test match' },
+};
+/* back to a fresh innings on the start screen: new bowler and field for the format, everyone in position */
+function menuReset() {
+  newInnings();
+  game.del = makeDelivery(game.bowl[game.bowler]); setFieldFor(game.del);
+  for (const f of fielders) { if (f.isBowler) continue; f.pos.copy(f.home); f.heading = Math.atan2(-f.pos.x, -1 - f.pos.z); }
+  placeStriker(rigA); placeNonStriker(rigB); resetBowler();
+  ball.position.set(bowler.pos.x, 1.0, bowler.pos.z);
+}
+function formatUI(fmt) {
+  const F = FORMATS[fmt], T = FORMAT_TEXT[fmt];
+  document.querySelectorAll('[data-ov]').forEach((b, i) => {
+    const ov = F.overs[i]; b.dataset.ov = ov; b.textContent = ov ? String(ov) : '∞';
+    b.setAttribute('aria-label', ov ? `${ov} overs` : 'Until all out'); b.classList.toggle('on', ov === game.overs);
+  });
+  document.querySelectorAll('[data-fmt]').forEach((b) => { const on = b.dataset.fmt === fmt; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  $('startEyebrow').textContent = T.eyebrow; $('ledeLead').textContent = T.lead; $('ledeTail').textContent = T.tail; $('bugTag').textContent = T.tag;
+}
+function setFormat(fmt, quiet) {
+  game.format = fmt;
+  const F = FORMATS[fmt];
+  if (!F.overs.includes(game.overs)) game.overs = F.def;
+  game.total = game.overs ? game.overs * 6 : Infinity;
+  formatUI(fmt);
+  if (!quiet) storage.set('floodlit.format', fmt);
+  if (!game.active) { game.resume = false; menuReset(); }
+  applyLook(fmt);
+  refreshStartPanel(); renderScore();
+}
+document.querySelectorAll('[data-fmt]').forEach((b) => b.addEventListener('click', () => { if (!game.active && b.dataset.fmt !== game.format) setFormat(b.dataset.fmt); }));
+
 /* ------------------------------------------------------------- game loop */
 const ballPrev = new V3();
 function updateGame(dt) {
@@ -3805,7 +4276,7 @@ function updateGame(dt) {
       const wait = game.outcome && game.outcome.out ? 3.2 : 2.3;
       if ((game.deadT > wait && (!P || P.t >= runEnd)) || (game.skip && game.deadT > 0.6)) {
         game.deadFlight = false;
-        if (game.wkts >= 10 || game.balls >= game.total) endInnings();
+        if (game.wkts >= 10 || game.balls >= game.total || (game.innings === 2 && game.runs >= game.target)) endInnings();
         else enterBetween(false);
       }
     }
@@ -3881,7 +4352,14 @@ window.addEventListener('keydown', (e) => {
   if (e.repeat) return;
   if (game.paused) { resume(); return; }
   if (game.state === 'menu' && !$('startPanel').hidden) { if (e.key === 'Enter') { if (!Loader.ready) Loader.request(); else if (xiReady()) startInnings(game.resume); } return; }
-  if (game.state === 'over') { if (e.key === 'r' || e.key === 'R' || e.key === 'Enter') restart(); return; }
+  if (game.state === 'over') {
+    if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
+      if (!$('resultPanel').hidden) newMatch();
+      else if (!$('endPanel').hidden && e.key === 'Enter') playHumanChase();
+      else if (!$('simPanel').hidden && simRun) simRun.skip = true;
+    }
+    return;
+  }
   if (map[e.key]) act(map[e.key]);
   else if (e.code === 'Space') act('swing');
   else if (e.key === 'd' || e.key === 'D') act('block');
@@ -3915,7 +4393,7 @@ function toggleVoice() {
 }
 $('voiceBtn').addEventListener('click', () => { toggleVoice(); canvas.focus({ preventScroll: true }); });
 document.querySelectorAll('[data-ov]').forEach((b) => b.addEventListener('click', () => {
-  game.overs = +b.dataset.ov; game.total = game.overs * 6; game.resume = false;
+  game.overs = +b.dataset.ov; game.total = game.overs ? game.overs * 6 : Infinity; game.resume = false;
   document.querySelectorAll('[data-ov]').forEach((x) => x.classList.toggle('on', x === b));
   refreshStartPanel(); renderScore();
 }));
@@ -3925,9 +4403,9 @@ document.querySelectorAll('[data-diff]').forEach((b) => b.addEventListener('clic
   setTimingZones();
 }));
 function refreshStartPanel() {
-  const best = game.best[game.overs];
+  const best = game.best[bestId()];
   $('bestStart').textContent = best === undefined ? 'none yet' : best;
-  $('startFine').firstChild.textContent = `Best for ${game.overs} overs: `;
+  $('startFine').firstChild.textContent = `Best for ${oversName()}: `;
   renderSquad();
   if (!Loader.ready) return; // the loader owns the button until everything is ready
   const full = xiPicked.filter(Boolean).length === XI_SIZE;
@@ -3966,8 +4444,7 @@ document.querySelectorAll('#squadGrid .pl').forEach((b) => b.addEventListener('c
 }
 const xiReady = () => game.resume || xiPicked.filter(Boolean).length === XI_SIZE;
 $('playBtn').addEventListener('click', () => { if (xiReady()) startInnings(game.resume); });
-function restart() { $('endPanel').hidden = true; game.resume = false; startInnings(false); }
-$('restartBtn').addEventListener('click', restart);
+
 
 function pause() {
   if (game.paused || !game.active || game.state === 'over') return;
@@ -4109,14 +4586,20 @@ function boot(data) {
   if (data.view) setView(data.view);
   if (data.muted) toggleMute();
   if (data.voice === false) { Voice.set(false); Caller.set(false); $('icoVoice').hidden = true; $('icoVoiceOff').hidden = false; }
-  if (data.overs && [2, 5, 10, 20].includes(data.overs)) game.overs = data.overs;
+  {
+    const fmt = data.format || storage.get('floodlit.format');
+    game.format = FORMATS[fmt] ? fmt : 't20';
+  }
+  if (data.overs !== undefined && FORMATS[game.format].overs.includes(data.overs)) game.overs = data.overs;
+  else if (!FORMATS[game.format].overs.includes(game.overs)) game.overs = FORMATS[game.format].def;
+  formatUI(game.format);
   if (data.diff && DIFF[data.diff]) game.diff = data.diff;
   document.querySelectorAll('[data-ov]').forEach((x) => x.classList.toggle('on', +x.dataset.ov === game.overs));
   document.querySelectorAll('[data-diff]').forEach((x) => x.classList.toggle('on', x.dataset.diff === game.diff));
-  game.total = game.overs * 6;
+  game.total = game.overs ? game.overs * 6 : Infinity;
   newInnings();
   const inn = data.innings;
-  if (inn && inn.bats && inn.balls < game.overs * 6 && inn.wkts < 10) {
+  if (inn && inn.bats && inn.balls < game.total && inn.wkts < 10 && !(inn.innings === 2 && inn.runs >= inn.target)) {
     const { sIdx, nIdx, ...rest } = inn;
     Object.assign(game, rest);
     setBatter(rigA, sIdx); setBatter(rigB, nIdx);
@@ -4135,6 +4618,7 @@ function boot(data) {
   resetBowler();
   ball.position.set(bowler.pos.x, 1.0, bowler.pos.z);
   setTimingZones();
+  applyLook(game.format);
   refreshStartPanel();
   renderScore();
   updateShotHUD();
@@ -4158,10 +4642,10 @@ function redrawText() {
 /* Loading: upload every texture and compile every shader in small steps before the first frame, painting progress
    between steps. Phones then never sit on a frozen screen, and the first ball does not stall on new shaders. */
 async function warmUp() {
-  await Loader.step(0.34, 'Printing the shirts', 0.37);
-  if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]);
+  await Loader.step(0.38, 'Printing the shirts', 0.39);
   redrawText();
-  await Loader.step(0.38, 'Painting the stands', 0.55);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawText);
+  await Loader.step(0.4, 'Painting the stands', 0.55);
   const texs = new Set();
   scene.traverse((o) => {
     if (!o.material) return;
@@ -4180,17 +4664,15 @@ async function warmUp() {
   renderer.compile(scene, camera);
   renderer.debug.checkShaderErrors = check;
   const progs = renderer.info.programs.map((p) => p.program);
+  let waiting = progs.slice();
   if (par) {
     const t0 = performance.now();
-    for (;;) {
-      let n = 0;
-      for (const p of progs) if (gl.getProgramParameter(p, par.COMPLETION_STATUS_KHR)) n++;
-      await Loader.step(0.56 + 0.38 * n / progs.length);
-      if (n === progs.length || performance.now() - t0 > 30000) break;
+    while (waiting.length && performance.now() - t0 < 2500) {
+      waiting = waiting.filter((p) => !gl.getProgramParameter(p, par.COMPLETION_STATUS_KHR));
+      await Loader.step(0.56 + 0.38 * (1 - waiting.length / progs.length));
     }
-  } else {
-    for (let k = 0; k < progs.length; k++) { gl.getProgramParameter(progs[k], gl.LINK_STATUS); await Loader.step(0.56 + 0.38 * (k + 1) / progs.length); }
   }
+  for (let k = 0; k < waiting.length; k++) { gl.getProgramParameter(waiting[k], gl.LINK_STATUS); await Loader.step(0.56 + 0.38 * (1 - (waiting.length - k - 1) / progs.length)); }
   for (const p of progs) if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error('Shader failed to link:', gl.getProgramInfoLog(p));
   await Loader.step(0.96, 'Rolling the pitch', 0.99);
   renderer.render(scene, camera); // compiles the shadow-pass shaders and draws the first frame
@@ -4199,17 +4681,18 @@ async function warmUp() {
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({
-    view: cam.view, muted: Sound.muted, voice: Voice.on, overs: game.overs, diff: game.diff,
+    view: cam.view, muted: Sound.muted, voice: Voice.on, overs: game.overs, diff: game.diff, format: game.format,
     innings: game.active ? {
       runs: game.runs, wkts: game.wkts, balls: game.balls, fours: game.fours, sixes: game.sixes, dots: game.dots,
       log: game.log, fow: game.fow, bats: game.bats, bowl: game.bowl, nextIn: game.nextIn, bowler: game.bowler,
       prevBowler: game.prevBowler, overRuns: game.overRuns, lastOut: game.lastOut, lastOverMark: game.lastOverMark,
-      sIdx: game.rigS.batIdx, nIdx: game.rigN.batIdx,
+      sIdx: game.rigS.batIdx, nIdx: game.rigN.batIdx, spells: game.spells, overBowlers: game.overBowlers,
+      innings: game.innings, batTeam: game.batTeam, target: game.target, first: game.first,
     } : null,
   }));
 }
 if (hot && hot.ready) hot.ready(boot); else boot((hot && hot.data) || {});
-})();
+};
 </script>
 </body>
 </html>

@@ -72,8 +72,13 @@ progress all size themselves off that array automatically.
 
 ## Floodlit Over (`/cricket/`)
 
-A standalone 3D cricket batting game: **Thudinest Coimbatore** bat a
-ten-wicket T20 innings (2, 5, 10 or 20 overs) under floodlights. The
+A standalone 3D cricket game: **Thudinest Coimbatore** against a **World
+XI**, as a T20 under floodlights (2, 5, 10 or 20 overs, coloured kits,
+white ball) or a Test match in daylight (15, 30 or 90 overs, or until all
+out; whites, red ball, white sightscreens, a slip cordon, bowlers in spells).
+Thudinest Coimbatore bat first; then the World XI chase, either batted by a
+player (pass the device to a friend) or by the computer, and the game gives
+the result (won by runs or wickets, tie, or a draw in a timed Test). The
 13-player squad is Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
 Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma; the
 start screen picks which 11 bat (the first 11 by default, remembered per
@@ -96,18 +101,25 @@ keys (or the on-screen pad on phones) and time the swing with Space.
   straight with the hands leading, and each shot has its own held finish
 - Defend mode (D or the DEFEND button) makes Swing play a defensive shot; a
   well-timed defence is never out, only a mistimed one can edge or miss
+- Batter confidence: well-timed shots and boundaries build it (and good
+  leaves in Tests), misses and edges dent it. A confident batter gets
+  slightly wider timing windows and more power, so lofted shots clear the
+  rope more often; the meter sits in the shot panel
 - A T20 field (four in the ring, four on the rope, slip or short leg), fair
   catching (a clean, well-timed stroke along the ground can't be caught) and
   return throws that go into the keeper's gloves
-- A loading percentage on the Start button; tapping it early shows a
-  progress card and starts the innings at 100%. Textures and shaders are
-  prepared in small steps before the first frame, so phones don't freeze
+- Fast loading on phones: the start screen and loading percentage paint
+  first, the engine downloads in parallel (preloaded) and the stadium is
+  built in steps; shaders and textures are prepared before the first frame,
+  and phones get a lighter render profile (1.5x resolution, standard cloth
+  materials, smaller shadow map). Tapping Start early shows a progress card
+  and starts the innings at 100%
 - "Thudinest Sixer / Four / Wicket" pop-ups, Thudinest boundary boards
   and outfield logos, and a full scorecard with a wagon wheel at the end
 
-It's one page, `cricket/index.html`, plus the voice banks in `cricket/voice/`: plain HTML/CSS/JS with
-[three.js r149](https://threejs.org) loaded from the jsDelivr CDN, so it
-needs an internet connection the first time. Best scores are saved in the
+It's one page, `cricket/index.html`, plus the voice banks in `cricket/voice/`
+and [three.js r149](https://threejs.org) (`cricket/three.min.js`, MIT, served
+from this site): plain HTML/CSS/JS. Best scores are saved in the
 browser via `localStorage`; there is no server or database.
 
 **Local development** — from the repo root run
