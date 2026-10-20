@@ -74,15 +74,21 @@ progress all size themselves off that array automatically.
 
 A standalone 3D cricket batting game: **Thudinest Coimbatore** bat a
 ten-wicket T20 innings (2, 5, 10 or 20 overs) under floodlights. The
-batting order opens with Vasanth, Harsha, Sabari, Thananjay and Anush.
-Read the length from the marker on the pitch, pick a shot with the arrow
+13-player squad is Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
+Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma; the
+start screen picks which 11 bat (the first 11 by default, remembered per
+browser). Read the length from the marker on the pitch, pick a shot with the arrow
 keys (or the on-screen pad on phones) and time the swing with Space.
 
 - Five bowlers (three pace, two spin) with their own deliveries, a
   natural run-up, gather, delivery stride and follow-through
-- Ball-by-ball commentary on screen and spoken through the browser's
-  speech engine (toggle with V), plus crowd cheers for boundaries and
-  wickets
+- Ball-by-ball broadcast-style commentary on screen, spoken in a native
+  English voice (British first, then Australian, Irish/NZ or US; Indian
+  English voices are skipped) through the browser's speech engine (toggle
+  with V), plus crowd cheers for boundaries and wickets
+- A loading percentage on the Start button; tapping it early shows a
+  progress card and starts the innings at 100%. Textures and shaders are
+  prepared in small steps before the first frame, so phones don't freeze
 - "Thudinest Sixer / Four / Wicket" pop-ups, Thudinest boundary boards
   and outfield logos, and a full scorecard with a wagon wheel at the end
 
@@ -98,8 +104,9 @@ browser via `localStorage`; there is no server or database.
 `https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
 game card in the Play hub's `.game-cards` list in the root `index.html`.
 
-**Changing the batting order** — edit the `LINEUP` array near the top of
-the script in `cricket/index.html` (name, shirt number, skin tone, look).
+**Changing the squad** — edit the `SQUAD` array near the top of the script
+in `cricket/index.html` (name, shirt number, skin tone, look), and the
+matching name buttons inside `#squadGrid` in the start card.
 
 ## Files
 

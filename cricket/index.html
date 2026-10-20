@@ -59,10 +59,26 @@ body {
 .bug-head small { font: 700 10px/1 var(--font-ui); letter-spacing: 0.16em; opacity: 0.72; }
 .left-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; width: 360px; max-width: 100%; }
 .left-col .bug { width: auto; }
-.comm { background: var(--panel-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 12px 9px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.comm-head { font: 600 11px/1.2 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.comm { position: relative; background: var(--panel-soft); border: 1px solid var(--rule); border-left: 3px solid var(--rule-strong); border-radius: 4px; padding: 8px 12px 9px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: border-color 300ms ease; }
+.comm[data-tone="big"] { border-left-color: var(--gold); }
+.comm[data-tone="out"] { border-left-color: var(--zing); }
+.comm[data-tone="good"] { border-left-color: var(--mint); }
+.comm-head { font: 600 11px/1.2 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; }
 .comm-head b { color: var(--gold); font-weight: 700; margin-right: 6px; }
 .comm-text { font: 500 15px/1.35 var(--font-ui); margin-top: 3px; text-wrap: pretty; }
+.comm-call { display: block; font: 800 24px/1 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; color: var(--chalk); margin: 5px 0 4px; }
+.comm-call:empty { display: none; }
+.comm-call.t-big { color: var(--gold); }
+.comm-call.t-out { color: var(--zing); }
+.comm-call.t-good { color: var(--mint); }
+.comm-eq { position: absolute; top: 9px; right: 11px; display: flex; align-items: flex-end; gap: 2px; height: 10px; opacity: 0; transition: opacity 200ms ease; }
+.comm.speaking .comm-eq { opacity: 1; }
+.comm-eq i { width: 2px; height: 3px; border-radius: 1px; background: var(--gold); }
+.comm.speaking .comm-eq i { animation: eq 0.8s ease-in-out infinite; }
+.comm-eq i:nth-child(2) { animation-delay: -0.2s; }
+.comm-eq i:nth-child(3) { animation-delay: -0.45s; }
+.comm-eq i:nth-child(4) { animation-delay: -0.65s; }
+@keyframes eq { 0%, 100% { height: 3px; } 50% { height: 10px; } }
 .comm.fresh { animation: commIn 380ms ease both; }
 @keyframes commIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .bug-score { display: flex; align-items: baseline; gap: 2px; padding: 8px 12px 6px; font: 900 52px/0.9 var(--font-display); font-variant-numeric: tabular-nums; }
@@ -203,6 +219,32 @@ body.is-touch .bottom { display: none; }
 .seg.light { background: rgba(241, 237, 225, 0.06); }
 .btn { font: 800 20px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; padding: 15px 26px; border-radius: 4px; border: 0; cursor: pointer; background: var(--gold); color: var(--gold-ink); }
 .btn:hover { filter: brightness(1.06); }
+.btn:disabled { cursor: default; filter: saturate(0.4) brightness(0.8); }
+/* while loading, the start button doubles as a progress bar */
+.btn.loading { --p: 0; background: linear-gradient(90deg, var(--gold) calc(var(--p) * 100%), rgba(255, 197, 61, 0.38) calc(var(--p) * 100%)); font-variant-numeric: tabular-nums; min-width: 12ch; }
+.load-card { width: min(420px, 100%); text-align: center; }
+.load-pct { margin: 14px 0 0; font: 900 clamp(84px, 24vw, 120px)/0.85 var(--font-display); font-variant-numeric: tabular-nums; color: var(--chalk); }
+.load-pct span { color: var(--gold); font-size: 0.5em; margin-left: 4px; }
+.load-track { height: 6px; margin: 18px 0 0; border-radius: 3px; background: rgba(241, 237, 225, 0.1); overflow: hidden; }
+.load-track i { display: block; height: 100%; background: var(--gold); transform-origin: left center; transform: scaleX(0); }
+.load-step { margin: 12px 0 0; font: 600 13px/1.3 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.squad { margin-top: 20px; }
+/* wide screens: intro and controls on the left, team and match setup on the right, so Start stays above the fold */
+@media (min-width: 980px) {
+  .start-card { width: min(1000px, 100%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 40px; align-items: start; }
+  .start-setup { padding-top: 4px; }
+  .start-setup .squad { margin-top: 0; }
+}
+.squad-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.squad-note { font: 500 13px/1.2 var(--font-ui); color: var(--muted); }
+.squad-note.bad { color: var(--amber); }
+.squad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 6px; }
+.pl { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 7px 9px; border-radius: 4px; border: 1px solid var(--rule); background: rgba(241, 237, 225, 0.03); color: var(--muted); font: 600 14px/1.1 var(--font-ui); text-align: left; cursor: pointer; }
+.pl i { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 3px; background: rgba(241, 237, 225, 0.08); color: var(--muted); font: 800 13px/1 var(--font-display); font-style: normal; font-variant-numeric: tabular-nums; }
+.pl b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl.on { color: var(--chalk); border-color: rgba(255, 197, 61, 0.5); background: rgba(255, 197, 61, 0.08); }
+.pl.on i { background: var(--gold); color: var(--gold-ink); }
+.pl:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .fine { margin: 14px 0 0; font: 500 13px/1.4 var(--font-ui); color: var(--muted); }
 .fine b { color: var(--chalk); font-weight: 600; font-variant-numeric: tabular-nums; }
 .end-score { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
@@ -241,6 +283,9 @@ body.is-touch .bottom { display: none; }
   .comm { padding: 5px 8px 6px; }
   .comm-head { font-size: 9px; }
   .comm-text { font-size: 12px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .comm-call { display: inline; font-size: 14px; line-height: 1; letter-spacing: 0.02em; margin: 0 5px 0 0; }
+  .comm-head { padding-right: 16px; }
+  .comm-eq { top: 6px; right: 8px; height: 8px; }
   .callout.branded::before { width: 320px; height: 320px; margin: -160px 0 0 -160px; }
   .bug-score { font-size: 34px; padding: 6px 9px 4px; }
   .bug-score .slash, .bug-score .wk { font-size: 24px; }
@@ -281,6 +326,9 @@ body.is-touch .bottom { display: none; }
 }
 @media (max-width: 520px) {
   .ctl-list { grid-template-columns: minmax(0, 1fr); }
+  .squad-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .pl { padding: 6px 7px; gap: 6px; font-size: 13px; }
+  .pl i { width: 18px; height: 18px; font-size: 12px; }
   .end-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; }
 }
 @media (max-height: 520px) {
@@ -289,9 +337,13 @@ body.is-touch .bottom { display: none; }
   .act .loft, .act .block { height: 37px; }
   .tshot { display: none; }
 }
+@media (pointer: coarse) and (hover: none) {
+  .ctl-list { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .pop, .comm.fresh, .callout.branded .callout-brand { animation: none; }
   .callout.branded::before { animation: none; }
+  .comm.speaking .comm-eq i { animation: none; height: 7px; }
   .timing, .t-bar i, .dial .arrow { transition: none; }
 }
 </style>
@@ -311,15 +363,15 @@ body.is-touch .bottom { display: none; }
         <div class="bug-cell bug-rr"><span class="lbl">Run rate</span><b id="rr">0.00</b></div>
       </div>
       <div class="bug-bat">
-        <div class="batter on" id="bat1"><span class="nm" id="nm1">Rahman</span><b id="r1">0</b><span class="bb" id="b1">(0)</span></div>
-        <div class="batter" id="bat2"><span class="nm" id="nm2">Clarke</span><b id="r2">0</b><span class="bb" id="b2">(0)</span></div>
+        <div class="batter on" id="bat1"><span class="nm" id="nm1">Kavin</span><b id="r1">0</b><span class="bb" id="b1">(0)</span></div>
+        <div class="batter" id="bat2"><span class="nm" id="nm2">Harsha</span><b id="r2">0</b><span class="bb" id="b2">(0)</span></div>
       </div>
       <div class="bug-sub">
         <div class="bowl"><span class="lbl">Bowling</span><b id="bowlerName">Mason</b><span id="bowlerFig">0-0 (0.0)</span></div>
         <div class="chips" id="chips" aria-label="This over"></div>
       </div>
     </section>
-    <div class="comm" id="comm" aria-live="polite"><div class="comm-head" id="commHead"><b>Commentary</b>Waiting for the first ball</div><div class="comm-text" id="commText">Thudinest Coimbatore bat first under the lights.</div></div>
+    <div class="comm" id="comm" aria-live="polite"><span class="comm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><div class="comm-head" id="commHead"><b>Commentary</b>Waiting for the first ball</div><div class="comm-text" id="commText"><span class="comm-call" id="commCall"></span><span id="commBody">Thudinest Coimbatore bat first under the lights.</span></div></div>
     </div>
     <div class="top-right">
       <div class="row">
@@ -405,10 +457,11 @@ body.is-touch .bottom { display: none; }
 </div>
 
 <div class="scrim" id="startPanel">
-  <div class="card" role="dialog" aria-labelledby="startTitle">
+  <div class="card start-card" role="dialog" aria-labelledby="startTitle">
+    <div class="start-intro">
     <p class="eyebrow">Thudinest Coimbatore · Day–night T20</p>
     <h1 id="startTitle">Floodlit <span>Over</span></h1>
-    <p class="lede">Thudinest Coimbatore bat first under the lights, with Vasanth and Harsha opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.</p>
+    <p class="lede">Thudinest Coimbatore bat first under the lights, with <span id="openers">Kavin and Harsha</span> opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.</p>
     <ul class="ctl-list">
       <li><kbd>←</kbd><span><b>Leg side</b> · on drive, pull</span></li>
       <li><kbd>→</kbd><span><b>Off side</b> · cover drive, cut</span></li>
@@ -421,6 +474,26 @@ body.is-touch .bottom { display: none; }
       <li><kbd>V</kbd><span><b>Voice</b> · spoken commentary</span></li>
       <li><kbd>M</kbd><span><b>Sound</b> · crowd and effects</span></li>
     </ul>
+    </div>
+    <div class="start-setup">
+    <div class="squad">
+      <div class="squad-head"><span class="lbl">Playing XI</span><span class="squad-note" id="squadNote">Tap a name to swap them in or out · 11 of 13</span></div>
+      <div class="squad-grid" id="squadGrid" role="group" aria-label="Choose the playing eleven">
+          <button type="button" class="pl on" data-i="0" aria-pressed="true"><i>1</i><b>Kavin</b></button>
+          <button type="button" class="pl on" data-i="1" aria-pressed="true"><i>2</i><b>Harsha</b></button>
+          <button type="button" class="pl on" data-i="2" aria-pressed="true"><i>3</i><b>Sabari</b></button>
+          <button type="button" class="pl on" data-i="3" aria-pressed="true"><i>4</i><b>Thananjay</b></button>
+          <button type="button" class="pl on" data-i="4" aria-pressed="true"><i>5</i><b>Vikrant Sahoo</b></button>
+          <button type="button" class="pl on" data-i="5" aria-pressed="true"><i>6</i><b>Vasanth</b></button>
+          <button type="button" class="pl on" data-i="6" aria-pressed="true"><i>7</i><b>Pooja</b></button>
+          <button type="button" class="pl on" data-i="7" aria-pressed="true"><i>8</i><b>Jay</b></button>
+          <button type="button" class="pl on" data-i="8" aria-pressed="true"><i>9</i><b>Venkatesh</b></button>
+          <button type="button" class="pl on" data-i="9" aria-pressed="true"><i>10</i><b>Govind</b></button>
+          <button type="button" class="pl on" data-i="10" aria-pressed="true"><i>11</i><b>Sundarraj</b></button>
+          <button type="button" class="pl" data-i="11" aria-pressed="false"><i>–</i><b>Durai</b></button>
+          <button type="button" class="pl" data-i="12" aria-pressed="false"><i>–</i><b>Kumma</b></button>
+      </div>
+    </div>
     <div class="opts">
       <div class="row"><span class="lbl">Overs</span>
         <div class="seg light" role="group" aria-label="Number of overs">
@@ -443,6 +516,17 @@ body.is-touch .bottom { display: none; }
       <button class="btn" id="playBtn" type="button">Start innings</button>
     </div>
     <p class="fine"><a class="home-link" href="/">&larr; Back to thudinest.com</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="loadPanel" hidden>
+  <div class="card load-card" role="status" aria-live="polite">
+    <p class="eyebrow">Thudinest Coimbatore · Getting ready</p>
+    <div class="load-pct"><b id="loadPct">0</b><span>%</span></div>
+    <div class="load-track"><i id="loadBar"></i></div>
+    <p class="load-step" id="loadStep">Downloading the engine</p>
+    <p class="fine" style="margin-top:14px">The first load takes a little longer on phones. The innings starts by itself at 100%.</p>
   </div>
 </div>
 
@@ -485,13 +569,71 @@ body.is-touch .bottom { display: none; }
   </div>
 </div>
 
+<script>
+/* Loading progress. This runs before the 3D engine downloads, so the Start button answers at once: it shows the
+   percentage while the engine, stadium and shaders load, and a tap during loading opens a progress card and starts
+   the innings by itself at 100%. The game script reports real progress through step() and finishes with done(). */
+window.__load = (() => {
+  const S = { p: 0, cap: 0, shown: 0, label: 'Downloading the engine', ready: false, want: false, creep: true, t0: performance.now(), audio: null };
+  const $ = (id) => document.getElementById(id);
+  const paint = () => {
+    const pct = Math.min(100, Math.floor(S.shown * 100));
+    const btn = $('playBtn');
+    if (btn && !S.ready) { btn.classList.add('loading'); btn.style.setProperty('--p', S.shown.toFixed(3)); btn.textContent = `Loading ${pct}%`; }
+    $('loadPct').textContent = pct; $('loadBar').style.transform = `scaleX(${S.shown.toFixed(3)})`; $('loadStep').textContent = S.label;
+  };
+  const tick = () => {
+    // between real reports the bar keeps easing toward the current stage's ceiling, so a long stage never looks stuck
+    if (S.creep) S.p = Math.max(S.p, 0.3 * (1 - Math.exp(-(performance.now() - S.t0) / 2500)));
+    else if (S.cap > S.p) S.p += (S.cap - S.p) * 0.006;
+    S.shown = S.p - S.shown < 0.003 ? S.p : S.shown + (S.p - S.shown) * 0.3;
+    paint();
+  };
+  const iv = setInterval(tick, 50);
+  tick();
+  /* sound and speech only start from a tap on iPhones, so unlock both now; the game adopts this audio context later */
+  const unlock = () => {
+    try { if (!S.audio) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { S.audio = new AC(); S.audio.resume(); } } } catch (e) { /* no audio */ }
+    try { if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; window.speechSynthesis.speak(u); } } catch (e) { /* no speech */ }
+  };
+  const request = () => { if (S.ready) return; S.want = true; unlock(); $('startPanel').hidden = true; $('loadPanel').hidden = false; };
+  document.addEventListener('click', (e) => {
+    if (S.ready || !e.target.closest || !e.target.closest('#playBtn')) return;
+    e.preventDefault(); e.stopImmediatePropagation(); request();
+  }, true);
+  return {
+    get ready() { return S.ready; },
+    request,
+    takeAudio() { const a = S.audio; S.audio = null; return a; },
+    /* move the bar to p (0-1) and set the stage ceiling it may creep toward, then wait for one painted frame */
+    step(p, label, cap) {
+      S.creep = false; S.p = Math.max(S.p, Math.min(1, p)); if (label) S.label = label; if (cap !== undefined) S.cap = cap;
+      return new Promise((resolve) => {
+        let fired = false; const go = () => { if (!fired) { fired = true; resolve(); } };
+        requestAnimationFrame(() => setTimeout(go, 0)); setTimeout(go, 120);
+      });
+    },
+    stop() { clearInterval(iv); $('loadPanel').hidden = true; },
+    done(start) {
+      S.p = S.shown = 1; S.label = 'Ready'; paint(); clearInterval(iv);
+      S.ready = true;
+      const btn = $('playBtn'); btn.classList.remove('loading'); btn.style.removeProperty('--p');
+      $('loadPanel').hidden = true;
+      if (S.want) start();
+    },
+  };
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
 (function () {
 'use strict';
 const $ = (id) => document.getElementById(id);
-const fatal = (msg) => { $('fatal').hidden = false; $('fatalMsg').textContent = msg; $('startPanel').hidden = true; };
+const fatal = (msg) => { if (window.__load) window.__load.stop(); $('fatal').hidden = false; $('fatalMsg').textContent = msg; $('startPanel').hidden = true; };
 if (typeof THREE === 'undefined') { fatal('The 3D engine did not load. Check your connection, then reload the page.'); return; }
+/* progress from the loader in the page head; the stand-in keeps the game working without it */
+const Loader = window.__load || { ready: true, request() {}, takeAudio: () => null, step: () => Promise.resolve(), done() {}, stop() {} };
+Loader.step(0.32, 'Building the stadium', 0.36);
 if (THREE.ColorManagement) {
   if ('legacyMode' in THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
   if ('enabled' in THREE.ColorManagement) THREE.ColorManagement.enabled = true;
@@ -621,10 +763,10 @@ function drawGrass(g, w, h) {
   g.fillStyle = rg; g.fillRect(0, 0, w, h);
 }
 function drawPitch(g, w, h) {
-  g.fillStyle = '#c3aa74'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#ad8f5c'; g.fillRect(0, 0, w, h);
   for (let i = 0; i < 3200; i++) {
     const x = Math.random() * w, y = Math.random() * h, r = Math.random() * 5 + 1;
-    g.fillStyle = Math.random() < 0.5 ? 'rgba(110,86,48,0.10)' : 'rgba(240,226,186,0.10)';
+    g.fillStyle = Math.random() < 0.5 ? 'rgba(96,74,40,0.12)' : 'rgba(214,196,150,0.09)';
     g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
   }
   const zToY = (z) => (z + 22.26) / 24.4 * h;
@@ -662,7 +804,7 @@ function drawPitch(g, w, h) {
   scene.add(apron);
 
   const pitchTex = canvasTex(256, 2048, drawPitch);
-  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), new THREE.MeshStandardMaterial({ map: pitchTex, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
+  const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), new THREE.MeshStandardMaterial({ map: pitchTex, color: 0xd6cbb6, roughness: 0.92, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
   pitch.rotation.x = -Math.PI / 2; pitch.position.set(0, 0.006, FIELD_C.z); pitch.receiveShadow = true;
   scene.add(pitch);
 
@@ -1240,19 +1382,25 @@ function makeBat() {
 
 /* ------------------------------------------------------------------ people */
 const person = (name, num, skin, look = {}) => ({ name, short: name.includes('. ') ? name.split(' ').pop() : name, num, skin: SKINS[skin], hair: look.hair || 'crop', beard: look.beard || 'none', hairColor: look.hairColor || 'black', build: look.build || 1 });
-const LINEUP = [
-  person('Vasanth', 18, 3, { beard: 'stubble', hair: 'side' }),
+/* the 13-player squad in batting order; the start screen picks which 11 play */
+const SQUAD = [
+  person('Kavin', 11, 2, { beard: 'stubble' }),
   person('Harsha', 7, 1, { beard: 'moustache' }),
   person('Sabari', 45, 0, { beard: 'full', build: 1.05 }),
   person('Thananjay', 10, 5, { beard: 'stubble', hair: 'side' }),
-  person('Anush', 23, 3, {}),
-  person('Karthik', 33, 1, { beard: 'stubble' }),
-  person('Pradeep', 9, 0, { beard: 'moustache', build: 1.06 }),
-  person('Arun', 14, 3, {}),
-  person('Dinesh', 5, 5, { beard: 'full' }),
-  person('Surya', 21, 1, { hair: 'side' }),
-  person('Naveen', 99, 0, { beard: 'stubble', build: 1.04 }),
+  person('Vikrant Sahoo', 23, 3, {}),
+  person('Vasanth', 18, 3, { beard: 'stubble', hair: 'side' }),
+  person('Pooja', 27, 2, { hair: 'side' }),
+  person('Jay', 3, 1, {}),
+  person('Venkatesh', 33, 0, { beard: 'moustache', build: 1.04 }),
+  person('Govind', 9, 5, { beard: 'full' }),
+  person('Sundarraj', 14, 1, { beard: 'stubble' }),
+  person('Durai', 21, 0, { beard: 'moustache', build: 1.06 }),
+  person('Kumma', 99, 3, { beard: 'stubble', hair: 'side' }),
 ];
+const XI_SIZE = 11;
+let xiPicked = SQUAD.map((_, i) => i < XI_SIZE);
+const xiList = () => SQUAD.filter((_, i) => xiPicked[i]);
 const ATTACK = [
   Object.assign(person('D. Mason', 8, 4, { hair: 'side', hairColor: 'brown', build: 1.05 }), { kind: 'fast', style: 'Right-arm fast' }),
   Object.assign(person('R. Ortega', 15, 3, { beard: 'full' }), { kind: 'fastmed', style: 'Right-arm fast-medium' }),
@@ -1391,14 +1539,61 @@ function updateWicket(w, dt, clock) {
 }
 
 /* ---------------------------------------------------------- ball & markers */
+/* The white ball wears a dark rim and keeps a minimum on-screen size in play, so it never melts into the clay. */
+const BALL_VIS = BALL_R * 1.8;
 const ball = new THREE.Group();
 {
-  const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_R * 1.8, 22, 16), std(0xfbfaf4, 0.38, { emissive: 0x33332e }));
+  const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS, 22, 16), std(0xffffff, 0.35, { emissive: 0x6a6a66 }));
   s.castShadow = true; ball.add(s);
-  ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_R * 1.81, 0.0035, 4, 28), std(0x9a9a92, 0.6)));
+  ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.006, 0.0035, 4, 28), std(0x9a9a92, 0.6)));
+  ball.add(new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS * 1.22, 16, 12), new THREE.MeshBasicMaterial({ color: 0x0d0a07, side: THREE.BackSide })));
   scene.add(ball);
 }
 const ballShadow = new THREE.Mesh(GEO.blob, blobMat); ballShadow.rotation.x = -HALF_PI; scene.add(ballShadow);
+
+/* comet trail: a camera-facing ribbon through the ball's recent path, sky blue so it stands off both the clay and the grass */
+const trail = (() => {
+  const N = 24, LIFE = 0.13;
+  const pts = Array.from({ length: N }, () => new V3()), ts = new Float32Array(N);
+  const pos = new Float32Array(N * 6), alpha = new Float32Array(N * 2);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+  geo.setAttribute('alpha', new THREE.BufferAttribute(alpha, 1).setUsage(THREE.DynamicDrawUsage));
+  const idx = [];
+  for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  geo.setIndex(idx);
+  const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+    vertexShader: 'attribute float alpha; varying float vA; void main() { vA = alpha; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'varying float vA; void main() { gl_FragColor = vec4(0.45, 0.84, 1.0, vA); }',
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+  }));
+  mesh.frustumCulled = false; mesh.renderOrder = 3; mesh.visible = false; scene.add(mesh);
+  const side = new V3(), tan = new V3(), view = new V3();
+  let n = 0;
+  return {
+    push(p, t) {
+      if (n && pts[0].distanceToSquared(p) > 9) n = 0; // the ball jumped (new delivery), so start afresh
+      for (let i = Math.min(n, N - 1); i > 0; i--) { pts[i].copy(pts[i - 1]); ts[i] = ts[i - 1]; }
+      pts[0].copy(p); ts[0] = t; n = Math.min(N, n + 1);
+    },
+    update(t, width) {
+      while (n && t - ts[n - 1] > LIFE) n--;
+      mesh.visible = n > 1;
+      if (n < 2) return;
+      for (let i = 0; i < N; i++) {
+        const k = Math.min(i, n - 1), p = pts[k];
+        tan.subVectors(pts[Math.max(0, k - 1)], pts[Math.min(n - 1, k + 1)]);
+        side.crossVectors(tan, view.subVectors(camera.position, p));
+        const u = i < n ? clamp((t - ts[k]) / LIFE, 0, 1) : 1, L = side.length();
+        const w = L > 1e-6 ? width * (1 - u) / L : 0;
+        pos[i * 6] = p.x + side.x * w; pos[i * 6 + 1] = p.y + side.y * w; pos[i * 6 + 2] = p.z + side.z * w;
+        pos[i * 6 + 3] = p.x - side.x * w; pos[i * 6 + 4] = p.y - side.y * w; pos[i * 6 + 5] = p.z - side.z * w;
+        alpha[i * 2] = alpha[i * 2 + 1] = i < n ? 0.62 * (1 - u) * (1 - u) : 0;
+      }
+      geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true;
+    },
+  };
+})();
 
 const marker = new THREE.Group();
 const markerMats = [];
@@ -1496,7 +1691,6 @@ const cols = (...hex) => hex.map((h) => new THREE.Color(h));
 const WOOD = cols(0xfff3d6, 0xffe2a0, 0xffffff, 0xffc86a);
 const DUST = cols(0xb89a68, 0xa48558, 0xcdb48a, 0x8c7048);
 const ZING = cols(0xff4a36, 0xff8a3a, 0xffd0a0);
-const TRAIL = cols(0xffffff);
 const FIREWORK = [cols(0xffc53d, 0xffe08a), cols(0x5ad1ff, 0xbfefff), cols(0xff4a36, 0xff9a7a), cols(0xf1ede1, 0xffffff)];
 
 /* -------------------------------------------------------------------- audio */
@@ -1508,7 +1702,8 @@ const Sound = (() => {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
-      ctx = new AC();
+      ctx = (window.__load && window.__load.takeAudio()) || new AC();
+      if (ctx.state === 'suspended') ctx.resume();
       master = ctx.createGain(); master.gain.value = muted ? 0 : 0.9;
       const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 4;
       master.connect(comp); comp.connect(ctx.destination);
@@ -1903,8 +2098,9 @@ function setBatter(b, idx) {
   b.rig.mats.skin.color.setHex(p.skin);
   drawDecal(b.rig, p.short, p.num, '#ffc53d');
 }
+const freshBats = () => xiList().map((p, i) => Object.assign({}, p, { runs: 0, balls: 0, fours: 0, sixes: 0, out: false, how: '', batted: i < 2 }));
 function newInnings() {
-  game.bats = LINEUP.map((p, i) => Object.assign({}, p, { runs: 0, balls: 0, fours: 0, sixes: 0, out: false, how: '', batted: i < 2 }));
+  game.bats = freshBats();
   game.bowl = ATTACK.map((p) => Object.assign({}, p, { balls: 0, runs: 0, wkts: 0 }));
   Object.assign(game, { runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [], nextIn: 2, overRuns: 0, prevBowler: -1, bowler: 0, lastOut: false, lastOverMark: 0 });
   game.rigS = rigA; game.rigN = rigB;
@@ -1958,8 +2154,8 @@ function startInnings(resume) {
   for (const f of fielders) if (!f.isBowler) f.pos.copy(f.home);
   Sound.applause(0.7, 3);
   const o1 = game.bats[game.rigS.batIdx].name, o2 = game.bats[game.rigN.batIdx].name;
-  showCommentary('', 'Thudinest Coimbatore', `${game.overs} overs`, `${o1} and ${o2} walk out under the lights. ${game.bowl[game.bowler].name} has the ball.`);
-  Voice.say(resume ? `Welcome back. Thudinest Coimbatore are ${game.runs} for ${game.wkts}.` : `Welcome to the stadium. Thudinest Coimbatore bat first, with ${o1} and ${o2} opening. ${game.bowl[game.bowler].short} has the new ball.`, true);
+  showCommentary('', 'Thudinest Coimbatore', `${game.overs} overs`, `${o1} and ${o2} walk out under the lights. ${game.bowl[game.bowler].name} has the ball.`, resume ? 'Welcome back' : 'Good evening, Coimbatore', '');
+  Voice.say(resume ? `Welcome back. Thudinest Coimbatore are ${game.runs} for ${game.wkts}, and the crowd is still very much here.` : fill(pickOne(LINES.welcome), { o1, o2, bw: game.bowl[game.bowler].short }), true);
 }
 
 function enterBetween(first) {
@@ -1971,17 +2167,20 @@ function enterBetween(first) {
     setBatter(game.rigS, idx);
     notes.push(`New batter: ${game.bats[idx].name}`);
     Sound.applause(0.55, 2.5);
-    Voice.say(`${game.bats[idx].name} walks out to the middle.`);
+    Voice.say(fill(pickOne(LINES.newBat), { name: game.bats[idx].name }));
   }
   if (game.balls > 0 && game.balls % 6 === 0 && game.balls !== game.lastOverMark) {
     game.lastOverMark = game.balls;
     notes.push(`End of over ${game.balls / 6} · ${game.overRuns} run${game.overRuns === 1 ? '' : 's'}`);
-    const overRuns = game.overRuns;
+    const overRuns = game.overRuns, pb = game.bowl[game.bowler];
     swapEnds();
     newOver();
     const nb = game.bowl[game.bowler];
-    showCommentary('', `End of over ${game.balls / 6}`, `${overRuns} run${overRuns === 1 ? '' : 's'}`, `Thudinest Coimbatore ${game.runs}/${game.wkts}. ${nb.name} comes on to bowl.`);
-    Voice.say(`End of the over, ${overRuns} from it. Thudinest Coimbatore are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
+    const kind = overRuns === 0 ? 'maiden' : overRuns >= 15 ? 'pricey' : 'overEnd';
+    const ol = fill(pickOne(LINES[kind]), { n: overRuns, bw: pb.short });
+    showCommentary('', `End of over ${game.balls / 6}`, `${overRuns} run${overRuns === 1 ? '' : 's'}`, `${kind === 'overEnd' ? '' : `${ol} `}Thudinest Coimbatore ${game.runs}/${game.wkts}. ${nb.name} comes on to bowl.`,
+      kind === 'maiden' ? 'Maiden over' : kind === 'pricey' ? 'Expensive over' : '', kind === 'maiden' ? 'good' : kind === 'pricey' ? 'big' : '');
+    Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} Thudinest Coimbatore are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
   }
   game.lastOut = false;
   game.del = makeDelivery(game.bowl[game.bowler]); setFieldFor(game.del);
@@ -2169,32 +2368,68 @@ function assignTasks() {
 }
 
 /* ------------------------------------------------------------ commentary */
+/* Spoken in a native English voice: British first, then Australian, Irish/NZ, North American. Indian-English and novelty voices are never chosen. */
 const Voice = (() => {
   const ok = typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined';
-  let on = true, voice = null;
+  const NOVELTY = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|kathy|ralph|grandma|grandpa|rocko|shelley|flo|eddy|reed|sandy)\b/i;
+  const LANGS = [[/^en[-_]GB/i, 60], [/^en[-_]AU/i, 50], [/^en[-_](IE|NZ)/i, 44], [/^en[-_](US|CA)/i, 34], [/^en[-_]ZA/i, 26]];
+  const MOODS = { calm: [1.0, 0.96], lift: [1.07, 1.06], roar: [1.12, 1.14] };
+  let on = true, voice = null, pending = 0;
+  const score = (v) => {
+    const lang = v.lang || '';
+    if (!/^en/i.test(lang) || /^en[-_]IN/i.test(lang) || /india/i.test(v.name) || NOVELTY.test(v.name)) return -1;
+    let s = 10;
+    for (const [re, w] of LANGS) if (re.test(lang)) { s = w; break; }
+    if (/natural|neural|premium|enhanced|online/i.test(v.name)) s += 30;
+    if (/daniel|arthur|oliver|ryan|thomas|george|william|lee|uk english male|united kingdom/i.test(v.name)) s += 12;
+    if (/compact|eloquence/i.test(v.name)) s -= 8;
+    return s;
+  };
   const pick = () => {
     if (!ok) return;
-    const vs = window.speechSynthesis.getVoices() || [];
-    voice = vs.find((v) => /en[-_]IN/i.test(v.lang)) || vs.find((v) => /en[-_]GB/i.test(v.lang)) || vs.find((v) => /^en/i.test(v.lang)) || null;
+    let best = null, bs = -1;
+    for (const v of window.speechSynthesis.getVoices() || []) { const s = score(v); if (s > bs) { bs = s; best = v; } }
+    voice = best;
   };
   if (ok) { pick(); try { window.speechSynthesis.addEventListener('voiceschanged', pick); } catch (e) { /* older engines fire no event */ } }
+  const live = (d) => { pending = Math.max(0, pending + d); $('comm').classList.toggle('speaking', pending > 0); };
+  const clean = (t) => t.replace(/[—·…]/g, ', ').replace(/km\/h/g, 'kilometres an hour').replace(/\s+,/g, ',');
   return {
     get on() { return on; },
-    set(v) { on = v; if (!v && ok) window.speechSynthesis.cancel(); },
-    say(text, interrupt) {
-      if (!ok || !on || Sound.muted || !text) return;
+    set(v) { on = v; if (!v && ok) { window.speechSynthesis.cancel(); pending = 0; live(0); } },
+    /* parts: a string, or [{ t, mood }] spoken back to back so the big calls land with a beat before the colour */
+    say(parts, interrupt) {
+      if (!ok || !on || Sound.muted || !parts) return;
       try {
-        if (interrupt) window.speechSynthesis.cancel();
-        const u = new window.SpeechSynthesisUtterance(text.replace(/[—·]/g, ', ').replace(/km\/h/g, 'kilometres an hour'));
-        if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-IN';
-        u.rate = 1.06; u.pitch = 1; u.volume = 1;
-        window.speechSynthesis.speak(u);
+        if (interrupt) { window.speechSynthesis.cancel(); pending = 0; live(0); }
+        for (const p of typeof parts === 'string' ? [{ t: parts }] : parts) {
+          if (!p.t) continue;
+          const u = new window.SpeechSynthesisUtterance(clean(p.t));
+          if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-GB';
+          const [rate, pitch] = MOODS[p.mood || 'calm'];
+          u.rate = rate; u.pitch = pitch; u.volume = 1;
+          u.onstart = () => live(1);
+          u.onend = u.onerror = () => live(-1);
+          window.speechSynthesis.speak(u);
+        }
       } catch (e) { /* speech is optional */ }
     },
   };
 })();
 const pickOne = (a) => a[(Math.random() * a.length) | 0];
 const fill = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => (v[k] !== undefined ? v[k] : ''));
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+/* each key deals its lines from a shuffled deck, so nothing repeats until the deck runs out */
+const decks = {};
+function deal(key) {
+  const src = LINES[key];
+  let d = decks[key];
+  if (!d || !d.length) {
+    d = decks[key] = src.map((_, i) => i);
+    for (let i = d.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [d[i], d[j]] = [d[j], d[i]]; }
+  }
+  return src[d.pop()];
+}
 /* where the ball went, in fielding-position language, measured from the striker */
 function regionOf(x, z, six) {
   const th = Math.atan2(x, -(z + 1)) / D2R, a = Math.abs(th), off = th >= 0;
@@ -2214,28 +2449,138 @@ function regionOf(x, z, six) {
   if (a < 165) return off ? 'down to third man' : 'down to fine leg';
   return 'fine past the keeper';
 }
+/* [headline call, colour]; an empty call keeps routine balls understated */
 const LINES = {
-  six: ['SIX! {bat} launches that {r6}. Thudinest Sixer!', 'That is huge! {bat} sends {bw} {r6}. Thudinest Sixer!', 'Into the stands! A clean strike {r6} from {bat}. Thudinest Sixer!', 'Gone all the way! {bat} clears the rope {r6}. Thudinest Sixer!'],
-  four: ['FOUR! {shot} from {bat}, {r}, and it races away to the rope.', 'Shot! {r}, beats the fielder, and that is four more.', 'FOUR! Timed beautifully by {bat}, {r}.', 'Cracking shot! {bat} finds the gap {r} for four.'],
-  fourEdge: ['FOUR! Off the {edge}, it flies {r}. {bat} gets lucky there.', 'Edged, and it runs away {r} for four. {bw} cannot believe it.'],
-  caught: ['OUT! {bat} picks out {fname} at {pos}. Gone for {runs}.', 'Caught! {fname} holds on at {pos}. Big wicket for {bw}.', 'In the air, and taken! {fname} at {pos}. {bat} has to go for {runs}.'],
-  caughtBehind: ['OUT! Edged and taken behind. {fname} makes no mistake, and {bat} goes for {runs}.', 'Nicked off! A thin edge carries to the keeper. {bat} departs for {runs}.'],
-  cAndB: ['OUT! Caught and bowled! {bw} snaps up the return catch. {bat} goes for {runs}.'],
-  bowled: ['BOWLED HIM! {bw} knocks back the stumps. {bat} is gone for {runs}.', 'Timber! Through the gate, and the bails are flying. {bat} goes for {runs}.', 'Castled! {bw} beats the bat and hits the top of off. {bat} goes for {runs}.'],
-  bowledLeft: ['BOWLED! {bat} left it alone and lost the stumps. Gone for {runs}.'],
-  playedOn: ['Dragged on! {bat} chops it onto the stumps and has to walk for {runs}.'],
-  one: ['{bat} works it {r} for a single.', 'Pushed {r}, and they scamper through for one.', 'Just the single, {r}.'],
-  two: ['Placed {r}, and they come back for two.', 'Good running! Two more {r}.'],
-  three: ['Into the gap {r}. They run hard and get three.'],
-  block: ['Solid defence from {bat}. No run.', '{bat} gets behind the line and blocks it.', 'Dead bat, and the ball drops at his feet. Dot ball.'],
-  fielded: ['{shot}, but straight to {pos}. No run.', 'Well stopped at {pos}. Dot ball.', 'Firmly struck, but {pos} is there. No run.'],
-  beaten: ['Beaten! It whistles past the outside edge.', 'Played and missed! {bat} was feeling for that one.', 'Lovely delivery from {bw}, right past the edge.'],
-  beatenIn: ['Cramped for room, and {bat} is beaten on the inside.'],
-  left: ['Left alone outside off.', '{bat} shoulders arms and lets it go through to the keeper.'],
-  duck: ['Bouncer! {bat} sways out of the way.', 'Short and sharp, and {bat} ducks underneath it.'],
-  missed: ['Swing and a miss from {bat}.', '{bat} went for the big shot and missed it completely.'],
-  dropped: ['Dropped! {fname} puts down a chance at {pos}.'],
+  six: [
+    ['Into the night sky!', '{bat} picks the length early and sends it sailing {r6}.'],
+    ['Have that!', 'Clean as a whistle from {bat}. {bw} is deposited {r6}.'],
+    ['Gone. All the way.', 'Head still, hands through the line, and that is in orbit {r6}.'],
+    ['Maximum!', 'Sheer timing from {bat}. Barely a follow-through, and it clears the rope {r6}.'],
+    ['That is enormous!', '{bw} offers the length, {bat} offers no mercy. {R6}, and into the stands.'],
+    ['Out of the middle!', 'What a sound off the bat! {bat} launches that {r6}, and somebody has a souvenir.'],
+    ['Sit down, everyone!', 'Effortless. {bat} simply leans on it, and it disappears {r6}.'],
+    ['Six of the best!', 'Pure theatre from {bat}, swatted {r6} with total disdain.'],
+  ],
+  sixCarry: ['That one travelled {m} metres.', '{m} metres, says the tracker.', '{an} {m}-metre strike. Monstrous.'],
+  four: [
+    ['Shot!', 'A gorgeous {shotl} from {bat}, and the outfield does the rest.'],
+    ['Glorious!', 'Timing, not power. {bat} simply caresses it {r} for four.'],
+    ['Pierced the gap!', 'Not a fielder moved. {R}, all along the carpet.'],
+    ['Exquisite.', 'Picture perfect from {bat}. High elbow, full face, and it races {r} to the rope.'],
+    ['Crunched!', '{bat} rocks back and punishes {bw} {r}. Four.'],
+    ['What a stroke!', 'Straight out of the coaching manual. {R}, and nobody gets near it.'],
+    ['Four more.', 'Dispatched {r} with a flick of the wrists. Delightful.'],
+    ['Racing away!', '{R}, and the rope comes up very quickly. Four to {bat}.'],
+  ],
+  fourEdge: [
+    ['Streaky!', 'Off the {edge}, and it flies {r} for four. {bat} will take those.'],
+    ['Edged… and four!', 'Not quite off the middle, but it runs away {r}. {bw} cannot believe it.'],
+    ['Fortune favours the brave.', 'The {edge} flies {r}. Four, and a wry smile from {bat}.'],
+  ],
+  caught: [
+    ['Gone!', '{bat} goes for glory and finds {fname} {at} instead. Out for {runs}.'],
+    ['Taken!', 'Safe as houses. {fname} pouches it {at}, and {bat} departs for {runs}.'],
+    ['In the air… and held!', 'Up, up, and straight down the throat of {fname} {at}. {bat} has to go for {runs}.'],
+    ['Picked out!', 'Plenty of power, not enough elevation. {fname} {at} makes no mistake, and {bat} goes for {runs}.'],
+    ['What a catch!', '{fname} holds a beauty {at}, and {bw} is off on a celebration run. {bat} goes for {runs}.'],
+  ],
+  caughtBehind: [
+    ['Feathered!', 'The faintest of kisses, and {fname} does the rest. {bat} walks for {runs}.'],
+    ['Nicked off!', 'Drawn into the drive, the edge carries, and the gloves close around it. {bat} goes for {runs}.'],
+    ['Gloved it!', 'Through to the keeper and taken cleanly. {bw} gets the edge, {bat} gets the long walk. Out for {runs}.'],
+  ],
+  cAndB: [
+    ['Caught and bowled!', '{bw} sticks out a hand, and it sticks! {bat} is gone for {runs}.'],
+    ['Return catch!', 'Straight back to {bw}, who gobbles it up. {bat} departs for {runs}.'],
+  ],
+  bowled: [
+    ['Clean bowled!', 'Through the gate, and the stumps are in a mess. {bw} has the last laugh, and {bat} goes for {runs}.'],
+    ['Timber!', 'The sound every bowler lives for. Off stump cartwheeling, and {bat} is gone for {runs}.'],
+    ['Castled!', '{bw} beats the bat and rattles the woodwork. {bat} departs for {runs}.'],
+    ['Knocked over!', 'Too quick, too straight, too good. {bat} is bowled for {runs}.'],
+  ],
+  bowledLeft: [
+    ['Shouldered arms… and bowled!', 'A judgement call gone horribly wrong. {bat} leaves it and loses the off stump. Out for {runs}.'],
+    ['Oh dear, oh dear.', '{bat} lets it go and hears the death rattle. Bowled for {runs}.'],
+  ],
+  playedOn: [
+    ['Dragged on!', 'The cruellest of deflections: an inside edge, straight onto the stumps. {bat} goes for {runs}.'],
+    ['Chopped on!', '{bat} plays it onto the timber and can only look to the heavens. Out for {runs}.'],
+  ],
+  one: [
+    ['', 'Worked {r}, and they scamper through for one.'],
+    ['', 'Soft hands from {bat}, {r}, and an easy single.'],
+    ['', 'Nudged {r}. Strike rotated, nice and tidy.'],
+    ['', 'Just the one, {r}. Busy cricket.'],
+  ],
+  two: [
+    ['Good running!', 'Placed {r}, and they come back hard for the second.'],
+    ['', '{bat} finds the gap {r}, and it is two all the way.'],
+    ['', 'Pushed {r}. A sharp call, and they make their ground for two.'],
+  ],
+  three: [
+    ['Superb running!', '{R}, and they turn the third with something to spare.'],
+    ['', 'Chased down just inside the rope {r}. Three, and some heavy breathing.'],
+  ],
+  block: [
+    ['', 'Solid as a rock from {bat}. No run.'],
+    ['', 'Dead bat, eyes level, ball at the feet. Dot ball.'],
+    ['', 'Watchful from {bat}, right behind the line.'],
+    ['', 'Defended with soft hands. {bw} nods in respect.'],
+  ],
+  fielded: [
+    ['', '{shot}, struck firmly, but straight to {pos}. Dot ball.'],
+    ['', 'Well hit, but {pos} is there. No run.'],
+    ['', 'Crisp off the bat, but it finds {pos}. {bw} wins that one.'],
+  ],
+  saved: [
+    ['Great stop!', 'Full stretch from {fname} {at}. That was four all day.'],
+    ['What a save!', '{fname} flings out a hand {at} and cuts it off. Superb.'],
+    ['Brilliant fielding!', 'A full-length dive {at}, and {fname} saves certain runs.'],
+  ],
+  beaten: [
+    ['Ooh!', 'Past the outside edge, and {bat} is left to admire it.'],
+    ['Played and missed!', 'A beauty from {bw}. Pitched, held its line, and beat everything.'],
+    ['What a delivery!', 'That is a jaffa. {bat} was feeling for it, and found only fresh air.'],
+    ['Beaten!', 'It shaped away late, and the bat was nowhere near it.'],
+  ],
+  beatenIn: [
+    ['Squared up!', '{bat} is beaten on the inside, and that has scuttled past the stumps.'],
+    ['Close!', 'Nipped back off the seam and beat the inside edge. A whisker from the timber.'],
+  ],
+  left: [
+    ['', 'Judged to perfection. {bat} lets it go.'],
+    ['', 'Shouldered arms outside off. Disciplined from {bat}.'],
+    ['', 'Left alone, and it thuds into the gloves of the keeper.'],
+  ],
+  duck: [
+    ['Bouncer!', '{bat} sways out of the way like a matador.'],
+    ['Short and sharp!', '{bat} drops the wrists just in time. Nasty.'],
+    ['', 'Banged in, and {bat} ducks underneath it. Sensible.'],
+  ],
+  missed: [
+    ['', 'Big swing, big miss. {bw} wins that round.'],
+    ['', '{bat} has a mighty heave and connects with nothing but the Coimbatore air.'],
+    ['', 'Swing and a miss. A touch too eager from {bat}.'],
+  ],
+  dropped: [
+    ['Dropped!', '{fname} {at} puts down a chance.'],
+    ['Spilled it!', 'A real let-off. {fname} {at} cannot hold on.'],
+  ],
+  streak: ['{n} boundaries on the bounce. {bw} is running out of ideas.', '{n} in a row! {bat} is in the mood.'],
+  pair: ['Back-to-back boundaries!', 'Two in two for {bat}.'],
+  dots: ['{n} dots on the trot. The pressure is building.', 'Another dot. {bw} has {bat} tied down here.'],
+  pace: ['{kmh} on the speed gun. Serious heat.', 'And that was {kmh} kilometres an hour. Express.'],
+  welcome: [
+    'Good evening, and welcome to a packed house under the lights here in Coimbatore. Thudinest Coimbatore will bat first. {o1} and {o2} to open, and {bw} has the new ball.',
+    'Welcome along, everyone. The floodlights are blazing, the crowd is buzzing, and Thudinest Coimbatore are about to bat. {o1} and {o2} walk out, and {bw} takes the new ball.',
+  ],
+  newBat: ['{name} makes the walk to the middle. Big moment.', 'In comes {name}. Plenty of work still to do.', 'Here is {name}, taking guard to a warm reception.'],
+  maiden: ['A maiden over! Superb control from {bw}.'],
+  pricey: ['{n} off that over. {bw} will want to forget it.', 'An expensive over, {n} from it.'],
+  overEnd: ['End of the over, {n} from it.', 'That is the over. {n} off it.'],
 };
+const sayRuns = (n) => (n === 1 ? 'one run' : `${n} runs`);
 function deliveryNote(d) {
   const line = d.landX > 0.3 ? 'outside off' : d.landX < -0.15 ? 'on the pads' : 'at the stumps';
   const len = { yorker: 'Yorker length', full: 'Full', good: 'Good length', short: 'Short', bouncer: 'Bouncer' }[d.length];
@@ -2244,34 +2589,68 @@ function deliveryNote(d) {
 }
 const nameOf = (f) => (f.isKeeper ? KEEPER_P.short : f.person ? f.person.short : f.name);
 const posOf = (f) => (f.isKeeper ? 'the keeper' : f.isBowler ? 'the bowler' : f.name);
+const atOf = (f) => (f.isKeeper ? 'behind the stumps' : f.isBowler ? 'in the follow-through' : `at ${f.name}`);
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const word = (n) => WORDS[n] || String(n);
+/* how far a six carried: first touchdown beyond the rope, measured from the striker */
+function sixCarry(sim) {
+  if (!sim || sim.boundaryIdx === null) return 0;
+  let i = sim.boundaryIdx;
+  while (i < sim.n - 1 && sim.air[i]) i++;
+  return Math.round(Math.hypot(sim.pts[i * 3], sim.pts[i * 3 + 2] + 1));
+}
+const trailing = (test) => { let n = 0; for (let i = game.log.length - 1; i >= 0 && test(game.log[i]); i--) n++; return n; };
+/* returns { call, text, tone } — tone colours the headline: big (boundary), out, good (bowling/fielding), or none */
 function commentFor(o, bat, bw) {
   const sw = game.swing, P = game.play, d = game.del;
-  const v = { bat: bat.short, bw: bw.short, runs: bat.runs, shot: P ? P.shot : '', r: 'into the field', r6: 'into the crowd', fname: '', pos: '', edge: 'edge' };
+  const v = { bat: bat.short, bw: bw.short, runs: bat.runs ? bat.runs : bat.balls === 1 ? 'a golden duck' : 'a duck', shot: P ? P.shot : '', shotl: P ? P.shot.toLowerCase() : 'shot', r: 'into the field', r6: 'into the crowd', fname: '', pos: '', at: '', edge: 'edge', kmh: Math.round(d.kmh) };
   if (o.end) { v.r = regionOf(o.end.x, o.end.z, false); v.r6 = regionOf(o.end.x, o.end.z, true); }
-  if (o.f) { v.fname = nameOf(o.f); v.pos = posOf(o.f); }
+  v.R = cap(v.r); v.R6 = cap(v.r6);
+  if (o.f) { v.fname = nameOf(o.f); v.pos = posOf(o.f); v.at = atOf(o.f); }
   if (P && P.edge) v.edge = P.edge.toLowerCase();
-  let pre = '';
-  const drop = P && P.events.find((e) => e.kind === 'drop');
-  if (drop) pre = fill(pickOne(LINES.dropped), { fname: nameOf(drop.f), pos: posOf(drop.f) }) + ' ';
-  let key;
-  if (o.kind === 'six') key = 'six';
-  else if (o.kind === 'four') key = P && P.edge ? 'fourEdge' : 'four';
-  else if (o.kind === 'caught') key = o.f.isKeeper ? 'caughtBehind' : o.f.isBowler ? 'cAndB' : 'caught';
-  else if (o.kind === 'bowled') key = sw ? 'bowled' : 'bowledLeft';
-  else if (o.kind === 'playedon') key = 'playedOn';
-  else if (o.kind === 'field') key = o.runs === 1 ? 'one' : o.runs === 2 ? 'two' : o.runs >= 3 ? 'three' : sw && sw.block ? 'block' : 'fielded';
+  let key, tone = '';
+  if (o.kind === 'six') { key = 'six'; tone = 'big'; }
+  else if (o.kind === 'four') { key = P && P.edge ? 'fourEdge' : 'four'; tone = 'big'; }
+  else if (o.kind === 'caught') { key = o.f.isKeeper ? 'caughtBehind' : o.f.isBowler ? 'cAndB' : 'caught'; tone = 'out'; }
+  else if (o.kind === 'bowled') { key = sw ? 'bowled' : 'bowledLeft'; tone = 'out'; }
+  else if (o.kind === 'playedon') { key = 'playedOn'; tone = 'out'; }
+  else if (o.kind === 'field') key = o.runs === 1 ? 'one' : o.runs === 2 ? 'two' : o.runs >= 3 ? 'three' : sw && sw.block ? 'block' : o.dive && !o.f.isBowler && !o.f.isKeeper ? 'saved' : 'fielded';
   else if (!sw) key = d.length === 'bouncer' || d.length === 'short' ? 'duck' : 'left';
   else if (sw.plan && sw.plan.beaten === 'Beaten on the inside') key = 'beatenIn';
   else if (sw.plan && sw.plan.beaten) key = 'beaten';
   else key = 'missed';
-  return pre + fill(pickOne(LINES[key]), v);
+  const drop = P && P.events.find((e) => e.kind === 'drop');
+  if (drop && key === 'saved') key = 'fielded';
+  let [call, text] = deal(key);
+  call = fill(call, v); text = fill(text, v);
+  if (call && !tone) tone = 'good';
+  if (drop) {
+    const [dc, dt] = deal('dropped');
+    text = `${fill(dt, { fname: nameOf(drop.f), at: atOf(drop.f) })} ${text}`;
+    if (tone !== 'big') { call = dc; tone = 'good'; }
+  }
+  // a touch of context: carry on sixes, streaks, ducks, pressure and pace
+  const extra = [];
+  if (o.kind === 'six') { const m = sixCarry(P && P.sim); if (m >= 60) extra.push(fill(pickOne(LINES.sixCarry), { m, an: /^(8|11$|18$)/.test(String(m)) ? 'An' : 'A' })); }
+  if (o.boundary) {
+    const n = trailing((e) => e.boundary);
+    if (n >= 3) extra.push(fill(pickOne(LINES.streak), { ...v, n: cap(word(n)) })); else if (n === 2) extra.push(fill(pickOne(LINES.pair), v));
+  }
+  if (!o.out && o.runs === 0) {
+    const n = trailing((e) => !e.out && e.runs === 0);
+    if (n >= 3 && Math.random() < 0.6) extra.push(fill(pickOne(LINES.dots), { ...v, n: cap(word(n)) }));
+    else if (d.kmh >= 147 && Math.random() < 0.5) extra.push(fill(pickOne(LINES.pace), v));
+  }
+  if (extra.length) text += ` ${extra.join(' ')}`;
+  return { call, text, tone };
 }
-function showCommentary(tag, head, note, text) {
+function showCommentary(tag, head, note, text, call = '', tone = '') {
   const h = $('commHead'); h.textContent = '';
   if (tag) { const b = document.createElement('b'); b.textContent = tag; h.appendChild(b); }
   h.appendChild(document.createTextNode(note ? `${head} · ${note}` : head));
-  $('commText').textContent = text;
-  const el = $('comm'); el.classList.remove('fresh'); void el.offsetWidth; el.classList.add('fresh');
+  const c = $('commCall'); c.textContent = call; c.className = `comm-call${tone ? ` t-${tone}` : ''}`;
+  $('commBody').textContent = text;
+  const el = $('comm'); el.dataset.tone = tone; el.classList.remove('fresh'); void el.offsetWidth; el.classList.add('fresh');
 }
 
 /* -------------------------------------------------------------- outcomes */
@@ -2292,13 +2671,13 @@ function finishBall(o) {
     game.fow.push(`${game.wkts}-${game.runs} (${bat.short}, ${oversText()})`);
     game.rigS.walkDelay = 1.1;
   } else {
-    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - o.runs < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); Voice.say(`That's ${m === 50 ? 'fifty' : 'a hundred'} for ${bat.name}! The crowd are on their feet.`); }, 900); }
+    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - o.runs < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); Voice.say(m === 50 ? `Raise the bat, ${bat.name}! A magnificent fifty, and Coimbatore rises as one.` : `A hundred! Take a bow, ${bat.name}. An innings of the very highest class.`); }, 900); }
     if (o.runs % 2 === 1) swapEnds();
   }
   game.log.push({ runs: o.runs, out: !!o.out, boundary: !!o.boundary, end: o.end || null });
-  const line = commentFor(o, bat, bw);
-  showCommentary(tag, `${bw.short} to ${bat.short}`, deliveryNote(game.del), line);
-  Voice.say(`${bw.short} to ${bat.short}. ${line}`, true);
+  const c = commentFor(o, bat, bw);
+  showCommentary(tag, `${bw.short} to ${bat.short}`, deliveryNote(game.del), c.text, c.call, c.tone);
+  Voice.say(c.call ? [{ t: c.call, mood: c.tone === 'good' ? 'lift' : 'roar' }, { t: c.text }] : `${bw.short} to ${bat.short}. ${c.text}`, true);
   renderScore();
   drawScreen(o.out ? { text: 'WICKET', bg: '#ff4a36', fg: '#ffffff' } : o.runs === 6 ? { text: 'SIXER', bg: '#ffc53d', fg: '#1b1404' } : (o.runs === 4 && o.boundary) ? { text: 'FOUR', bg: '#ffc53d', fg: '#1b1404' } : null);
 }
@@ -2336,7 +2715,7 @@ function onEvent(ev) {
     const where = ev.f.isKeeper ? 'gathered by the keeper' : ev.f.isBowler ? 'stopped by the bowler' : `fielded at ${ev.f.name}`;
     showCallout(label, `${P.shot} · ${where}`, ev.runs ? 'k-runs' : 'k-dot');
     if (ev.runs >= 2) Sound.applause(0.3, 1.5);
-    finishBall({ runs: ev.runs, kind: 'field', f: ev.f, end: { x: ev.x, z: ev.z } });
+    finishBall({ runs: ev.runs, kind: 'field', f: ev.f, dive: !!ev.dive, end: { x: ev.x, z: ev.z } });
   } else if (ev.kind === 'bowled') {
     const v = velAt(P.sim, Math.max(0, Math.round(ev.t / H) - 1), new V3());
     breakWicket(wicket, v, sampleAt(P.sim, ev.t, tmp).x);
@@ -2471,7 +2850,7 @@ function endInnings() {
   }
   $('fowLine').textContent = (game.fow.length ? `Fall of wickets: ${game.fow.join(', ')}. ` : '') + (dnb.length ? `Did not bat: ${dnb.join(', ')}.` : '');
   drawWagon();
-  Voice.say(allOut ? `That's the end of the innings. Thudinest Coimbatore are all out for ${game.runs}.` : `That's the end of the innings. Thudinest Coimbatore finish on ${game.runs} for ${game.wkts}.`);
+  Voice.say(allOut ? `And that is the end of the innings. Thudinest Coimbatore are all out for ${game.runs}. What a night of cricket.` : `And that is the innings. Thudinest Coimbatore finish on ${game.runs} for ${game.wkts}. What a night of cricket under the Coimbatore lights.`);
   setTimeout(() => { if (game.state === 'over') $('endPanel').hidden = false; }, 600);
   renderScore();
 }
@@ -3118,7 +3497,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Shift') { game.shift = true; updateShotHUD(); return; }
   if (e.repeat) return;
   if (game.paused) { resume(); return; }
-  if (game.state === 'menu' && !$('startPanel').hidden) { if (e.key === 'Enter') startInnings(game.resume); return; }
+  if (game.state === 'menu' && !$('startPanel').hidden) { if (e.key === 'Enter') { if (!Loader.ready) Loader.request(); else if (xiReady()) startInnings(game.resume); } return; }
   if (game.state === 'over') { if (e.key === 'r' || e.key === 'R' || e.key === 'Enter') restart(); return; }
   if (map[e.key]) act(map[e.key]);
   else if (e.code === 'Space') act('swing');
@@ -3166,9 +3545,44 @@ function refreshStartPanel() {
   const best = game.best[game.overs];
   $('bestStart').textContent = best === undefined ? 'none yet' : best;
   $('startFine').firstChild.textContent = `Best for ${game.overs} overs: `;
-  $('playBtn').textContent = game.resume ? `Resume · ${game.runs}/${game.wkts} in ${oversText()} ov` : 'Start innings';
+  renderSquad();
+  if (!Loader.ready) return; // the loader owns the button until everything is ready
+  const full = xiPicked.filter(Boolean).length === XI_SIZE;
+  const btn = $('playBtn');
+  btn.disabled = !game.resume && !full;
+  btn.textContent = game.resume ? `Resume · ${game.runs}/${game.wkts} in ${oversText()} ov` : full ? 'Start innings' : `Pick ${XI_SIZE} to start`;
 }
-$('playBtn').addEventListener('click', () => startInnings(game.resume));
+/* squad picker: tap to toggle; batting order follows the squad order among those picked */
+function renderSquad() {
+  let n = 0;
+  document.querySelectorAll('#squadGrid .pl').forEach((b) => {
+    const on = xiPicked[+b.dataset.i];
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+    b.querySelector('i').textContent = on ? String(++n) : '–';
+    b.disabled = game.resume;
+  });
+  const note = $('squadNote');
+  note.textContent = game.resume ? 'Innings in progress' : n === XI_SIZE ? `Tap a name to swap them in or out · ${n} of ${SQUAD.length}` : `${n} picked. Choose exactly ${XI_SIZE} to bat`;
+  note.classList.toggle('bad', !game.resume && n !== XI_SIZE);
+  const xi = xiList();
+  if (xi.length >= 2 && !game.resume) $('openers').textContent = `${xi[0].name} and ${xi[1].name}`;
+}
+document.querySelectorAll('#squadGrid .pl').forEach((b) => b.addEventListener('click', () => {
+  if (game.resume) return;
+  const i = +b.dataset.i;
+  xiPicked[i] = !xiPicked[i];
+  storage.set('floodlit.xi', JSON.stringify(SQUAD.filter((_, k) => xiPicked[k]).map((p) => p.name)));
+  game.bats = freshBats(); setBatter(rigA, 0); setBatter(rigB, 1);
+  refreshStartPanel(); renderScore();
+}));
+{
+  try {
+    const saved = JSON.parse(storage.get('floodlit.xi') || 'null');
+    if (Array.isArray(saved) && saved.length === XI_SIZE && saved.every((n) => SQUAD.some((p) => p.name === n))) xiPicked = SQUAD.map((p) => saved.includes(p.name));
+  } catch (e) { /* keep the default XI */ }
+}
+const xiReady = () => game.resume || xiPicked.filter(Boolean).length === XI_SIZE;
+$('playBtn').addEventListener('click', () => { if (xiReady()) startInnings(game.resume); });
 function restart() { $('endPanel').hidden = true; game.resume = false; startInnings(false); }
 $('restartBtn').addEventListener('click', restart);
 
@@ -3267,11 +3681,16 @@ function frame(now) {
   const hgt = Math.max(0, bp.y);
   ballShadow.scale.setScalar(0.18 + hgt * 0.05);
   ballShadow.visible = ball.visible && hgt < 25;
-  const spd = tmp.copy(bp).sub(ballTrailPrev).length() / Math.max(rdt, 1e-4);
-  if (ball.visible && (game.state === 'flight' || game.state === 'inplay') && spd > 6 && !(game.play && game.play.holder)) {
-    sparks.spawn(bp, 2, { colors: TRAIL, speed: 0, life: 0.14, size: 0.085, alpha: 0.42, jitter: 0.001 });
-  }
+  const spd = tmp.copy(bp).sub(ballTrailPrev).length() / Math.max(dt, 1e-4);
+  const loose = ball.visible && (game.state === 'flight' || game.state === 'inplay') && !(game.play && game.play.holder);
+  if (loose && spd > 6) trail.push(bp, game.clock);
   ballTrailPrev.copy(bp);
+  // in play the ball stays at least ~1.3% of the view tall (7-12 px), however far it is from the camera
+  const viewH = canvas.clientHeight || window.innerHeight;
+  const pxPerM = viewH / (2 * Math.max(0.5, camera.position.distanceTo(bp)) * Math.tan(camera.fov * D2R / 2));
+  const want = loose ? clamp(clamp(viewH * 0.013, 7, 12) / (2 * BALL_VIS * pxPerM), 1, 2.4) : 1;
+  ball.scale.setScalar(damp(ball.scale.x, want, 14, rdt));
+  trail.update(game.clock, BALL_VIS * ball.scale.x * 0.95);
   ball.rotation.x += rdt * 25; ball.rotation.y += rdt * 9;
 
   if (marker.visible) {
@@ -3341,11 +3760,62 @@ function boot(data) {
   refreshStartPanel();
   renderScore();
   updateShotHUD();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
-    drawScreen(null); led.redraw();
-    for (const r of [rigA.rig, rigB.rig, ...fielders.map((f) => f.rig)]) { if (r.decalInfo) drawDecal(r, ...r.decalInfo); if (r.frontCanvas) drawFront(r); }
+  if (!window.__load) { // no loader on the page (tests): start straight away
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawText);
+    requestAnimationFrame(frame);
+    return;
+  }
+  warmUp().catch((e) => console.warn('Warm-up skipped:', e)).then(() => {
+    requestAnimationFrame(frame);
+    Loader.done(() => { if (xiReady()) startInnings(game.resume); else $('startPanel').hidden = false; });
+    refreshStartPanel();
   });
-  requestAnimationFrame(frame);
+}
+/* boards, big screen and shirt names are canvas text, redrawn once the web fonts arrive */
+function redrawText() {
+  drawScreen(null); led.redraw();
+  for (const r of [rigA.rig, rigB.rig, ...fielders.map((f) => f.rig)]) { if (r.decalInfo) drawDecal(r, ...r.decalInfo); if (r.frontCanvas) drawFront(r); }
+}
+/* Loading: upload every texture and compile every shader in small steps before the first frame, painting progress
+   between steps. Phones then never sit on a frozen screen, and the first ball does not stall on new shaders. */
+async function warmUp() {
+  await Loader.step(0.34, 'Printing the shirts', 0.37);
+  if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]);
+  redrawText();
+  await Loader.step(0.38, 'Painting the stands', 0.55);
+  const texs = new Set();
+  scene.traverse((o) => {
+    if (!o.material) return;
+    for (const m of [].concat(o.material)) {
+      for (const k in m) if (m[k] && m[k].isTexture) texs.add(m[k]);
+      if (m.uniforms) for (const k in m.uniforms) { const v = m.uniforms[k].value; if (v && v.isTexture) texs.add(v); }
+    }
+  });
+  let i = 0;
+  for (const t of texs) { renderer.initTexture(t); if (++i % 3 === 0) await Loader.step(0.38 + 0.18 * i / texs.size); }
+  await Loader.step(0.56, 'Switching on the floodlights', 0.93);
+  // issue every compile at once without waiting on each, then follow them to completion
+  const gl = renderer.getContext(), par = gl.getExtension('KHR_parallel_shader_compile');
+  const check = renderer.debug.checkShaderErrors;
+  renderer.debug.checkShaderErrors = false;
+  renderer.compile(scene, camera);
+  renderer.debug.checkShaderErrors = check;
+  const progs = renderer.info.programs.map((p) => p.program);
+  if (par) {
+    const t0 = performance.now();
+    for (;;) {
+      let n = 0;
+      for (const p of progs) if (gl.getProgramParameter(p, par.COMPLETION_STATUS_KHR)) n++;
+      await Loader.step(0.56 + 0.38 * n / progs.length);
+      if (n === progs.length || performance.now() - t0 > 30000) break;
+    }
+  } else {
+    for (let k = 0; k < progs.length; k++) { gl.getProgramParameter(progs[k], gl.LINK_STATUS); await Loader.step(0.56 + 0.38 * (k + 1) / progs.length); }
+  }
+  for (const p of progs) if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error('Shader failed to link:', gl.getProgramInfoLog(p));
+  await Loader.step(0.96, 'Rolling the pitch', 0.99);
+  renderer.render(scene, camera); // compiles the shadow-pass shaders and draws the first frame
+  await Loader.step(1);
 }
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
