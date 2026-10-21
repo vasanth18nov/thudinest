@@ -229,6 +229,11 @@ body.is-touch .bottom { display: none; }
 .btn:hover { filter: brightness(1.06); }
 .btn:disabled { cursor: default; filter: saturate(0.4) brightness(0.8); }
 .btn.ghost { background: transparent; color: var(--gold); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.replay { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); left: 50%; transform: translateX(-50%); z-index: 6; display: flex; align-items: baseline; gap: 10px; padding: 7px 14px 8px; background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--zing); border-radius: 4px; pointer-events: auto; cursor: pointer; }
+.replay b { font: 900 20px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--chalk); }
+.replay b::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: var(--zing); vertical-align: 2px; animation: freePulse 0.8s ease-in-out infinite alternate; }
+.replay span { font: 600 12px/1 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.replay em { font: 500 11px/1 var(--font-ui); font-style: normal; color: var(--muted); }
 .bug-free { padding: 5px 12px; background: var(--zing); font: 800 12px/1.2 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); animation: freePulse 1s ease-in-out infinite alternate; }
 @keyframes freePulse { from { opacity: 1; } to { opacity: 0.72; } }
 .sc-bowl { margin-top: 10px; }
@@ -476,6 +481,7 @@ body.is-touch .bottom { display: none; }
     </div>
     <div id="toast" class="toast" hidden></div>
   </div>
+  <div class="replay" id="replay" hidden><b>Replay</b><span id="replaySub"></span><em>Tap to skip</em></div>
 
   <div class="bottom">
     <div class="shot" aria-live="polite">
@@ -553,23 +559,13 @@ body.is-touch .bottom { display: none; }
       <button type="button" data-fmt="t20" class="on" aria-pressed="true"><b>T20</b><small>Floodlights · colours · white ball</small></button>
       <button type="button" data-fmt="test" aria-pressed="false"><b>Test match</b><small>Daytime · whites · red ball</small></button>
     </div>
+    <div class="fmt team" role="group" aria-label="Your team">
+      <button type="button" data-team="thudinest" class="on" aria-pressed="true"><b>Thudinest</b><small>Coimbatore · blue and gold</small></button>
+      <button type="button" data-team="amh" aria-pressed="false"><b>Team AMH</b><small>Green and orange</small></button>
+    </div>
     <div class="squad">
       <div class="squad-head"><span class="lbl">Playing XI</span><span class="squad-note" id="squadNote">Tap a name to swap them in or out · 11 of 13</span></div>
-      <div class="squad-grid" id="squadGrid" role="group" aria-label="Choose the playing eleven">
-          <button type="button" class="pl on" data-i="0" aria-pressed="true"><i>1</i><b>Kavin</b></button>
-          <button type="button" class="pl on" data-i="1" aria-pressed="true"><i>2</i><b>Harsha</b></button>
-          <button type="button" class="pl on" data-i="2" aria-pressed="true"><i>3</i><b>Sabari</b></button>
-          <button type="button" class="pl on" data-i="3" aria-pressed="true"><i>4</i><b>Thananjay</b></button>
-          <button type="button" class="pl on" data-i="4" aria-pressed="true"><i>5</i><b>Vikrant Sahoo</b></button>
-          <button type="button" class="pl on" data-i="5" aria-pressed="true"><i>6</i><b>Vasanth</b></button>
-          <button type="button" class="pl on" data-i="6" aria-pressed="true"><i>7</i><b>Pooja</b></button>
-          <button type="button" class="pl on" data-i="7" aria-pressed="true"><i>8</i><b>Jay</b></button>
-          <button type="button" class="pl on" data-i="8" aria-pressed="true"><i>9</i><b>Venkatesh</b></button>
-          <button type="button" class="pl on" data-i="9" aria-pressed="true"><i>10</i><b>Govind</b></button>
-          <button type="button" class="pl on" data-i="10" aria-pressed="true"><i>11</i><b>Sundarraj</b></button>
-          <button type="button" class="pl" data-i="11" aria-pressed="false"><i>–</i><b>Durai</b></button>
-          <button type="button" class="pl" data-i="12" aria-pressed="false"><i>–</i><b>Kumma</b></button>
-      </div>
+      <div class="squad-grid" id="squadGrid" role="group" aria-label="Choose the playing eleven"></div>
     </div>
     <div class="opts">
       <div class="row"><span class="lbl">Overs</span>
@@ -585,6 +581,12 @@ body.is-touch .bottom { display: none; }
           <button type="button" data-diff="easy">Easy</button>
           <button type="button" data-diff="normal" class="on">Normal</button>
           <button type="button" data-diff="hard">Hard</button>
+        </div>
+      </div>
+      <div class="row"><span class="lbl">Replays</span>
+        <div class="seg light" role="group" aria-label="Replays of sixes and wickets">
+          <button type="button" data-replays="1" class="on">On</button>
+          <button type="button" data-replays="0">Off</button>
         </div>
       </div>
       <div class="row"><span class="lbl">Crowd anthem</span>
@@ -605,7 +607,7 @@ body.is-touch .bottom { display: none; }
 
 <div class="scrim" id="loadPanel" hidden>
   <div class="card load-card" role="status" aria-live="polite">
-    <p class="eyebrow">Thudinest Coimbatore · Getting ready</p>
+    <p class="eyebrow">Floodlit Over · Getting ready</p>
     <div class="load-pct"><b id="loadPct">0</b><span>%</span></div>
     <div class="load-track"><i id="loadBar"></i></div>
     <p class="load-step" id="loadStep">Downloading the engine</p>
@@ -650,7 +652,7 @@ body.is-touch .bottom { display: none; }
     <p class="end-chase" id="simNeed"></p>
     <div class="sim-bar"><i id="simBar"></i></div>
     <ol class="sim-feed" id="simFeed"></ol>
-    <div class="card-row"><span class="fine" style="margin:0">Thudinest Coimbatore are bowling.</span><button class="btn ghost" id="simSkip" type="button">Skip to result</button></div>
+    <div class="card-row"><span class="fine" style="margin:0" id="simTeam">Thudinest Coimbatore are bowling.</span><button class="btn ghost" id="simSkip" type="button">Skip to result</button></div>
   </div>
 </div>
 
@@ -1148,6 +1150,28 @@ const led = {};
   ring([[104, 25], [104, 31]], concrete);
   ring([[107, 34.5], [86, 31.5]], roofMat);
 
+  // the Mexican wave: a band of spectators on their feet, arms up, that travels round both tiers
+  const waveTex = canvasTex(256, 128, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    const shirts = ['#ffffff', '#ffe08a', '#ffc53d', '#bfefff', '#f1ede1', '#5ad1ff'], skins = ['#d9a07a', '#c68e6a', '#e0b08f', '#b07a56'];
+    for (let r = 0; r < 4; r++) for (let x = 3; x < w; x += 8) {
+      if (Math.random() < 0.12) continue;
+      const y = r * 32 + 4, c = skins[(Math.random() * skins.length) | 0];
+      g.strokeStyle = c; g.lineWidth = 2.6;
+      g.beginPath(); g.moveTo(x, y + 14); g.lineTo(x - 3 + Math.random() * 2, y + 2); g.moveTo(x + 6, y + 14); g.lineTo(x + 8 + Math.random() * 2, y + 2); g.stroke();
+      g.fillStyle = c; g.beginPath(); g.arc(x + 3, y + 11, 2.6, 0, TAU); g.fill();
+      g.fillStyle = shirts[(Math.random() * shirts.length) | 0]; g.fillRect(x, y + 14, 7, 12);
+    }
+  }, { repeat: [5, 3] });
+  // added light: the band reads as a bright ripple running round the stands (same shader as the other unlit overlays)
+  const waveMat = new THREE.MeshBasicMaterial({ map: waveTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, opacity: 0 });
+  const wavePts = [[73.2, 2.0], [88.2, 12.2], [88.6, 14.6], [103.2, 25.6]].map(([r, y]) => new THREE.Vector2(r, y));
+  const waveGeo = new THREE.LatheGeometry(wavePts, 12, -0.26, 0.52);
+  waveGeo.scale(-1, 1, 1); // face in toward the field
+  const wave = new THREE.Mesh(waveGeo, waveMat);
+  wave.position.copy(FIELD_C); wave.visible = false; scene.add(wave);
+  stadium.wave = { mesh: wave, mat: waveMat, t: -1, laps: 0 };
+
   // sightscreens (black for the white ball, white for the red) and the end blocks behind them
   const black = stadium.sightMat = std(0x07080c, 0.95);
   for (const end of [-1, 1]) {
@@ -1602,8 +1626,9 @@ function makeBat() {
 
 /* ------------------------------------------------------------------ people */
 const person = (name, num, skin, look = {}) => ({ name, short: name.includes('. ') ? name.split(' ').pop() : name, num, skin: SKINS[skin], hair: look.hair || 'crop', beard: look.beard || 'none', hairColor: look.hairColor || 'black', build: look.build || 1 });
-/* the 13-player squad in batting order; the start screen picks which 11 play */
-const SQUAD = [
+/* the home sides to choose from on the start card, each squad in batting order; the start screen picks which 11 play */
+const SQUADS = {};
+SQUADS.thudinest = [
   person('Kavin', 11, 2, { beard: 'stubble' }),
   person('Harsha', 7, 1, { beard: 'moustache' }),
   person('Sabari', 45, 0, { beard: 'full', build: 1.05 }),
@@ -1618,13 +1643,46 @@ const SQUAD = [
   person('Durai', 21, 0, { beard: 'moustache', build: 1.06 }),
   person('Kumma', 99, 3, { beard: 'stubble', hair: 'side' }),
 ];
+SQUADS.amh = [
+  person('Pandi', 7, 2, { beard: 'moustache' }),
+  person('Narayanan', 10, 1, { beard: 'stubble' }),
+  person('Babu', 18, 0, { beard: 'full', build: 1.05 }),
+  person('Veera', 45, 5, { beard: 'stubble', hair: 'side' }),
+  person('Anantha', 23, 3, { beard: 'moustache' }),
+  person('Srini', 1, 2, {}),
+  person('Senra', 33, 1, { hair: 'side' }),
+  person('Karthik', 17, 3, { beard: 'stubble' }),
+  person('Rams', 9, 0, { beard: 'moustache', build: 1.04 }),
+  person('Prem', 27, 4, { hair: 'side' }),
+  person('Jay', 3, 1, {}),
+];
+/* each side's name, shirt front, kits (T20 colours, or Test whites with the side's colour on the trim and cap), voice lines and anthem */
+const HOME_TEAMS = {
+  thudinest: { id: 'thudinest', name: 'Thudinest Coimbatore', front: 'THUDINEST', res: 'res_home', anthem: 'voice/anthem.mp3',
+    kits: { t20: { shirt: 0x2350b8, pants: 0x1b3a80, trim: 0xffc53d, text: '#ffc53d', cap: 0x1b3a80, helmet: 0x14254f },
+      test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0x1b3a80, text: '#1b3a80', cap: 0x1b3a80, helmet: 0x14254f } } },
+  amh: { id: 'amh', name: 'Team AMH', front: 'TEAM AMH', res: 'res_amh', anthem: 'voice/anthem-amh.mp3',
+    kits: { t20: { shirt: 0x17784a, pants: 0x0f4d30, trim: 0xff9f1c, text: '#ff9f1c', cap: 0x0f4d30, helmet: 0x0b3a24 },
+      test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0x17784a, text: '#17784a', cap: 0x17784a, helmet: 0x0b3a24 } } },
+};
+let homeId = storage.get('floodlit.team') === 'amh' ? 'amh' : 'thudinest';
+let SQUAD = SQUADS[homeId];
 const XI_SIZE = 11;
 let xiPicked = SQUAD.map((_, i) => i < XI_SIZE);
+const xiKey = () => (homeId === 'thudinest' ? 'floodlit.xi' : `floodlit.xi.${homeId}`);
+function loadXI() {
+  xiPicked = SQUAD.map((_, i) => i < XI_SIZE);
+  try {
+    const saved = JSON.parse(storage.get(xiKey()) || 'null');
+    if (Array.isArray(saved) && saved.length === XI_SIZE && saved.every((n) => SQUAD.some((p) => p.name === n))) xiPicked = SQUAD.map((p) => saved.includes(p.name));
+  } catch (e) { /* keep the default XI */ }
+}
 const xiList = () => SQUAD.filter((_, i) => xiPicked[i]);
 const homeAttack = () => xiList().slice(6, 11).map((p, i) => Object.assign({}, p, { kind: HOME_BOWL[i][0], style: HOME_BOWL[i][1] }));
 const homeKeeper = () => xiList()[5];
 const fieldTeam = () => (game.batTeam === 'home' ? 'away' : 'home');
-const teamKit = (team) => TEAM_KITS[team][game.format];
+const kitsOf = (team) => (team === 'home' ? HOME_TEAMS[homeId].kits : TEAM_KITS.away);
+const teamKit = (team) => kitsOf(team)[game.format];
 const batTeamName = () => TEAMS[game.batTeam].name;
 const ATTACK = [
   Object.assign(person('D. Mason', 8, 4, { hair: 'side', hairColor: 'brown', build: 1.05 }), { kind: 'fast', style: 'Right-arm fast' }),
@@ -1638,7 +1696,7 @@ const KEEPER_P = person('H. Ashby', 1, 2, { beard: 'stubble', hairColor: 'brown'
 /* Thudinest Coimbatore (the picked XI) bat first; the World XI chase. When the World XI bat, the five lower-order
    players of the picked XI bowl and the sixth keeps wicket. */
 const WORLD_XI = [OUTFIELD[0], OUTFIELD[1], OUTFIELD[2], OUTFIELD[3], OUTFIELD[4], KEEPER_P, ATTACK[4], ATTACK[3], ATTACK[1], ATTACK[2], ATTACK[0]];
-const TEAMS = { home: { name: 'Thudinest Coimbatore', front: 'THUDINEST' }, away: { name: 'World XI', front: 'WORLD XI' } };
+const TEAMS = { get home() { return HOME_TEAMS[homeId]; }, away: { name: 'World XI', front: 'WORLD XI' } };
 const HOME_BOWL = [['fast', 'Right-arm fast'], ['fastmed', 'Right-arm fast-medium'], ['off', 'Right-arm off-spin'], ['leg', 'Right-arm leg-spin'], ['fast', 'Right-arm fast']];
 
 function newPose(withBat) {
@@ -1818,6 +1876,7 @@ const trail = (() => {
   const side = new V3(), tan = new V3(), view = new V3();
   let n = 0;
   return {
+    hide() { n = 0; mesh.visible = false; },
     color: mesh.material.uniforms.uColor.value,
     push(p, t) {
       if (n && pts[0].distanceToSquared(p) > 9) n = 0; // the ball jumped (new delivery), so start afresh
@@ -2119,16 +2178,19 @@ const Sound = (() => {
 /* The home crowd's song: an original terrace anthem (sung, chanted and drummed by the stand), first heard after the
    second over (the first, in a two-over game) and again every five overs, or every ten in a Test. A wicket hushes it. */
 const Anthem = (() => {
-  let buf = null, state = 'idle', on = storage.get('floodlit.anthem') !== '0', lastAt = -99;
+  let buf = null, state = 'idle', on = storage.get('floodlit.anthem') !== '0', lastAt = -99, file = null;
   function load() {
+    const want = TEAMS.home.anthem;
+    if (file !== want) { file = want; buf = null; state = 'idle'; }
     if (state !== 'idle' || !Sound.ctx) return;
     state = 'loading';
-    fetch('voice/anthem.mp3').then((r) => { if (!r.ok) throw new Error(`anthem ${r.status}`); return r.arrayBuffer(); })
+    fetch(want).then((r) => { if (!r.ok) throw new Error(`anthem ${r.status}`); return r.arrayBuffer(); })
       .then((b) => new Promise((res, rej) => Sound.ctx.decodeAudioData(b, res, rej)))
-      .then((b) => { buf = b; state = 'ready'; }).catch(() => { state = 'failed'; });
+      .then((b) => { if (file === want) { buf = b; state = 'ready'; } }).catch(() => { state = 'failed'; });
   }
   return {
     load,
+    teamChanged() { Sound.stopAnthem(0.5); if (file !== TEAMS.home.anthem) { buf = null; state = 'idle'; file = null; } },
     get on() { return on; },
     set(v) { on = v; storage.set('floodlit.anthem', v ? '1' : '0'); if (!v) Sound.stopAnthem(1); },
     overEnd(over) {
@@ -2136,12 +2198,25 @@ const Anthem = (() => {
       const first = game.overs && game.overs <= 2 ? 1 : 2, every = isTest() ? 10 : 5;
       if (over < first || (lastAt >= 0 && over - lastAt < every)) return;
       lastAt = over;
-      if (Sound.playAnthem(buf, 0.6)) setTimeout(() => { if (Sound.anthemOn) Comm.anthem(); }, 5000);
+      if (Sound.playAnthem(buf, 0.6)) { setTimeout(() => { if (Sound.anthemOn) Comm.anthem(); }, 5000); startWave(2); }
     },
     hush() { Sound.stopAnthem(1.8); },
     reset() { lastAt = -99; Sound.stopAnthem(0.6); },
   };
 })();
+
+function startWave(laps) { const W = stadium.wave; if (W.t < 0) { W.t = 0; W.laps = laps; W.dir = Math.random() < 0.5 ? 1 : -1; W.a0 = Math.random() * TAU; } }
+function updateWave(dt) {
+  const W = stadium.wave; if (W.t < 0) return;
+  const LAP = 13; W.t += dt;
+  if (W.t > W.laps * LAP) { W.t = -1; W.mesh.visible = false; return; }
+  const a = W.a0 + W.dir * TAU * W.t / LAP;
+  W.mesh.visible = true; W.mesh.rotation.y = a;
+  // fade over the gaps behind the sightscreens, and in and out at the ends
+  const s = Math.abs(Math.sin(a)), ends = clamp(W.t / 1.5, 0, 1) * clamp((W.laps * LAP - W.t) / 1.5, 0, 1);
+  W.mat.opacity = 0.95 * clamp((s - 0.3) / 0.14, 0, 1) * ends; // the band is half a radian wide: gone before it reaches the gap
+  W.mesh.position.y = 0.5 * Math.sin(W.t * 9);
+}
 
 /* ------------------------------------------------------------- simulation */
 function sampleAt(sim, t, out) {
@@ -2531,10 +2606,10 @@ function startInnings(resume) {
   const o1 = game.bats[game.rigS.batIdx].name, o2 = game.bats[game.rigN.batIdx].name, bw0 = game.bowl[game.bowler];
   const chase = game.innings === 2;
   showCommentary('', batTeamName(), isTest() ? (game.overs ? `Test match · ${game.overs} overs` : 'Test match') : `${game.overs} overs`,
-    chase ? `${o1} and ${o2} walk out for the World XI, needing ${game.target} to win. ${bw0.name} opens the bowling for Thudinest Coimbatore.`
+    chase ? `${o1} and ${o2} walk out for the World XI, needing ${game.target} to win. ${bw0.name} opens the bowling for ${TEAMS.home.name}.`
       : isTest() ? `${o1} and ${o2} walk out in the sunshine, in whites, to face the red ball. ${bw0.name} has the new ball.` : `${o1} and ${o2} walk out under the lights. ${bw0.name} has the ball.`,
     resume ? 'Welcome back' : chase ? `Target ${game.target}` : isTest() ? 'Good morning, Coimbatore' : 'Good evening, Coimbatore', chase ? 'big' : '');
-  if (Caller.failed) Voice.say(resume ? `Welcome back. ${batTeamName()} are ${game.runs} for ${game.wkts}.` : chase ? `The World Eleven need ${game.target} to win.` : fill(pickOne(LINES.welcome), { o1, o2, bw: bw0.short }), true);
+  if (Caller.failed) Voice.say(resume ? `Welcome back. ${batTeamName()} are ${game.runs} for ${game.wkts}.` : chase ? `The World Eleven need ${game.target} to win.` : fill(pickOne(LINES.welcome), { o1, o2, bw: bw0.short, team: TEAMS.home.name }), true);
   else if (chase && !resume) Comm.chase();
   else Comm.welcome(game.bats[game.rigS.batIdx], resume);
 }
@@ -2566,6 +2641,7 @@ function enterBetween(first) {
     Anthem.overEnd(game.balls / 6);
   }
   game.lastOut = false;
+  game.replayDue = null; game.replayDone = false; Replay.reset();
   if (first) game.saidSlips = false;
   game.freeHitNow = !!game.freeHit && !isTest();
   if (game.freeHitNow) { notes.push('Free hit: you cannot be bowled or caught'); Comm.extra('freehit'); }
@@ -2600,6 +2676,7 @@ function release() {
   game.flight = { sim: simulateDelivery(d), t: 0, bounced: false, stumped: false, kept: false };
   game.state = 'flight'; game.t = 0;
   bowler.relT = 0;
+  Replay.mark('release');
   $('gunSpeed').textContent = d.kmh.toFixed(1);
   $('gunLen').innerHTML = `${LEN_NAME[d.length]} <i>· ${d.variation}</i>`;
   Sound.whoosh();
@@ -2742,6 +2819,7 @@ function doHit(sw, plan) {
   game.state = 'inplay'; game.t = 0;
   game.flight = null;
   sw.animStart = game.clock - SWING_T;
+  Replay.mark('contact');
   marker.visible = false;
   if (plan.edge) Sound.edge(); else if (sw.block) Sound.block(); else Sound.crack(q);
   sparks.spawn(p0, plan.edge || sw.block ? 12 : 22 + Math.round(q * 26), { colors: WOOD, speed: 3 + q * 4, up: 0.8, life: 0.5, size: 0.05, gravity: 5, drag: 2 });
@@ -3011,8 +3089,8 @@ const LINES = {
   dots: ['{n} dots on the trot. The pressure is building.', 'Another dot. {bw} has {bat} tied down here.'],
   pace: ['{kmh} on the speed gun. Serious heat.', 'And that was {kmh} kilometres an hour. Express.'],
   welcome: [
-    'Good evening, and welcome to a packed house under the lights here in Coimbatore. Thudinest Coimbatore will bat first. {o1} and {o2} to open, and {bw} has the new ball.',
-    'Welcome along, everyone. The floodlights are blazing, the crowd is buzzing, and Thudinest Coimbatore are about to bat. {o1} and {o2} walk out, and {bw} takes the new ball.',
+    'Good evening, and welcome to a packed house under the lights here in Coimbatore. {team} will bat first. {o1} and {o2} to open, and {bw} has the new ball.',
+    'Welcome along, everyone. The floodlights are blazing, the crowd is buzzing, and {team} are about to bat. {o1} and {o2} walk out, and {bw} takes the new ball.',
   ],
   newBat: ['{name} makes the walk to the middle. Big moment.', 'In comes {name}. Plenty of work still to do.', 'Here is {name}, taking guard to a warm reception.'],
   maiden: ['A maiden over! Superb control from {bw}.'],
@@ -3099,7 +3177,7 @@ function showCommentary(tag, head, note, text, call = '', tone = '') {
    ball live, and an analyst who adds a line after it. The clips ship as three small MP3 banks that are decoded on
    demand and played through the game's audio graph, so the crowd ducks under them. If the banks cannot load, the
    browser's speech engine reads the written commentary instead. */
-const VOICE_INDEX = /*VOICE_INDEX*/{"files":["lead.mp3","colour.mp3","names.mp3"],"clips":{"runup_mason_1":[0,0,7797,1.441],"runup_mason_2":[0,7797,8637,1.619],"runup_mason_3":[0,16434,9117,1.723],"runup_ortega_1":[0,25551,8877,1.667],"runup_ortega_2":[0,34428,8757,1.65],"runup_ortega_3":[0,43185,9837,1.861],"runup_boateng_1":[0,53022,8277,1.542],"runup_boateng_2":[0,61299,9477,1.785],"runup_boateng_3":[0,70776,9597,1.821],"runup_iqbal_1":[0,80373,8157,1.518],"runup_iqbal_2":[0,88530,9117,1.717],"runup_iqbal_3":[0,97647,9117,1.724],"runup_thorne_1":[0,106764,7077,1.319],"runup_thorne_2":[0,113841,8397,1.572],"runup_thorne_3":[0,122238,8517,1.602],"call_drive_1":[0,130755,4557,0.797],"call_drive_2":[0,135312,7437,1.375],"call_drive_3":[0,142749,6357,1.171],"call_cover_1":[0,149106,6117,1.107],"call_cover_2":[0,155223,6957,1.273],"call_straight_1":[0,162180,8877,1.658],"call_straight_2":[0,171057,6717,1.248],"call_ondrive_1":[0,177774,9837,1.852],"call_ondrive_2":[0,187611,5997,1.09],"call_cut_1":[0,193608,5277,0.953],"call_cut_2":[0,198885,5397,0.965],"call_cut_3":[0,204282,8757,1.637],"call_pull_1":[0,213039,3717,0.625],"call_pull_2":[0,216756,7797,1.453],"call_pull_3":[0,224553,9477,1.781],"call_punch_1":[0,234030,5877,1.058],"call_punch_2":[0,239907,9477,1.778],"call_loft_1":[0,249384,5997,1.099],"call_loft_2":[0,255381,6717,1.231],"call_loft_3":[0,262098,4437,0.789],"call_loft_4":[0,266535,8997,1.694],"call_loft_5":[0,275532,8397,1.567],"call_air_1":[0,283929,4677,0.817],"call_air_2":[0,288606,5637,1.03],"call_air_3":[0,294243,5637,1.016],"call_edge_1":[0,299880,4197,0.736],"call_edge_2":[0,304077,5757,1.038],"call_edge_3":[0,309834,4797,0.849],"call_inedge_1":[0,314631,6597,1.223],"call_topedge_1":[0,321228,9717,1.841],"call_block_1":[0,330945,5637,1.017],"call_block_2":[0,336582,8397,1.563],"call_block_3":[0,344979,4437,0.79],"call_block_4":[0,349416,10797,2.049],"call_beaten_1":[0,360213,4317,0.764],"call_beaten_2":[0,364530,6117,1.119],"call_beaten_3":[0,370647,9477,1.792],"call_beaten_4":[0,380124,6477,1.191],"call_beatenin_1":[0,386601,8517,1.596],"call_beatenin_2":[0,395118,8757,1.64],"call_miss_1":[0,403875,7917,1.487],"call_miss_2":[0,411792,4797,0.863],"call_miss_3":[0,416589,10197,1.932],"call_left_1":[0,426786,6957,1.294],"call_left_2":[0,433743,7917,1.487],"call_left_3":[0,441660,6117,1.121],"call_duck_1":[0,447777,9957,1.885],"call_duck_2":[0,457734,11037,2.092],"fin_six_1":[0,468771,11757,2.242],"fin_six_2":[0,480528,9117,1.711],"fin_six_3":[0,489645,10197,1.937],"fin_six_4":[0,499842,5397,0.965],"fin_six_5":[0,505239,9837,1.861],"fin_four_1":[0,515076,6837,1.263],"fin_four_2":[0,521913,5637,1.014],"fin_four_3":[0,527550,9237,1.742],"fin_four_4":[0,536787,12597,2.422],"fin_four_5":[0,549384,11517,2.201],"fin_caught_1":[0,560901,5877,1.062],"fin_caught_2":[0,566778,4077,0.715],"fin_caught_3":[0,570855,6237,1.146],"fin_caught_4":[0,577092,10197,1.924],"fin_caught_5":[0,587289,5637,1.026],"fin_behind_1":[0,592926,6717,1.227],"fin_behind_2":[0,599643,11877,2.264],"fin_cab_1":[0,611520,6477,1.188],"fin_bowled_1":[0,617997,4557,0.808],"fin_bowled_2":[0,622554,5997,1.082],"fin_bowled_3":[0,628551,4077,0.716],"fin_bowled_4":[0,632628,8517,1.589],"fin_bowled_5":[0,641145,9597,1.81],"fin_playedon_1":[0,650742,5637,1.022],"fin_playedon_2":[0,656379,11517,2.193],"fin_dropped_1":[0,667896,5877,1.064],"fin_dropped_2":[0,673773,9117,1.716],"fin_dropped_3":[0,682890,5037,0.904],"fin_stop_1":[0,687927,5877,1.057],"fin_stop_2":[0,693804,8397,1.577],"fin_stop_3":[0,702201,9357,1.759],"fin_fielded_1":[0,711558,6837,1.252],"fin_fielded_2":[0,718395,9477,1.783],"fin_fielded_3":[0,727872,6237,1.139],"run_1_1":[0,734109,8637,1.616],"run_1_2":[0,742746,5877,1.079],"run_1_3":[0,748623,6237,1.146],"run_2_1":[0,754860,8397,1.566],"run_2_2":[0,763257,5517,1.006],"run_3_1":[0,768774,6717,1.241],"run_3_2":[0,775491,10317,1.961],"fin_slips_1":[0,785808,11517,2.207],"fin_slips_2":[0,797325,5997,1.091],"fin_gully_1":[0,803322,6957,1.273],"res_home_1":[0,810279,17037,3.289],"res_home_2":[0,827316,15717,3.041],"res_away_1":[0,843033,14997,2.896],"res_away_2":[0,858030,16437,3.18],"res_tie_1":[0,874467,13797,2.653],"col_pressure_1":[1,0,10557,2.009],"col_pressure_2":[1,10557,7077,1.318],"col_btb_1":[1,17634,8037,1.491],"col_btb_2":[1,25671,5997,1.09],"col_streak3_1":[1,31668,8757,1.65],"col_streak4_1":[1,40425,11277,2.143],"col_streak5_1":[1,51702,14997,2.893],"col_pace_1":[1,66699,5877,1.073],"col_pace_2":[1,72576,7917,1.475],"col_maiden_1":[1,80493,12957,2.479],"col_expensive_1":[1,93450,10917,2.071],"col_overend_1":[1,104367,7317,1.352],"col_overend_2":[1,111684,6237,1.128],"col_golden_1":[1,117921,12717,2.435],"col_duck_1":[1,130638,6237,1.138],"col_beauty_1":[1,136875,12117,2.319],"col_timing_1":[1,148992,15117,2.928],"col_timing_2":[1,164109,7317,1.359],"col_power_1":[1,171426,5277,0.943],"col_power_2":[1,176703,10557,2.005],"col_lucky_1":[1,187260,8637,1.611],"col_lucky_2":[1,195897,6837,1.256],"col_welcome1_1":[1,202734,24357,4.758],"col_welcome2_1":[1,227091,18597,3.619],"col_welcomeback_1":[1,245688,11157,2.127],"col_end_1":[1,256845,21477,4.196],"col_allout_1":[1,278322,14757,2.85],"dist_60":[1,293079,8877,1.677],"dist_65":[1,301956,10197,1.932],"dist_70":[1,312153,9357,1.775],"dist_75":[1,321510,10797,2.047],"dist_80":[1,332307,8997,1.7],"dist_85":[1,341304,10197,1.921],"dist_90":[1,351501,9357,1.76],"dist_95":[1,360858,10197,1.931],"dist_100":[1,371055,10197,1.933],"dist_105":[1,381252,13197,2.527],"dist_110":[1,394449,12837,2.457],"bowl_attack_mason":[1,407286,11037,2.11],"bowl_wicket_mason":[1,418323,8757,1.644],"bowl_attack_ortega":[1,427080,11637,2.229],"bowl_wicket_ortega":[1,438717,9717,1.832],"bowl_attack_boateng":[1,448434,11157,2.114],"bowl_wicket_boateng":[1,459591,10077,1.907],"bowl_attack_iqbal":[1,469668,10677,2.034],"bowl_wicket_iqbal":[1,480345,9117,1.706],"bowl_attack_thorne":[1,489462,9957,1.879],"bowl_wicket_thorne":[1,499419,8997,1.683],"col_test_welcome_1":[1,508416,29637,5.826],"col_test_end_1":[1,538053,16557,3.206],"col_test_allout_1":[1,554610,18957,3.685],"col_test_leave_1":[1,573567,14517,2.788],"col_test_leave_2":[1,588084,14397,2.765],"col_test_block_1":[1,602481,14277,2.754],"col_test_block_2":[1,616758,14517,2.789],"col_test_swing_1":[1,631275,13317,2.547],"col_test_slips_1":[1,644592,14277,2.757],"col_test_maiden_1":[1,658869,14157,2.719],"col_chase_1":[1,673026,13797,2.651],"col_chase_2":[1,686823,16557,3.215],"res_draw_1":[1,703380,15597,3.014],"col_conf_1":[1,718977,11877,2.273],"col_conf_2":[1,730854,13317,2.554],"col_nervy_1":[1,744171,11517,2.205],"bat_six_kavin":[2,0,7437,1.382],"bat_four_kavin":[2,7437,8517,1.592],"bat_out_kavin":[2,15954,8037,1.505],"bat_new_kavin":[2,23991,10077,1.911],"bat_fifty_kavin":[2,34068,11757,2.253],"bat_hundred_kavin":[2,45825,11997,2.288],"bat_strike_kavin":[2,57822,11757,2.234],"bat_six_harsha":[2,69579,8037,1.503],"bat_four_harsha":[2,77616,8997,1.698],"bat_out_harsha":[2,86613,8277,1.553],"bat_new_harsha":[2,94890,10317,1.956],"bat_fifty_harsha":[2,105207,11997,2.294],"bat_hundred_harsha":[2,117204,12477,2.378],"bat_strike_harsha":[2,129681,11757,2.249],"bat_six_sabari":[2,141438,7557,1.401],"bat_four_sabari":[2,148995,8877,1.678],"bat_out_sabari":[2,157872,8157,1.517],"bat_new_sabari":[2,166029,10317,1.954],"bat_fifty_sabari":[2,176346,11757,2.239],"bat_hundred_sabari":[2,188103,12237,2.332],"bat_strike_sabari":[2,200340,11997,2.285],"bat_six_thananjay":[2,212337,9237,1.734],"bat_four_thananjay":[2,221574,10197,1.934],"bat_out_thananjay":[2,231771,10077,1.912],"bat_new_thananjay":[2,241848,11157,2.129],"bat_fifty_thananjay":[2,253005,13077,2.496],"bat_hundred_thananjay":[2,266082,13437,2.578],"bat_strike_thananjay":[2,279519,13077,2.505],"bat_six_vikrant":[2,292596,9837,1.865],"bat_four_vikrant":[2,302433,11157,2.132],"bat_out_vikrant":[2,313590,11157,2.132],"bat_new_vikrant":[2,324747,12717,2.429],"bat_fifty_vikrant":[2,337464,14037,2.703],"bat_hundred_vikrant":[2,351501,14277,2.758],"bat_strike_vikrant":[2,365778,13917,2.674],"bat_six_vasanth":[2,379695,8037,1.502],"bat_four_vasanth":[2,387732,9117,1.713],"bat_out_vasanth":[2,396849,9237,1.731],"bat_new_vasanth":[2,406086,10797,2.063],"bat_fifty_vasanth":[2,416883,12477,2.379],"bat_hundred_vasanth":[2,429360,12717,2.43],"bat_strike_vasanth":[2,442077,11997,2.295],"bat_six_pooja":[2,454074,7677,1.434],"bat_four_pooja":[2,461751,8997,1.697],"bat_out_pooja":[2,470748,8397,1.578],"bat_new_pooja":[2,479145,10317,1.953],"bat_fifty_pooja":[2,489462,11997,2.288],"bat_hundred_pooja":[2,501459,12477,2.387],"bat_strike_pooja":[2,513936,11397,2.178],"bat_six_jay":[2,525333,7917,1.479],"bat_four_jay":[2,533250,8517,1.599],"bat_out_jay":[2,541767,7557,1.404],"bat_new_jay":[2,549324,9717,1.844],"bat_fifty_jay":[2,559041,11757,2.235],"bat_hundred_jay":[2,570798,11997,2.299],"bat_strike_jay":[2,582795,10437,1.972],"bat_six_venkatesh":[2,593232,9237,1.745],"bat_four_venkatesh":[2,602469,10677,2.018],"bat_out_venkatesh":[2,613146,10677,2.026],"bat_new_venkatesh":[2,623823,12237,2.33],"bat_fifty_venkatesh":[2,636060,12957,2.496],"bat_hundred_venkatesh":[2,649017,13677,2.633],"bat_strike_venkatesh":[2,662694,13317,2.558],"bat_six_govind":[2,676011,8517,1.601],"bat_four_govind":[2,684528,9237,1.743],"bat_out_govind":[2,693765,9477,1.792],"bat_new_govind":[2,703242,11157,2.116],"bat_fifty_govind":[2,714399,12717,2.44],"bat_hundred_govind":[2,727116,12837,2.462],"bat_strike_govind":[2,739953,12357,2.364],"bat_six_sundarraj":[2,752310,9117,1.713],"bat_four_sundarraj":[2,761427,9957,1.881],"bat_out_sundarraj":[2,771384,9717,1.844],"bat_new_sundarraj":[2,781101,11517,2.208],"bat_fifty_sundarraj":[2,792618,13317,2.546],"bat_hundred_sundarraj":[2,805935,13557,2.608],"bat_strike_sundarraj":[2,819492,12477,2.39],"bat_six_durai":[2,831969,8157,1.532],"bat_four_durai":[2,840126,8997,1.69],"bat_out_durai":[2,849123,8637,1.615],"bat_new_durai":[2,857760,9837,1.863],"bat_fifty_durai":[2,867597,11997,2.287],"bat_hundred_durai":[2,879594,12237,2.334],"bat_strike_durai":[2,891831,11277,2.158],"bat_six_kumma":[2,903108,6837,1.259],"bat_four_kumma":[2,909945,8277,1.555],"bat_out_kumma":[2,918222,7557,1.4],"bat_new_kumma":[2,925779,9957,1.873],"bat_fifty_kumma":[2,935736,11277,2.145],"bat_hundred_kumma":[2,947013,11877,2.263],"bat_strike_kumma":[2,958890,11157,2.124]}}/*/VOICE_INDEX*/;
+const VOICE_INDEX = /*VOICE_INDEX*/{"files":["lead-v9.mp3","colour-v9.mp3","names-v9.mp3"],"clips":{"runup_mason_1":[0,0,5037,0.893],"runup_mason_2":[0,5037,5517,1.001],"runup_mason_3":[0,10554,6957,1.29],"runup_ortega_1":[0,17511,5397,0.976],"runup_ortega_2":[0,22908,5877,1.074],"runup_ortega_3":[0,28785,9597,1.817],"runup_boateng_1":[0,38382,4797,0.861],"runup_boateng_2":[0,43179,8757,1.647],"runup_boateng_3":[0,51936,10557,2.004],"runup_iqbal_1":[0,62493,5637,1.031],"runup_iqbal_2":[0,68130,5637,1.021],"runup_iqbal_3":[0,73767,7437,1.374],"runup_thorne_1":[0,81204,4677,0.828],"runup_thorne_2":[0,85881,7437,1.377],"runup_thorne_3":[0,93318,6717,1.225],"call_drive_1":[0,100035,4197,0.721],"call_drive_2":[0,104232,5757,1.054],"call_drive_3":[0,109989,6357,1.168],"call_drive_4":[0,116346,8757,1.64],"call_cover_1":[0,125103,4677,0.817],"call_cover_2":[0,129780,5397,0.962],"call_cover_3":[0,135177,7197,1.325],"call_straight_1":[0,142374,7677,1.422],"call_straight_2":[0,150051,10077,1.898],"call_ondrive_1":[0,160128,9597,1.819],"call_ondrive_2":[0,169725,5277,0.948],"call_cut_1":[0,175002,3957,0.679],"call_cut_2":[0,178959,5517,0.993],"call_cut_3":[0,184476,8757,1.637],"call_pull_1":[0,193233,3477,0.594],"call_pull_2":[0,196710,8997,1.694],"call_pull_3":[0,205707,8637,1.625],"call_punch_1":[0,214344,4317,0.762],"call_punch_2":[0,218661,7557,1.413],"call_sweep_1":[0,226218,5037,0.906],"call_sweep_2":[0,231255,10077,1.913],"call_slog_1":[0,241332,4557,0.81],"call_slog_2":[0,245889,8037,1.504],"call_paddle_1":[0,253926,5997,1.092],"call_paddle_2":[0,259923,5637,1.019],"call_scoop_1":[0,265560,7197,1.327],"call_scoop_2":[0,272757,8277,1.55],"call_reverse_1":[0,281034,6357,1.166],"call_reverse_2":[0,287391,8157,1.525],"call_flick_1":[0,295548,6237,1.146],"call_flick_2":[0,301785,4917,0.883],"call_hook_1":[0,306702,3837,0.663],"call_hook_2":[0,310539,7437,1.38],"call_late_1":[0,317976,8637,1.613],"call_late_2":[0,326613,11517,2.195],"call_upper_1":[0,338130,8037,1.491],"call_upper_2":[0,346167,9357,1.757],"call_loft_1":[0,355524,5037,0.889],"call_loft_2":[0,360561,5757,1.042],"call_loft_3":[0,366318,3957,0.695],"call_loft_4":[0,370275,6237,1.143],"call_loft_5":[0,376512,5517,0.993],"call_air_1":[0,382029,4437,0.773],"call_air_2":[0,386466,3957,0.684],"call_air_3":[0,390423,4557,0.803],"call_edge_1":[0,394980,2997,0.494],"call_edge_2":[0,397977,4077,0.711],"call_edge_3":[0,402054,5397,0.974],"call_inedge_1":[0,407451,4437,0.778],"call_inedge_2":[0,411888,11637,2.209],"call_topedge_1":[0,423525,7677,1.419],"call_block_1":[0,431202,5157,0.926],"call_block_2":[0,436359,5277,0.942],"call_block_3":[0,441636,6117,1.125],"call_block_4":[0,447753,8757,1.634],"call_beaten_1":[0,456510,3837,0.648],"call_beaten_2":[0,460347,5397,0.966],"call_beaten_3":[0,465744,9237,1.732],"call_beaten_4":[0,474981,8877,1.662],"call_beatenin_1":[0,483858,6477,1.194],"call_beatenin_2":[0,490335,6117,1.104],"call_miss_1":[0,496452,6717,1.238],"call_miss_2":[0,503169,4917,0.87],"call_miss_3":[0,508086,7437,1.387],"call_left_1":[0,515523,4437,0.779],"call_left_2":[0,519960,5517,0.992],"call_left_3":[0,525477,5757,1.04],"call_duck_1":[0,531234,7797,1.459],"call_duck_2":[0,539031,11157,2.126],"fin_six_1":[0,550188,10557,1.997],"fin_six_2":[0,560745,8517,1.587],"fin_six_3":[0,569262,11157,2.119],"fin_six_4":[0,580419,11157,2.134],"fin_six_5":[0,591576,8037,1.502],"fin_six_6":[0,599613,8397,1.568],"fin_four_1":[0,608010,7077,1.303],"fin_four_2":[0,615087,4557,0.803],"fin_four_3":[0,619644,7317,1.352],"fin_four_4":[0,626961,13677,2.621],"fin_four_5":[0,640638,8517,1.596],"fin_four_6":[0,649155,9477,1.78],"fin_caught_1":[0,658632,5037,0.912],"fin_caught_2":[0,663669,8277,1.558],"fin_caught_3":[0,671946,5277,0.95],"fin_caught_4":[0,677223,9717,1.839],"fin_caught_5":[0,686940,5157,0.921],"fin_behind_1":[0,692097,6717,1.227],"fin_behind_2":[0,698814,8157,1.518],"fin_cab_1":[0,706971,6357,1.155],"fin_bowled_1":[0,713328,5877,1.076],"fin_bowled_2":[0,719205,6837,1.266],"fin_bowled_3":[0,726042,2517,0.391],"fin_bowled_4":[0,728559,6597,1.218],"fin_bowled_5":[0,735156,9117,1.726],"fin_playedon_1":[0,744273,4437,0.769],"fin_playedon_2":[0,748710,9237,1.735],"fin_dropped_1":[0,757947,5037,0.89],"fin_dropped_2":[0,762984,7557,1.408],"fin_dropped_3":[0,770541,11037,2.091],"fin_stop_1":[0,781578,4197,0.735],"fin_stop_2":[0,785775,5277,0.949],"fin_stop_3":[0,791052,6957,1.28],"fin_fielded_1":[0,798009,4557,0.798],"fin_fielded_2":[0,802566,5997,1.1],"fin_fielded_3":[0,808563,4557,0.793],"fin_slips_1":[0,813120,9117,1.725],"fin_slips_2":[0,822237,4917,0.867],"fin_gully_1":[0,827154,5277,0.938],"run_1_1":[0,832431,4797,0.85],"run_1_2":[0,837228,3837,0.659],"run_1_3":[0,841065,3717,0.648],"run_2_1":[0,844782,5637,1.027],"run_2_2":[0,850419,6237,1.129],"run_3_1":[0,856656,4677,0.828],"run_3_2":[0,861333,8997,1.696],"ex_wide_1":[0,870330,7317,1.345],"ex_wide_2":[0,877647,4557,0.816],"ex_wide_3":[0,882204,8877,1.669],"ex_noball_1":[0,891081,9117,1.726],"ex_noball_2":[0,900198,10677,2.026],"ex_noball_3":[0,910875,12717,2.436],"ex_freehit_1":[0,923592,5397,0.979],"ex_freehit_2":[0,928989,8997,1.702],"ex_freehit_3":[0,937986,12597,2.409],"ex_reprieve_1":[0,950583,10797,2.045],"ex_reprieve_2":[0,961380,7797,1.456],"ex_reprieve_3":[0,969177,8997,1.686],"ex_byes_1":[0,978174,10317,1.945],"ex_byes_2":[0,988491,8637,1.609],"res_home_1":[0,997128,15117,2.908],"res_home_2":[0,1012245,15117,2.913],"res_away_1":[0,1027362,14397,2.77],"res_away_2":[0,1041759,14397,2.772],"res_amh_1":[0,1056156,11517,2.196],"res_amh_2":[0,1067673,13437,2.583],"res_tie_1":[0,1081110,15837,3.055],"col_pressure_1":[1,0,7677,1.425],"col_pressure_2":[1,7677,10917,2.072],"col_btb_1":[1,18594,6477,1.197],"col_btb_2":[1,25071,12597,2.409],"col_streak3_1":[1,37668,6117,1.112],"col_streak4_1":[1,43785,11637,2.221],"col_streak5_1":[1,55422,12837,2.471],"col_pace_1":[1,68259,4197,0.726],"col_pace_2":[1,72456,6957,1.285],"col_maiden_1":[1,79413,11397,2.179],"col_expensive_1":[1,90810,8157,1.521],"col_overend_1":[1,98967,5637,1.019],"col_overend_2":[1,104604,4917,0.871],"col_overend_3":[1,109521,7077,1.297],"col_overend_4":[1,116598,8997,1.686],"col_golden_1":[1,125595,12237,2.346],"col_duck_1":[1,137832,15357,2.957],"col_beauty_1":[1,153189,12597,2.423],"col_beauty_2":[1,165786,8637,1.609],"col_timing_1":[1,174423,12837,2.467],"col_timing_2":[1,187260,7677,1.433],"col_power_1":[1,194937,4797,0.853],"col_power_2":[1,199734,9357,1.758],"col_lucky_1":[1,209091,5877,1.06],"col_lucky_2":[1,214968,11397,2.17],"col_welcome1_1":[1,226365,23157,4.523],"col_welcome2_1":[1,249522,21237,4.142],"col_welcomeback_1":[1,270759,9477,1.778],"col_end_1":[1,280236,21837,4.269],"col_allout_1":[1,302073,15597,3.007],"col_test_welcome_1":[1,317670,27837,5.46],"col_test_end_1":[1,345507,17517,3.403],"col_test_allout_1":[1,363024,18597,3.62],"col_test_leave_1":[1,381621,15717,3.028],"col_test_leave_2":[1,397338,13317,2.552],"col_test_block_1":[1,410655,15237,2.938],"col_test_block_2":[1,425892,14757,2.852],"col_test_swing_1":[1,440649,10917,2.075],"col_test_slips_1":[1,451566,13077,2.514],"col_test_maiden_1":[1,464643,14877,2.863],"col_chase_1":[1,479520,11757,2.256],"col_chase_2":[1,491277,13677,2.637],"res_draw_1":[1,504954,15237,2.941],"col_conf_1":[1,520191,9837,1.855],"col_conf_2":[1,530028,8877,1.665],"col_nervy_1":[1,538905,8637,1.619],"col_anthem_1":[1,547542,15237,2.939],"col_anthem_2":[1,562779,13437,2.59],"col_anthem_3":[1,576216,12477,2.391],"col_sweep_1":[1,588693,9117,1.723],"col_sweep_2":[1,597810,9357,1.754],"col_innovate_1":[1,607167,11997,2.287],"col_innovate_2":[1,619164,10077,1.903],"col_anthem_amh_1":[1,629241,15597,3.024],"col_freehit_1":[1,644838,14157,2.713],"dist_60":[1,658995,8517,1.593],"dist_65":[1,667512,8877,1.666],"dist_70":[1,676389,7677,1.421],"dist_75":[1,684066,12117,2.321],"dist_80":[1,696183,7917,1.471],"dist_85":[1,704100,9717,1.825],"dist_90":[1,713817,8037,1.51],"dist_95":[1,721854,8637,1.61],"dist_100":[1,730491,9717,1.841],"dist_105":[1,740208,8637,1.616],"dist_110":[1,748845,10077,1.915],"bowl_attack_mason":[1,758922,8997,1.691],"bowl_wicket_mason":[1,767919,7077,1.319],"bowl_attack_ortega":[1,774996,9237,1.75],"bowl_wicket_ortega":[1,784233,8637,1.622],"bowl_attack_boateng":[1,792870,11157,2.117],"bowl_wicket_boateng":[1,804027,9957,1.872],"bowl_attack_iqbal":[1,813984,8997,1.682],"bowl_wicket_iqbal":[1,822981,7317,1.35],"bowl_attack_thorne":[1,830298,8877,1.679],"bowl_wicket_thorne":[1,839175,8037,1.511],"runup_kavin_1":[2,0,8877,1.665],"runup_harsha_1":[2,8877,9477,1.784],"runup_sabari_1":[2,18354,9117,1.711],"runup_thananjay_1":[2,27471,9957,1.883],"runup_vikrant_1":[2,37428,11517,2.187],"runup_vasanth_1":[2,48945,9837,1.871],"runup_pooja_1":[2,58782,8997,1.695],"runup_jay_1":[2,67779,7917,1.472],"runup_venkatesh_1":[2,75696,11037,2.098],"runup_govind_1":[2,86733,9837,1.858],"runup_sundarraj_1":[2,96570,10677,2.02],"runup_durai_1":[2,107247,9357,1.77],"runup_kumma_1":[2,116604,8757,1.643],"runup_pandi_1":[2,125361,8997,1.693],"runup_narayanan_1":[2,134358,11037,2.109],"runup_babu_1":[2,145395,8517,1.589],"runup_veera_1":[2,153912,8637,1.616],"runup_anantha_1":[2,162549,9837,1.872],"runup_srini_1":[2,172386,9477,1.789],"runup_senra_1":[2,181863,8877,1.672],"runup_karthik_1":[2,190740,9597,1.801],"runup_rams_1":[2,200337,9477,1.787],"runup_prem_1":[2,209814,8637,1.626],"bat_six_kavin":[2,218451,7437,1.389],"bat_four_kavin":[2,225888,8277,1.548],"bat_out_kavin":[2,234165,5877,1.058],"bat_new_kavin":[2,240042,7677,1.439],"bat_fifty_kavin":[2,247719,11757,2.253],"bat_hundred_kavin":[2,259476,11997,2.288],"bat_strike_kavin":[2,271473,11757,2.234],"bowl_attack_kavin":[2,283230,10917,2.079],"bowl_wicket_kavin":[2,294147,8877,1.674],"bat_six_harsha":[2,303024,6957,1.278],"bat_four_harsha":[2,309981,7197,1.34],"bat_out_harsha":[2,317178,5997,1.083],"bat_new_harsha":[2,323175,7557,1.407],"bat_fifty_harsha":[2,330732,11997,2.294],"bat_hundred_harsha":[2,342729,12477,2.378],"bat_strike_harsha":[2,355206,11757,2.249],"bowl_attack_harsha":[2,366963,11037,2.105],"bowl_wicket_harsha":[2,378000,9117,1.705],"bat_six_sabari":[2,387117,13797,2.646],"bat_four_sabari":[2,400914,8997,1.689],"bat_out_sabari":[2,409911,7077,1.297],"bat_new_sabari":[2,416988,8157,1.517],"bat_fifty_sabari":[2,425145,11757,2.239],"bat_hundred_sabari":[2,436902,12237,2.332],"bat_strike_sabari":[2,449139,11997,2.285],"bowl_attack_sabari":[2,461136,11157,2.124],"bowl_wicket_sabari":[2,472293,8877,1.666],"bat_six_thananjay":[2,481170,8517,1.599],"bat_four_thananjay":[2,489687,8997,1.697],"bat_out_thananjay":[2,498684,7557,1.416],"bat_new_thananjay":[2,506241,8997,1.693],"bat_fifty_thananjay":[2,515238,13077,2.496],"bat_hundred_thananjay":[2,528315,13437,2.578],"bat_strike_thananjay":[2,541752,13077,2.505],"bowl_attack_thananjay":[2,554829,11757,2.238],"bowl_wicket_thananjay":[2,566586,10917,2.065],"bat_six_vikrant":[2,577503,10077,1.896],"bat_four_vikrant":[2,587580,9837,1.857],"bat_out_vikrant":[2,597417,9477,1.782],"bat_new_vikrant":[2,606894,10677,2.02],"bat_fifty_vikrant":[2,617571,14037,2.703],"bat_hundred_vikrant":[2,631608,14277,2.758],"bat_strike_vikrant":[2,645885,13917,2.674],"bowl_attack_vikrant":[2,659802,12957,2.488],"bowl_wicket_vikrant":[2,672759,11157,2.133],"bat_six_vasanth":[2,683916,7317,1.359],"bat_four_vasanth":[2,691233,7797,1.44],"bat_out_vasanth":[2,699030,6357,1.154],"bat_new_vasanth":[2,705387,8157,1.516],"bat_fifty_vasanth":[2,713544,12477,2.379],"bat_hundred_vasanth":[2,726021,12717,2.43],"bat_strike_vasanth":[2,738738,11997,2.295],"bowl_attack_vasanth":[2,750735,11277,2.137],"bowl_wicket_vasanth":[2,762012,9357,1.773],"bat_six_pooja":[2,771369,7557,1.408],"bat_four_pooja":[2,778926,7917,1.474],"bat_out_pooja":[2,786843,5997,1.081],"bat_new_pooja":[2,792840,7677,1.431],"bat_fifty_pooja":[2,800517,11997,2.288],"bat_hundred_pooja":[2,812514,12477,2.387],"bat_strike_pooja":[2,824991,11397,2.178],"bowl_attack_pooja":[2,836388,10917,2.083],"bowl_wicket_pooja":[2,847305,9357,1.755],"bat_six_jay":[2,856662,7077,1.311],"bat_four_jay":[2,863739,6957,1.272],"bat_out_jay":[2,870696,5997,1.08],"bat_new_jay":[2,876693,7677,1.438],"bat_fifty_jay":[2,884370,11757,2.235],"bat_hundred_jay":[2,896127,11997,2.299],"bat_strike_jay":[2,908124,10437,1.972],"bowl_attack_jay":[2,918561,10437,1.986],"bowl_wicket_jay":[2,928998,9477,1.784],"bat_six_venkatesh":[2,938475,7317,1.364],"bat_four_venkatesh":[2,945792,7557,1.394],"bat_out_venkatesh":[2,953349,7797,1.445],"bat_new_venkatesh":[2,961146,9117,1.727],"bat_fifty_venkatesh":[2,970263,12957,2.496],"bat_hundred_venkatesh":[2,983220,13677,2.633],"bat_strike_venkatesh":[2,996897,13317,2.558],"bowl_attack_venkatesh":[2,1010214,11997,2.286],"bowl_wicket_venkatesh":[2,1022211,10557,1.998],"bat_six_govind":[2,1032768,7437,1.377],"bat_four_govind":[2,1040205,8037,1.505],"bat_out_govind":[2,1048242,6117,1.107],"bat_new_govind":[2,1054359,8517,1.597],"bat_fifty_govind":[2,1062876,12717,2.44],"bat_hundred_govind":[2,1075593,12837,2.462],"bat_strike_govind":[2,1088430,12357,2.364],"bowl_attack_govind":[2,1100787,11517,2.187],"bowl_wicket_govind":[2,1112304,9597,1.808],"bat_six_sundarraj":[2,1121901,9957,1.886],"bat_four_sundarraj":[2,1131858,9237,1.748],"bat_out_sundarraj":[2,1141095,8157,1.532],"bat_new_sundarraj":[2,1149252,9717,1.835],"bat_fifty_sundarraj":[2,1158969,13317,2.546],"bat_hundred_sundarraj":[2,1172286,13557,2.608],"bat_strike_sundarraj":[2,1185843,12477,2.39],"bowl_attack_sundarraj":[2,1198320,11877,2.267],"bowl_wicket_sundarraj":[2,1210197,10437,1.98],"bat_six_durai":[2,1220634,8637,1.626],"bat_four_durai":[2,1229271,9837,1.853],"bat_out_durai":[2,1239108,7077,1.309],"bat_new_durai":[2,1246185,9357,1.763],"bat_fifty_durai":[2,1255542,11997,2.287],"bat_hundred_durai":[2,1267539,12237,2.334],"bat_strike_durai":[2,1279776,11277,2.158],"bowl_attack_durai":[2,1291053,10317,1.967],"bowl_wicket_durai":[2,1301370,9717,1.827],"bat_six_kumma":[2,1311087,7197,1.338],"bat_four_kumma":[2,1318284,7317,1.366],"bat_out_kumma":[2,1325601,5997,1.093],"bat_new_kumma":[2,1331598,7437,1.38],"bat_fifty_kumma":[2,1339035,11277,2.145],"bat_hundred_kumma":[2,1350312,11877,2.263],"bat_strike_kumma":[2,1362189,11157,2.124],"bowl_attack_kumma":[2,1373346,10197,1.937],"bowl_wicket_kumma":[2,1383543,8517,1.586],"bat_six_pandi":[2,1392060,7677,1.417],"bat_four_pandi":[2,1399737,7797,1.457],"bat_out_pandi":[2,1407534,5877,1.062],"bat_new_pandi":[2,1413411,7557,1.401],"bat_fifty_pandi":[2,1420968,11637,2.228],"bat_hundred_pandi":[2,1432605,12357,2.359],"bat_strike_pandi":[2,1444962,11637,2.225],"bowl_attack_pandi":[2,1456599,10797,2.052],"bowl_wicket_pandi":[2,1467396,9237,1.734],"bat_six_narayanan":[2,1476633,9957,1.889],"bat_four_narayanan":[2,1486590,9477,1.788],"bat_out_narayanan":[2,1496067,7317,1.349],"bat_new_narayanan":[2,1503384,10077,1.919],"bat_fifty_narayanan":[2,1513461,13557,2.595],"bat_hundred_narayanan":[2,1527018,13917,2.676],"bat_strike_narayanan":[2,1540935,13437,2.574],"bowl_attack_narayanan":[2,1554372,12117,2.327],"bowl_wicket_narayanan":[2,1566489,11277,2.137],"bat_six_babu":[2,1577766,8877,1.659],"bat_four_babu":[2,1586643,8997,1.7],"bat_out_babu":[2,1595640,6717,1.235],"bat_new_babu":[2,1602357,9837,1.856],"bat_fifty_babu":[2,1612194,12357,2.353],"bat_hundred_babu":[2,1624551,12237,2.337],"bat_strike_babu":[2,1636788,11037,2.109],"bowl_attack_babu":[2,1647825,10677,2.034],"bowl_wicket_babu":[2,1658502,9477,1.788],"bat_six_veera":[2,1667979,7437,1.378],"bat_four_veera":[2,1675416,8757,1.633],"bat_out_veera":[2,1684173,8157,1.536],"bat_new_veera":[2,1692330,9957,1.884],"bat_fifty_veera":[2,1702287,11757,2.25],"bat_hundred_veera":[2,1714044,12237,2.331],"bat_strike_veera":[2,1726281,11517,2.185],"bowl_attack_veera":[2,1737798,10437,1.988],"bowl_wicket_veera":[2,1748235,8757,1.656],"bat_six_anantha":[2,1756992,8757,1.652],"bat_four_anantha":[2,1765749,9837,1.862],"bat_out_anantha":[2,1775586,8757,1.655],"bat_new_anantha":[2,1784343,10677,2.033],"bat_fifty_anantha":[2,1795020,12597,2.414],"bat_hundred_anantha":[2,1807617,12477,2.381],"bat_strike_anantha":[2,1820094,12117,2.306],"bowl_attack_anantha":[2,1832211,11517,2.185],"bowl_wicket_anantha":[2,1843728,9357,1.763],"bat_six_srini":[2,1853085,7677,1.436],"bat_four_srini":[2,1860762,8877,1.663],"bat_out_srini":[2,1869639,7797,1.456],"bat_new_srini":[2,1877436,9837,1.869],"bat_fifty_srini":[2,1887273,11877,2.272],"bat_hundred_srini":[2,1899150,12117,2.315],"bat_strike_srini":[2,1911267,10917,2.067],"bowl_attack_srini":[2,1922184,10557,1.995],"bowl_wicket_srini":[2,1932741,8877,1.66],"bat_six_senra":[2,1941618,7557,1.401],"bat_four_senra":[2,1949175,8517,1.604],"bat_out_senra":[2,1957692,8157,1.517],"bat_new_senra":[2,1965849,10317,1.945],"bat_fifty_senra":[2,1976166,11637,2.213],"bat_hundred_senra":[2,1987803,11997,2.282],"bat_strike_senra":[2,1999800,11517,2.204],"bowl_attack_senra":[2,2011317,11037,2.094],"bowl_wicket_senra":[2,2022354,8877,1.66],"bat_six_karthik":[2,2031231,8277,1.558],"bat_four_karthik":[2,2039508,9237,1.733],"bat_out_karthik":[2,2048745,8157,1.531],"bat_new_karthik":[2,2056902,10437,1.976],"bat_fifty_karthik":[2,2067339,12357,2.353],"bat_hundred_karthik":[2,2079696,12597,2.42],"bat_strike_karthik":[2,2092293,11997,2.288],"bowl_attack_karthik":[2,2104290,10917,2.066],"bowl_wicket_karthik":[2,2115207,9357,1.766],"bat_six_rams":[2,2124564,7557,1.407],"bat_four_rams":[2,2132121,8997,1.704],"bat_out_rams":[2,2141118,8157,1.529],"bat_new_rams":[2,2149275,10197,1.925],"bat_fifty_rams":[2,2159472,11997,2.297],"bat_hundred_rams":[2,2171469,12237,2.343],"bat_strike_rams":[2,2183706,11157,2.128],"bowl_attack_rams":[2,2194863,9957,1.882],"bowl_wicket_rams":[2,2204820,8997,1.695],"bat_six_prem":[2,2213817,7437,1.385],"bat_four_prem":[2,2221254,8517,1.605],"bat_out_prem":[2,2229771,7677,1.421],"bat_new_prem":[2,2237448,9597,1.802],"bat_fifty_prem":[2,2247045,11637,2.228],"bat_hundred_prem":[2,2258682,11997,2.297],"bat_strike_prem":[2,2270679,11037,2.095],"bowl_attack_prem":[2,2281716,10197,1.931],"bowl_wicket_prem":[2,2291913,8997,1.684],"bat_six_lund":[2,2300910,6957,1.286],"bat_four_lund":[2,2307867,8517,1.592],"bat_out_lund":[2,2316384,5157,0.931],"bat_new_lund":[2,2321541,7437,1.389],"bat_strike_lund":[2,2328978,10917,2.078],"bat_six_pereira":[2,2339895,7917,1.479],"bat_four_pereira":[2,2347812,8637,1.624],"bat_out_pereira":[2,2356449,7197,1.34],"bat_new_pereira":[2,2363646,8517,1.586],"bat_strike_pereira":[2,2372163,11877,2.259],"bat_six_kowalski":[2,2384040,7557,1.409],"bat_four_kowalski":[2,2391597,8637,1.612],"bat_out_kowalski":[2,2400234,7437,1.388],"bat_new_kowalski":[2,2407671,9597,1.802],"bat_strike_kowalski":[2,2417268,12357,2.371],"bat_six_mensah":[2,2429625,7557,1.4],"bat_four_mensah":[2,2437182,7557,1.404],"bat_out_mensah":[2,2444739,6597,1.211],"bat_new_mensah":[2,2451336,8757,1.648],"bat_strike_mensah":[2,2460093,11637,2.212],"bat_six_rao":[2,2471730,7077,1.31],"bat_four_rao":[2,2478807,7437,1.379],"bat_out_rao":[2,2486244,5637,1.022],"bat_new_rao":[2,2491881,7917,1.475],"bat_strike_rao":[2,2499798,10677,2.037],"bat_six_ashby":[2,2510475,6717,1.238],"bat_four_ashby":[2,2517192,7197,1.322],"bat_out_ashby":[2,2524389,6117,1.106],"bat_new_ashby":[2,2530506,7917,1.48],"bat_strike_ashby":[2,2538423,10917,2.077],"bat_six_thorne":[2,2549340,7437,1.376],"bat_four_thorne":[2,2556777,7917,1.472],"bat_out_thorne":[2,2564694,5037,0.909],"bat_new_thorne":[2,2569731,8397,1.566],"bat_strike_thorne":[2,2578128,11157,2.112],"bat_six_iqbal":[2,2589285,7197,1.343],"bat_four_iqbal":[2,2596482,7317,1.359],"bat_out_iqbal":[2,2603799,6117,1.126],"bat_new_iqbal":[2,2609916,8997,1.696],"bat_strike_iqbal":[2,2618913,11277,2.156],"bat_six_ortega":[2,2630190,7677,1.433],"bat_four_ortega":[2,2637867,9717,1.831],"bat_out_ortega":[2,2647584,9357,1.753],"bat_new_ortega":[2,2656941,10797,2.052],"bat_strike_ortega":[2,2667738,11997,2.28],"bat_six_boateng":[2,2679735,8877,1.662],"bat_four_boateng":[2,2688612,9717,1.837],"bat_out_boateng":[2,2698329,9117,1.709],"bat_new_boateng":[2,2707446,10797,2.055],"bat_strike_boateng":[2,2718243,11877,2.264],"bat_six_mason":[2,2730120,7797,1.459],"bat_four_mason":[2,2737917,8757,1.639],"bat_out_mason":[2,2746674,8157,1.534],"bat_new_mason":[2,2754831,10317,1.957],"bat_strike_mason":[2,2765148,11277,2.156]}}/*/VOICE_INDEX*/;
 const Caller = (() => {
   const idx = VOICE_INDEX, banks = [], decoded = new Map(), last = {}, variants = {};
   let state = idx ? 'idle' : 'off', cur = null, queue = [], on = true;
@@ -3248,6 +3326,7 @@ const Comm = (() => {
       if (chance({ left: 0.45, beaten: 1, beatenIn: 1, duck: 0.8, miss: 0.85 }[kind])) Caller.say([P(id)], { pri: 2, maxWait: 0.4 });
     },
     after(o, bat, bw, cc) {
+      if (o.extra === 'wd' || o.extra === 'b' || o.reprieve) return; // the umpire's call already said it
       const ids = [], n = game.log.length;
       if (cc && cc.before < 75 && cc.after >= 75) { Caller.say([P('col_conf')], { pri: 1, delay: 0.3, maxWait: 3.5 }); return; }
       if (cc && cc.before >= 20 && cc.after < 20 && chance(0.6)) { Caller.say(['col_nervy_1'], { pri: 1, delay: 0.3, maxWait: 3.5 }); return; }
@@ -3290,8 +3369,8 @@ const Comm = (() => {
     milestone(b, m) { soon([`bat_${m === 50 ? 'fifty' : 'hundred'}_${batId(b)}`], { pri: 3, maxWait: 2 }, 4); },
     welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : [isTest() ? 'col_test_welcome_1' : 'col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
     chase() { soon([P('col_chase')], { pri: 2, maxWait: 4 }); },
-    anthem() { soon([P('col_anthem')], { pri: 1, maxWait: 3 }, 4); },
-    result(r) { soon([P(r.winner === 'home' ? 'res_home' : r.winner === 'away' ? 'res_away' : r.tie ? 'res_tie' : 'res_draw')], { pri: 3, maxWait: 4 }, 6); },
+    anthem() { const ids = homeId === 'thudinest' ? ['col_anthem_1', 'col_anthem_2', 'col_anthem_3'] : ['col_anthem_1', 'col_anthem_2', 'col_anthem_amh_1']; soon([ids[(Math.random() * 3) | 0]], { pri: 1, maxWait: 3 }, 4); },
+    result(r) { soon([P(r.winner === 'home' ? TEAMS.home.res : r.winner === 'away' ? 'res_away' : r.tie ? 'res_tie' : 'res_draw')], { pri: 3, maxWait: 4 }, 6); },
     end(allOut) { soon([isTest() ? (allOut ? 'col_test_allout_1' : 'col_test_end_1') : allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
   };
 })();
@@ -3300,6 +3379,9 @@ const Comm = (() => {
 function finishBall(o) {
   if (game.outcome) return;
   game.outcome = o;
+  Replay.mark('event');
+  // every wicket gets a replay; a six about half the time, and always when it's a monster
+  game.replayDue = o.out ? (o.kind === 'caught' ? 'caught' : 'bowled') : o.kind === 'six' && (Math.random() < 0.55 || sixCarry(game.play && game.play.sim) >= 85) ? 'six' : null;
   game.state = 'dead'; game.deadT = 0;
   const bat = game.bats[game.rigS.batIdx], bw = game.bowl[game.bowler];
   const tag = `${Math.floor(game.balls / 6)}.${game.balls % 6 + 1}`;
@@ -3567,7 +3649,7 @@ function endInnings() {
   const isBest = prev === undefined || game.runs > prev;
   if (isBest) { game.best[bestId()] = game.runs; storage.set(bestKey(game.format, game.overs), String(game.runs)); }
   const allOut = game.wkts >= 10;
-  $('endEyebrow').textContent = `${isBest && game.runs > 0 ? 'New best score · ' : ''}Innings break · Thudinest Coimbatore`;
+  $('endEyebrow').textContent = `${isBest && game.runs > 0 ? 'New best score · ' : ''}Innings break · ${TEAMS.home.name}`;
   $('chaseLine').textContent = `World XI need ${game.target} to win${game.overs ? ` from ${game.overs * 6} balls` : ''}.`;
   $('endScore').textContent = allOut ? `${game.runs}` : `${game.runs}/${game.wkts}`;
   $('endOvers').textContent = allOut ? `all out (${oversText()} ov)` : `(${oversText()} ov)`;
@@ -3597,7 +3679,7 @@ function endInnings() {
   $('fowLine').textContent = (game.fow.length ? `Fall of wickets: ${game.fow.join(', ')}. ` : '') + (dnb.length ? `Did not bat: ${dnb.join(', ')}.` : '');
   drawWagon();
   if (!Caller.failed) Comm.end(allOut);
-  else Voice.say(allOut ? `And that is the end of the innings. Thudinest Coimbatore are all out for ${game.runs}. What a night of cricket.` : `And that is the innings. Thudinest Coimbatore finish on ${game.runs} for ${game.wkts}. What a night of cricket under the Coimbatore lights.`);
+  else Voice.say(allOut ? `And that is the end of the innings. ${batTeamName()} are all out for ${game.runs}. What a night of cricket.` : `And that is the innings. ${batTeamName()} finish on ${game.runs} for ${game.wkts}. What a night of cricket under the Coimbatore lights.`);
   setTimeout(() => { if (game.state === 'over') $('endPanel').hidden = false; }, 600);
   renderScore();
 }
@@ -4291,7 +4373,7 @@ function matchResult(first, second) {
   if (isTest() && w < 10) return { draw: true, text: 'Match drawn', sub: `The World XI finished ${t - r} short of the target, with ${10 - w} wicket${10 - w === 1 ? '' : 's'} in hand.` };
   if (r === t - 1) return { tie: true, text: 'Match tied', sub: 'Scores level at the end. What a finish.' };
   const m = t - 1 - r;
-  return { winner: 'home', text: `Thudinest Coimbatore won by ${m} run${m === 1 ? '' : 's'}`, sub: second.wkts >= 10 ? 'The World XI were bowled out.' : '' };
+  return { winner: 'home', text: `${TEAMS.home.name} won by ${m} run${m === 1 ? '' : 's'}`, sub: second.wkts >= 10 ? 'The World XI were bowled out.' : '' };
 }
 function finishMatch(second) {
   game.state = 'over'; game.active = false;
@@ -4442,7 +4524,7 @@ const LOOKS = {
     sky: [0x2b66b8, 0x6fa4dc, 0xd8e6f0, 0], crowd: 0.07, concrete: 0x8a909c, roof: 0x5c6270, sight: 0xf3f3ef, lamps: 0x5a5d66, glow: 0, exposure: 1.0, grass: 0x8fa88d, pitch: 0x9c9080 },
 };
 function applyLook(fmt) {
-  const L = LOOKS[fmt === 'test' ? 'day' : 'night'], KB = TEAM_KITS[game.batTeam][fmt], KF = TEAM_KITS[fieldTeam()][fmt];
+  const L = LOOKS[fmt === 'test' ? 'day' : 'night'], KB = kitsOf(game.batTeam)[fmt], KF = kitsOf(fieldTeam())[fmt];
   scene.background.setHex(L.bg); scene.fog.color.setHex(L.fog[0]); scene.fog.near = L.fog[1]; scene.fog.far = L.fog[2];
   LIGHTS.hemi.color.setHex(L.hemi[0]); LIGHTS.hemi.groundColor.setHex(L.hemi[1]); LIGHTS.hemi.intensity = L.hemi[2];
   for (const k of ['key', 'fill', 'rim']) { LIGHTS[k].color.setHex(L[k][0]); LIGHTS[k].intensity = L[k][1]; }
@@ -4469,8 +4551,8 @@ function applyLook(fmt) {
   drawScreen(null);
 }
 const FORMAT_TEXT = {
-  t20: { eyebrow: 'Thudinest Coimbatore · Day–night T20', lead: 'Thudinest Coimbatore bat first under the lights, with ', tail: ' opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.', tag: 'Batting' },
-  test: { eyebrow: 'Thudinest Coimbatore · Test match', lead: 'A Test match in the sunshine: whites, the red ball and a slip cordon. Thudinest Coimbatore bat first, with ', tail: ' opening. Leave the good ones, defend straight and put away the bad balls. Ten wickets, with ball-by-ball commentary.', tag: 'Test match' },
+  t20: { eyebrow: '{team} · Day–night T20', lead: '{team} bat first under the lights, with ', tail: ' opening. Read the length from the marker on the pitch, pick your shot, and time the swing. Ten wickets, with ball-by-ball commentary.', tag: 'Batting' },
+  test: { eyebrow: '{team} · Test match', lead: 'A Test match in the sunshine: whites, the red ball and a slip cordon. {team} bat first, with ', tail: ' opening. Leave the good ones, defend straight and put away the bad balls. Ten wickets, with ball-by-ball commentary.', tag: 'Test match' },
 };
 /* back to a fresh innings on the start screen: new bowler and field for the format, everyone in position */
 function menuReset() {
@@ -4487,7 +4569,8 @@ function formatUI(fmt) {
     b.setAttribute('aria-label', ov ? `${ov} overs` : 'Until all out'); b.classList.toggle('on', ov === game.overs);
   });
   document.querySelectorAll('[data-fmt]').forEach((b) => { const on = b.dataset.fmt === fmt; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  $('startEyebrow').textContent = T.eyebrow; $('ledeLead').textContent = T.lead; $('ledeTail').textContent = T.tail; $('bugTag').textContent = T.tag;
+  const team = (t) => t.replace('{team}', TEAMS.home.name);
+  $('startEyebrow').textContent = team(T.eyebrow); $('ledeLead').textContent = team(T.lead); $('ledeTail').textContent = T.tail; $('bugTag').textContent = T.tag;
 }
 function setFormat(fmt, quiet) {
   game.format = fmt;
@@ -4630,6 +4713,7 @@ function updateGame(dt) {
       const runEnd = P && P.runs ? P.runStart + P.runs * RUN_T + 0.2 : 0;
       const wait = game.outcome && game.outcome.out ? 3.2 : 2.3;
       if ((game.deadT > wait && (!P || P.t >= runEnd)) || (game.skip && game.deadT > 0.6)) {
+        if (game.replayDue && !game.replayDone && !game.skip) { game.replayDone = true; if (Replay.start(game.replayDue)) return; }
         game.deadFlight = false;
         if (game.wkts >= 10 || game.balls >= game.total || (game.innings === 2 && game.runs >= game.target)) endInnings();
         else enterBetween(false);
@@ -4679,10 +4763,102 @@ function flyThrow(P, dt) {
   if (g.last && T.t >= g.T) { T.done = true; P.holder = keeper; Sound.glove(); }
 }
 
+/* -------------------------------------------------------------- replays */
+/* TV replays of sixes and wickets. Every frame of a delivery is recorded (each player's joints, both bats, the ball and
+   the stumps), then shown again in slow motion from a new angle, with the moment of contact slowed right down.
+   A tap, or any key, skips it. */
+const Replay = (() => {
+  const nodes = [];
+  const addRig = (r) => { nodes.push(r.root, r.pelvis, r.spine, r.head); for (const L of r.legs) nodes.push(L.hip, L.knee, L.ankle); for (const A of r.arms) nodes.push(A.sh, A.el, A.wrist); };
+  for (const b of [rigA, rigB]) { addRig(b.rig); nodes.push(b.bat); }
+  for (const f of fielders) addRig(f.rig);
+  addRig(umpire); addRig(legUmp);
+  nodes.push(ball, ballShadow);
+  for (const s of wicket.stumps) nodes.push(s.pivot);
+  for (const b of wicket.bails) nodes.push(b.mesh);
+  const W = 8, CAP = 420, HZ = 30, pool = [];
+  let frames = [], lastRec = -1, on = storage.get('floodlit.replays') !== '0';
+  let R = null; // the replay being shown
+  const marks = {};
+  const take = () => pool.pop() || new Float32Array(nodes.length * W);
+  function snap(a) {
+    let i = 0;
+    for (const n of nodes) { const p = n.position, q = n.quaternion; a[i++] = p.x; a[i++] = p.y; a[i++] = p.z; a[i++] = q.x; a[i++] = q.y; a[i++] = q.z; a[i++] = q.w; a[i++] = n.visible ? 1 : 0; }
+    return a;
+  }
+  const _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion();
+  function pose(a, b, u) {
+    let i = 0;
+    for (const n of nodes) {
+      n.position.set(lerp(a[i], b[i], u), lerp(a[i + 1], b[i + 1], u), lerp(a[i + 2], b[i + 2], u));
+      _qa.set(a[i + 3], a[i + 4], a[i + 5], a[i + 6]); _qb.set(b[i + 3], b[i + 4], b[i + 5], b[i + 6]);
+      n.quaternion.copy(_qa.slerp(_qb, u));
+      n.visible = (u < 0.5 ? a[i + 7] : b[i + 7]) > 0.5;
+      i += W;
+    }
+  }
+  function at(t) {
+    let k = 0; while (k < frames.length - 2 && frames[k + 1].t < t) k++;
+    const A = frames[k], B = frames[Math.min(k + 1, frames.length - 1)];
+    pose(A.d, B.d, B.t > A.t ? clamp((t - A.t) / (B.t - A.t), 0, 1) : 0);
+  }
+  const ui = (show, sub) => { $('replay').hidden = !show; if (sub) $('replaySub').textContent = sub; };
+  return {
+    get on() { return on; },
+    set(v) { on = v; storage.set('floodlit.replays', v ? '1' : '0'); },
+    get active() { return !!R; },
+    mark(k) { marks[k] = game.clock; },
+    reset() { for (const f of frames) pool.push(f.d); frames = []; lastRec = -1; for (const k in marks) delete marks[k]; },
+    record() {
+      if (R || game.clock - lastRec < 1 / HZ) return;
+      lastRec = game.clock;
+      frames.push({ t: game.clock, d: snap(take()) });
+      if (frames.length > CAP) pool.push(frames.shift().d);
+    },
+    /* kind: 'six' | 'bowled' | 'caught' */
+    start(kind) {
+      if (!on || frames.length < 20 || marks.release === undefined) return false;
+      const t0 = Math.max(frames[0].t, marks.release - 0.75), end = frames[frames.length - 1].t;
+      const key = marks.contact !== undefined ? marks.contact : marks.event !== undefined ? marks.event : marks.release + 0.7;
+      const t1 = Math.min(end, (marks.event !== undefined ? marks.event : key) + (kind === 'six' ? 1.9 : 1.3));
+      if (t1 - t0 < 0.8) return false;
+      R = { kind, t: t0, t0, t1, key, live: snap(new Float32Array(nodes.length * W)), cam: { pos: camera.position.clone(), look: cam.look.clone(), fov: camera.fov }, look: new V3(), first: true };
+      trail.hide(); marker.visible = false; $('callout').hidden = true; sparks.points.visible = dust.points.visible = false;
+      ui(true, kind === 'six' ? 'Into the crowd' : kind === 'bowled' ? 'Through the defences' : 'Taken');
+      return true;
+    },
+    skip() { if (R) R.t = R.t1 + 1; },
+    update(rdt) {
+      // slow right down around the moment of the stroke (or of the stumps), a steady half speed either side
+      const near = Math.abs(R.t - R.key);
+      R.t += rdt * (near < 0.35 ? 0.28 : near < 0.8 ? 0.5 : 0.75);
+      if (R.t > R.t1) {
+        pose(R.live, R.live, 0);
+        camera.position.copy(R.cam.pos); cam.look.copy(R.cam.look); camera.lookAt(cam.look); camera.fov = R.cam.fov; camera.updateProjectionMatrix();
+        sparks.points.visible = dust.points.visible = true;
+        R = null; ui(false);
+        return;
+      }
+      at(R.t);
+      // the camera: side-on from point for the stroke, then up behind the batter to follow the ball; a low stump-cam for bowled
+      const b = ball.position;
+      let pos, look, fov;
+      if (R.kind === 'bowled') { pos = _v1.set(game.del && !game.del.pace ? -2.4 : 2.4, 0.75, 2.2); look = _v2.set(-0.1, 0.5, -0.6); fov = 36; }
+      else if (R.t < R.key + 0.2) { pos = _v1.set(6.8, 1.7, 0.2); look = _v2.set(-0.4, 1.0, -2.2); fov = 34; }
+      else { const d = Math.hypot(b.x, b.z + 1); pos = _v1.set(2.6, 3.6 + Math.min(d, 80) * 0.06, 5.5); look = _v2.set(b.x, Math.max(0.5, b.y), b.z); fov = clamp(40 - d * 0.22, 16, 40); }
+      if (R.first) { R.look.copy(look); R.first = false; } else R.look.lerp(look, 1 - Math.exp(-6 * rdt));
+      camera.position.copy(pos); camera.lookAt(R.look);
+      const f = fov / Math.pow(clamp(camera.aspect, 0.5, 1), 0.5);
+      if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
+    },
+  };
+})();
+
 /* ----------------------------------------------------------------- input */
 function setSide(s) { if (!game.swing && game.active) { game.intent.side = s; updateShotHUD(); } }
 function act(k, touch) {
   if (game.paused) { resume(); return; }
+  if (Replay.active) { Replay.skip(); return; }
   if (k === 'left') setSide(-1);
   else if (k === 'right') setSide(1);
   else if (k === 'up') { if (!game.swing && game.active) { game.intent.side = 0; game.intent.foot = 'front'; updateShotHUD(); } }
@@ -4706,6 +4882,7 @@ window.addEventListener('keydown', (e) => {
   if (map[e.key] || e.code === 'Space') e.preventDefault();
   if (e.key === 'Shift') { game.shift = true; updateShotHUD(); return; }
   if (e.repeat) return;
+  if (Replay.active) { e.preventDefault(); Replay.skip(); return; }
   if (game.paused) { resume(); return; }
   if (game.state === 'menu' && !$('startPanel').hidden) { if (e.key === 'Enter') { if (!Loader.ready) Loader.request(); else if (xiReady()) startInnings(game.resume); } return; }
   if (game.state === 'over') {
@@ -4754,6 +4931,13 @@ document.querySelectorAll('[data-ov]').forEach((b) => b.addEventListener('click'
   document.querySelectorAll('[data-ov]').forEach((x) => x.classList.toggle('on', x === b));
   refreshStartPanel(); renderScore();
 }));
+document.querySelectorAll('[data-replays]').forEach((b) => {
+  b.classList.toggle('on', (b.dataset.replays === '1') === Replay.on);
+  b.addEventListener('click', () => {
+    Replay.set(b.dataset.replays === '1');
+    document.querySelectorAll('[data-replays]').forEach((x) => x.classList.toggle('on', x === b));
+  });
+});
 document.querySelectorAll('[data-anthem]').forEach((b) => {
   b.classList.toggle('on', (b.dataset.anthem === '1') === Anthem.on);
   b.addEventListener('click', () => {
@@ -4792,20 +4976,39 @@ function renderSquad() {
   const xi = xiList();
   if (xi.length >= 2 && !game.resume) $('openers').textContent = `${xi[0].name} and ${xi[1].name}`;
 }
-document.querySelectorAll('#squadGrid .pl').forEach((b) => b.addEventListener('click', () => {
-  if (game.resume) return;
+/* the squad buttons are built for whichever side is chosen */
+function buildSquadGrid() {
+  const grid = $('squadGrid'); grid.textContent = '';
+  SQUAD.forEach((p, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pl'; b.dataset.i = String(i);
+    const n = document.createElement('i'), nm = document.createElement('b'); nm.textContent = p.name;
+    b.appendChild(n); b.appendChild(nm); grid.appendChild(b);
+  });
+}
+$('squadGrid').addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('.pl');
+  if (!b || game.resume) return;
   const i = +b.dataset.i;
   xiPicked[i] = !xiPicked[i];
-  storage.set('floodlit.xi', JSON.stringify(SQUAD.filter((_, k) => xiPicked[k]).map((p) => p.name)));
+  storage.set(xiKey(), JSON.stringify(SQUAD.filter((_, k) => xiPicked[k]).map((p) => p.name)));
   game.bats = freshBats(); setBatter(rigA, 0); setBatter(rigB, 1);
   refreshStartPanel(); renderScore();
-}));
-{
-  try {
-    const saved = JSON.parse(storage.get('floodlit.xi') || 'null');
-    if (Array.isArray(saved) && saved.length === XI_SIZE && saved.every((n) => SQUAD.some((p) => p.name === n))) xiPicked = SQUAD.map((p) => saved.includes(p.name));
-  } catch (e) { /* keep the default XI */ }
+});
+/* choosing the side: its squad, kit, name and anthem; not while an innings is in progress */
+function setHomeTeam(id) {
+  if (!HOME_TEAMS[id] || game.resume || game.active) return;
+  homeId = id; SQUAD = SQUADS[id]; storage.set('floodlit.team', id);
+  loadXI(); buildSquadGrid();
+  document.querySelectorAll('[data-team]').forEach((b) => { const on = b.dataset.team === id; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  menuReset(); applyLook(game.format); formatUI(game.format);
+  $('simTeam').textContent = `${TEAMS.home.name} are bowling.`; $('commBody').textContent = `${TEAMS.home.name} bat first under the lights.`;
+  Anthem.teamChanged();
+  refreshStartPanel(); renderScore();
 }
+document.querySelectorAll('[data-team]').forEach((b) => b.addEventListener('click', () => setHomeTeam(b.dataset.team)));
+loadXI(); buildSquadGrid();
+document.querySelectorAll('[data-team]').forEach((b) => { const on = b.dataset.team === homeId; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+$('simTeam').textContent = `${TEAMS.home.name} are bowling.`; $('commBody').textContent = `${TEAMS.home.name} bat first under the lights.`;
 const xiReady = () => game.resume || xiPicked.filter(Boolean).length === XI_SIZE;
 $('playBtn').addEventListener('click', () => { if (xiReady()) startInnings(game.resume); });
 
@@ -4822,7 +5025,8 @@ function resume() {
 window.addEventListener('blur', pause);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 $('pausePanel').addEventListener('pointerdown', resume);
-canvas.addEventListener('pointerdown', () => { if (game.paused) resume(); });
+canvas.addEventListener('pointerdown', () => { if (game.paused) resume(); else if (Replay.active) Replay.skip(); });
+$('replay').addEventListener('pointerdown', () => Replay.skip());
 
 /* --------------------------------------------------------------- camera */
 const VIEWS = {
@@ -4853,7 +5057,7 @@ function updateCamera(rdt) {
     desired.fov = clamp(54 - d * 0.22, 30, 54) / Math.pow(clamp(aspect, 0.5, 1), 0.4);
     kp = 2.4; kl = 7;
   } else if (cam.mode === 'stumps') {
-    desired.pos.set(2.6, 0.8, 2.6); desired.look.set(0, 0.45, 0); desired.fov = 42 / Math.pow(clamp(aspect, 0.5, 1), 0.5);
+    desired.pos.set(game.del && !game.del.pace ? -2.6 : 2.6, 0.8, 2.6); desired.look.set(0, 0.45, 0); desired.fov = 42 / Math.pow(clamp(aspect, 0.5, 1), 0.5); // the leg side when the keeper stands up
     kp = 5; kl = 8;
   } else {
     const V = VIEWS[cam.view];
@@ -4888,6 +5092,7 @@ function frame(now) {
   requestAnimationFrame(frame);
   const rdt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
   if (game.paused) { renderer.render(scene, camera); return; }
+  if (Replay.active) { Replay.update(rdt); renderer.render(scene, camera); return; }
   let scale = 1;
   if (game.slowT > 0) { game.slowT -= rdt; scale = game.slowScale; }
   const dt = rdt * scale;
@@ -4943,6 +5148,8 @@ function frame(now) {
   const pxScale = renderer.domElement.height / (2 * Math.tan(camera.fov * D2R / 2));
   sparks.update(dt, pxScale); dust.update(dt, pxScale);
   for (const g of stadium.glows) g.quaternion.copy(camera.quaternion); // floodlight halos always face the lens
+  updateWave(rdt);
+  if (game.state === 'runup' || game.state === 'flight' || game.state === 'inplay' || game.state === 'dead') Replay.record();
   renderer.render(scene, camera);
 }
 

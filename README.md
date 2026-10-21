@@ -72,33 +72,49 @@ progress all size themselves off that array automatically.
 
 ## Floodlit Over (`/cricket/`)
 
-A standalone 3D cricket game: **Thudinest Coimbatore** against a **World
-XI**, as a T20 under floodlights (2, 5, 10 or 20 overs, coloured kits,
+A standalone 3D cricket game: your side against a **World XI**, as a T20 under floodlights (2, 5, 10 or 20 overs, coloured kits,
 white ball) or a Test match in daylight (15, 30 or 90 overs, or until all
 out; whites, red ball, white sightscreens, a slip cordon, bowlers in spells).
-Thudinest Coimbatore bat first; then the World XI chase, either batted by a
+Your side bats first; then the World XI chase, either batted by a
 player (pass the device to a friend) or by the computer, and the game gives
 the result (won by runs or wickets, tie, or a draw in a timed Test). The
-13-player squad is Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
-Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma; the
-start screen picks which 11 bat (the first 11 by default, remembered per
-browser). Read the length from the marker on the pitch, pick a shot with the arrow
-keys (or the on-screen pad on phones) and time the swing with Space.
+side is chosen on the start card: **Thudinest Coimbatore** (blue and gold;
+a 13-player squad of Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
+Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma) or
+**Team AMH** (green and orange; Pandi, Narayanan, Babu, Veera, Anantha,
+Srini, Senra, Karthik, Rams, Prem and Jay), each with its own commentary
+lines and crowd chant. The start screen picks which 11 bat (the first 11 by
+default, remembered per browser). Read the length from the marker on the pitch, pick a shot with the arrow
+keys (or the on-screen pad on phones), S to sweep, and time the swing with Space.
 
 - Five bowlers (three pace, two spin) with their own deliveries, a
   natural run-up, gather, delivery stride and follow-through
 - Live two-voice commentary: a lead caller who calls each ball as it
   happens (run-up, the stroke, the result) and an analyst who follows up
-  (players' names, six distances, streaks, milestones). The voices are
-  natural British-English recordings rendered offline with the open
-  [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model (Apache-2.0)
-  and shipped as three small MP3 banks in `cricket/voice/`; the crowd ducks
-  under them. Toggle with V. If the banks cannot load, the browser's speech
-  engine reads the written commentary instead
+  (players' names, six distances, streaks, milestones, wides and free hits).
+  The voices are expressive British-English recordings rendered offline with
+  the open [Chatterbox](https://github.com/resemble-ai/chatterbox) model
+  (MIT), the excitement dialled up for the big moments, in two voices based on
+  [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0); they
+  ship as three small MP3 banks in `cricket/voice/` and the crowd ducks under
+  them. Toggle with V. If the banks cannot load, the browser's speech engine
+  reads the written commentary instead
+- The home crowd's anthem: an original terrace song (the crowd sings the tune,
+  chants "Thu-di-nest!" with three claps, a bass drum and a brass band),
+  first after the second over and again every few overs, with a Mexican wave
+  round the stands. A wicket hushes it; switch it off on the start card
+- Wides and front-foot no-balls with the umpire's signals, a free hit after a
+  T20 no-ball (you can't be bowled or caught), byes when the keeper fumbles,
+  and extras and bowling figures on the scorecard
+- Replays of sixes and wickets: the whole delivery is recorded and shown again
+  in slow motion from a side-on camera (a stump camera for bowled); tap to skip
 - Crowd cheers for boundaries and wickets, mixed below the commentary
 - Strokes with real footwork: the batter strides to the pitch of the ball
   (or goes back and across) while it is in the air, the bat comes down
-  straight with the hands leading, and each shot has its own held finish
+  straight with the hands leading, and each shot has its own held finish.
+  Sweep mode puts the batter down on one knee for the sweep, slog sweep,
+  paddle, scoop, reverse sweep and reverse ramp; flicks off the pads, hooks
+  and late cuts are named by the line and height of the ball
 - Defend mode (D or the DEFEND button) makes Swing play a defensive shot; a
   well-timed defence is never out, only a mistimed one can edge or miss
 - Batter confidence: well-timed shots and boundaries build it (and good
@@ -108,12 +124,13 @@ keys (or the on-screen pad on phones) and time the swing with Space.
 - A T20 field (four in the ring, four on the rope, slip or short leg), fair
   catching (a clean, well-timed stroke along the ground can't be caught) and
   return throws that go into the keeper's gloves
-- Fast loading on phones: the start screen and loading percentage paint
-  first, the engine downloads in parallel (preloaded) and the stadium is
-  built in steps; shaders and textures are prepared before the first frame,
-  and phones get a lighter render profile (1.5x resolution, standard cloth
-  materials, smaller shadow map). Tapping Start early shows a progress card
-  and starts the innings at 100%
+- Fast loading on phones, with a real loading percentage: the engine
+  download is measured in bytes, then every build step, texture and shader;
+  shaders are built one at a time so the page never freezes on a number, and
+  materials share shaders (9 on phones), which is what a first visit spends
+  most of its time on. A stalled download retries from a CDN, and a stage
+  that stops reporting offers a reload. Tapping Start early shows a progress
+  card and starts the innings at 100%
 - "Thudinest Sixer / Four / Wicket" pop-ups, Thudinest boundary boards
   and outfield logos, and a full scorecard with a wagon wheel at the end
 
@@ -129,9 +146,11 @@ browser via `localStorage`; there is no server or database.
 `https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
 game card in the Play hub's `.game-cards` list in the root `index.html`.
 
-**Changing the squad** — edit the `SQUAD` array near the top of the script
-in `cricket/index.html` (name, shirt number, skin tone, look), and the
-matching name buttons inside `#squadGrid` in the start card.
+**Changing a squad or adding a side** — edit `SQUADS` near the top of the
+script in `cricket/index.html` (name, shirt number, skin tone, look) and the
+side's entry in `HOME_TEAMS` (name, shirt text, kit colours, anthem file);
+the start card builds its squad buttons from them. A new side also needs a
+`data-team` button in the start card, and its players' commentary clips.
 
 ## Files
 
