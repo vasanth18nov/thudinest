@@ -82,7 +82,7 @@ side is chosen on the start card: **Thudinest Coimbatore** (blue and gold;
 a 13-player squad of Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
 Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma) or
 **Team AMH** (green and orange; Pandi, Narayanan, Babu, Veera, Anantha,
-Srini, Senra, Karthik, Rams, Prem and Jay), each with its own commentary
+Renault Prem, Senra, Karthik, Rams, Ganesh and Azeez), each with its own commentary
 lines and crowd chant; each side has at least four left-handers (marked LH),
 who stand, swing and get bowled at as left-handers, with the field mirrored.
 The arrow keys always point at the side of the field on that side of the
