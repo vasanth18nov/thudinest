@@ -83,7 +83,11 @@ a 13-player squad of Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
 Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma) or
 **Team AMH** (green and orange; Pandi, Narayanan, Babu, Veera, Anantha,
 Srini, Senra, Karthik, Rams, Prem and Jay), each with its own commentary
-lines and crowd chant. The start screen picks which 11 bat (the first 11 by
+lines and crowd chant; each side has at least four left-handers (marked LH),
+who stand, swing and get bowled at as left-handers, with the field mirrored.
+The arrow keys always point at the side of the field on that side of the
+screen, so they swap for a left-hander and for the view from behind the
+bowler. The start screen picks which 11 bat (the first 11 by
 default, remembered per browser). Read the length from the marker on the pitch, pick a shot with the arrow
 keys (or the on-screen pad on phones), S to sweep, and time the swing with Space.
 
