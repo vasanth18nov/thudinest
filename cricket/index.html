@@ -108,6 +108,11 @@ body {
 .chip.four { background: var(--gold); color: var(--gold-ink); border-color: transparent; }
 .chip.six { background: var(--gold); color: var(--gold-ink); border-color: var(--night); box-shadow: 0 0 0 2px var(--gold); }
 .chip.out { background: var(--zing); color: var(--white); border-color: transparent; }
+.chip.ex { width: auto; min-width: 24px; padding: 0 4px; border-radius: 12px; font-size: 10px; letter-spacing: 0.02em; }
+.chips.many { gap: 2px; }
+.chips.many .chip { width: 20px; height: 20px; font-size: 11px; }
+.chips.many .chip.ex { width: auto; min-width: 20px; padding: 0 3px; font-size: 9px; }
+.bug-sub.tight .bowl .lbl { display: none; }
 
 /* Top-right cluster */
 .top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; flex: none; }
@@ -192,6 +197,7 @@ body.is-touch .bottom { display: none; }
 .pad .k-left { grid-column: 1; grid-row: 2; }
 .pad .k-down { grid-column: 2; grid-row: 2; }
 .pad .k-right { grid-column: 3; grid-row: 2; }
+.pad .k-sweep { grid-column: 1; grid-row: 1; font-size: 11px; letter-spacing: 0.04em; }
 .act { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; gap: 6px; align-items: end; pointer-events: auto; }
 .act .loft, .act .block { width: 64px; height: 43px; font-size: 14px; grid-column: 1; }
 .act .swing { grid-column: 2; grid-row: 1 / span 2; width: 94px; height: 94px; border-radius: 50%; font-size: 22px; background: var(--chalk); color: var(--night); border-color: var(--chalk); }
@@ -223,6 +229,10 @@ body.is-touch .bottom { display: none; }
 .btn:hover { filter: brightness(1.06); }
 .btn:disabled { cursor: default; filter: saturate(0.4) brightness(0.8); }
 .btn.ghost { background: transparent; color: var(--gold); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.bug-free { padding: 5px 12px; background: var(--zing); font: 800 12px/1.2 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); animation: freePulse 1s ease-in-out infinite alternate; }
+@keyframes freePulse { from { opacity: 1; } to { opacity: 0.72; } }
+.sc-bowl { margin-top: 10px; }
+.sc tr.tot td { font-weight: 700; border-top: 1px solid var(--rule-strong); }
 .bug-chase { padding: 5px 12px; background: rgba(255, 197, 61, 0.14); border-bottom: 1px solid var(--rule); font: 700 12px/1.2 var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .conf { display: flex; align-items: center; gap: 8px; margin-top: 8px; font: 600 10px/1 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 .conf i, .tconf { position: relative; display: block; width: 92px; height: 6px; border-radius: 3px; background: rgba(241, 237, 225, 0.12); overflow: hidden; flex: none; }
@@ -334,6 +344,7 @@ body.is-touch .bottom { display: none; }
   .comm-head { padding-right: 16px; }
   .comm-eq { top: 6px; right: 8px; height: 8px; }
   .bug-chase { padding: 3px 8px; font-size: 10px; }
+  .bug-free { padding: 3px 8px; font-size: 10px; }
   .end-chase { font-size: 18px; }
   .end-actions .btn { font-size: 16px; padding: 13px 16px; flex: 1 1 auto; }
   .callout.branded::before { width: 320px; height: 320px; margin: -160px 0 0 -160px; }
@@ -352,6 +363,9 @@ body.is-touch .bottom { display: none; }
   .bowl .lbl { display: none; }
   .chips { gap: 3px; }
   .chip { width: 17px; height: 17px; font-size: 10px; border-width: 1px; }
+  .chip.ex { width: auto; min-width: 17px; padding: 0 3px; font-size: 8px; }
+  .chips.many .chip { width: 15px; height: 15px; font-size: 9px; }
+  .chips.many .chip.ex { width: auto; min-width: 15px; padding: 0 2px; font-size: 7px; }
   .chip.dot::after { width: 3px; height: 3px; }
   .top-right { gap: 6px; }
   .row { gap: 6px; }
@@ -411,6 +425,7 @@ body.is-touch .bottom { display: none; }
     <section class="bug" aria-label="Scoreboard">
       <div class="bug-head"><span id="bugTeam">Thudinest Coimbatore</span><small id="bugTag">Batting</small></div>
       <div class="bug-chase" id="bugChase" hidden></div>
+      <div class="bug-free" id="bugFree" hidden>Free hit · can&rsquo;t be bowled or caught</div>
       <div class="bug-main">
         <div class="bug-score"><span id="runs">0</span><span class="slash">/</span><span class="wk" id="wkts">0</span></div>
         <div class="bug-cell"><span class="lbl">Overs</span><b><span id="overs">0.0</span><small id="oversOf"> /5</small></b></div>
@@ -420,7 +435,7 @@ body.is-touch .bottom { display: none; }
         <div class="batter on" id="bat1"><span class="nm" id="nm1">Kavin</span><b id="r1">0</b><span class="bb" id="b1">(0)</span></div>
         <div class="batter" id="bat2"><span class="nm" id="nm2">Harsha</span><b id="r2">0</b><span class="bb" id="b2">(0)</span></div>
       </div>
-      <div class="bug-sub">
+      <div class="bug-sub" id="bugSub">
         <div class="bowl"><span class="lbl">Bowling</span><b id="bowlerName">Mason</b><span id="bowlerFig">0-0 (0.0)</span></div>
         <div class="chips" id="chips" aria-label="This over"></div>
       </div>
@@ -486,6 +501,7 @@ body.is-touch .bottom { display: none; }
       <div><kbd id="kRight">→</kbd>Off side</div>
       <div><kbd id="kUp">↑</kbd>Straight, front foot</div>
       <div><kbd id="kDown">↓</kbd>Back foot</div>
+      <div><kbd id="kSweep">S</kbd>Sweep</div>
       <div><kbd id="kShift">Shift</kbd>Loft (hold)</div>
       <div><kbd id="kBlock">D</kbd>Defend</div>
       <div><kbd>Space</kbd>Swing</div>
@@ -501,6 +517,7 @@ body.is-touch .bottom { display: none; }
         <button type="button" class="k-left" data-k="left" aria-label="Leg side">←</button>
         <button type="button" class="k-down" data-k="down" aria-label="Back foot">↓</button>
         <button type="button" class="k-right" data-k="right" aria-label="Off side">→</button>
+        <button type="button" class="k-sweep" data-k="sweep" aria-label="Sweep, down on one knee">Sweep</button>
       </div>
       <div class="act">
         <button type="button" class="loft" data-k="loft">Loft</button>
@@ -522,6 +539,7 @@ body.is-touch .bottom { display: none; }
       <li><kbd>→</kbd><span><b>Off side</b> · cover drive, cut</span></li>
       <li><kbd>↑</kbd><span><b>Straight</b> · onto the front foot</span></li>
       <li><kbd>↓</kbd><span><b>Back foot</b> · for short balls</span></li>
+      <li><kbd>S</kbd><span><b>Sweep</b> · down on one knee: ← sweep, ↑ paddle or scoop, → reverse sweep</span></li>
       <li><kbd>Shift</kbd><span><b>Loft</b> · hold for an aerial shot</span></li>
       <li><kbd>D</kbd><span><b>Defend</b> · safe, kills the ball</span></li>
       <li><kbd>Space</kbd><span><b>Swing</b> · also skips replays</span></li>
@@ -569,6 +587,12 @@ body.is-touch .bottom { display: none; }
           <button type="button" data-diff="hard">Hard</button>
         </div>
       </div>
+      <div class="row"><span class="lbl">Crowd anthem</span>
+        <div class="seg light" role="group" aria-label="Crowd anthem">
+          <button type="button" data-anthem="1" class="on">On</button>
+          <button type="button" data-anthem="0">Off</button>
+        </div>
+      </div>
     </div>
     <div class="card-row">
       <p class="fine" id="startFine" style="margin:0">Best for 5 overs: <b id="bestStart">none yet</b></p>
@@ -608,6 +632,7 @@ body.is-touch .bottom { display: none; }
     </div>
     <div class="sc-wrap">
       <table class="sc"><thead><tr><th>Batter</th><th></th><th class="n">R</th><th class="n">B</th></tr></thead><tbody id="scBody"></tbody></table>
+      <table class="sc sc-bowl"><thead><tr><th>Bowler</th><th class="n">O</th><th class="n">R</th><th class="n">W</th><th class="n">Econ</th></tr></thead><tbody id="scBowl"></tbody></table>
     </div>
     <p class="fine" id="fowLine"></p>
     <div class="card-row end-actions">
@@ -2042,6 +2067,26 @@ const Sound = (() => {
     claps(3 + level * 1.5, 45 + 35 * level, 0.13, 0.5);
     swell(level, 5);
   }
+  /* the crowd's anthem: a recorded track that fades in over the stand and ducks under the commentary like the crowd */
+  let anthemSrc = null, anthemGain = null;
+  function playAnthem(buf, level) {
+    if (!ctx || !buf) return false;
+    stopAnthem(0.2);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const g = ctx.createGain(), t = ctx.currentTime;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(level, t + 2.5);
+    src.connect(g); g.connect(crowdBus); src.start(t);
+    anthemSrc = src; anthemGain = g;
+    src.onended = () => { if (anthemSrc === src) { anthemSrc = null; anthemGain = null; } };
+    return true;
+  }
+  function stopAnthem(fade) {
+    if (!anthemSrc) return;
+    const t = ctx.currentTime, g = anthemGain.gain;
+    g.cancelScheduledValues(t); g.setValueAtTime(Math.max(0.0001, g.value), t); g.exponentialRampToValueAtTime(0.0001, t + fade);
+    try { anthemSrc.stop(t + fade + 0.05); } catch (e) { /* already stopped */ }
+    anthemSrc = null; anthemGain = null;
+  }
   function duck(active) {
     if (!crowdBus) return;
     const t = ctx.currentTime, g = crowdBus.gain;
@@ -2049,7 +2094,8 @@ const Sound = (() => {
     g.linearRampToValueAtTime(active ? CROWD * 0.45 : CROWD, t + (active ? 0.09 : 0.7));
   }
   return {
-    init, duck,
+    init, duck, playAnthem, stopAnthem,
+    get anthemOn() { return !!anthemSrc; },
     get ctx() { return ctx; },
     get voiceBus() { return voiceBus; },
     get muted() { return muted; },
@@ -2067,6 +2113,33 @@ const Sound = (() => {
     ooh() { voices(12, { vowel: 'oo', fLo: 140, fHi: 330, dur: 1.1, glide: [0.95, 1.2, 0.9], gain: 0.06, spread: 0.15 }); roar(0.25, 1.2); },
     groan() { voices(14, { vowel: 'aw', fLo: 150, fHi: 340, dur: 1.4, glide: [1.12, 1.0, 0.78], gain: 0.06, spread: 0.2 }); roar(0.3, 1.5); },
     applause(level, dur) { claps(dur, 30 + 30 * level, 0.1); swell(level * 0.5, dur + 1); },
+  };
+})();
+
+/* The home crowd's song: an original terrace anthem (sung, chanted and drummed by the stand), first heard after the
+   second over (the first, in a two-over game) and again every five overs, or every ten in a Test. A wicket hushes it. */
+const Anthem = (() => {
+  let buf = null, state = 'idle', on = storage.get('floodlit.anthem') !== '0', lastAt = -99;
+  function load() {
+    if (state !== 'idle' || !Sound.ctx) return;
+    state = 'loading';
+    fetch('voice/anthem.mp3').then((r) => { if (!r.ok) throw new Error(`anthem ${r.status}`); return r.arrayBuffer(); })
+      .then((b) => new Promise((res, rej) => Sound.ctx.decodeAudioData(b, res, rej)))
+      .then((b) => { buf = b; state = 'ready'; }).catch(() => { state = 'failed'; });
+  }
+  return {
+    load,
+    get on() { return on; },
+    set(v) { on = v; storage.set('floodlit.anthem', v ? '1' : '0'); if (!v) Sound.stopAnthem(1); },
+    overEnd(over) {
+      if (!on || !buf || Sound.anthemOn || Sound.muted) return;
+      const first = game.overs && game.overs <= 2 ? 1 : 2, every = isTest() ? 10 : 5;
+      if (over < first || (lastAt >= 0 && over - lastAt < every)) return;
+      lastAt = over;
+      if (Sound.playAnthem(buf, 0.6)) setTimeout(() => { if (Sound.anthemOn) Comm.anthem(); }, 5000);
+    },
+    hush() { Sound.stopAnthem(1.8); },
+    reset() { lastAt = -99; Sound.stopAnthem(0.6); },
   };
 })();
 
@@ -2291,6 +2364,13 @@ function makeDelivery(bw) {
     d.swingAx = rand(-0.4, 0.4); d.seam = 0; d.e = d.variation === 'Top-spinner' ? 0.62 : 0.54; d.fr = 0.82;
     d.runT = 1.45; d.runL = 2.6;
   }
+  // now and then a bad ball: a wide, well outside off or down the leg side, or a front-foot no-ball
+  const wideP = isTest() ? 0.01 : pace ? 0.032 : 0.02, nbP = isTest() ? 0.008 : pace ? 0.018 : 0.007;
+  if (Math.random() < wideP && d.length !== 'yorker') {
+    d.wide = Math.random() < 0.6 ? 'off' : 'leg';
+    d.landX = d.wide === 'off' ? rand(1.06, 1.36) : rand(-0.88, -0.66);
+    d.turn *= 0.3; d.swingAx *= 0.4; d.seam *= 0.3;
+  } else if (Math.random() < nbP) d.noBall = true;
   d.speed = d.kmh / 3.6;
   d.keeperZ = pace ? 13 : 1.25;
   return d;
@@ -2304,8 +2384,22 @@ function solveDelivery(d, p0) {
 const SHOTS = {
   front: { '-1': { name: 'On drive', loft: 'Lofted on drive', th: -36 }, '0': { name: 'Straight drive', loft: 'Straight hit', th: 0 }, '1': { name: 'Cover drive', loft: 'Lofted cover drive', th: 44 } },
   back: { '-1': { name: 'Pull', loft: 'Hook', th: -80 }, '0': { name: 'Back-foot punch', loft: 'Lofted punch', th: 30 }, '1': { name: 'Square cut', loft: 'Upper cut', th: 74 } },
-  block: { front: 'Forward defence', back: 'Back-foot defence' },
+  // down on one knee: the sweep to square leg, the paddle fine, the reverse sweep to point; lofted, the slog sweep, the scoop over the keeper and the reverse ramp
+  sweep: { '-1': { name: 'Sweep', loft: 'Slog sweep', th: -122, lth: -62 }, '0': { name: 'Paddle sweep', loft: 'Scoop', th: -136, lth: -170 }, '1': { name: 'Reverse sweep', loft: 'Reverse ramp', th: 118, lth: 150 } },
+  block: { front: 'Forward defence', back: 'Back-foot defence', sweep: 'Forward defence' },
 };
+const ZC_SWEEP = -1.42;
+const shotKind = (foot, side, block) => block ? 'block' : foot === 'sweep' ? 'sweep' : foot === 'front' ? 'drive' : side === 1 ? 'cut' : side === -1 ? 'pull' : 'punch';
+const contactZ = (kind, foot) => kind === 'sweep' ? ZC_SWEEP : foot === 'front' ? ZC.front : (kind === 'cut' || kind === 'pull') ? ZC.backH : ZC.backV;
+/* the name a stroke goes by: the line and height of the ball turn a drive into a flick, a pull into a hook, a cut into a late cut */
+function strokeName(sw, plan) {
+  if (sw.block) return SHOTS.block[sw.foot] || 'Forward defence';
+  const info = SHOTS[sw.foot][sw.side], C = sw.C, line = sw.Xs + 0.36;
+  if (sw.foot === 'front' && sw.side === -1 && C.x < line - 0.12) return sw.loft ? 'Lofted flick' : 'Flick off the pads';
+  if (sw.foot === 'back' && sw.side === -1 && C.y > 1.25) return 'Hook';
+  if (sw.foot === 'back' && sw.side === 1 && !sw.loft && plan && plan.grade === 'late') return 'Late cut';
+  return sw.loft ? info.loft : info.name;
+}
 const GRADE_LABEL = { perfect: 'Perfect', good: 'Good timing', early: 'Early', late: 'Late', tooEarly: 'Too early', tooLate: 'Too late' };
 function batCollision(vIn, thDeg, beDeg, Vb, e) {
   const th = thDeg * D2R, be = beDeg * D2R;
@@ -2346,7 +2440,7 @@ const freshBats = () => (game.batTeam === 'away' ? WORLD_XI : xiList()).map((p, 
 function newInnings() {
   game.bats = freshBats();
   game.bowl = (game.batTeam === 'away' ? homeAttack() : ATTACK).map((p) => Object.assign({}, p, { balls: 0, runs: 0, wkts: 0 }));
-  Object.assign(game, { runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [], nextIn: 2, overRuns: 0, prevBowler: -1, bowler: 0, lastOut: false, lastOverMark: 0, spells: null, overBowlers: [] });
+  Object.assign(game, { extras: { wd: 0, nb: 0, b: 0 }, freeHit: false, freeHitNow: false, runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [], nextIn: 2, overRuns: 0, prevBowler: -1, bowler: 0, lastOut: false, lastOverMark: 0, spells: null, overBowlers: [] });
   game.rigS = rigA; game.rigN = rigB;
   setBatter(rigA, 0); setBatter(rigB, 1);
   newOver();
@@ -2422,7 +2516,8 @@ function placeStriker(b) { b.snap = b.mode !== 'bat'; b.mode = 'bat'; b.run = nu
 function placeNonStriker(b) { b.mode = 'ns'; b.run = null; b.walkDelay = 0; b.pos.set(-1.05, 0, -20.7); b.heading = 0; }
 
 function startInnings(resume) {
-  Sound.init();
+  Sound.init(); Anthem.load();
+  if (!resume) Anthem.reset();
   if (!resume) newInnings();
   game.total = game.overs ? game.overs * 6 : Infinity;
   game.active = true; game.resume = false;
@@ -2468,9 +2563,13 @@ function enterBetween(first) {
       kind === 'maiden' ? 'Maiden over' : kind === 'pricey' ? 'Expensive over' : '', kind === 'maiden' ? 'good' : kind === 'pricey' ? 'big' : '');
     if (Caller.failed) Voice.say(`${kind === 'overEnd' ? `End of the over, ${sayRuns(overRuns)} from it.` : ol} ${batTeamName()} are ${game.runs} for ${game.wkts}. ${nb.short} will bowl the next one.`);
     else Comm.overEnd(kind, nb, game.newSpell);
+    Anthem.overEnd(game.balls / 6);
   }
   game.lastOut = false;
   if (first) game.saidSlips = false;
+  game.freeHitNow = !!game.freeHit && !isTest();
+  if (game.freeHitNow) { notes.push('Free hit: you cannot be bowled or caught'); Comm.extra('freehit'); }
+  $('bugFree').hidden = !game.freeHitNow;
   game.del = makeDelivery(game.bowl[game.bowler]); setFieldFor(game.del);
   game.swing = null; game.flight = null; game.play = null; game.outcome = null; game.markerOn = false; game.deadFlight = false; game.runupSaid = false;
   game.intent = { side: 0, foot: 'auto', loft: false, defend: game.intent.defend };
@@ -2480,7 +2579,7 @@ function enterBetween(first) {
   placeStriker(game.rigS); placeNonStriker(game.rigN);
   resetBowler();
   for (const f of fielders) { f.tasks = []; f.pose = 'ready'; if (!f.isBowler && f.pos.distanceTo(f.home) > 14) f.pos.copy(f.home); }
-  umpire.signal = null;
+  umpire.signal = game.freeHitNow ? 'freehit' : null; umpire.sigT = 0;
   updateShotHUD(); hideTiming(); renderScore();
   notes.push(`${game.bowl[game.bowler].short} to ${game.bats[game.rigS.batIdx].short} · ball ${game.balls % 6 + 1}`);
   showToast(notes.join(' · '), notes.length > 1 ? 3 : 1.8);
@@ -2504,9 +2603,17 @@ function release() {
   $('gunSpeed').textContent = d.kmh.toFixed(1);
   $('gunLen').innerHTML = `${LEN_NAME[d.length]} <i>· ${d.variation}</i>`;
   Sound.whoosh();
+  if (d.noBall) {
+    // over the line: the umpire calls it at once, so the batter knows it is a free swing
+    umpire.signal = 'noball'; umpire.sigT = 0;
+    showCallout('No ball', isTest() ? 'Overstepped · you cannot be out' : 'Overstepped · free swing, then a free hit', 'k-runs');
+    Sound.ooh();
+    Comm.extra('noball');
+  }
 }
-function resolveFoot() {
-  if (game.intent.foot !== 'auto') return game.intent.foot;
+function resolveFoot(block) {
+  const f = game.intent.foot;
+  if (f !== 'auto' && !(block && f === 'sweep')) return f; // a defensive shot is never played on one knee
   return game.del.landZ > -6.6 ? 'front' : 'back';
 }
 
@@ -2516,10 +2623,10 @@ function trySwing(block, fromTouch) {
   if (game.state === 'runup' || game.state === 'between') { showToast('Wait for the release'); return; }
   if (game.state !== 'flight' || game.swing) return;
   const F = game.flight;
-  const foot = resolveFoot();
+  const foot = resolveFoot(block);
   const side = block ? 0 : game.intent.side;
-  const kind = block ? 'block' : foot === 'front' ? 'drive' : side === 1 ? 'cut' : side === -1 ? 'pull' : 'punch';
-  const zc = foot === 'front' ? ZC.front : (kind === 'cut' || kind === 'pull') ? ZC.backH : ZC.backV;
+  const kind = shotKind(foot, side, block), sweep = kind === 'sweep';
+  const zc = contactZ(kind, foot);
   const cross = crossInfo(F.sim, zc);
   const W = Object.assign({}, DIFF[game.diff]);
   if (block) { W.perfect *= 1.6; W.good *= 1.6; W.edge *= 1.6; }
@@ -2530,7 +2637,7 @@ function trySwing(block, fromTouch) {
   const shuffle = side === 1 ? 0.18 : side === -1 ? -0.14 : 0;
   const Xs = BAT_X + shuffle, line = Xs + 0.36;
   const lo = side === -1 ? -0.8 : -0.6, hi = side === 1 ? 1.05 : 0.8;
-  const maxY = foot === 'back' ? 2.05 : 1.4;
+  const maxY = sweep ? 0.95 : foot === 'back' ? 2.05 : 1.4;
   const tPress = F.t - (fromTouch ? TOUCH_LAG : 0);
   const sw = { animStart: game.clock, foot, side, loft, block, kind, zc, cross, Xs, W, resolved: false };
   sw.dt = cross ? cross.t - (tPress + SWING_T) : -1;
@@ -2567,6 +2674,7 @@ function trySwing(block, fromTouch) {
   else if (cross.y > maxY) edge = 'top';
   else if (!block && grade === 'late' && dx > -0.05 && Math.random() < 0.3 * (1.25 - 0.5 * cf)) edge = 'outside';
   else if (!block && grade === 'early' && Math.random() < 0.22 * (1.25 - 0.5 * cf)) edge = 'leading';
+  else if (sweep && grade !== 'perfect' && Math.random() < (game.del.pace ? (grade === 'good' ? 0.16 : 0.34) : (grade === 'good' ? 0.05 : 0.14)) * (1.25 - 0.5 * cf)) edge = 'top';
   sw.plan = { hit: true, grade, edge };
 }
 function resolveSwing() {
@@ -2597,14 +2705,21 @@ function doHit(sw, plan) {
     const hs = Math.hypot(vOut.x, vOut.z); vOut.y = Math.min(vOut.y, -0.16 * Math.max(hs, 2)); // a dead bat sends it into the pitch
   } else {
     const r = clamp(sw.dt / W.edge, -1, 1);
-    const th = info.th + clamp(sw.cross.x * 45, -14, 16) - r * 30 + randn() * 3;
-    let be = sw.loft ? (sw.foot === 'front' ? 31 : 34) : (sw.foot === 'front' ? 2 : 4);
+    const th = (sw.loft && info.lth !== undefined ? info.lth : info.th) + clamp(sw.cross.x * 45, -14, 16) - r * (sw.kind === 'sweep' ? 14 : 30) + randn() * 3;
+    const sweep = sw.kind === 'sweep';
+    let be = sweep ? (sw.loft ? [33, 46, 42][sw.side + 1] : 3) : sw.loft ? (sw.foot === 'front' ? 31 : 34) : (sw.foot === 'front' ? 2 : 4);
     if (plan.grade === 'early') be += 10;
     if (!sw.loft && sw.cross.y > 1.15) be += 7;
     const tier = { perfect: [19.5, 0.45], good: [16, 0.41], early: [10.5, 0.32], late: [10.5, 0.32] }[plan.grade];
     // confidence puts more into the stroke, most of all into the lofted ones: they carry further and clear the rope
     const cf = confOf(game.bats[game.rigS.batIdx]) / 100, power = sw.loft ? 0.9 + 0.2 * cf : 0.97 + 0.06 * cf;
     vOut = batCollision(vIn, th, be, tier[0] * power * rand(0.96, 1.04), tier[1]);
+    // the scoop and the ramp use the bowler's pace: the ball is helped on, over the keeper or the slips
+    // sweeps go where the bat sends them: the paddle, scoop and ramp borrow the bowler's pace, the others are struck
+    const gq = { perfect: 1, good: 0.9, early: 0.7, late: 0.72 }[plan.grade];
+    if (sweep && sw.loft && sw.side >= 0) vOut = dirVel(clamp(vIn.length() * rand(0.8, 0.95) * gq * power, 17, 36), th, be);
+    else if (sweep && sw.side === 0) vOut = dirVel(clamp(vIn.length() * rand(0.5, 0.66) * gq, 10, 25), th, be);
+    else if (sweep && !sw.loft) vOut = dirVel(tier[0] * power * rand(1.3, 1.45), th, be);
     // strokes along the ground are hit down into the turf and skim away; only an early, mistimed one chips up
     const hs = Math.hypot(vOut.x, vOut.z), elev = Math.atan2(vOut.y, hs) / D2R;
     const maxE = sw.loft ? 60 : plan.grade === 'early' ? 14 : plan.grade === 'late' ? 2 : -2;
@@ -2619,7 +2734,7 @@ function doHit(sw, plan) {
   const last = plan2.events[plan2.events.length - 1];
   const runs = last && last.kind === 'field' ? last.runs : 0;
   game.play = { sim: plan2.sim, events: plan2.events, ei: 0, t: 0, holder: null, throwing: null, edge: edgeName,
-    shot: sw.block ? SHOTS.block[sw.foot] : (sw.loft ? info.loft : info.name), q, runs, runStart: 0.55 };
+    shot: strokeName(sw, plan), q, runs, runStart: 0.55 };
   if (runs > 0) {
     game.rigS.run = { from: 's', n: runs, lane: 1.15 };
     game.rigN.run = { from: 'n', n: runs, lane: -1.15 };
@@ -2855,6 +2970,23 @@ const LINES = {
     ['Squared up!', '{bat} is beaten on the inside, and that has scuttled past the stumps.'],
     ['Close!', 'Nipped back off the seam and beat the inside edge. A whisker from the timber.'],
   ],
+  wide: [
+    ['Wide', 'Called wide. {bw} strays too far and has to bowl it again.'],
+    ['Wide', "That's wide, the umpire's arms go out. A gift of a run from {bw}."],
+    ['Wide', 'Too wide, and {bw} knows it. One extra.'],
+  ],
+  wideRun: [
+    ['Wides', 'Wide, and it gets away! {t} wides added to the total.'],
+    ['Wides', 'A wide that beats the keeper as well. {t} extras for nothing.'],
+  ],
+  byes: [
+    ['Byes', "It beats the bat and the keeper! They scamper {n} byes."],
+    ['Byes', 'Through everything. {n} byes, and {bw} is not amused.'],
+  ],
+  reprieve: [
+    ['Not out!', "That would have been out, but it's a free swing. {bat} survives!"],
+    ['Reprieve!', "No harm done for {bat}: it doesn't count. What a let-off!"],
+  ],
   left: [
     ['', 'Judged to perfection. {bat} lets it go.'],
     ['', 'Shouldered arms outside off. Disciplined from {bat}.'],
@@ -3065,11 +3197,14 @@ const Caller = (() => {
 /* What the box says, and when: the lead calls the stroke and the result as they happen; the analyst follows up. */
 const Comm = (() => {
   const P = (k) => Caller.pick(k);
-  const batId = (b) => b.name.split(' ')[0].toLowerCase();
-  const bwId = (bw) => bw.short.toLowerCase();
+  const batId = (b) => (b.short || b.name).split(' ')[0].toLowerCase(); // 'F. Lund' -> lund, 'Vikrant Sahoo' -> vikrant
+  const bwId = (bw) => bw.short.split(' ')[0].toLowerCase();
   const chance = (p) => Math.random() < p;
   const peak = (sim) => { let m = 0; for (let i = 1; i < sim.n * 3; i += 9) m = Math.max(m, sim.pts[i]); return m; };
-  function shotCall(sw) {
+  const NAMED = { 'Sweep': 'call_sweep', 'Slog sweep': 'call_slog', 'Paddle sweep': 'call_paddle', 'Scoop': 'call_scoop', 'Reverse sweep': 'call_reverse', 'Reverse ramp': 'call_reverse',
+    'Flick off the pads': 'call_flick', 'Lofted flick': 'call_flick', 'Hook': 'call_hook', 'Late cut': 'call_late', 'Upper cut': 'call_upper' };
+  function shotCall(sw, name) {
+    if (NAMED[name] && Caller.has(`${NAMED[name]}_1`)) return NAMED[name];
     if (sw.kind === 'drive') return sw.side === 1 ? (chance(0.6) ? 'call_cover' : 'call_drive') : sw.side === -1 ? (chance(0.6) ? 'call_ondrive' : 'call_drive') : (chance(0.6) ? 'call_straight' : 'call_drive');
     return { cut: 'call_cut', pull: 'call_pull', punch: 'call_punch' }[sw.kind] || null;
   }
@@ -3091,7 +3226,7 @@ const Comm = (() => {
       else if (kind === 'boundary' && last.runs === 6) call = 'call_loft';
       else if (high && (kind === 'catch' || evs.some((e) => e.kind === 'drop'))) call = 'call_air';
       else if (high) call = chance(0.5) ? 'call_air' : 'call_loft';
-      else if (kind === 'boundary' || play.q >= 0.7 || chance(0.5)) call = shotCall(sw);
+      else if (kind === 'boundary' || play.q >= 0.7 || chance(0.5)) call = shotCall(sw, play.shot);
       if (call) Caller.say([P(call)], { pri: 2, maxWait: 0.3 });
     },
     boundary(six) { Caller.say([P(six ? 'fin_six' : 'fin_four')], { pri: 3, maxWait: 0.6 }); },
@@ -3106,6 +3241,8 @@ const Comm = (() => {
       else if (chance(0.3)) Caller.say([P('fin_fielded')], { pri: 1, maxWait: 0.6 });
     },
     bowled(playedOn) { Caller.say([P(playedOn ? 'fin_playedon' : 'fin_bowled')], { pri: 3, maxWait: 0.4 }); },
+    /* wides, no-balls, free hits, byes and the batter let off by a no-ball */
+    extra(kind) { const id = P(`ex_${kind}`); if (id) Caller.say([id], { pri: 3, maxWait: 0.8 }); },
     noHit(kind) {
       const id = { beaten: 'call_beaten', beatenIn: 'call_beatenin', left: 'call_left', duck: 'call_duck', miss: 'call_miss' }[kind];
       if (chance({ left: 0.45, beaten: 1, beatenIn: 1, duck: 0.8, miss: 0.85 }[kind])) Caller.say([P(id)], { pri: 2, maxWait: 0.4 });
@@ -3120,6 +3257,8 @@ const Comm = (() => {
         if (streak >= 3) ids.push(`col_streak${Math.min(5, streak)}_1`);
         else if (streak === 2) ids.push(P('col_btb'));
         else if (game.play && game.play.edge) ids.push(P('col_lucky'));
+        else if (game.play && /Scoop|Reverse|ramp/.test(game.play.shot) && chance(0.6)) ids.push(P('col_innovate'));
+        else if (game.play && /sweep/i.test(game.play.shot) && chance(0.3)) ids.push(P('col_sweep'));
         else if (o.kind === 'six' ? chance(0.7) : chance(0.5)) ids.push(`bat_${o.kind}_${batId(bat)}`);
         else if (game.swing && game.swing.plan && game.swing.plan.grade === 'perfect') ids.push(P(chance(0.5) ? 'col_timing' : 'col_power'));
         if (o.kind === 'six' && game.play) {
@@ -3151,6 +3290,7 @@ const Comm = (() => {
     milestone(b, m) { soon([`bat_${m === 50 ? 'fifty' : 'hundred'}_${batId(b)}`], { pri: 3, maxWait: 2 }, 4); },
     welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : [isTest() ? 'col_test_welcome_1' : 'col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
     chase() { soon([P('col_chase')], { pri: 2, maxWait: 4 }); },
+    anthem() { soon([P('col_anthem')], { pri: 1, maxWait: 3 }, 4); },
     result(r) { soon([P(r.winner === 'home' ? 'res_home' : r.winner === 'away' ? 'res_away' : r.tie ? 'res_tie' : 'res_draw')], { pri: 3, maxWait: 4 }, 6); },
     end(allOut) { soon([isTest() ? (allOut ? 'col_test_allout_1' : 'col_test_end_1') : allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
   };
@@ -3163,23 +3303,45 @@ function finishBall(o) {
   game.state = 'dead'; game.deadT = 0;
   const bat = game.bats[game.rigS.batIdx], bw = game.bowl[game.bowler];
   const tag = `${Math.floor(game.balls / 6)}.${game.balls % 6 + 1}`;
-  game.balls += 1; game.runs += o.runs; game.overRuns += o.runs;
-  bat.balls += 1; bat.runs += o.runs;
-  bw.balls += 1; bw.runs += o.runs;
-  if (o.runs === 4 && o.boundary) { game.fours += 1; bat.fours += 1; }
-  if (o.runs === 6) { game.sixes += 1; bat.sixes += 1; }
-  if (o.runs === 0 && !o.out) game.dots += 1;
+  /* extras: a wide or no-ball adds one and is bowled again; runs run on a wide are wides, byes go to nobody;
+     runs hit off a no-ball are the batter's. Byes are not charged to the bowler. */
+  const byes = game.play && game.play.extra === 'b' ? 'b' : null;
+  const ex = game.del && game.del.noBall ? 'nb' : o.extra || (game.play && game.play.extra) || null;
+  const pen = ex === 'nb' || ex === 'wd' ? 1 : 0, legal = !pen, total = o.runs + pen;
+  const offBat = (!ex || ex === 'nb') && !byes ? o.runs : 0, charged = total - (byes ? o.runs : 0);
+  o.extra = ex; o.offBat = offBat; o.total = total;
+  const E = game.extras || (game.extras = { wd: 0, nb: 0, b: 0 });
+  if (ex === 'wd') E.wd += total; else if (ex === 'nb') E.nb += 1;
+  if (byes) E.b += o.runs;
+  if (legal) game.balls += 1;
+  game.runs += total; game.overRuns += charged;
+  if (ex !== 'wd') bat.balls += 1;
+  bat.runs += offBat;
+  if (legal) bw.balls += 1;
+  bw.runs += charged;
+  if (offBat === 4 && o.boundary) { game.fours += 1; bat.fours += 1; }
+  if (offBat === 6) { game.sixes += 1; bat.sixes += 1; }
+  if (legal && total === 0 && !o.out) game.dots += 1;
+  // a no-ball in a T20 brings a free hit, which carries over any wide or no-ball until a fair ball is bowled
+  if (ex === 'nb' && !isTest()) game.freeHit = true; else if (legal) game.freeHit = false;
   if (o.out) {
+    Anthem.hush();
     game.wkts += 1; bat.out = true; bat.how = o.card; bw.wkts += 1; game.lastOut = true;
     game.fow.push(`${game.wkts}-${game.runs} (${bat.short}, ${oversText()})`);
     game.rigS.walkDelay = 1.1;
   } else {
-    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - o.runs < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); if (Caller.failed) Voice.say(m === 50 ? `Raise the bat, ${bat.name}! A magnificent fifty, and Coimbatore rises as one.` : `A hundred! Take a bow, ${bat.name}. An innings of the very highest class.`); else Comm.milestone(bat, m); }, 900); }
+    for (const m of [50, 100]) if (bat.runs >= m && bat.runs - offBat < m) { setTimeout(() => { showToast(`${m === 50 ? 'Fifty' : 'Hundred'} for ${bat.name}`, 2.6); Sound.applause(1, 4); if (Caller.failed) Voice.say(m === 50 ? `Raise the bat, ${bat.name}! A magnificent fifty, and Coimbatore rises as one.` : `A hundred! Take a bow, ${bat.name}. An innings of the very highest class.`); else Comm.milestone(bat, m); }, 900); }
     if (o.runs % 2 === 1) swapEnds();
   }
-  game.log.push({ runs: o.runs, out: !!o.out, boundary: !!o.boundary, end: o.end || null });
+  game.log.push({ runs: total, out: !!o.out, boundary: !!o.boundary && !!offBat, end: o.end || null, ex, legal, over: Math.floor((game.balls - (legal ? 1 : 0)) / 6) });
   const cc = o.out ? null : updateConfidence(bat, o);
   const c = commentFor(o, bat, bw);
+  if (ex) {
+    const v = { bat: bat.short, bw: bw.short, n: o.runs, t: total };
+    const key = o.reprieve ? 'reprieve' : ex === 'wd' ? (o.runs ? 'wideRun' : 'wide') : ex === 'b' ? 'byes' : null;
+    if (key) { const [call, text] = deal(key); c.call = fill(call, v); c.text = fill(text, v); c.tone = o.reprieve ? 'big' : 'good'; }
+    if (ex === 'nb') { c.text = `No ball${offBat ? `, and ${offBat} off the bat` : ''}. ${c.text}`; if (!isTest()) c.text += ' Free hit coming up.'; c.call = c.call || 'No ball'; }
+  }
   if (cc && cc.before < 75 && cc.after >= 75) c.text += ` ${bat.short} is looking very confident now.`;
   else if (cc && cc.before >= 20 && cc.after < 20) c.text += ` ${bat.short} looks a little unsettled.`;
   showCommentary(tag, `${bw.short} to ${bat.short}`, deliveryNote(game.del), c.text, c.call, c.tone);
@@ -3211,7 +3373,12 @@ const caughtLine = (f) => f.isKeeper ? 'Caught behind' : f.isBowler ? 'Caught an
 
 function onEvent(ev) {
   const P = game.play, bw = game.bowl[game.bowler];
-  if (ev.kind === 'boundary') {
+  if (ev.kind === 'boundary' && P.extra) {
+    showCallout(`${ev.runs} ${P.extra === 'wd' ? 'wides' : 'byes'}`, 'All the way to the rope', 'k-runs');
+    Sound.four(); umpire.signal = 'bye'; umpire.sigT = 0;
+    const bi = P.sim.boundaryIdx * 3;
+    finishBall({ runs: ev.runs, boundary: true, kind: 'extras', end: { x: P.sim.pts[bi], z: P.sim.pts[bi + 2] } });
+  } else if (ev.kind === 'boundary') {
     const six = ev.runs === 6;
     showCallout(six ? 'Sixer' : 'Four', six ? `${P.shot} · into the crowd` : `${P.shot} · to the rope`, six ? 'k-six' : 'k-four', true);
     if (six) Sound.six(); else Sound.four();
@@ -3221,6 +3388,11 @@ function onEvent(ev) {
     Comm.boundary(six);
     const bi = P.sim.boundaryIdx * 3;
     finishBall({ runs: ev.runs, boundary: true, kind: six ? 'six' : 'four', end: { x: P.sim.pts[bi], z: P.sim.pts[bi + 2] } });
+  } else if (ev.kind === 'catch' && noOut()) {
+    P.holder = ev.f; Sound.glove();
+    showCallout('Not out', `Caught ${ev.f.isKeeper ? 'behind' : `at ${ev.f.name}`} · but it's a ${game.del.noBall ? 'no ball' : 'free hit'}`, 'k-runs', true);
+    Sound.ooh(); Comm.extra('reprieve');
+    finishBall({ runs: 0, kind: 'field', f: ev.f, reprieve: true, end: { x: ev.x, z: ev.z } });
   } else if (ev.kind === 'catch') {
     P.holder = ev.f; Sound.glove();
     showCallout('Wicket', caughtLine(ev.f) + (ev.dive ? ' · diving' : ''), 'k-out', true);
@@ -3238,12 +3410,19 @@ function onEvent(ev) {
   } else if (ev.kind === 'field') {
     P.holder = ev.f; Sound.glove();
     if (!ev.f.isKeeper) P.throwAt = P.t + 0.45;
-    const label = ev.runs === 0 ? 'Dot ball' : ev.runs === 1 ? '1 run' : `${ev.runs} runs`;
+    const label = P.extra && ev.runs ? `${ev.runs} ${P.extra === 'wd' ? 'wide' : 'bye'}${ev.runs === 1 ? '' : 's'}` : ev.runs === 0 ? 'Dot ball' : ev.runs === 1 ? '1 run' : `${ev.runs} runs`;
     const where = ev.f.isKeeper ? 'gathered by the keeper' : ev.f.isBowler ? 'stopped by the bowler' : `fielded at ${ev.f.name}`;
-    showCallout(label, `${P.shot} · ${where}`, ev.runs ? 'k-runs' : 'k-dot');
+    if (game.del && game.del.noBall && !P.extra) showCallout(ev.runs ? `${label} + no ball` : 'No ball', `${P.shot} · ${where}`, 'k-runs');
+    else showCallout(label, `${P.shot} · ${where}`, ev.runs ? 'k-runs' : 'k-dot');
     if (ev.runs >= 2) Sound.applause(0.3, 1.5);
     Comm.fielded(ev);
     finishBall({ runs: ev.runs, kind: 'field', f: ev.f, dive: !!ev.dive, end: { x: ev.x, z: ev.z } });
+  } else if (ev.kind === 'bowled' && noOut()) {
+    const v = velAt(P.sim, Math.max(0, Math.round(ev.t / H) - 1), new V3());
+    breakWicket(wicket, v, sampleAt(P.sim, ev.t, tmp).x);
+    showCallout('Not out', `Played on · but it's a ${game.del.noBall ? 'no ball' : 'free hit'}`, 'k-runs', true);
+    Sound.ooh(); Comm.extra('reprieve');
+    finishBall({ runs: 0, kind: 'field', reprieve: true });
   } else if (ev.kind === 'bowled') {
     const v = velAt(P.sim, Math.max(0, Math.round(ev.t / H) - 1), new V3());
     breakWicket(wicket, v, sampleAt(P.sim, ev.t, tmp).x);
@@ -3279,18 +3458,24 @@ function renderScore() {
   if (bw) { $('bowlerName').textContent = bw.short; $('bowlerFig').textContent = `${bw.wkts}-${bw.runs} (${oversText(bw.balls)})`; }
   const chips = $('chips'); chips.textContent = '';
   const done = game.state === 'dead' || game.state === 'over';
-  const overStart = Math.floor(Math.max(0, game.balls - (done ? 1 : 0)) / 6) * 6;
-  for (let i = 0; i < 6; i++) {
-    const e = game.log[overStart + i];
+  // this over's balls, wides and no-balls included, then an empty slot for each fair ball still to come
+  const lastE = game.log[game.log.length - 1];
+  const cur = done && lastE ? (lastE.over !== undefined ? lastE.over : Math.floor((game.balls - 1) / 6)) : Math.floor(game.balls / 6);
+  const es = game.log.filter((e, i) => (e.over !== undefined ? e.over : Math.floor(i / 6)) === cur);
+  for (const e of es.concat(Array(Math.max(0, 6 - es.filter((x) => x.legal !== false).length)).fill(null))) {
     const c = document.createElement('span'); c.className = 'chip';
     if (!e) c.classList.add('empty');
+    else if (e.ex === 'wd' || e.ex === 'nb') { c.classList.add('run', 'ex'); c.textContent = e.ex === 'wd' ? (e.runs > 1 ? `${e.runs}wd` : 'wd') : (e.runs > 1 ? `${e.runs - 1}nb` : 'nb'); }
     else if (e.out) { c.classList.add('out'); c.textContent = 'W'; }
     else if (e.runs === 6) { c.classList.add('six'); c.textContent = '6'; }
-    else if (e.runs === 4) { c.classList.add('four'); c.textContent = '4'; }
+    else if (e.runs === 4 && e.boundary) { c.classList.add('four'); c.textContent = '4'; }
     else if (e.runs === 0) c.classList.add('dot');
-    else { c.classList.add('run'); c.textContent = e.runs; }
+    else { c.classList.add('run'); c.textContent = e.ex === 'b' ? `${e.runs}b` : e.runs; if (e.ex === 'b') c.classList.add('ex'); }
     chips.appendChild(c);
   }
+  // an over with wides or no-balls in it has more than six balls: squeeze the strip to fit
+  const many = es.length > 6 || es.length + Math.max(0, 6 - es.filter((x) => x.legal !== false).length) > 6;
+  chips.classList.toggle('many', many); $('bugSub').classList.toggle('tight', many);
   drawScreen(null);
 }
 function drawScreen(flash) {
@@ -3357,21 +3542,22 @@ function updateShotHUD() {
   const name = defend ? SHOTS.block[sw ? sw.foot : showFoot] : (loft ? s.loft : s.name);
   $('shotName').textContent = name; $('tShotName').textContent = name;
   $('dialArrow').style.transform = `rotate(${defend ? 0 : s.th}deg)`;
-  const footTxt = footSel === 'auto' ? (game.markerOn ? `Auto · ${showFoot} foot` : 'Auto footwork') : footSel === 'front' ? 'Front foot' : 'Back foot';
+  const footTxt = footSel === 'auto' ? (game.markerOn ? `Auto · ${showFoot} foot` : 'Auto footwork') : footSel === 'front' ? 'Front foot' : footSel === 'sweep' ? 'Down on one knee' : 'Back foot';
   const tf = $('tagFoot'); tf.textContent = footTxt; tf.classList.toggle('hot', footSel !== 'auto');
   const air = defend ? 'Defend mode' : loft ? 'In the air' : 'Along the ground';
   const tl = $('tagLoft'); tl.textContent = air; tl.classList.toggle('hot', loft || defend);
   $('tShotTags').textContent = `${footTxt} · ${air}`;
   $('kLeft').classList.toggle('on', side === -1); $('kRight').classList.toggle('on', side === 1);
   $('kUp').classList.toggle('on', footSel === 'front' && side === 0); $('kDown').classList.toggle('on', footSel === 'back');
-  $('kShift').classList.toggle('on', loft); $('kBlock').classList.toggle('on', defend);
+  $('kShift').classList.toggle('on', loft); $('kBlock').classList.toggle('on', defend); $('kSweep').classList.toggle('on', footSel === 'sweep');
   document.querySelectorAll('.touch [data-k]').forEach((b) => {
     const k = b.dataset.k;
-    b.classList.toggle('on', (k === 'left' && side === -1) || (k === 'right' && side === 1) || (k === 'up' && footSel === 'front' && side === 0) || (k === 'down' && footSel === 'back') || (k === 'loft' && loft) || (k === 'block' && defend));
+    b.classList.toggle('on', (k === 'left' && side === -1) || (k === 'right' && side === 1) || (k === 'up' && footSel === 'front' && side === 0) || (k === 'down' && footSel === 'back') || (k === 'sweep' && footSel === 'sweep') || (k === 'loft' && loft) || (k === 'block' && defend));
   });
 }
 
 function endInnings() {
+  Anthem.reset();
   game.state = 'over'; game.active = false;
   setTimeout(() => { if (game.state === 'over') cam.mode = 'menu'; }, 1200);
   if (game.innings === 2) { finishMatch(inningsSummary(), null); return; }
@@ -3398,6 +3584,15 @@ function endInnings() {
     const cells = [[b.name, 'who'], [b.out ? b.how : 'not out', 'how'], [String(b.runs), 'n r'], [String(b.balls), 'n']];
     for (const [t, c] of cells) { const td = document.createElement('td'); td.textContent = t; td.className = c; tr.appendChild(td); }
     body.appendChild(tr);
+  }
+  const row = (tb, cells, cls) => { const tr = document.createElement('tr'); if (cls) tr.className = cls; for (const [t, c] of cells) { const td = document.createElement('td'); td.textContent = t; td.className = c; tr.appendChild(td); } tb.appendChild(tr); };
+  const E = game.extras || { wd: 0, nb: 0, b: 0 };
+  row(body, [['Extras', 'who'], [`wd ${E.wd}, nb ${E.nb}, b ${E.b}`, 'how'], [String(E.wd + E.nb + E.b), 'n r'], ['', 'n']]);
+  row(body, [['Total', 'who'], [`${game.wkts >= 10 ? 'all out' : `${game.wkts} wkts`}, ${oversText()} ov`, 'how'], [String(game.runs), 'n r'], ['', 'n']], 'tot');
+  const bb = $('scBowl'); bb.textContent = '';
+  for (const b of game.bowl) {
+    if (!b.balls && !b.runs) continue;
+    row(bb, [[b.name, 'who'], [oversText(b.balls), 'n'], [String(b.runs), 'n'], [String(b.wkts), 'n r'], [b.balls ? (b.runs / (b.balls / 6)).toFixed(1) : '–', 'n']]);
   }
   $('fowLine').textContent = (game.fow.length ? `Fall of wickets: ${game.fow.join(', ')}. ` : '') + (dnb.length ? `Did not bat: ${dnb.join(', ')}.` : '');
   drawWagon();
@@ -3444,12 +3639,13 @@ function spineToward(P, chest) {
 }
 /* The swing frame: Q1 turns the bat so that, swinging about the pivot Pv, its sweet spot meets the ball at C. */
 function planFrame(sw) {
-  const C = sw.C, kind = sw.kind, horiz = kind === 'cut' || kind === 'pull', front = sw.foot === 'front';
-  const dy = (front ? 1.2 : 1.32) - C.y;
+  const C = sw.C, kind = sw.kind, sweep = kind === 'sweep', horiz = kind === 'cut' || kind === 'pull' || sweep, front = sw.foot === 'front';
+  const dy = (sweep ? 0.8 : front ? 1.2 : 1.32) - C.y;
   let Rss, tau;
-  if (horiz) { Rss = 0.9; tau = Math.max(Math.acos(clamp(dy / Rss, 0, 1)), C.y > 0.55 ? 0.85 : 0.5); }
+  if (sweep) { Rss = 0.86; tau = Math.max(Math.acos(clamp(dy / Rss, 0, 1)), 1.05); }
+  else if (horiz) { Rss = 0.9; tau = Math.max(Math.acos(clamp(dy / Rss, 0, 1)), C.y > 0.55 ? 0.85 : 0.5); }
   else { Rss = clamp(dy, kind === 'block' ? 0.8 : 0.74, 1.12); tau = Math.acos(clamp(dy / Rss, 0, 1)); }
-  const th = sw.thVis * D2R, be = (kind === 'block' ? -22 : sw.loft ? 14 : -3) * D2R;
+  const th = sw.thVis * D2R, be = (kind === 'block' ? -22 : sweep ? (sw.loft ? 24 : 2) : sw.loft ? 14 : -3) * D2R;
   const m = new V3(Math.sin(th) * Math.cos(be), Math.sin(be), -Math.cos(th) * Math.cos(be));
   const hz = new V3(-m.z, 0, m.x);
   if (hz.lengthSq() < 1e-6) hz.set(-1, 0, 0);
@@ -3468,6 +3664,21 @@ function bodyAtContact(sw) {
   const C = sw.C, kind = sw.kind, horiz = sw.horiz, front = sw.foot === 'front', tau = sw.tau;
   const chest = sw.Pv.clone().add(horiz ? new V3(-0.06, -0.1, 0.17) : new V3(-0.28, -0.04, 0.05).lerp(new V3(-0.06, -0.1, 0.17), clamp(tau / 1.4, 0, 1) * 0.5));
   const P = newPose(), Xs = sw.Xs;
+  if (kind === 'sweep') {
+    // down on one knee: a long front stride toward the line, the back knee on the turf, head low over the ball
+    const rev = sw.side === 1;
+    P.fL.set(clamp(C.x - (rev ? 0.05 : 0.28), Xs - 0.25, Xs + 0.7), 0, C.z + 0.22);
+    P.pel.set(lerp(Xs, P.fL.x, 0.4), 0.43, P.fL.z + 0.4);
+    P.fR.set(P.pel.x - 0.12, 0.02, P.pel.z + 0.42); // on the toes, the shin along the turf
+    P.yL = HALF_PI + 0.35; P.yR = HALF_PI + 0.75;
+    P.yaw = HALF_PI + (rev ? -0.15 : 0.38);
+    P.tilt = 0.22;
+    P.pel.x = lerp(P.pel.x, chest.x, 0.15);
+    spineToward(P, chest);
+    P.lean = Math.max(P.lean, 0.45);
+    P.twist = rev ? -0.35 : 0.25;
+    return P;
+  }
   if (front) {
     // a long, balanced stride to the pitch of the ball, front knee bent, head over it
     P.fL.set(clamp(C.x - 0.24, Xs - 0.4, Xs + 0.85), 0, C.z + 0.02);
@@ -3503,12 +3714,15 @@ const FINISH = {
   cut: { phi: 2.6, wrap: -0.3, lift: [0.02, 0.16, 0.08], R: 0.8, hold: 0.4 },
   pull: { phi: 3.05, wrap: 1.0, lift: [-0.04, 0.08, 0.12], R: 0.82, hold: 0.4 },
   block: { phi: -0.14, wrap: 0, lift: [0, -0.03, 0.06], R: 0.95, hold: 0.7 },
+  sweep: { phi: 2.5, wrap: 0.95, lift: [-0.02, -0.04, 0.1], R: 0.84, hold: 0.5 },
+  rsweep: { phi: 2.4, wrap: -0.9, lift: [0.04, -0.02, 0.08], R: 0.84, hold: 0.5 },
+  scoop: { phi: 1.4, wrap: 0.1, lift: [0, 0.18, 0.12], R: 0.9, hold: 0.45 },
 };
 /* Plans one shot from wherever the batter already is (usually mid- or post-stride): bat frame, contact pose, finish. */
 function planSwingPose(sw, b) {
   planFrame(sw);
   const kind = sw.kind, front = sw.foot === 'front', cur = b.cur;
-  sw.fin = FINISH[kind === 'drive' && sw.loft ? 'loft' : kind];
+  sw.fin = FINISH[kind === 'drive' && sw.loft ? 'loft' : kind === 'sweep' ? (sw.side === 1 ? 'rsweep' : sw.side === 0 && sw.loft ? 'scoop' : 'sweep') : kind];
   sw.pose0 = copyPose(newPose(), cur);
   sw.Q0 = cur.Q.clone(); sw.pv0 = cur.pivot.clone(); sw.R0 = cur.Rss; sw.phi0 = Math.min(cur.phi, -0.6);
   const P = bodyAtContact(sw);
@@ -3516,9 +3730,10 @@ function planSwingPose(sw, b) {
   const F = copyPose(newPose(), P);
   if (kind === 'block') { F.lean += 0.04; F.pel.y -= 0.01; }
   else {
-    F.twist += { drive: 0.42, punch: 0.18, cut: 0.32, pull: 0.62 }[kind];
-    F.yaw += { drive: 0.22, punch: 0.1, cut: -0.05, pull: 0.3 }[kind];
-    if (front) {
+    F.twist += { drive: 0.42, punch: 0.18, cut: 0.32, pull: 0.62, sweep: sw.side === 1 ? -0.4 : 0.45 }[kind];
+    F.yaw += { drive: 0.22, punch: 0.1, cut: -0.05, pull: 0.3, sweep: sw.side === 1 ? -0.15 : 0.2 }[kind];
+    if (kind === 'sweep') { F.pel.y -= 0.02; F.lean += 0.04; } // stays down on the knee through the shot
+    else if (front) {
       // weight through onto the front knee, back toe trailing up onto its point
       F.pel.y -= 0.03; F.pel.z -= 0.06; F.lean += 0.06;
       F.fR.z -= 0.1; F.fR.y = 0.05; F.yR += 0.55;
@@ -3533,15 +3748,15 @@ function planSwingPose(sw, b) {
 const _stride = newPose();
 function strideFor() {
   const F = game.flight; if (!F || !game.del) return null;
-  const defend = game.intent.defend, foot = resolveFoot(), side = defend ? 0 : game.intent.side;
-  const kind = defend ? 'block' : foot === 'front' ? 'drive' : side === 1 ? 'cut' : side === -1 ? 'pull' : 'punch';
+  const defend = game.intent.defend, foot = resolveFoot(defend), side = defend ? 0 : game.intent.side;
+  const kind = shotKind(foot, side, defend);
   const key = `${foot}|${side}|${kind}`;
   if (F.stride && F.stride.key === key) return F.stride;
-  const zc = foot === 'front' ? ZC.front : (kind === 'cut' || kind === 'pull') ? ZC.backH : ZC.backV;
+  const zc = contactZ(kind, foot);
   const cross = crossInfo(F.sim, zc);
   if (!cross) return (F.stride = null);
   const Xs = BAT_X + (side === 1 ? 0.18 : side === -1 ? -0.14 : 0), line = Xs + 0.36;
-  const lo = side === -1 ? -0.8 : -0.6, hi = side === 1 ? 1.05 : 0.8, maxY = foot === 'back' ? 2.05 : 1.4;
+  const lo = side === -1 ? -0.8 : -0.6, hi = side === 1 ? 1.05 : 0.8, maxY = kind === 'sweep' ? 0.95 : foot === 'back' ? 2.05 : 1.4;
   const sw = { foot, side, kind, loft: !!game.intent.loft, block: defend, Xs, thVis: defend ? 0 : SHOTS[foot][side].th,
     C: new V3(clamp(cross.x, line + lo, line + hi), clamp(cross.y, 0.05, maxY), zc) };
   planFrame(sw);
@@ -4038,11 +4253,16 @@ function updateUmpire(dt) {
   if (r.signal === 'four') { rz = -HALF_PI; rx = Math.sin(r.sigT * 8) * 0.7; }
   else if (r.signal === 'six') { lz = Math.PI * 0.94; rz = -Math.PI * 0.94; }
   else if (r.signal === 'out') { rx = -Math.PI * 0.97; }
-  if (r.sigT > 2.8) r.signal = null;
+  else if (r.signal === 'wide') { lz = HALF_PI; rz = -HALF_PI; } // both arms straight out
+  else if (r.signal === 'noball') { rz = -HALF_PI; } // one arm out
+  else if (r.signal === 'bye') { lx = -Math.PI * 0.95; } // an open palm raised
+  else if (r.signal === 'freehit') { rx = -Math.PI * 0.92 + Math.sin(r.sigT * 7) * 0.12; rz = -0.1 + Math.cos(r.sigT * 7) * 0.12; } // a finger circling overhead
+  if (r.sigT > (r.signal === 'freehit' ? 2.2 : 2.8)) r.signal = null;
   r.cur = r.cur || { lx: 0, lz: 0.08, rx: 0, rz: -0.08 };
   const k = 1 - Math.exp(-10 * dt);
   r.cur.lx = lerp(r.cur.lx, lx, k); r.cur.lz = lerp(r.cur.lz, lz, k); r.cur.rz = lerp(r.cur.rz, rz, k);
-  r.cur.rx = r.signal === 'four' ? rx : lerp(r.cur.rx, rx, k);
+  r.cur.rx = r.signal === 'four' || r.signal === 'freehit' ? rx : lerp(r.cur.rx, rx, k);
+  if (r.signal === 'freehit') r.cur.rz = rz;
   L.sh.rotation.set(r.cur.lx, 0, r.cur.lz); R.sh.rotation.set(r.cur.rx, 0, r.cur.rz);
   L.el.rotation.x = r.signal ? 0 : -0.35; R.el.rotation.x = r.signal ? 0 : -0.35;
   if (game.state === 'flight' || game.state === 'inplay') lookAtBall(r);
@@ -4101,7 +4321,7 @@ function simulateChase() {
   const bowl = homeAttack().map((p) => ({ name: p.name, short: p.short, balls: 0, runs: 0, wkts: 0 }));
   const keeperP = homeKeeper(), catchers = xiList().filter((_, i) => i !== 5);
   const balls = [];
-  let runs = 0, wkts = 0, n = 0, s = 0, ns = 1, next = 2, bw = 0, prev = -1;
+  let runs = 0, wkts = 0, n = 0, s = 0, ns = 1, next = 2, bw = 0, prev = -1, extras = 0;
   const ends = [null, null], spell = [0, 0];
   while (wkts < 10 && n < limit && runs < target) {
     if (n % 6 === 0) {
@@ -4117,6 +4337,8 @@ function simulateChase() {
       }
       prev = bw;
     }
+    // wides and no-balls cost runs without using up a ball (never quite enough on their own to win it)
+    if (Math.random() < (t20 ? 0.05 : 0.02) && runs + 1 < target) { const e = Math.random() < 0.06 && runs + 5 < target ? 5 : 1; runs += e; bowl[bw].runs += e; extras += e; }
     const bt = bats[s], q = (s < 7 ? 1 : s < 8 ? 0.78 : 0.55) * Math.min(1.35, 1 + bt.runs / 110);
     let a = 0;
     if (Number.isFinite(limit)) a = clamp(((target - runs) / Math.max(1, limit - n) * 6 - baseRR) / baseRR, -0.5, 1.3);
@@ -4145,7 +4367,7 @@ function simulateChase() {
   }
   const top = bats.filter((b) => b.balls).sort((x, y) => y.runs - x.runs)[0];
   const best = bowl.filter((b) => b.balls).sort((x, y) => y.wkts - x.wkts || x.runs - y.runs)[0];
-  return { runs, wkts, balls: n, perBall: balls, team: 'away', name: 'World XI',
+  return { runs, wkts, balls: n, extras, perBall: balls, team: 'away', name: 'World XI',
     top: top ? { name: top.name, runs: top.runs, balls: top.balls, out: top.out } : null,
     best: best ? { name: best.name, wkts: best.wkts, runs: best.runs, balls: best.balls } : null };
 }
@@ -4280,6 +4502,30 @@ function setFormat(fmt, quiet) {
 }
 document.querySelectorAll('[data-fmt]').forEach((b) => b.addEventListener('click', () => { if (!game.active && b.dataset.fmt !== game.format) setFormat(b.dataset.fmt); }));
 
+/* A free swing: on a no-ball (and the free hit after one in T20) the batter cannot be bowled or caught. */
+const noOut = () => !!((game.del && game.del.noBall) || game.freeHitNow);
+/* The keeper cannot hold it: the ball squirts away off the gloves and the batters run byes (or wides). */
+function keeperFumble(F, extra) {
+  const S = F.sim, i = Math.max(0, Math.round(S.keeperT / H) - 1);
+  const p0 = new V3(S.pts[i * 3], Math.max(BALL_R, S.pts[i * 3 + 1]), S.pts[i * 3 + 2]);
+  const vIn = velAt(S, i, new V3());
+  const vOut = new V3(vIn.x * 0.4 + rand(-5, 5), rand(0.3, 1.8), Math.max(4, vIn.z * rand(0.3, 0.55)));
+  const sim = simulateHit(p0, vOut, { bounced: true, noStumps: true });
+  const plan = planPlay(sim, { noCatch: true });
+  const last = plan.events[plan.events.length - 1];
+  const runs = last && last.kind === 'field' ? last.runs : 0;
+  Sound.glove(); Sound.groan();
+  showToast(extra === 'wd' ? 'Wide, and it beats the keeper!' : 'Through the keeper! Byes', 2.2);
+  if (extra === 'wd') { umpire.signal = 'wide'; umpire.sigT = 0; }
+  game.play = { sim: plan.sim, events: plan.events, ei: 0, t: 0, holder: null, throwing: null, edge: null, extra,
+    shot: extra === 'wd' ? 'Wide' : 'Byes', q: 0, runs, runStart: 0.35 };
+  if (runs > 0) { game.rigS.run = { from: 's', n: runs, lane: 1.15 }; game.rigN.run = { from: 'n', n: runs, lane: -1.15 }; }
+  game.state = 'inplay'; game.t = 0; game.flight = null;
+  marker.visible = false;
+  const dir = tmp.set(vOut.x, 0, vOut.z).normalize(); cam.chaseDir.copy(dir); cam.mode = 'chase'; cam.modeT = 0;
+  assignTasks();
+}
+
 /* ------------------------------------------------------------- game loop */
 const ballPrev = new V3();
 function updateGame(dt) {
@@ -4314,6 +4560,15 @@ function updateGame(dt) {
       F.bounced = true; Sound.bounce();
       dust.spawn(new V3(ball.position.x, 0.03, ball.position.z), 12, { colors: DUST, speed: 1.4, up: 0.6, life: 0.7, size: 0.06, gravity: 2, drag: 2 });
     }
+    if (!F.stumped && S.stumpsT !== null && F.t >= S.stumpsT && noOut()) {
+      F.stumped = true;
+      breakWicket(wicket, game.del.stumpsVel || new V3(0, 0, 30), S.stumpsX);
+      showCallout('Not out', `Bowled · but it's a ${game.del.noBall ? 'no ball' : 'free hit'}`, 'k-runs', true);
+      Sound.ooh(); Comm.extra('reprieve');
+      finishBall({ runs: 0, kind: 'keeper', reprieve: true });
+      game.flight = F; game.deadFlight = true;
+      return;
+    }
     if (!F.stumped && S.stumpsT !== null && F.t >= S.stumpsT) {
       F.stumped = true;
       breakWicket(wicket, game.del.stumpsVel || new V3(0, 0, 30), S.stumpsX);
@@ -4328,11 +4583,25 @@ function updateGame(dt) {
       game.flight = F; game.deadFlight = true;
       return;
     }
+    if (!F.kept && S.keeperT !== null && F.t >= S.keeperT && !(sw && sw.plan && sw.plan.hit)) {
+      const wide = !!game.del.wide;
+      if (Math.random() < (wide ? (game.del.wide === 'leg' ? 0.14 : 0.06) : game.del.pace ? 0.018 : 0.01)) { keeperFumble(F, wide ? 'wd' : 'b'); return; }
+      if (wide) {
+        F.kept = true; Sound.glove();
+        umpire.signal = 'wide'; umpire.sigT = 0;
+        showCallout('Wide', game.del.wide === 'leg' ? 'Down the leg side · one extra, bowl it again' : 'Too far outside off · one extra, bowl it again', 'k-runs');
+        Comm.extra('wide');
+        finishBall({ runs: 0, kind: 'keeper', extra: 'wd' });
+        game.deadFlight = true; game.flight = F;
+        return;
+      }
+    }
     if (!F.kept && S.keeperT !== null && F.t >= S.keeperT) {
       F.kept = true; Sound.glove();
       { const pl = sw && sw.plan; Comm.noHit(!sw ? (game.del.length === 'bouncer' || game.del.length === 'short' ? 'duck' : 'left') : pl && pl.beaten === 'Left outside off' ? 'left' : pl && pl.beaten === 'Beaten on the inside' ? 'beatenIn' : pl && pl.beaten ? 'beaten' : 'miss'); }
       const sub = sw ? (sw.plan && sw.plan.beaten) || (sw.plan && sw.plan.grade === 'tooEarly' ? 'Through too early' : 'Played and missed') : (game.del.length === 'bouncer' ? 'Ducked under the bouncer' : 'Left alone');
-      showCallout('Dot ball', sub, 'k-dot');
+      if (game.del.noBall) showCallout('No ball', isTest() ? `${sub} · one extra` : `${sub} · one extra, free hit next`, 'k-runs');
+      else showCallout('Dot ball', sub, 'k-dot');
       finishBall({ runs: 0, kind: 'keeper' });
       game.deadFlight = true; game.flight = F;
     }
@@ -4418,6 +4687,7 @@ function act(k, touch) {
   else if (k === 'right') setSide(1);
   else if (k === 'up') { if (!game.swing && game.active) { game.intent.side = 0; game.intent.foot = 'front'; updateShotHUD(); } }
   else if (k === 'down') { if (!game.swing && game.active) { game.intent.foot = 'back'; updateShotHUD(); } }
+  else if (k === 'sweep') { if (!game.swing && game.active) { game.intent.foot = game.intent.foot === 'sweep' ? 'auto' : 'sweep'; if (game.intent.foot === 'sweep') game.intent.defend = false; updateShotHUD(); } }
   else if (k === 'loft') { if (!game.swing && game.active) { game.intent.loft = !game.intent.loft; if (game.intent.loft) game.intent.defend = false; updateShotHUD(); } }
   else if (k === 'swing') trySwing(game.intent.defend, touch);
   else if (k === 'block') {
@@ -4450,6 +4720,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.code === 'Space') act('swing');
   else if (e.key === 'd' || e.key === 'D') act('block');
   else if (e.key === 'l' || e.key === 'L') act('loft');
+  else if (e.key === 's' || e.key === 'S') act('sweep');
   else if (e.key === 'c' || e.key === 'C') setView(cam.view === 'batsman' ? 'broadcast' : 'batsman');
   else if (e.key === 'm' || e.key === 'M') toggleMute();
   else if (e.key === 'v' || e.key === 'V') toggleVoice();
@@ -4483,6 +4754,13 @@ document.querySelectorAll('[data-ov]').forEach((b) => b.addEventListener('click'
   document.querySelectorAll('[data-ov]').forEach((x) => x.classList.toggle('on', x === b));
   refreshStartPanel(); renderScore();
 }));
+document.querySelectorAll('[data-anthem]').forEach((b) => {
+  b.classList.toggle('on', (b.dataset.anthem === '1') === Anthem.on);
+  b.addEventListener('click', () => {
+    Anthem.set(b.dataset.anthem === '1');
+    document.querySelectorAll('[data-anthem]').forEach((x) => x.classList.toggle('on', x === b));
+  });
+});
 document.querySelectorAll('[data-diff]').forEach((b) => b.addEventListener('click', () => {
   game.diff = b.dataset.diff;
   document.querySelectorAll('[data-diff]').forEach((x) => x.classList.toggle('on', x === b));
@@ -4797,7 +5075,7 @@ if (hot && hot.snapshot) {
       log: game.log, fow: game.fow, bats: game.bats, bowl: game.bowl, nextIn: game.nextIn, bowler: game.bowler,
       prevBowler: game.prevBowler, overRuns: game.overRuns, lastOut: game.lastOut, lastOverMark: game.lastOverMark,
       sIdx: game.rigS.batIdx, nIdx: game.rigN.batIdx, spells: game.spells, overBowlers: game.overBowlers,
-      innings: game.innings, batTeam: game.batTeam, target: game.target, first: game.first,
+      innings: game.innings, batTeam: game.batTeam, target: game.target, first: game.first, extras: game.extras, freeHit: game.freeHit,
     } : null,
   }));
 }
