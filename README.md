@@ -107,6 +107,13 @@ keys (or the on-screen pad on phones), S to sweep, and time the swing with Space
   chants "Thu-di-nest!" with three claps, a bass drum and a brass band),
   first after the second over and again every few overs, with a Mexican wave
   round the stands. A wicket hushes it; switch it off on the start card
+- Test cricket that feels like a Test: in a full day (90 overs, or until
+  all out) there are lunch, tea and stumps every 30 overs with the light
+  turning golden through the evening session; the ball swings when new, goes
+  soft and then reverses, and a new ball is taken every 80 overs; spinners
+  get more turn as the pitch wears, bowlers lose pace late in a long spell,
+  and the captain crowds a new batter (three slips, gully, short leg) and
+  spreads the field for a set one. You can declare (tap Declare twice)
 - Wides and front-foot no-balls with the umpire's signals, a free hit after a
   T20 no-ball (you can't be bowled or caught), byes when the keeper fumbles,
   and extras and bowling figures on the scorecard
@@ -118,7 +125,11 @@ keys (or the on-screen pad on phones), S to sweep, and time the swing with Space
   straight with the hands leading, and each shot has its own held finish.
   Sweep mode puts the batter down on one knee for the sweep, slog sweep,
   paddle, scoop, reverse sweep and reverse ramp; flicks off the pads, hooks
-  and late cuts are named by the line and height of the ball
+  and late cuts are named by the line and height of the ball.
+  Tap an arrow twice for the finer angle: the flick and square drive off the
+  front foot, the glance and late cut off the back foot (with lofted
+  versions: lofted flick, inside-out over cover, hook behind square, upper
+  cut over the slips). Leave the ball and the batter shoulders arms
 - Defend mode (D or the DEFEND button) makes Swing play a defensive shot; a
   well-timed defence is never out, only a mistimed one can edge or miss
 - Batter confidence: well-timed shots and boundaries build it (and good
