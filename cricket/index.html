@@ -468,6 +468,7 @@ body.is-touch .bottom { display: none; }
         </button>
       </div>
       <div class="row">
+      <button id="pauseBtn" class="iconbtn" type="button" aria-label="Pause" title="Pause (P)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
       <button id="voiceBtn" class="iconbtn" type="button" aria-label="Turn commentary voice off" title="Commentary voice (V)">
         <svg id="icoVoice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/></svg>
         <svg id="icoVoiceOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="m3 3 18 18"/></svg>
@@ -684,6 +685,7 @@ body.is-touch .bottom { display: none; }
   <div class="card" style="width:min(380px,100%);text-align:center">
     <p class="eyebrow">Paused</p>
     <p class="lede" style="margin:12px auto 0">Tap the field or press any key to carry on.</p>
+    <div class="card-row" style="justify-content:center"><button class="btn" id="resumeBtn" type="button">Resume</button></div>
   </div>
 </div>
 
@@ -2778,7 +2780,7 @@ function startInnings(resume) {
 }
 
 function enterBetween(first) {
-  game.state = 'between'; game.t = 0; game.skip = false; game.leadIn = first ? 4.6 : 1.9; // the first ball waits for the welcome
+  game.state = 'between'; game.t = 0; game.skip = false; game.leadIn = first ? 5.5 : 4.4; // time to breathe between balls; the first waits for the welcome
   const notes = [];
   if (game.lastOut && game.wkts < 10) {
     const idx = game.nextIn++;
@@ -2805,7 +2807,7 @@ function enterBetween(first) {
     testDay(game.balls / 6);
   }
   game.lastOut = false;
-  game.replayDue = null; game.replayDone = false; Replay.reset(); game.celebUntil = 0; rigA.celebAt = rigB.celebAt = 0;
+  game.replayDue = null; game.replayDone = false; Replay.reset(); game.celebUntil = 0; game.danceAt = 0; rigA.celebAt = rigB.celebAt = 0;
   if (first) game.saidSlips = false;
   game.freeHitNow = !!game.freeHit && !isTest();
   if (game.freeHitNow) { notes.push('Free hit: you cannot be bowled or caught'); Comm.extra('freehit'); }
@@ -2858,7 +2860,7 @@ function testDay(over) {
     showToast(`${which} · Day ${day}`, 3); Sound.applause(0.6, 3);
     Comm.say(`col_${which.toLowerCase()}`);
   }, 2600);
-  game.leadIn = 6; // a little longer before the next ball: the players come back out
+  game.leadIn = 8.5; // a little longer before the next ball: the players come back out
 }
 function startRunup() { game.state = 'runup'; game.t = 0; }
 
@@ -3605,6 +3607,7 @@ function finishBall(o) {
   if (legal && total === 0 && !o.out) game.dots += 1;
   // a no-ball in a T20 brings a free hit, which carries over any wide or no-ball until a fair ball is bowled
   if (ex === 'nb' && !isTest()) game.freeHit = true; else if (legal) game.freeHit = false;
+  if (total > 0 && Math.floor(game.runs / 25) > Math.floor((game.runs - total) / 25)) teamMilestone(Math.floor(game.runs / 25) * 25);
   if (o.out) {
     Anthem.hush();
     game.wkts += 1; bat.out = true; bat.how = o.card; bw.wkts += 1; game.lastOut = true;
@@ -4235,12 +4238,26 @@ function updateStriker(b, dt) {
 }
 /* Milestones: once the runs are completed the batter turns to the dressing room and raises his bat, the crowd stands,
    the cheerleaders dance, and the cameras cut to him and then to the stage before the next ball. */
+const danceLen = (m) => (m >= 100 ? 10 : 8); // seconds the cheerleaders dance for
+/* the team's total passing 25, 50, 75, 100...: the cheerleaders dance (once the runs are completed) */
+function teamMilestone(m) {
+  const P = game.play, wait = P && P.runs ? Math.max(0, P.runStart + P.runs * RUN_T - P.t) + 0.25 : 0.5;
+  game.danceAt = game.clock + wait; game.danceM = m;
+  game.celebUntil = Math.max(game.celebUntil || 0, game.clock + wait + danceLen(m) + 0.6);
+}
+function startTeamDance() {
+  const m = game.danceM, len = danceLen(m);
+  game.danceAt = 0;
+  startDance(len); Sound.cheerBeat(len - 0.4); Sound.applause(0.9, len);
+  showToast(`${batTeamName()} reach ${m}`, 3);
+  cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; // straight to the stage
+}
 function celebrate(bat, m) {
   const b = [rigA, rigB].find((r) => game.bats[r.batIdx] === bat);
   if (!b) return;
   const P = game.play, wait = P && P.runs ? Math.max(0, P.runStart + P.runs * RUN_T - P.t) + 0.25 : 0.5;
   b.celebAt = game.clock + wait; b.celebM = m;
-  game.celebUntil = game.clock + wait + (m >= 100 ? 6 : 4.6);
+  game.celebUntil = Math.max(game.celebUntil || 0, game.clock + wait + danceLen(m) + 0.6);
 }
 function startCeleb(b) {
   b.rig.pelvis.getWorldPosition(_v1);
@@ -4248,8 +4265,9 @@ function startCeleb(b) {
   b.pos.set(_v1.x, 0, _v1.z); b.mode = 'celeb'; b.celebStart = game.clock; b.celebAt = 0;
   b.celebFace = Math.atan2(-22 - b.pos.x, -10 - b.pos.z); // towards the dressing room on the leg side
   const big = b.celebM >= 100;
-  Sound.applause(1, big ? 6 : 4.5); Sound.cheerBeat(big ? 5.5 : 4.2); if (big) Sound.six();
-  startDance(big ? 6 : 4.6);
+  const len = danceLen(b.celebM);
+  Sound.applause(1, len); Sound.cheerBeat(len - 0.4); if (big) Sound.six();
+  startDance(len); cam.danceLen = len; game.danceAt = 0; // the batter's moment includes the dance
   cam.mode = 'celeb'; cam.modeT = 0; cam.celeb = b;
 }
 function updateCeleb(b, dt) {
@@ -4331,6 +4349,7 @@ function updateBatters(dt) {
       b.walkDelay -= dt;
       if (b.walkDelay <= 0) { b.rig.pelvis.getWorldPosition(_v1); if (b.mode === 'bat' && isLefty(b)) _v1.x = -_v1.x; b.pos.set(_v1.x, 0, _v1.z); b.heading = -1.35; b.mode = 'walkoff'; }
     }
+    if (game.danceAt && game.clock >= game.danceAt && !rigA.celebAt && !rigB.celebAt && rigA.mode !== 'celeb' && rigB.mode !== 'celeb') startTeamDance();
     if (b.celebAt && game.clock >= b.celebAt && b.mode !== 'celeb' && b.mode !== 'walkoff' && (b.mode !== 'run' || !game.play || game.play.t >= game.play.runStart + game.play.runs * RUN_T)) startCeleb(b);
     if (b.mode === 'celeb') updateCeleb(b, dt);
     else if (b.mode === 'bat') updateStriker(b, dt);
@@ -4980,7 +4999,7 @@ function updateGame(dt) {
       const P = game.play;
       const runEnd = P && P.runs ? P.runStart + P.runs * RUN_T + 0.2 : 0;
       const wait = game.outcome && game.outcome.out ? 3.2 : 2.3;
-      if ((game.deadT > wait && (!P || P.t >= runEnd) && game.clock >= (game.celebUntil || 0)) || (game.skip && game.deadT > 0.6)) {
+      if (game.clock >= (game.celebUntil || 0) && ((game.deadT > wait && (!P || P.t >= runEnd)) || (game.skip && game.deadT > 0.6))) {
         if (game.replayDue && !game.replayDone && !game.skip) { game.replayDone = true; if (Replay.start(game.replayDue)) return; }
         game.deadFlight = false;
         if (game.wkts >= 10 || game.balls >= game.total || (game.innings === 2 && game.runs >= game.target)) endInnings();
@@ -5176,6 +5195,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key === 'c' || e.key === 'C') setView(cam.view === 'batsman' ? 'broadcast' : 'batsman');
   else if (e.key === 'm' || e.key === 'M') toggleMute();
   else if (e.key === 'v' || e.key === 'V') toggleVoice();
+  else if (e.key === 'p' || e.key === 'P') pause();
 });
 window.addEventListener('keyup', (e) => { if (e.key === 'Shift') { game.shift = false; updateShotHUD(); } });
 document.querySelectorAll('.touch [data-k]').forEach((b) => b.addEventListener('pointerdown', (e) => { e.preventDefault(); document.body.classList.add('is-touch'); act(b.dataset.k, e.pointerType !== 'mouse'); }));
@@ -5294,6 +5314,7 @@ $('playBtn').addEventListener('click', () => { if (xiReady()) startInnings(game.
 function pause() {
   if (game.paused || !game.active || game.state === 'over') return;
   game.paused = true; $('pausePanel').hidden = false;
+  if (Sound.ctx && Sound.ctx.state === 'running') Sound.ctx.suspend(); // the crowd and the commentators wait too
 }
 function resume() {
   if (!game.paused) return;
@@ -5303,6 +5324,7 @@ function resume() {
 window.addEventListener('blur', pause);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 $('pausePanel').addEventListener('pointerdown', resume);
+$('pauseBtn').addEventListener('click', () => { if (game.paused) resume(); else pause(); });
 canvas.addEventListener('pointerdown', () => { if (game.paused) resume(); else if (Replay.active) Replay.skip(); });
 $('replay').addEventListener('pointerdown', () => Replay.skip());
 
@@ -5342,7 +5364,7 @@ function updateCamera(rdt) {
       const S = STAGES.reduce((a, s) => (Math.abs(s.z - camera.position.z) < Math.abs(a.z - camera.position.z) ? s : a), STAGES[0]);
       desired.pos.set(S.x * 0.6, 3.4, S.z - Math.sign(S.z - FIELD_C.z) * 21); desired.look.set(S.x, 2.1, S.z); desired.fov = 19 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 2.4; kl = 4.5;
     }
-    if (cam.modeT > 4.6) cam.mode = 'view';
+    if (cam.modeT > (cam.danceLen || 7)) cam.mode = 'view';
   } else if (cam.mode === 'stumps') {
     desired.pos.set(game.del && !game.del.pace ? -2.6 : 2.6, 0.8, 2.6); desired.look.set(0, 0.45, 0); desired.fov = 42 / Math.pow(clamp(aspect, 0.5, 1), 0.5); // the leg side when the keeper stands up
     kp = 5; kl = 8;

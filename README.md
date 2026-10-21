@@ -121,6 +121,9 @@ keys (or the on-screen pad on phones), S to sweep, and time the swing with Space
 - A small field map (fielders, batters and the ball from above) under the
   speed gun; tap it to shrink it to a dot
 - Athletic players: broad shoulders, a V-shaped torso and muscular arms and legs
+- A pause button (or P); pausing also stops the crowd and the commentary
+- Every 25 runs the team makes (25, 50, 75, 100...) the cheerleaders dance
+  for eight seconds, longer at 100; the next ball waits for them
 - Milestones (25, 50, 100, 150 and 200): the batter turns to the dressing
   room and raises his bat, the crowd stands, a DJ beat starts and
   cheerleaders dance on stages branded with the home side's name, with
