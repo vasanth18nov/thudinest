@@ -9,9 +9,10 @@
 <style>body { margin: 0; } [hidden] { display: none !important; } .home-link { color: var(--gold); text-decoration: none; font-weight: 600; } .home-link:hover { text-decoration: underline; }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="script" href="three.min.js">
+<link rel="preload" as="fetch" crossorigin="anonymous" href="three.min.js">
 <script>(function () { var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap'; document.head.appendChild(l); })();</script>
 <style>
+[hidden] { display: none !important; }
 /* Layout: full-bleed WebGL stadium under a broadcast-style HUD pinned to the corners; on touch screens the HUD compacts to a top strip and a thumb bar so the pitch stays clear. */
 :root {
   --night: #060b17;
@@ -254,9 +255,18 @@ body.is-touch .bottom { display: none; }
 .load-card { width: min(420px, 100%); text-align: center; }
 .load-pct { margin: 14px 0 0; font: 900 clamp(84px, 24vw, 120px)/0.85 var(--font-display); font-variant-numeric: tabular-nums; color: var(--chalk); }
 .load-pct span { color: var(--gold); font-size: 0.5em; margin-left: 4px; }
-.load-track { height: 6px; margin: 18px 0 0; border-radius: 3px; background: rgba(241, 237, 225, 0.1); overflow: hidden; }
+.load-track { position: relative; height: 6px; margin: 18px 0 0; border-radius: 3px; background: rgba(241, 237, 225, 0.1); overflow: hidden; }
 .load-track i { display: block; height: 100%; background: var(--gold); transform-origin: left center; transform: scaleX(0); }
+/* the sheen runs on the compositor, so it keeps moving even while the graphics driver holds the page to build a shader */
+.load-track::after, .btn.loading::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent); animation: sheen 1.3s linear infinite; }
+.btn.loading { position: relative; overflow: hidden; }
+@keyframes sheen { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+@media (prefers-reduced-motion: reduce) { .load-track::after, .btn.loading::after { animation-duration: 4s; } }
 .load-step { margin: 12px 0 0; font: 600 13px/1.3 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.load-detail { margin: 6px 0 0; min-height: 1.3em; font: 500 13px/1.3 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--muted); opacity: 0.8; }
+.load-slow { margin: 14px 0 0; }
+.load-slow .btn { margin-top: 10px; }
 .squad { margin-top: 20px; }
 .fmt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 .fmt button { text-align: left; padding: 10px 12px 11px; border-radius: 6px; border: 1px solid var(--rule); background: rgba(241, 237, 225, 0.04); color: var(--muted); cursor: pointer; }
@@ -575,7 +585,9 @@ body.is-touch .bottom { display: none; }
     <div class="load-pct"><b id="loadPct">0</b><span>%</span></div>
     <div class="load-track"><i id="loadBar"></i></div>
     <p class="load-step" id="loadStep">Downloading the engine</p>
-    <p class="fine" style="margin-top:14px">The first load takes a little longer on phones. The innings starts by itself at 100%.</p>
+    <p class="load-detail" id="loadDetail"></p>
+    <p class="fine" style="margin-top:14px">The first visit builds the floodlights for your phone's graphics chip, so it takes longer than later visits. The innings starts by itself at 100%.</p>
+    <div class="load-slow" id="loadSlow" hidden><p class="fine" style="margin:0">This is taking longer than usual.</p><button class="btn ghost" id="loadReload" type="button">Reload the page</button></div>
   </div>
 </div>
 
@@ -642,48 +654,60 @@ body.is-touch .bottom { display: none; }
   <div class="card" style="width:min(440px,100%)">
     <p class="eyebrow">Can't load the stadium</p>
     <p class="lede" id="fatalMsg"></p>
+    <p class="fine" id="fatalWhy"></p>
+    <div class="card-row"><button class="btn" id="fatalReload" type="button">Reload the page</button></div>
   </div>
 </div>
 
 <script>
-/* Loading progress. This runs before the 3D engine downloads, so the Start button answers at once: it shows the
-   percentage while the engine, stadium and shaders load, and a tap during loading opens a progress card and starts
-   the innings by itself at 100%. The game script reports real progress through step() and finishes with done(). */
+/* Loading progress, measured rather than guessed: the engine download in bytes, then every build stage, texture and
+   shader as it is finished. This runs before the 3D engine, so the Start button answers at once; a tap during loading
+   opens the progress card and the innings starts by itself at 100%. */
 window.__load = (() => {
-  const S = { p: 0, cap: 0, shown: 0, label: 'Downloading the engine', ready: false, want: false, creep: true, t0: performance.now(), audio: null };
+  const S = { p: 0, shown: 0, label: 'Downloading the engine', detail: '', ready: false, want: false, t0: performance.now(), last: performance.now(), audio: null, slow: false };
   const $ = (id) => document.getElementById(id);
+  const secs = () => Math.round((performance.now() - S.t0) / 1000);
   const paint = () => {
-    const pct = Math.min(100, Math.floor(S.shown * 100));
+    const pct = Math.min(100, Math.floor(S.shown * 100 + 1e-6));
     const btn = $('playBtn');
     if (btn && !S.ready) { btn.classList.add('loading'); btn.style.setProperty('--p', S.shown.toFixed(3)); btn.textContent = `Loading ${pct}%`; }
     $('loadPct').textContent = pct; $('loadBar').style.transform = `scaleX(${S.shown.toFixed(3)})`; $('loadStep').textContent = S.label;
+    $('loadDetail').textContent = (S.detail ? S.detail + ' · ' : '') + secs() + ' s';
   };
   const tick = () => {
-    // between real reports the bar keeps easing toward the current stage's ceiling, so a long stage never looks stuck
-    if (S.creep) S.p = Math.max(S.p, 0.3 * (1 - Math.exp(-(performance.now() - S.t0) / 2500)));
-    else if (S.cap > S.p) S.p += (S.cap - S.p) * 0.006;
-    S.shown = S.p - S.shown < 0.003 ? S.p : S.shown + (S.p - S.shown) * 0.3;
+    S.shown = S.p - S.shown < 0.002 ? S.p : S.shown + (S.p - S.shown) * 0.45;
+    // a stage that stops reporting for a long while (a dropped connection, a stuck graphics driver) offers a reload
+    if (!S.slow && !document.hidden && performance.now() - S.last > 20000) { S.slow = true; $('loadSlow').hidden = false; }
     paint();
   };
   const iv = setInterval(tick, 50);
   tick();
-  /* sound and speech only start from a tap on iPhones, so unlock both now; the game adopts this audio context later */
+  document.addEventListener('visibilitychange', () => { S.last = performance.now(); }); // time in the background is not a stall
+  /* sound only starts from a tap on iPhones, so unlock it now; the game adopts this audio context later */
   const unlock = () => {
     try { if (!S.audio) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { S.audio = new AC(); S.audio.resume(); } } } catch (e) { /* no audio */ }
-    try { if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; window.speechSynthesis.speak(u); } } catch (e) { /* no speech */ }
   };
   const request = () => { if (S.ready) return; S.want = true; unlock(); $('startPanel').hidden = true; $('loadPanel').hidden = false; };
   document.addEventListener('click', (e) => {
-    if (S.ready || !e.target.closest || !e.target.closest('#playBtn')) return;
+    if (!e.target.closest) return;
+    if (e.target.closest('#loadReload, #fatalReload')) { location.reload(); return; }
+    if (S.ready || !e.target.closest('#playBtn')) return;
     e.preventDefault(); e.stopImmediatePropagation(); request();
   }, true);
+  const report = (p, label, detail) => {
+    S.p = Math.max(S.p, Math.min(1, p)); if (label) S.label = label; S.detail = detail || ''; S.last = performance.now();
+    if (S.slow) { S.slow = false; $('loadSlow').hidden = true; }
+  };
   return {
     get ready() { return S.ready; },
     request,
     takeAudio() { const a = S.audio; S.audio = null; return a; },
-    /* move the bar to p (0-1) and set the stage ceiling it may creep toward, then wait for one painted frame */
-    step(p, label, cap) {
-      S.creep = false; S.p = Math.max(S.p, Math.min(1, p)); if (label) S.label = label; if (cap !== undefined) S.cap = cap;
+    /* download progress of the engine, in bytes */
+    bytes(got, total) { report(0.3 * Math.min(1, got / total), 'Downloading the engine', `${Math.round(100 * Math.min(1, got / total))}% of the engine`); },
+    /* move the bar to p (0-1), then wait for one painted frame so the new value is on screen before more work runs */
+    step(p, label, detail) {
+      report(p, label, detail);
+      tick();
       return new Promise((resolve) => {
         let fired = false; const go = () => { if (!fired) { fired = true; resolve(); } };
         requestAnimationFrame(() => setTimeout(go, 0)); setTimeout(go, 120);
@@ -691,8 +715,9 @@ window.__load = (() => {
     },
     stop() { clearInterval(iv); $('loadPanel').hidden = true; },
     done(start) {
-      S.p = S.shown = 1; S.label = 'Ready'; paint(); clearInterval(iv);
+      S.p = S.shown = 1; S.label = 'Ready'; S.detail = ''; paint(); clearInterval(iv);
       S.ready = true;
+      console.info(`Floodlit Over ready in ${((performance.now() - S.t0) / 1000).toFixed(1)} s`);
       const btn = $('playBtn'); btn.classList.remove('loading'); btn.style.removeProperty('--p');
       $('loadPanel').hidden = true;
       if (S.want) start();
@@ -701,19 +726,69 @@ window.__load = (() => {
 })();
 </script>
 <script>
-/* Paint first, then run: the engine starts downloading at once (the preload in the head) but only executes after the
-   start screen and its loading bar are on screen, so a phone never sits on a blank page while the stadium is built. */
+/* The engine: downloaded with fetch so the bar follows the real bytes, started after the start screen has painted, and
+   retried from the next source if a download stalls, so a dropped request on a phone never leaves the page waiting. */
 (() => {
+  const ENGINE = ['three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js']; // our own copy first, the CDN if that fails
+  const SIZE = 608081; // three.min.js r149 as served, before compression
+  const L = window.__load;
+  const fail = (why) => {
+    if (L) L.stop();
+    document.getElementById('startPanel').hidden = true;
+    document.getElementById('fatal').hidden = false;
+    document.getElementById('fatalMsg').textContent = 'Something went wrong while building the stadium.';
+    document.getElementById('fatalWhy').textContent = why ? `Details: ${String(why).slice(0, 160)}` : '';
+  };
+  window.__fail = fail;
+  const run = (code, url) => { const s = document.createElement('script'); s.text = `${code}\n//# sourceURL=${url}`; document.head.appendChild(s); };
+  const byTag = (url) => new Promise((resolve, reject) => {
+    const s = document.createElement('script'); s.src = url; s.onload = resolve; s.onerror = () => reject(new Error(`could not load ${url}`)); document.head.appendChild(s);
+    setTimeout(() => reject(new Error(`timed out loading ${url}`)), 20000);
+  });
+  async function byFetch(url) {
+    const ctl = window.AbortController ? new AbortController() : null;
+    let last = performance.now();
+    const dog = setInterval(() => { if (ctl && performance.now() - last > 9000) ctl.abort(); }, 1000); // no bytes for 9 s: give up on this request
+    try {
+      const r = await fetch(url, ctl ? { signal: ctl.signal } : {});
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      let code;
+      if (r.body && r.body.getReader && window.TextDecoder) {
+        const rd = r.body.getReader(), parts = []; let got = 0;
+        for (;;) {
+          const { done, value } = await rd.read();
+          if (done) break;
+          parts.push(value); got += value.length; last = performance.now();
+          if (L) L.bytes(got, SIZE);
+        }
+        const all = new Uint8Array(got); let o = 0;
+        for (const c of parts) { all.set(c, o); o += c.length; }
+        code = new TextDecoder().decode(all);
+      } else code = await r.text();
+      return code;
+    } finally { clearInterval(dog); }
+  }
   let started = false;
-  const fail = () => { const f = document.getElementById('fatal'); if (f) { f.hidden = false; document.getElementById('fatalMsg').textContent = 'Something went wrong while building the stadium. Please reload the page.'; } };
-  const go = () => {
+  async function go() {
     if (started) return;
     started = true;
-    const s = document.createElement('script');
-    s.src = 'three.min.js';
-    s.onload = s.onerror = () => { if (window.__gameMain) window.__gameMain().catch((e) => { console.error(e); fail(); }); };
-    document.body.appendChild(s);
-  };
+    let why = '';
+    for (const url of ENGINE) {
+      if (typeof THREE !== 'undefined') break;
+      let code = null;
+      try { code = await byFetch(url); } catch (e) { why = e && e.message; console.warn('Engine download failed, trying again', url, e); }
+      if (code) {
+        // the bytes are now in the browser cache: a script tag runs them with off-thread compiling and a code cache
+        try { await byTag(url); } catch (e) { /* fall through to running the downloaded text */ }
+        if (typeof THREE === 'undefined') { try { run(code, url); } catch (e) { why = e && e.message; } }
+      }
+      if (typeof THREE !== 'undefined') break;
+      try { await byTag(url); } catch (e) { why = e && e.message; } // a page that blocks fetch or inline code still allows the tag
+    }
+    if (typeof THREE === 'undefined') { fail(`the 3D engine did not download (${why || 'no response'}). Check the connection and reload.`); return; }
+    if (L) L.bytes(1, 1);
+    if (window.__gameMain) window.__gameMain().catch((e) => { console.error(e); fail(e && (e.message || e)); });
+  }
   // two frames: the first may be produced before the start screen is laid out; the second has certainly painted it
   requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(go, 0)));
   setTimeout(go, 3000); // a page opened in a background tab gets no frames until it is shown
@@ -727,7 +802,7 @@ const fatal = (msg) => { if (window.__load) window.__load.stop(); $('fatal').hid
 if (typeof THREE === 'undefined') { fatal('The 3D engine did not load. Check your connection, then reload the page.'); return; }
 /* progress from the loader in the page head; the stand-in keeps the game working without it */
 const Loader = window.__load || { ready: true, request() {}, takeAudio: () => null, step: () => Promise.resolve(), done() {}, stop() {} };
-Loader.step(0.32, 'Building the stadium', 0.36);
+Loader.step(0.31, 'Building the stadium');
 if (THREE.ColorManagement) {
   if ('legacyMode' in THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
   if ('enabled' in THREE.ColorManagement) THREE.ColorManagement.enabled = true;
@@ -812,6 +887,9 @@ function canvasTex(w, h, draw, opts = {}) {
   return t;
 }
 const std = (color, roughness = 0.8, extra = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness, metalness: 0 }, extra));
+/* A plain white 1x1 texture. Every distinct combination of material features is a separate shader, and a phone's first
+   visit pays a fixed cost for each one, so untextured materials borrow this to share the shader of the textured ones. */
+const WHITE_TEX = (() => { const t = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); t.encoding = THREE.sRGBEncoding; t.needsUpdate = true; return t; })();
 
 /* ---------------------------------------------------------------------- sky */
 const skyMat = new THREE.ShaderMaterial({
@@ -838,7 +916,7 @@ const skyMat = new THREE.ShaderMaterial({
   sky.renderOrder = -1;
   scene.add(sky);
 }
-await Loader.step(0.33, 'Building the stadium', 0.35);
+await Loader.step(0.32, 'Building the stadium');
 
 /* -------------------------------------------------------------- field & pitch */
 /* materials the match format retunes: night T20 under lights, or a Test in daylight */
@@ -896,7 +974,7 @@ function drawPitch(g, w, h) {
 }
 {
   const grass = canvasTex(LITE ? 512 : 1024, LITE ? 512 : 1024, drawGrass);
-  stadium.fieldMat = new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a });
+  stadium.fieldMat = new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a, emissiveMap: WHITE_TEX, side: THREE.DoubleSide });
   const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), stadium.fieldMat);
   field.rotation.x = -Math.PI / 2; field.position.copy(FIELD_C); field.receiveShadow = true;
   scene.add(field);
@@ -905,7 +983,7 @@ function drawPitch(g, w, h) {
   scene.add(apron);
 
   const pitchTex = canvasTex(256, 2048, drawPitch);
-  stadium.pitchMat = new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
+  stadium.pitchMat = new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, emissiveMap: WHITE_TEX, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
   const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), stadium.pitchMat);
   pitch.rotation.x = -Math.PI / 2; pitch.position.set(0, 0.006, FIELD_C.z); pitch.receiveShadow = true;
   scene.add(pitch);
@@ -937,9 +1015,17 @@ function drawPitch(g, w, h) {
   const nStraight = Math.floor(PITCH / 1.7);
   for (let i = 0; i < nStraight; i++) { const z = -(i + 0.5) * PITCH / nStraight; dashes.push([R, z, Math.PI / 2]); dashes.push([-R, z, Math.PI / 2]); }
   const dGeo = new THREE.PlaneGeometry(0.9, 0.11); dGeo.rotateX(-Math.PI / 2);
-  const dm = new THREE.InstancedMesh(dGeo, creaseMat, dashes.length);
-  const dummy = new THREE.Object3D();
-  dashes.forEach(([x, z, a], i) => { dummy.position.set(x, 0.012, z); dummy.rotation.set(0, a, 0); dummy.updateMatrix(); dm.setMatrixAt(i, dummy.matrix); });
+  const dPos = dGeo.attributes.position, dIdx = dGeo.index.array, nv = dPos.count;
+  const pos = new Float32Array(dashes.length * nv * 3), nor = new Float32Array(dashes.length * nv * 3), idx = [];
+  const dummy = new THREE.Object3D(), v = new V3();
+  dashes.forEach(([x, z, a], i) => {
+    dummy.position.set(x, 0.012, z); dummy.rotation.set(0, a, 0); dummy.updateMatrix();
+    for (let k = 0; k < nv; k++) { v.fromBufferAttribute(dPos, k).applyMatrix4(dummy.matrix); v.toArray(pos, (i * nv + k) * 3); nor[(i * nv + k) * 3 + 1] = 1; }
+    for (const j of dIdx) idx.push(i * nv + j);
+  });
+  const mGeo = new THREE.BufferGeometry();
+  mGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); mGeo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); mGeo.setIndex(idx);
+  const dm = new THREE.Mesh(mGeo, creaseMat);
   dm.receiveShadow = true;
   scene.add(dm);
 
@@ -974,7 +1060,7 @@ const led = {};
     g.fillStyle = 'rgba(255,255,255,0.92)'; g.fillText('THUDINEST', w / 2, h / 2 + 10, w - 40);
   };
   led.logo = canvasTex(1024, 256, drawLogo);
-  const logoMat = new THREE.MeshStandardMaterial({ map: led.logo, transparent: true, opacity: 0.62, roughness: 0.95, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  const logoMat = new THREE.MeshStandardMaterial({ map: led.logo, transparent: true, alphaTest: 0.01, opacity: 0.62, roughness: 0.95, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
   for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), logoMat);
     m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI / 2, a + Math.PI, 0);
@@ -988,7 +1074,7 @@ const led = {};
     }
     drawLogo(led.logo.image.getContext('2d'), 1024, 256); led.logo.needsUpdate = true;
   };
-  led.mat = new THREE.MeshBasicMaterial({ map: led.idle, side: THREE.BackSide, toneMapped: false });
+  led.mat = new THREE.MeshBasicMaterial({ map: led.idle, side: THREE.DoubleSide, toneMapped: false });
   led.flash = 0;
   const boards = new THREE.Mesh(new THREE.CylinderGeometry(BOARD_R, BOARD_R, 0.95, 180, 1, true), led.mat);
   boards.position.set(FIELD_C.x, 0.48, FIELD_C.z);
@@ -1013,8 +1099,8 @@ const led = {};
     }
   }, { repeat: [16, 1] });
   const crowdMat = stadium.crowdMat = new THREE.MeshLambertMaterial({ map: crowdTex, emissive: 0xffffff, emissiveMap: crowdTex, emissiveIntensity: 0.32, side: THREE.DoubleSide });
-  const concrete = stadium.concrete = new THREE.MeshLambertMaterial({ color: 0x1b2131, side: THREE.DoubleSide });
-  const roofMat = stadium.roof = new THREE.MeshLambertMaterial({ color: 0x0e121c, side: THREE.DoubleSide });
+  const concrete = stadium.concrete = new THREE.MeshLambertMaterial({ color: 0x1b2131, side: THREE.DoubleSide, map: WHITE_TEX, emissiveMap: WHITE_TEX });
+  const roofMat = stadium.roof = new THREE.MeshLambertMaterial({ color: 0x0e121c, side: THREE.DoubleSide, map: WHITE_TEX, emissiveMap: WHITE_TEX });
   const ribbonTex = canvasTex(512, 32, (g, w, h) => {
     const gr = g.createLinearGradient(0, 0, w, 0);
     gr.addColorStop(0, '#2350b8'); gr.addColorStop(0.5, '#5ad1ff'); gr.addColorStop(1, '#2350b8');
@@ -1063,8 +1149,10 @@ const led = {};
     }
   });
   const pylonMat = std(0x2a2f3b, 0.7, { metalness: 0.3 });
-  const lampMat = stadium.lampMat = new THREE.MeshBasicMaterial({ map: lampTex, toneMapped: false });
-  const glowMat = stadium.glowMat = new THREE.SpriteMaterial({ map: glowTex, color: 0xfff0d2, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false, opacity: 0.9 });
+  const lampMat = stadium.lampMat = new THREE.MeshBasicMaterial({ map: lampTex, toneMapped: false, side: THREE.DoubleSide });
+  const glowMat = stadium.glowMat = new THREE.MeshBasicMaterial({ map: glowTex, color: 0xccc0a8, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false, opacity: 0.9 });
+  const glowGeo = new THREE.PlaneGeometry(38, 38);
+  stadium.glows = [];
   for (let k = 0; k < 4; k++) {
     const a = Math.PI / 4 + k * Math.PI / 2, r = 98;
     const x = FIELD_C.x + r * Math.sin(a), z = FIELD_C.z + r * Math.cos(a);
@@ -1075,8 +1163,8 @@ const led = {};
     const frame = new THREE.Mesh(new THREE.BoxGeometry(13, 7, 1), pylonMat); head.add(frame);
     const lamps = new THREE.Mesh(new THREE.PlaneGeometry(12, 6.2), lampMat); lamps.position.z = 0.55; head.add(lamps);
     scene.add(head);
-    const glow = new THREE.Sprite(glowMat); glow.scale.set(38, 38, 1);
-    glow.position.set(x - Math.sin(a) * 2, 52, z - Math.cos(a) * 2); scene.add(glow);
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    glow.position.set(x - Math.sin(a) * 2, 52, z - Math.cos(a) * 2); scene.add(glow); stadium.glows.push(glow);
   }
 }
 
@@ -1084,10 +1172,10 @@ const led = {};
 const screenCanvas = document.createElement('canvas'); screenCanvas.width = 512; screenCanvas.height = 256;
 const screenTex = new THREE.CanvasTexture(screenCanvas); screenTex.encoding = THREE.sRGBEncoding;
 {
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(26, 13), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(26, 13), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false, side: THREE.DoubleSide }));
   scr.position.set(0, 26, FIELD_C.z - 93.9); scene.add(scr);
 }
-await Loader.step(0.35, 'Dressing the players', 0.37);
+await Loader.step(0.34, 'Dressing the players');
 /* ------------------------------------------------------------------- lights */
 const LIGHTS = {};
 {
@@ -1268,13 +1356,14 @@ const GEOM = (() => {
   return g;
 })();
 const GEO = GEOM;
+await Loader.step(0.345, 'Dressing the players');
 
 const blobTex = canvasTex(64, 64, (g, w) => {
   const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
   gr.addColorStop(0, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = gr; g.fillRect(0, 0, w, w);
 });
-const blobMat = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -6 });
+const blobMat = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, toneMapped: false, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -6 });
 const KIT = {
   bat: { shirt: 0x2350b8, pants: 0x1b3a80, helmet: 0x14254f, trim: 0xffc53d },
   field: { shirt: 0x8e1f42, pants: 0x5f1530, cap: 0x761634, trim: 0xf1ede1 },
@@ -1299,18 +1388,13 @@ const fabricTex = canvasTex(64, 64, (g, w, h) => {
 }, { repeat: [18, 18] });
 fabricTex.encoding = THREE.LinearEncoding;
 const cloth = (color, rough = 0.8) => LITE ? new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0 }) : new THREE.MeshPhysicalMaterial({ color, roughness: rough, metalness: 0, sheen: 0.55, sheenRoughness: 0.5, sheenColor: new THREE.Color(0x9aa2b4), bumpMap: fabricTex, bumpScale: 0.05 });
-const padMat = LITE ? std(0xf4f2ec, 0.62, { side: THREE.DoubleSide }) : new THREE.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.62, sheen: 0.3, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide });
+const padMat = LITE ? std(0xf4f2ec, 0.62) : new THREE.MeshPhysicalMaterial({ color: 0xf4f2ec, roughness: 0.62, sheen: 0.3, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide });
 const strapMat = std(0x262a33, 0.7), shoeMat = std(0xf3f3ef, 0.5), soleMat = std(0x2a2d33, 0.9), metalMat = std(0x30343c, 0.35, { metalness: 0.7 });
 const beltMat = std(0x16181d, 0.55), eyeMat = std(0xf3f1ea, 0.3), irisMat = std(0x1a120e, 0.4), lipMat = std(0x6a3a32, 0.6);
 const willowMat = std(0xe8d3a0, 0.5), gloveMat = std(0xf6f4ee, 0.7), kGloveMat = std(0xd9a441, 0.6);
 const hairMats = { black: std(0x15100c, 0.75), brown: std(0x3a2618, 0.75), grey: std(0x6d6a66, 0.8) };
-const stubbleMat = new THREE.MeshStandardMaterial({ color: 0x15100c, roughness: 0.9, transparent: true, opacity: 0.42, depthWrite: false });
-const gripTex = canvasTex(32, 64, (g, w, h) => {
-  g.fillStyle = '#1b1f2a'; g.fillRect(0, 0, w, h);
-  g.strokeStyle = '#c9302c'; g.lineWidth = 5;
-  for (let y = -w; y < h + w; y += 14) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y + w * 0.6); g.stroke(); }
-}, { repeat: [2, 3] });
-const gripMat = std(0xffffff, 0.9, { map: gripTex });
+const stubbleMat = new THREE.MeshStandardMaterial({ color: 0x15100c, roughness: 0.9, map: WHITE_TEX, alphaTest: 0.01, transparent: true, opacity: 0.42, depthWrite: false });
+const gripMat = std(0x3b1d24, 0.9); // rubber grip; a plain colour keeps it on the shared shader
 
 /* ------------------------------------------------------------------ rigs */
 function makeRig(o) {
@@ -1346,7 +1430,7 @@ function makeRig(o) {
   add(head, GEOM.lips, lipMat, 0, 0.046, 0.097);
   const hairMat = hairMats[o.hairColor || 'black'];
   if (o.beard === 'full') add(head, GEOM.beard, hairMat, 0, 0.062, 0.02).scale.set(1.08, 0.95, 1.08);
-  else if (o.beard === 'stubble') add(head, GEOM.beard, stubbleMat, 0, 0.062, 0.02).scale.set(1.07, 0.95, 1.07);
+  else if (o.beard === 'stubble') { const st = add(head, GEOM.beard, stubbleMat, 0, 0.062, 0.02); st.scale.set(1.07, 0.95, 1.07); st.castShadow = false; } // a see-through layer casts no shadow of its own
   if (o.beard === 'full' || o.beard === 'moustache') add(head, GEOM.moustache, hairMat, 0, 0.059, 0.1);
   if (o.head === 'helmet') {
     add(head, GEOM.helmet, (mats.helmet = LITE ? std(o.helmet, 0.3) : new THREE.MeshPhysicalMaterial({ color: o.helmet, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })));
@@ -1554,6 +1638,7 @@ function makeBatter() {
   return { rig, bat, mode: 'idle', batIdx: 0, pos: new V3(), heading: 0, cur: newPose(true), look: new V3(0.5, 1.8, -20), run: null, walkDelay: 0, batAxis: new V3(0, 1, 0), gripRel: new V3(0.2, -0.55, 0), snap: true };
 }
 const rigA = makeBatter(), rigB = makeBatter();
+await Loader.step(0.35, 'Dressing the players');
 
 /* a T20 field: slip (short leg to spin), four in the ring, four out on the rope to turn the gaps into ones and twos;
    a Test field: a slip cordon and gully waiting for the edge (short leg and silly point to the spinners) */
@@ -1587,11 +1672,12 @@ function addFielder(rig, spec) {
   return f;
 }
 const fieldKit = (p, extra) => Object.assign({ shirt: KIT.field.shirt, pants: KIT.field.pants, skin: p.skin, cap: KIT.field.cap, trim: KIT.field.trim, hair: p.hair, beard: p.beard, hairColor: p.hairColor, build: p.build }, extra);
-FIELD_POS.forEach((p, i) => {
+for (const [i, p] of FIELD_POS.entries()) {
   const look = OUTFIELD[i % OUTFIELD.length];
   const rig = makeRig(fieldKit(look, { head: i % 3 === 1 ? 'bare' : 'cap', cast: !!p.close }));
   addFielder(rig, p.close ? { name: p.name, spot: p, speed: 4.5, reaction: 0.12, reach: 0.9, dive: 1.4, hands: 0.86, close: true } : { name: p.name, spot: p });
-});
+  if (i % 3 === 2) await Loader.step(0.35 + 0.01 * (i + 1) / FIELD_POS.length, 'Dressing the players');
+}
 const keeper = addFielder(makeRig(fieldKit(KEEPER_P, { head: 'cap', pads: true, gloves: 'keeper', cast: true })),
   { name: 'keeper', isKeeper: true, person: KEEPER_P, speed: 4.2, reaction: 0.1, reach: 1.25, dive: 1.3, catchH: 2.3, hands: 0.94 });
 const bowler = addFielder(makeRig(fieldKit(ATTACK[0], { head: 'bare', cast: true })),
@@ -1605,7 +1691,7 @@ umpire.root.position.set(-0.55, 0, -PITCH - 2.3); scene.add(umpire.root);
 umpire.signal = null; umpire.sigT = 0;
 const legUmp = makeRig({ shirt: 0x2b8f8a, pants: 0x1d2128, skin: SKINS[5], head: 'hat', trim: 0x1d2128, longSleeves: true, hairColor: 'grey' });
 legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.add(legUmp.root);
-await Loader.step(0.37, 'Setting the field', 0.38);
+await Loader.step(0.36, 'Setting the field');
 
 /* ------------------------------------------------------------------ wickets */
 function makeWicket(z) {
@@ -1701,7 +1787,7 @@ const trail = (() => {
     uniforms: { uColor: { value: new THREE.Vector3(0.45, 0.84, 1.0) } },
     vertexShader: 'attribute float alpha; varying float vA; void main() { vA = alpha; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: 'uniform vec3 uColor; varying float vA; void main() { gl_FragColor = vec4(uColor, vA); }',
-    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true,
   }));
   mesh.frustumCulled = false; mesh.renderOrder = 3; mesh.visible = false; scene.add(mesh);
   const side = new V3(), tan = new V3(), view = new V3();
@@ -1736,7 +1822,7 @@ const marker = new THREE.Group();
 const markerMats = [];
 {
   const mk = (geo, op) => {
-    const m = new THREE.MeshBasicMaterial({ color: 0xffc53d, transparent: true, opacity: op, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 });
+    const m = new THREE.MeshBasicMaterial({ color: 0xffc53d, map: WHITE_TEX, transparent: true, opacity: op, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 });
     markerMats.push([m, op]);
     const mesh = new THREE.Mesh(geo, m); mesh.rotation.x = -HALF_PI; marker.add(mesh); return mesh;
   };
@@ -4516,6 +4602,7 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+await Loader.step(0.37, 'Setting the field');
 
 const ballTrailPrev = new V3();
 let last = performance.now();
@@ -4577,6 +4664,7 @@ function frame(now) {
   updateCamera(rdt);
   const pxScale = renderer.domElement.height / (2 * Math.tan(camera.fov * D2R / 2));
   sparks.update(dt, pxScale); dust.update(dt, pxScale);
+  for (const g of stadium.glows) g.quaternion.copy(camera.quaternion); // floodlight halos always face the lens
   renderer.render(scene, camera);
 }
 
@@ -4639,44 +4727,66 @@ function redrawText() {
   drawScreen(null); led.redraw();
   for (const r of [rigA.rig, rigB.rig, ...fielders.map((f) => f.rig)]) { if (r.decalInfo) drawDecal(r, ...r.decalInfo); if (r.frontCanvas) drawFront(r); }
 }
-/* Loading: upload every texture and compile every shader in small steps before the first frame, painting progress
-   between steps. Phones then never sit on a frozen screen, and the first ball does not stall on new shaders. */
+/* Loading: upload every texture, then build the shaders one program at a time, painting progress after each. A phone's
+   first visit spends most of its loading time here (later visits reuse the browser's shader cache), and one program
+   per step keeps the bar moving instead of freezing the page while the graphics driver works. */
 async function warmUp() {
-  await Loader.step(0.38, 'Printing the shirts', 0.39);
+  await Loader.step(0.38, 'Printing the shirts');
   redrawText();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawText);
-  await Loader.step(0.4, 'Painting the stands', 0.55);
-  const texs = new Set();
+  const texs = new Set(), reps = [], seen = new Set();
+  // a material shared by different kinds of object (instanced or not, shadowed or not) needs a program for each kind
+  const kind = (o, m) => `${m.uuid}${o.isInstancedMesh ? 'i' : ''}${o.isSkinnedMesh ? 's' : ''}${o.receiveShadow ? 'r' : ''}${o.geometry && o.geometry.attributes.color ? 'c' : ''}`;
   scene.traverse((o) => {
     if (!o.material) return;
+    let fresh = false;
     for (const m of [].concat(o.material)) {
+      const k = kind(o, m);
+      if (!seen.has(k)) { seen.add(k); fresh = true; }
       for (const k in m) if (m[k] && m[k].isTexture) texs.add(m[k]);
       if (m.uniforms) for (const k in m.uniforms) { const v = m.uniforms[k].value; if (v && v.isTexture) texs.add(v); }
     }
+    if (fresh) reps.push(o);
   });
+  const paint = 'Painting the stands';
+  await Loader.step(0.39, paint, `0 of ${texs.size} textures`);
   let i = 0;
-  for (const t of texs) { renderer.initTexture(t); if (++i % 3 === 0) await Loader.step(0.38 + 0.18 * i / texs.size); }
-  await Loader.step(0.56, 'Switching on the floodlights', 0.93);
-  // issue every compile at once without waiting on each, then follow them to completion
-  const gl = renderer.getContext(), par = gl.getExtension('KHR_parallel_shader_compile');
-  const check = renderer.debug.checkShaderErrors;
-  renderer.debug.checkShaderErrors = false;
-  renderer.compile(scene, camera);
-  renderer.debug.checkShaderErrors = check;
-  const progs = renderer.info.programs.map((p) => p.program);
-  let waiting = progs.slice();
-  if (par) {
-    const t0 = performance.now();
-    while (waiting.length && performance.now() - t0 < 2500) {
-      waiting = waiting.filter((p) => !gl.getProgramParameter(p, par.COMPLETION_STATUS_KHR));
-      await Loader.step(0.56 + 0.38 * (1 - waiting.length / progs.length));
-    }
+  for (const t of texs) {
+    renderer.initTexture(t);
+    if (++i % 3 === 0 || i === texs.size) await Loader.step(0.39 + 0.06 * i / texs.size, paint, `${i} of ${texs.size} textures`);
   }
-  for (let k = 0; k < waiting.length; k++) { gl.getProgramParameter(waiting[k], gl.LINK_STATUS); await Loader.step(0.56 + 0.38 * (1 - (waiting.length - k - 1) / progs.length)); }
-  for (const p of progs) if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error('Shader failed to link:', gl.getProgramInfoLog(p));
-  await Loader.step(0.96, 'Rolling the pitch', 0.99);
+  // one object per material: the renderer builds its program, or reuses an identical one already built
+  const gl = renderer.getContext(), par = gl.getExtension('KHR_parallel_shader_compile');
+  const sig = (o, m) => [m.type, !!m.map, m.alphaTest > 0, m.side, m.transparent, !!o.isInstancedMesh, o.receiveShadow, !!m.emissiveMap, !!m.bumpMap, m.vertexColors, m.fog, m.toneMapped].join();
+  const sigs = new Set();
+  for (const o of reps) for (const m of [].concat(o.material)) sigs.add(sig(o, m));
+  const total = sigs.size + 1; // and the shadow pass
+  const known = new Set(renderer.info.programs.map((p) => p.program));
+  const lights = 'Switching on the floodlights';
+  let built = 0;
+  const at = () => { const n = Math.max(total, built + 1); return Loader.step(0.45 + 0.51 * built / n, lights, `${built} of ${n} shaders`); };
+  await at();
+  const check = renderer.debug.checkShaderErrors, traverse = scene.traverse;
+  renderer.debug.checkShaderErrors = false;
+  try {
+    for (const o of reps) {
+      scene.traverse = (cb) => cb(o);
+      try { renderer.compile(scene, camera); } finally { scene.traverse = traverse; }
+      for (const p of renderer.info.programs) {
+        if (known.has(p.program)) continue;
+        known.add(p.program);
+        if (par) { const t0 = performance.now(); while (!gl.getProgramParameter(p.program, par.COMPLETION_STATUS_KHR) && performance.now() - t0 < 4000) await at(); }
+        if (!gl.getProgramParameter(p.program, gl.LINK_STATUS)) console.error('Shader failed to link:', gl.getProgramInfoLog(p.program));
+        built++;
+        await at();
+      }
+    }
+  } finally { scene.traverse = traverse; renderer.debug.checkShaderErrors = check; }
+  await Loader.step(0.97, 'Rolling the pitch');
+  for (const g of stadium.glows) g.quaternion.copy(camera.quaternion);
   renderer.render(scene, camera); // compiles the shadow-pass shaders and draws the first frame
-  await Loader.step(1);
+  if (window.__dbgProgs) window.__dbgProgs(renderer, known);
+  await Loader.step(1, 'Rolling the pitch');
 }
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
