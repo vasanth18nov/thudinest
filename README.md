@@ -117,6 +117,10 @@ keys (or the on-screen pad on phones), S to sweep, and time the swing with Space
 - Wides and front-foot no-balls with the umpire's signals, a free hit after a
   T20 no-ball (you can't be bowled or caught), byes when the keeper fumbles,
   and extras and bowling figures on the scorecard
+- Milestones (25, 50, 100, 150 and 200): the batter turns to the dressing
+  room and raises his bat, the crowd stands, a DJ beat starts and
+  cheerleaders dance on stages branded with the home side's name, with
+  the cameras cutting to him and then to the stage
 - Replays of sixes and wickets: the whole delivery is recorded and shown again
   in slow motion from a side-on camera (a stump camera for bowled); tap to skip
 - Crowd cheers for boundaries and wickets, mixed below the commentary
