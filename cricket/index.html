@@ -130,6 +130,10 @@ body {
 .gun-speed b { font: 900 34px/1 var(--font-display); font-variant-numeric: tabular-nums; }
 .gun-speed span { font: 600 13px/1 var(--font-ui); color: var(--muted); letter-spacing: 0.06em; }
 .gun-len { font: 600 14px/1.2 var(--font-ui); margin-top: 3px; }
+/* the field map: small, see-through, out of the way; a tap shrinks it to a dot and back */
+.fieldmap { width: 104px; height: 104px; padding: 0; border: 0; border-radius: 50%; background: transparent; opacity: 0.9; cursor: pointer; pointer-events: auto; }
+.fieldmap canvas { width: 100%; height: 100%; display: block; }
+.fieldmap.off { width: 26px; height: 26px; opacity: 0.6; }
 .gun-len i { font-style: normal; color: var(--muted); }
 
 /* Centre callouts */
@@ -375,6 +379,8 @@ body.is-touch .bottom { display: none; }
   .chips.many .chip.ex { width: auto; min-width: 15px; padding: 0 2px; font-size: 7px; }
   .chip.dot::after { width: 3px; height: 3px; }
   .top-right { gap: 6px; }
+  .fieldmap { width: 62px; height: 62px; opacity: 0.8; }
+  .fieldmap.off { width: 22px; height: 22px; }
   .row { gap: 6px; }
   .seg { padding: 2px; }
   .seg button { padding: 6px 8px; font-size: 11px; letter-spacing: 0.04em; }
@@ -472,6 +478,7 @@ body.is-touch .bottom { display: none; }
         <div class="gun-len" id="gunLen"><i>Waiting for the first ball</i></div>
       </div>
       </div>
+      <button class="fieldmap" id="fieldMap" type="button" aria-label="Field map: tap to hide" title="Field map (tap to hide)"><canvas id="fieldMapC" width="132" height="132"></canvas></button>
     </div>
   </div>
 
@@ -1335,17 +1342,18 @@ const limbGeo = (pts, seg = 14) => smoothNormals(new THREE.LatheGeometry(pts.map
 
 const GEOM = (() => {
   const g = {};
-  g.torso = shapedTube([[-0.08, 0.15, 0.105, 0.11], [0.02, 0.152, 0.104, 0.108], [0.15, 0.16, 0.112, 0.11], [0.28, 0.172, 0.128, 0.112], [0.38, 0.186, 0.13, 0.112], [0.45, 0.2, 0.108, 0.104], [0.51, 0.172, 0.086, 0.085], [0.55, 0.095, 0.07, 0.07], [0.575, 0.055, 0.052, 0.052]]);
+  // athletes' builds: a narrow waist, a deep chest and broad shoulders (a V from the hips up), big arms and legs
+  g.torso = shapedTube([[-0.08, 0.145, 0.1, 0.108], [0.02, 0.141, 0.097, 0.104], [0.15, 0.152, 0.106, 0.11], [0.28, 0.182, 0.134, 0.119], [0.37, 0.2, 0.142, 0.12], [0.45, 0.217, 0.113, 0.109], [0.51, 0.184, 0.089, 0.089], [0.55, 0.101, 0.073, 0.073], [0.575, 0.058, 0.054, 0.054]]);
   g.hips = shapedTube([[-0.15, 0.12, 0.09, 0.1], [-0.08, 0.162, 0.104, 0.124], [0.0, 0.158, 0.1, 0.114], [0.09, 0.15, 0.1, 0.108]], 26, 10);
   g.belt = shapedTube([[0.058, 0.154, 0.105, 0.112], [0.09, 0.153, 0.105, 0.111]], 26, 1);
-  g.thigh = limbGeo([[0, -0.47], [0.05, -0.465], [0.057, -0.44], [0.062, -0.38], [0.073, -0.27], [0.083, -0.15], [0.089, -0.06], [0.087, 0.0], [0.06, 0.03], [0, 0.04]]);
-  g.shin = limbGeo([[0, -0.445], [0.032, -0.44], [0.036, -0.4], [0.042, -0.32], [0.055, -0.2], [0.063, -0.12], [0.06, -0.05], [0.055, 0.0], [0.04, 0.03], [0, 0.035]]);
-  g.upper = limbGeo([[0, -0.325], [0.035, -0.32], [0.041, -0.29], [0.046, -0.2], [0.051, -0.12], [0.056, -0.04], [0.058, 0.0], [0.045, 0.04], [0, 0.05]]);
-  g.sleeve = limbGeo([[0.05, -0.18], [0.06, -0.172], [0.062, -0.1], [0.066, -0.02], [0.068, 0.02], [0.05, 0.06], [0, 0.07]]);
-  g.fore = limbGeo([[0, -0.285], [0.026, -0.28], [0.029, -0.25], [0.034, -0.17], [0.042, -0.07], [0.044, -0.02], [0.038, 0.02], [0, 0.03]]);
+  g.thigh = limbGeo([[0, -0.47], [0.052, -0.465], [0.06, -0.44], [0.068, -0.38], [0.081, -0.27], [0.092, -0.15], [0.096, -0.06], [0.09, 0.0], [0.062, 0.03], [0, 0.04]]);
+  g.shin = limbGeo([[0, -0.445], [0.033, -0.44], [0.037, -0.4], [0.045, -0.32], [0.06, -0.2], [0.068, -0.12], [0.063, -0.05], [0.056, 0.0], [0.04, 0.03], [0, 0.035]]);
+  g.upper = limbGeo([[0, -0.325], [0.037, -0.32], [0.044, -0.29], [0.055, -0.21], [0.061, -0.13], [0.059, -0.06], [0.063, 0.0], [0.048, 0.04], [0, 0.05]]);
+  g.sleeve = limbGeo([[0.058, -0.18], [0.067, -0.172], [0.07, -0.1], [0.073, -0.02], [0.075, 0.02], [0.055, 0.06], [0, 0.07]]);
+  g.fore = limbGeo([[0, -0.285], [0.027, -0.28], [0.03, -0.25], [0.037, -0.17], [0.047, -0.08], [0.049, -0.03], [0.041, 0.02], [0, 0.03]]);
   g.knee = new THREE.SphereGeometry(0.058, 12, 8);
   g.elbow = new THREE.SphereGeometry(0.04, 10, 8);
-  g.shoulder = new THREE.SphereGeometry(0.062, 12, 8);
+  g.shoulder = new THREE.SphereGeometry(0.069, 14, 10);
   g.stripe = new THREE.BoxGeometry(0.012, 0.4, 0.03);
   g.hand = mergeGeos([
     { geo: new THREE.CapsuleGeometry(0.028, 0.04, 4, 8), scale: [1.35, 1, 0.62] },
@@ -1363,8 +1371,8 @@ const GEOM = (() => {
   ]);
   g.shoe = mergeGeos([{ geo: new THREE.CapsuleGeometry(0.044, 0.16, 4, 12), rot: [HALF_PI, 0, 0], scale: [1.08, 1, 0.82], pos: [0, -0.035, 0.045] }]);
   g.sole = new THREE.BoxGeometry(0.098, 0.016, 0.28);
-  g.neck = new THREE.CylinderGeometry(0.05, 0.058, 0.12, 12);
-  g.collar = new THREE.TorusGeometry(0.066, 0.015, 6, 20);
+  g.neck = new THREE.CylinderGeometry(0.054, 0.064, 0.12, 12);
+  g.collar = new THREE.TorusGeometry(0.07, 0.015, 6, 20);
   g.headSkin = mergeGeos([
     { geo: new THREE.SphereGeometry(0.098, 22, 16), pos: [0, 0.105, 0], scale: [0.92, 1.08, 1.02] },
     { geo: new THREE.SphereGeometry(0.068, 16, 12), pos: [0, 0.052, 0.028], scale: [1.08, 0.8, 1.0] },
@@ -1524,13 +1532,13 @@ function makeRig(o) {
   const dc = document.createElement('canvas'); dc.width = 128; dc.height = 160;
   const dTex = new THREE.CanvasTexture(dc); dTex.encoding = THREE.sRGBEncoding; dTex.anisotropy = maxAniso;
   const decal = new THREE.Mesh(GEOM.decal, decalMat(dTex));
-  decal.position.set(0, 0.31, -0.126 * build); decal.rotation.y = Math.PI; spine.add(decal);
+  decal.position.set(0, 0.31, -0.132 * build); decal.rotation.y = Math.PI; spine.add(decal);
   const rig = { root, pelvis, spine, head, legs, arms, mats, decalCanvas: dc, decalTex: dTex, phase: Math.random() * TAU };
   if (o.frontText) {
     const fc = document.createElement('canvas'); fc.width = 256; fc.height = 88;
     const fTex = new THREE.CanvasTexture(fc); fTex.encoding = THREE.sRGBEncoding; fTex.anisotropy = maxAniso;
     const front = new THREE.Mesh(GEOM.frontDecal, decalMat(fTex));
-    front.position.set(0, 0.33, 0.134 * build); spine.add(front);
+    front.position.set(0, 0.33, 0.146 * build); spine.add(front);
     rig.frontCanvas = fc; rig.frontTex = fTex; rig.frontText = o.frontText;
     drawFront(rig);
   }
@@ -1755,14 +1763,15 @@ const FIELD_SETS = {
     spin: [['short leg', -38, 3.1, 1], ['third man', 128, 48], ['point', 100, 20], ['deep cover', 60, 58], ['mid-off', 18, 24], ['mid-on', -18, 24], ['deep midwicket', -60, 58], ['square leg', -95, 21], ['fine leg', -140, 48]],
   },
   test: {
-    pace: [['first slip', 161, 15.6, 1], ['second slip', 154, 15.9, 1], ['gully', 130, 17, 1], ['point', 96, 24], ['cover', 54, 27], ['mid-off', 16, 28], ['mid-on', -16, 28], ['square leg', -98, 24], ['fine leg', -148, 54]],
-    spin: [['short leg', -38, 3.1, 1], ['silly point', 58, 3.4, 1], ['point', 100, 21], ['cover', 58, 23], ['mid-off', 18, 25], ['mid-on', -18, 25], ['midwicket', -60, 23], ['deep square leg', -95, 56], ['long-on', -12, 70]],
+    // Test fields keep the catchers behind the bat and leave the drives open: one fielder in front of the wicket at most
+    pace: [['first slip', 161, 15.6, 1], ['second slip', 154, 15.9, 1], ['third slip', 147, 16.3, 1], ['gully', 130, 17, 1], ['point', 96, 25], ['third man', 132, 52], ['mid-off', 16, 30], ['square leg', -98, 25], ['fine leg', -148, 54]],
+    spin: [['slip', 165, 5.5, 1], ['short leg', -38, 3.1, 1], ['point', 100, 22], ['deep cover', 56, 60], ['long-off', 12, 68], ['long-on', -12, 68], ['deep midwicket', -62, 60], ['deep square leg', -95, 56], ['fine leg', -145, 48]],
   },
 };
-FIELD_SETS.test.paceAttack = [['first slip', 161, 15.6, 1], ['second slip', 154, 15.9, 1], ['third slip', 147, 16.3, 1], ['gully', 130, 17, 1], ['point', 96, 24], ['cover', 54, 27], ['mid-off', 16, 28], ['mid-on', -16, 28], ['short leg', -38, 3.1, 1]];
-FIELD_SETS.test.paceDefend = [['first slip', 161, 15.6, 1], ['third man', 132, 52], ['deep point', 100, 60], ['cover', 54, 27], ['mid-off', 16, 28], ['mid-on', -16, 28], ['deep midwicket', -62, 60], ['deep square leg', -98, 58], ['fine leg', -145, 50]];
-FIELD_SETS.test.spinDefend = [['slip', 165, 5.5, 1], ['deep point', 100, 58], ['cover', 58, 23], ['long-off', 12, 60], ['long-on', -12, 60], ['midwicket', -60, 23], ['deep square leg', -95, 58], ['short leg', -38, 3.1, 1], ['fine leg', -145, 48]];
-const FIELD_NOTE = { paceAttack: 'Attacking field: three slips, a gully and a short leg', paceDefend: 'Defensive field: the sweepers go out', spinDefend: 'Defensive field for the spinner: long-on and long-off back' };
+FIELD_SETS.test.paceAttack = [['first slip', 161, 15.6, 1], ['second slip', 154, 15.9, 1], ['third slip', 147, 16.3, 1], ['gully', 130, 17, 1], ['short leg', -38, 3.1, 1], ['leg gully', -150, 11, 1], ['point', 96, 25], ['fine leg', -145, 54], ['mid-off', 16, 30]];
+FIELD_SETS.test.paceDefend = [['first slip', 161, 15.6, 1], ['third man', 132, 52], ['deep point', 100, 60], ['deep cover', 56, 62], ['long-off', 14, 68], ['long-on', -14, 68], ['deep midwicket', -62, 60], ['deep square leg', -98, 58], ['fine leg', -145, 50]];
+FIELD_SETS.test.spinDefend = [['slip', 165, 5.5, 1], ['deep point', 100, 58], ['deep cover', 56, 60], ['long-off', 12, 68], ['long-on', -12, 68], ['deep midwicket', -62, 60], ['deep square leg', -95, 58], ['short leg', -38, 3.1, 1], ['fine leg', -145, 48]];
+const FIELD_NOTE = { paceAttack: 'Attacking field: three slips, gully, short leg and leg gully', paceDefend: 'Defensive field: the sweepers go out', spinDefend: 'Defensive field for the spinner: long-on and long-off back' };
 /* which field the captain sets in a Test: crowd a new batter or the new ball, protect the boundary against a set one */
 function testFieldKey(d) {
   const bat = game.bats[game.rigS.batIdx] || { runs: 0, balls: 0 };
@@ -2732,6 +2741,7 @@ function setFieldFor(d) {
     if (!f.isKeeper) {
       const [name, a, r, close] = set[si++];
       f.name = name; f.close = !!close; Object.assign(f, close ? CLOSE_F : RING_F);
+      if (isTest() && !close) { f.speed = 6.5; f.reaction = 0.4; } // Test outfielders: a touch slower to the ball
       f.home.copy(polar(a, r)); f.home.x *= sideM();
       continue;
     }
@@ -5377,6 +5387,36 @@ function mirrorBatters(on) {
   }
 }
 function draw() { mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); }
+/* The field map: fielders, batters and the ball from above, the batter's end at the bottom (turned round for the view
+   from behind the bowler, so it matches the screen). Drawn a few times a second; a tap shrinks it to a dot. */
+const FieldMap = (() => {
+  const c = $('fieldMapC'), g = c.getContext('2d'), W = c.width, R = W / 2 - 3, S = R / 70;
+  let off = storage.get('floodlit.fieldmap') === '0', tick = 0;
+  $('fieldMap').classList.toggle('off', off);
+  $('fieldMap').addEventListener('click', () => { off = !off; storage.set('floodlit.fieldmap', off ? '0' : '1'); $('fieldMap').classList.toggle('off', off); tick = 99; canvas.focus({ preventScroll: true }); });
+  const dot = (x, z, r, fill, flip) => {
+    const px = (x - FIELD_C.x) * S * flip, pz = (z - FIELD_C.z) * S * flip;
+    g.beginPath(); g.arc(W / 2 + px, W / 2 + pz, r, 0, TAU); g.fillStyle = fill; g.fill();
+  };
+  return {
+    update(dt) {
+      tick += dt; if (tick < 0.12) return; tick = 0;
+      g.clearRect(0, 0, W, W);
+      if (off) { g.beginPath(); g.arc(W / 2, W / 2, W / 2 - 2, 0, TAU); g.fillStyle = 'rgba(43,106,44,0.85)'; g.fill(); g.lineWidth = 6; g.strokeStyle = 'rgba(241,237,225,0.7)'; g.stroke(); return; }
+      if (!game.active) return;
+      const flip = cam.view === 'broadcast' ? -1 : 1;
+      g.beginPath(); g.arc(W / 2, W / 2, R, 0, TAU); g.fillStyle = 'rgba(30,90,34,0.62)'; g.fill();
+      g.lineWidth = 1.5; g.strokeStyle = 'rgba(241,237,225,0.55)'; g.stroke();
+      g.setLineDash([3, 3]); g.beginPath(); g.arc(W / 2, W / 2, 27.4 * S, 0, TAU); g.strokeStyle = 'rgba(241,237,225,0.3)'; g.stroke(); g.setLineDash([]);
+      g.fillStyle = 'rgba(214,190,140,0.9)'; g.fillRect(W / 2 - 1.6 * S * 1.3, W / 2 - 10 * S, 3.2 * S * 1.3, 20 * S);
+      const fk = teamKit(fieldTeam()), bk = teamKit(game.batTeam);
+      const fieldCol = isTest() ? `#${new THREE.Color(fk.trim).getHexString()}` : `#${new THREE.Color(fk.shirt).getHexString()}`;
+      for (const f of fielders) dot(f.pos.x, f.pos.z, f.isKeeper || f.isBowler ? 3.2 : 2.8, f.isBowler ? '#f1ede1' : fieldCol, flip);
+      for (const b of [rigA, rigB]) { const p = b.mode === 'bat' ? _v1.set(BAT_X * sideM(), 0, -1) : b.pos; dot(p.x, p.z, 3.4, bk.text, flip); }
+      if (ball.visible && game.state !== 'between' && game.state !== 'runup') dot(ball.position.x, ball.position.z, 2.4, '#ffffff', flip);
+    },
+  };
+})();
 const ballTrailPrev = new V3();
 let last = performance.now();
 function frame(now) {
@@ -5439,7 +5479,7 @@ function frame(now) {
   const pxScale = renderer.domElement.height / (2 * Math.tan(camera.fov * D2R / 2));
   sparks.update(dt, pxScale); dust.update(dt, pxScale);
   for (const g of stadium.glows) g.quaternion.copy(camera.quaternion); // floodlight halos always face the lens
-  updateWave(rdt); updateDance(rdt);
+  updateWave(rdt); updateDance(rdt); FieldMap.update(rdt);
   if (game.state === 'runup' || game.state === 'flight' || game.state === 'inplay' || game.state === 'dead') Replay.record();
   draw();
 }

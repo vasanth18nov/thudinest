@@ -112,11 +112,15 @@ keys (or the on-screen pad on phones), S to sweep, and time the swing with Space
   turning golden through the evening session; the ball swings when new, goes
   soft and then reverses, and a new ball is taken every 80 overs; spinners
   get more turn as the pitch wears, bowlers lose pace late in a long spell,
-  and the captain crowds a new batter (three slips, gully, short leg) and
-  spreads the field for a set one. You can declare (tap Declare twice)
+  and the captain crowds a new batter with catchers (slips, gully, short leg)
+  and spreads the field for a set one. Test fields keep the catchers behind
+  the bat and leave the drives open, with at most one fielder in front. You can declare (tap Declare twice)
 - Wides and front-foot no-balls with the umpire's signals, a free hit after a
   T20 no-ball (you can't be bowled or caught), byes when the keeper fumbles,
   and extras and bowling figures on the scorecard
+- A small field map (fielders, batters and the ball from above) under the
+  speed gun; tap it to shrink it to a dot
+- Athletic players: broad shoulders, a V-shaped torso and muscular arms and legs
 - Milestones (25, 50, 100, 150 and 200): the batter turns to the dressing
   room and raises his bat, the crowd stands, a DJ beat starts and
   cheerleaders dance on stages branded with the home side's name, with
