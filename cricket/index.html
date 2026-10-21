@@ -3822,7 +3822,9 @@ function spineToward(P, chest) {
 /* The swing frame: Q1 turns the bat so that, swinging about the pivot Pv, its sweet spot meets the ball at C. */
 function planFrame(sw) {
   const C = sw.C, kind = sw.kind, sweep = kind === 'sweep', horiz = kind === 'cut' || kind === 'pull' || sweep, front = sw.foot === 'front';
-  const dy = (sweep ? 0.8 : front ? 1.2 : 1.32) - C.y;
+  // a straight bat off the back foot: the hands rise with the bounce so the bat stays upright for the punch and the defence
+  const straightBack = !front && !sweep && (kind === 'punch' || kind === 'block');
+  const dy = (sweep ? 0.8 : straightBack ? Math.min(1.6, Math.max(1.32, C.y + 0.8)) : front ? 1.2 : 1.32) - C.y;
   let Rss, tau;
   if (sweep) { Rss = 0.86; tau = Math.max(Math.acos(clamp(dy / Rss, 0, 1)), 1.05); }
   else if (horiz) { Rss = 0.9; tau = Math.max(Math.acos(clamp(dy / Rss, 0, 1)), C.y > 0.55 ? 0.85 : 0.5); }
@@ -3872,19 +3874,27 @@ function bodyAtContact(sw) {
   } else {
     // back and across: the back foot goes back towards the stumps, the front foot follows
     const backZ = clamp(chest.z + 0.28, -0.7, -0.22);
-    const across = kind === 'cut' ? clamp(C.x - (Xs + 0.62), 0, 0.42) * 0.75 : 0; // step across to the wide ones
-    P.fR.set(Xs + (kind === 'pull' ? 0.14 : 0.06) + across, 0, backZ);
-    P.fL.set(Xs - 0.05, 0, backZ - 0.42);
-    P.yL = HALF_PI + 0.25; P.yR = HALF_PI - 0.05;
-    P.pel.set(lerp(P.fL.x, P.fR.x, 0.6), 0.91, lerp(P.fL.z, P.fR.z, 0.62));
-    P.yaw = HALF_PI + (kind === 'pull' ? 0.85 : kind === 'cut' ? -0.12 : 0.12);
+    if (kind === 'cut') {
+      // the cut: back and well across towards off stump to get in line, weight on the back foot, knees flexed, over the ball
+      const across = clamp(C.x - (Xs + 0.62), 0, 0.42) * 0.8;
+      P.fR.set(Xs + 0.34 + across, 0, backZ + 0.06);
+      P.fL.set(Xs + 0.1 + across * 0.5, 0, P.fR.z - 0.52);
+      P.yL = HALF_PI + 0.6; P.yR = HALF_PI + 0.05;
+      P.pel.set(lerp(P.fL.x, P.fR.x, 0.68), 0.83, lerp(P.fL.z, P.fR.z, 0.7));
+    } else {
+      P.fR.set(Xs + (kind === 'pull' ? 0.14 : 0.1), 0, backZ);
+      P.fL.set(Xs - 0.05, 0, backZ - 0.42);
+      P.yL = HALF_PI + 0.25; P.yR = HALF_PI - 0.05;
+      P.pel.set(lerp(P.fL.x, P.fR.x, 0.6), kind === 'pull' ? 0.86 : clamp(0.86 + (C.y - 0.75) * 0.25, 0.86, 0.97), lerp(P.fL.z, P.fR.z, 0.62)); // up on the toes to a high one
+    }
+    P.yaw = HALF_PI + (kind === 'pull' ? 0.85 : kind === 'cut' ? -0.04 : 0.12);
     P.tilt = 0.08;
   }
   P.pel.x = lerp(P.pel.x, chest.x, 0.25);
   P.pel.z = lerp(P.pel.z, chest.z, 0.25);
   spineToward(P, chest);
-  if (kind === 'cut') { P.lean = Math.min(P.lean, 0.56); P.side = clamp(P.side - 0.12, -0.45, 0.45); } // reach with the arms, stay tall
-  P.twist = { drive: 0.05, punch: 0, cut: -0.25, pull: 0.45, block: -0.05 }[kind];
+  if (kind === 'cut') { P.lean = clamp(P.lean, 0.38, 0.62); P.side = clamp(P.side - 0.08, -0.45, 0.45); } // head over the ball, arms reaching for it
+  P.twist = { drive: 0.05, punch: 0, cut: -0.12, pull: 0.45, block: -0.05 }[kind];
   return P;
 }
 /* How each stroke finishes: bat angle past contact (phi), how far the swing plane wraps round the body, where the
@@ -3892,8 +3902,8 @@ function bodyAtContact(sw) {
 const FINISH = {
   drive: { phi: 3.85, wrap: 0.5, lift: [0.0, -0.06, -0.08], R: 0.76, hold: 0.55 },
   loft: { phi: 4.05, wrap: 0.42, lift: [0.02, 0.0, -0.1], R: 0.8, hold: 0.6 },
-  punch: { phi: 1.55, wrap: 0.08, lift: [0.04, 0.06, -0.08], R: 0.9, hold: 0.45 },
-  cut: { phi: 2.6, wrap: -0.3, lift: [0.02, 0.16, 0.08], R: 0.8, hold: 0.4 },
+  punch: { phi: 0.85, wrap: 0.1, lift: [0.06, 0.03, -0.14], R: 0.92, hold: 0.55 }, // checked: the bat stops pointing up towards cover
+  cut: { phi: 3.5, wrap: 0.55, lift: [-0.08, 0.24, 0.16], R: 0.7, hold: 0.55 },
   pull: { phi: 3.05, wrap: 1.0, lift: [-0.04, 0.08, 0.12], R: 0.82, hold: 0.4 },
   block: { phi: -0.14, wrap: 0, lift: [0, -0.03, 0.06], R: 0.95, hold: 0.7 },
   sweep: { phi: 2.5, wrap: 0.95, lift: [-0.02, -0.04, 0.1], R: 0.84, hold: 0.5 },
