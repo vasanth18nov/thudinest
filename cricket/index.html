@@ -295,6 +295,8 @@ body.is-touch .bottom { display: none; }
 .fmt button.on { border-color: var(--gold); background: rgba(255, 197, 61, 0.1); }
 .fmt button.on b { color: var(--gold); }
 .fmt button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.fmt.team { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fmt.team button b { font-size: 18px; line-height: 1.05; }
 /* wide screens: intro and controls on the left, team and match setup on the right, so Start stays above the fold */
 @media (min-width: 980px) {
   .start-card { width: min(1000px, 100%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 40px; align-items: start; }
@@ -407,6 +409,9 @@ body.is-touch .bottom { display: none; }
   .fmt button { padding: 8px 10px 9px; }
   .fmt button b { font-size: 18px; }
   .fmt button small { font-size: 11px; }
+  .fmt.team { gap: 6px; }
+  .fmt.team button { padding: 8px 8px 9px; }
+  .fmt.team button b { font-size: 15px; letter-spacing: 0.04em; }
   .pl { padding: 6px 7px; gap: 6px; font-size: 13px; }
   .pl i { width: 18px; height: 18px; font-size: 12px; }
   .end-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; }
@@ -573,6 +578,7 @@ body.is-touch .bottom { display: none; }
     <div class="fmt team" role="group" aria-label="Your team">
       <button type="button" data-team="thudinest" class="on" aria-pressed="true"><b>Thudinest</b><small>Coimbatore · blue and gold</small></button>
       <button type="button" data-team="amh" aria-pressed="false"><b>Team AMH</b><small>Green and orange</small></button>
+      <button type="button" data-team="bulls" aria-pressed="false"><b>Ragging Bulls</b><small>Black and red</small></button>
     </div>
     <div class="squad">
       <div class="squad-head"><span class="lbl">Playing XI</span><span class="squad-note" id="squadNote">Tap a name to swap them in or out · 11 of 13</span></div>
@@ -1684,6 +1690,24 @@ SQUADS.amh = [
   person('Ganesh', 27, 4, { hair: 'side', lefty: true }),
   person('Azeez', 3, 1, { beard: 'full' }),
 ];
+SQUADS.bulls = [
+  person('Narayanan K', 10, 1, { beard: 'stubble', lefty: true }),
+  person('Sriram', 7, 2, { hair: 'side' }),
+  person('Appandraj', 45, 0, { beard: 'full', build: 1.05, lefty: true }),
+  person('Bharath', 18, 3, { beard: 'stubble' }),
+  person('Praveen', 23, 1, { beard: 'moustache', hair: 'side' }),
+  person('Deepak', 77, 2, { beard: 'stubble', lefty: true }),
+  person('Sathya', 33, 5, {}),
+  person('Ravi', 9, 0, { beard: 'moustache', build: 1.04, lefty: true }),
+  person('Bruce', 12, 4, { hair: 'side', beard: 'stubble' }),
+  person('Ananth', 27, 3, { beard: 'stubble' }),
+  person('Saran', 21, 1, { hair: 'side', lefty: true }),
+  person('Akshay', 17, 2, {}),
+  person('Sairam', 5, 0, { beard: 'full' }),
+  person('Siddhu', 99, 3, { hair: 'side', beard: 'stubble' }),
+  person('Ishaq', 3, 5, { beard: 'full', lefty: true }),
+  person('Parthiban', 66, 1, { beard: 'moustache', build: 1.06 }),
+];
 /* each side's name, shirt front, kits (T20 colours, or Test whites with the side's colour on the trim and cap), voice lines and anthem */
 const HOME_TEAMS = {
   thudinest: { id: 'thudinest', name: 'Thudinest Coimbatore', front: 'THUDINEST', res: 'res_home', anthem: 'voice/anthem.mp3',
@@ -1692,8 +1716,11 @@ const HOME_TEAMS = {
   amh: { id: 'amh', name: 'Team AMH', front: 'TEAM AMH', res: 'res_amh', anthem: 'voice/anthem-amh.mp3',
     kits: { t20: { shirt: 0x17784a, pants: 0x0f4d30, trim: 0xff9f1c, text: '#ff9f1c', cap: 0x0f4d30, helmet: 0x0b3a24 },
       test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0x17784a, text: '#17784a', cap: 0x17784a, helmet: 0x0b3a24 } } },
+  bulls: { id: 'bulls', name: 'Ragging Bulls', front: 'BULLS', res: 'res_bulls', anthem: 'voice/anthem-bulls.mp3',
+    kits: { t20: { shirt: 0x1f1f27, pants: 0x16161c, trim: 0xd6162f, text: '#ff4155', cap: 0xc4122f, helmet: 0x121216 },
+      test: { shirt: 0xe9e6dc, pants: 0xe4e0d4, trim: 0xc4122f, text: '#c4122f', cap: 0xa50f27, helmet: 0x121216 } } },
 };
-let homeId = storage.get('floodlit.team') === 'amh' ? 'amh' : 'thudinest';
+let homeId = HOME_TEAMS[storage.get('floodlit.team')] ? storage.get('floodlit.team') : 'thudinest';
 let SQUAD = SQUADS[homeId];
 const XI_SIZE = 11;
 let xiPicked = SQUAD.map((_, i) => i < XI_SIZE);
@@ -3570,7 +3597,7 @@ const Comm = (() => {
     welcome(striker, resume) { soon(resume ? ['col_welcomeback_1'] : [isTest() ? 'col_test_welcome_1' : 'col_welcome1_1', `bat_strike_${batId(striker)}`], { pri: 1, maxWait: 4 }); },
     chase() { soon([P('col_chase')], { pri: 2, maxWait: 4 }); },
     say(prefix) { soon([P(prefix)], { pri: 2, maxWait: 3 }, 4); },
-    anthem() { const ids = homeId === 'thudinest' ? ['col_anthem_1', 'col_anthem_2', 'col_anthem_3'] : ['col_anthem_1', 'col_anthem_2', 'col_anthem_amh_1']; soon([ids[(Math.random() * 3) | 0]], { pri: 1, maxWait: 3 }, 4); },
+    anthem() { const ids = ['col_anthem_1', 'col_anthem_2', homeId === 'thudinest' ? 'col_anthem_3' : `col_anthem_${homeId}_1`]; soon([ids[(Math.random() * 3) | 0]], { pri: 1, maxWait: 3 }, 4); },
     result(r) { soon([P(r.winner === 'home' ? TEAMS.home.res : r.winner === 'away' ? 'res_away' : r.tie ? 'res_tie' : 'res_draw')], { pri: 3, maxWait: 4 }, 6); },
     end(allOut) { soon([isTest() ? (allOut ? 'col_test_allout_1' : 'col_test_end_1') : allOut ? 'col_allout_1' : 'col_end_1'], { pri: 3, maxWait: 3 }, 6); },
   };
