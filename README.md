@@ -83,7 +83,7 @@ a 13-player squad of Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
 Vasanth, Pooja, Jay, Venkatesh, Govind, Sundarraj, Durai and Kumma),
 **Team AMH** (green and orange; Pandi, Narayanan, Babu, Veera, Anantha,
 Renault Prem, Senra, Karthik, Rams, Ganesh and Azeez) or **Ragging Bulls**
-(black and red; a 16-player squad of Narayanan K, Sriram, Appandraj, Bharath,
+(black and red; a 17-player squad of Vedu, Narayanan K, Sriram, Appandraj, Bharath,
 Praveen, Deepak, Sathya, Ravi, Bruce, Ananth, Saran, Akshay, Sairam, Siddhu,
 Ishaq and Parthiban), each with its own commentary
 lines and crowd chant; each side has at least four left-handers (marked LH),
