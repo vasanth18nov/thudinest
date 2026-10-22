@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>CricketHub — fixtures, teams and tournaments for your club</title>
+    <meta name="description" content="Run your cricket club: teams, fixtures, availability, scorecards, stats and tournaments with live points tables." />
+    <meta name="theme-color" content="#0d3b24" />
+    <link rel="icon" href="/crickethub/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/crickethub/apple-touch-icon.png" />
+
+    <!-- Open Graph / social preview card (per-page cards come from og-worker, see README) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CricketHub" />
+    <meta property="og:title" content="CricketHub — club cricket, organised" />
+    <meta property="og:description" content="Fixtures, availability, scorecards, stats and tournaments with live points tables and NRR." />
+    <meta property="og:image" content="https://thudinest.com/crickethub/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script>
+      // Apply the saved colour scheme before first paint to avoid a light/dark flash.
+      (function () {
+        try {
+          var pref = localStorage.getItem('ch-theme') || 'system';
+          var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+        } catch (e) {}
+      })();
+      // GitHub Pages has no SPA fallback: the site-wide 404.html redirects deep links here as
+      // ?__route=/teams/abc. Put the real path back into the address bar before the router starts.
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var route = params.get('__route');
+        if (route !== null) {
+          var base = '/crickethub/'.replace(/\/$/, '');
+          history.replaceState(null, '', base + (route.charAt(0) === '/' ? route : '/' + route));
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/crickethub/assets/index-B6ZrAr7_.js"></script>
+    <link rel="modulepreload" crossorigin href="/crickethub/assets/ui-DusxecCq.js">
+    <link rel="modulepreload" crossorigin href="/crickethub/assets/firebase-BGF-khHG.js">
+    <link rel="stylesheet" crossorigin href="/crickethub/assets/index-BI82wZE6.css">
+  <link rel="manifest" href="/crickethub/manifest.webmanifest"></head>
+  <body>
+    <div id="root"></div>
+    <noscript>CricketHub needs JavaScript to run.</noscript>
+  </body>
+</html>

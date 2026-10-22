@@ -1,0 +1,1 @@
+import{F as e,I as t}from"./ui-DusxecCq.js";import{_ as n,b as r,d as i,m as a,n as o,u as s}from"./firebase-BGF-khHG.js";async function c(c,l,u){let d=t(l);return d?(await s(a(r(o,c),n(`searchTokens`,`array-contains`,d),i(u)))).docs.map(e=>({...e.data(),id:e.id})).filter(t=>e(t.name,l)):[]}var l=(e,t=20)=>c(`teams`,e,t),u=(e,t=20)=>c(`tournaments`,e,t);export{u as n,l as t};

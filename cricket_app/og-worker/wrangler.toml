@@ -1,0 +1,16 @@
+# CricketHub Open Graph worker — optional, see ../README.md → "Link previews".
+name = "crickethub-og"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Runs in front of GitHub Pages for the app's path only. The zone (thudinest.com) must be on
+# your Cloudflare account; nothing else on the site is affected.
+routes = [{ pattern = "thudinest.com/crickethub/*", zone_name = "thudinest.com" }]
+
+[vars]
+BASE_PATH = "/crickethub"
+# Public web config (same values as VITE_FIREBASE_* in ../.env). Not secrets.
+FIREBASE_PROJECT_ID = "your-project-id"
+FIREBASE_API_KEY = "your-web-api-key"
+# Time zone used for fixture times in preview text
+TIME_ZONE = "Asia/Kolkata"

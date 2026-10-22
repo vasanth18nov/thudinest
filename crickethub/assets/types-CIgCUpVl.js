@@ -1,0 +1,1 @@
+var e=[`batter`,`bowler`,`allRounder`,`wicketkeeper`],t=[`right`,`left`],n=[`none`,`rightFast`,`rightMedium`,`leftFast`,`leftMedium`,`offSpin`,`legSpin`,`leftOrthodox`,`leftWrist`],r=[`owner`,`admin`,`captain`,`viceCaptain`,`player`],i=[`T20`,`ODI`,`Custom`],a=[`available`,`maybe`,`unavailable`],o=[`league`,`knockout`,`groups`];export{a,e as i,n,r as o,i as r,o as s,t};

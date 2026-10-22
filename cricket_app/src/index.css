@@ -1,0 +1,228 @@
+/*
+ * CricketHub design system.
+ *
+ * Direction: a cricket ground on match day. Chalk-white crease lines on pitch green,
+ * a scoreboard display face (Big Shoulders Display) over a sturdy, readable body face
+ * (Barlow), the red of a new ball as the one hot accent, and the tan of a dry pitch strip.
+ * Light mode is a sunny afternoon on the outfield; dark mode is a floodlit night game.
+ */
+@import 'tailwindcss';
+
+@import '@fontsource/big-shoulders-display/700';
+@import '@fontsource/big-shoulders-display/800';
+@import '@fontsource/big-shoulders-display/900';
+@import '@fontsource/barlow/400';
+@import '@fontsource/barlow/500';
+@import '@fontsource/barlow/600';
+@import '@fontsource/barlow/700';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Raw palette ─────────────────────────────────────────────────────────── */
+@theme {
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-sans: 'Barlow', ui-sans-serif, system-ui, sans-serif;
+
+  --color-pitch-50: #eef7f0;
+  --color-pitch-100: #d4ecd9;
+  --color-pitch-200: #a9d8b4;
+  --color-pitch-300: #74bd87;
+  --color-pitch-400: #43a05f;
+  --color-pitch-500: #238444;
+  --color-pitch-600: #166c37;
+  --color-pitch-700: #11562d;
+  --color-pitch-800: #0d3b24;
+  --color-pitch-900: #08261a;
+  --color-pitch-950: #04140d;
+
+  --color-chalk: #f7f4ea;
+  --color-leather: #b3202a;
+  --color-leather-bright: #ff5a5f;
+  --color-willow: #dcc48e;
+  --color-strip: #c9a86a;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Semantic tokens (swap per theme) ───────────────────────────────────── */
+@theme inline {
+  --color-bg: var(--ch-bg);
+  --color-surface: var(--ch-surface);
+  --color-surface-2: var(--ch-surface-2);
+  --color-ink: var(--ch-ink);
+  --color-ink-muted: var(--ch-ink-muted);
+  --color-line: var(--ch-line);
+  --color-accent: var(--ch-accent);
+  --color-accent-ink: var(--ch-accent-ink);
+  --color-accent-soft: var(--ch-accent-soft);
+  --color-danger: var(--ch-danger);
+  --color-warn: var(--ch-warn);
+  --color-focus: var(--ch-focus);
+}
+
+:root {
+  --ch-bg: #f3f0e4;
+  --ch-surface: #fffdf6;
+  --ch-surface-2: #ebe7d7;
+  --ch-ink: #0e2318;
+  --ch-ink-muted: #4b5e52;
+  --ch-line: #d8d2bd;
+  --ch-accent: #146c3c;
+  --ch-accent-ink: #ffffff;
+  --ch-accent-soft: #dcefe0;
+  --ch-danger: #b3202a;
+  --ch-warn: #8a5a00;
+  --ch-focus: #c47e00;
+  --turf-a: #1b6b3a;
+  --turf-b: #18613a;
+  --glow: transparent;
+  color-scheme: light;
+}
+
+.dark {
+  --ch-bg: #07130d;
+  --ch-surface: #0e1f16;
+  --ch-surface-2: #142a1e;
+  --ch-ink: #eff1e6;
+  --ch-ink-muted: #a3b8aa;
+  --ch-line: #24402f;
+  --ch-accent: #4cc779;
+  --ch-accent-ink: #04140d;
+  --ch-accent-soft: #143523;
+  --ch-danger: #ff7a7f;
+  --ch-warn: #f2b84b;
+  --ch-focus: #f2b84b;
+  --turf-a: #0c2a1a;
+  --turf-b: #0a2416;
+  --glow: rgba(255, 249, 220, 0.09);
+  color-scheme: dark;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    min-height: 100dvh;
+    font-size: 1rem;
+    line-height: 1.5;
+    /* Floodlight wash at night, invisible by day */
+    background-image:
+      radial-gradient(60rem 30rem at 10% -10%, var(--glow), transparent 60%),
+      radial-gradient(50rem 30rem at 95% -15%, var(--glow), transparent 60%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3 {
+    @apply font-display uppercase;
+    letter-spacing: 0.01em;
+    line-height: 0.95;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ch-focus);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: var(--color-willow);
+    color: #0e2318;
+  }
+  input, select, textarea, button {
+    font: inherit;
+  }
+}
+
+/* ── Textures and signature elements ────────────────────────────────────── */
+@layer components {
+  /* Mown outfield stripes with film grain, used for hero bands and team headers */
+  .turf {
+    background-color: var(--turf-a);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(100deg, var(--turf-a) 0 56px, var(--turf-b) 56px 112px);
+    color: #f7f4ea;
+  }
+  /* Chalk crease line: a thin double rule like a popping crease */
+  .crease {
+    background-image: linear-gradient(var(--ch-line), var(--ch-line)), linear-gradient(var(--ch-line), var(--ch-line));
+    background-size: 100% 1px, 100% 1px;
+    background-position: 0 0, 0 4px;
+    background-repeat: no-repeat;
+    padding-top: 0.75rem;
+  }
+  .turf .crease-light {
+    border-color: rgba(247, 244, 234, 0.55);
+  }
+  /* Scoreboard numerals */
+  .score {
+    @apply font-display tabular-nums;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .eyebrow {
+    @apply font-sans text-xs font-semibold uppercase tracking-[0.18em] text-ink-muted;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-surface;
+    box-shadow: 0 1px 0 rgba(14, 35, 24, 0.04), 0 8px 24px -18px rgba(14, 35, 24, 0.35);
+  }
+  .link {
+    @apply font-semibold text-accent underline decoration-2 underline-offset-4 hover:decoration-4;
+  }
+  .press {
+    transition: transform 160ms var(--ease-spring), background-color 160ms, box-shadow 160ms, color 160ms;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Spinning ball loader */
+@keyframes ball-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ball-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+.animate-rise { animation: rise-in 320ms var(--ease-spring) both; }
+.skeleton {
+  background: linear-gradient(90deg, var(--ch-surface-2) 0%, var(--ch-surface) 50%, var(--ch-surface-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Print: clean black-on-white sheets for fixtures and points tables ─── */
+@media print {
+  :root, .dark {
+    --ch-bg: #fff;
+    --ch-surface: #fff;
+    --ch-surface-2: #f2f2f2;
+    --ch-ink: #000;
+    --ch-ink-muted: #333;
+    --ch-line: #999;
+    --glow: transparent;
+  }
+  body { background: #fff !important; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; }
+  a { text-decoration: none; color: inherit; }
+}

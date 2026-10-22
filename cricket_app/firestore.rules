@@ -1,0 +1,516 @@
+rules_version = '2';
+
+// CricketHub security rules.
+//
+// Principles
+//   - Public pages (teams, fixtures, results, tournaments) are readable by anyone, writable by no-one
+//     except the right organisers.
+//   - Team data: only owners/admins edit the team and roster; owners/admins/captains/vice-captains
+//     manage fixtures, playing XIs and results.
+//   - Tournaments: only the owner and co-admins (adminUids) edit fixtures and results; only the owner
+//     changes the co-admin list.
+//   - Every write is shape-checked (allowed keys, types, lengths) to mirror src/lib/validation.ts.
+//   - Multi-document flows (create team, accept invite, transfer ownership) are validated together
+//     with existsAfter()/getAfter(), so they only succeed as the intended atomic batch.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Generic helpers ───────────────────────────────────────────────────
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function changedKeys() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    function onlyChanged(keys) { return changedKeys().hasOnly(keys); }
+    function unchanged(keys) { return !changedKeys().hasAny(keys); }
+
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+    function nullableStr(v, max) { return v == null || (v is string && v.size() <= max); }
+    function intIn(v, min, max) { return v is int && v >= min && v <= max; }
+    function hex(v) { return v is string && v.matches('^#[0-9a-fA-F]{6}$'); }
+    function tokens(v) { return v is list && v.size() <= 120; }
+    function day(v) { return v is string && v.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'); }
+    // In-app links only (no javascript:, no external URLs)
+    function appLink(v) { return v is string && v.size() <= 200 && v.matches('^/[A-Za-z0-9/_-]*$'); }
+
+    function tokenEmail() { return request.auth.token.get('email', '').lower(); }
+    function verifiedEmail() { return request.auth.token.get('email_verified', false) == true && tokenEmail() != ''; }
+
+    // ── Team helpers ──────────────────────────────────────────────────────
+    function teamPath(teamId) { return /databases/$(database)/documents/teams/$(teamId); }
+    function memberPath(teamId, u) { return /databases/$(database)/documents/teamMembers/$(teamId + '_' + u); }
+    function invitePath(teamId) { return /databases/$(database)/documents/teams/$(teamId)/private/invite; }
+
+    function isMemberOf(teamId, u) { return exists(memberPath(teamId, u)); }
+    function isMember(teamId) { return signedIn() && isMemberOf(teamId, uid()); }
+    function roleIn(teamId) { return get(memberPath(teamId, uid())).data.role; }
+    function isTeamAdmin(teamId) { return isMember(teamId) && roleIn(teamId) in ['owner', 'admin']; }
+    function isTeamManager(teamId) { return isMember(teamId) && roleIn(teamId) in ['owner', 'admin', 'captain', 'viceCaptain']; }
+    // True only inside the batch that creates the team
+    function creatingTeam(teamId) {
+      return !exists(teamPath(teamId)) && existsAfter(teamPath(teamId)) && getAfter(teamPath(teamId)).data.ownerUid == uid();
+    }
+
+    // ── Tournament / fixture helpers ──────────────────────────────────────
+    function tournamentPath(tid) { return /databases/$(database)/documents/tournaments/$(tid); }
+    function fixturePath(fid) { return /databases/$(database)/documents/fixtures/$(fid); }
+
+    function isTournamentAdminData(t) { return signedIn() && (t.ownerUid == uid() || uid() in t.adminUids); }
+    function isTournamentAdmin(tid) { return isTournamentAdminData(get(tournamentPath(tid)).data); }
+
+    // Team fixtures: the owning team's managers. Tournament fixtures: owner + co-admins.
+    function canManageFixtureData(f) {
+      return signedIn() && (
+        (f.ownerTeamId is string && isTeamManager(f.ownerTeamId)) ||
+        (f.tournamentId is string && isTournamentAdmin(f.tournamentId))
+      );
+    }
+    function canManageFixture(fid) { return canManageFixtureData(get(fixturePath(fid)).data); }
+
+    // ── Users ─────────────────────────────────────────────────────────────
+    function validUser(d) {
+      return d.keys().hasOnly(['uid', 'displayName', 'photoURL', 'battingStyle', 'bowlingStyle', 'playerRole', 'jerseyNumber',
+                               'searchTokens', 'onboarded', 'emailNotifications', 'createdAt', 'updatedAt'])
+        && d.uid == uid()
+        && str(d.displayName, 1, 60)
+        && nullableStr(d.photoURL, 2000)
+        && d.battingStyle in ['right', 'left']
+        && d.bowlingStyle in ['none', 'rightFast', 'rightMedium', 'leftFast', 'leftMedium', 'offSpin', 'legSpin', 'leftOrthodox', 'leftWrist']
+        && d.playerRole in ['batter', 'bowler', 'allRounder', 'wicketkeeper']
+        && (d.jerseyNumber == null || intIn(d.jerseyNumber, 0, 999))
+        && tokens(d.searchTokens)
+        && d.onboarded is bool
+        && d.emailNotifications is bool
+        && d.updatedAt == request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if signedIn();
+      allow list: if signedIn() && request.query.limit <= 50;
+      allow create: if signedIn() && userId == uid() && validUser(incoming())
+                    && incoming().onboarded == false && incoming().createdAt == request.time;
+      allow update: if signedIn() && userId == uid() && validUser(incoming()) && unchanged(['uid', 'createdAt']);
+      allow delete: if false;
+    }
+
+    // Email address: private to its owner (the email extension reads it with admin rights)
+    match /userPrivate/{userId} {
+      allow read: if signedIn() && userId == uid();
+      allow create, update: if signedIn() && userId == uid()
+                            && incoming().keys().hasOnly(['email', 'createdAt'])
+                            && incoming().email == tokenEmail();
+      allow delete: if false;
+    }
+
+    // Exact-email lookup for "invite by email" / search. Single gets only, never listing.
+    match /userEmails/{email} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update: if signedIn() && verifiedEmail() && email == tokenEmail()
+                            && incoming().keys().hasOnly(['uid']) && incoming().uid == uid();
+      allow delete: if false;
+    }
+
+    // ── Teams ─────────────────────────────────────────────────────────────
+    function validTeam(d) {
+      return d.keys().hasOnly(['name', 'shortName', 'logoDataUrl', 'homeGround', 'colors', 'ownerUid', 'searchTokens', 'createdAt', 'updatedAt'])
+        && str(d.name, 2, 60)
+        && str(d.shortName, 1, 4)
+        && (d.logoDataUrl == null || (d.logoDataUrl is string && d.logoDataUrl.size() <= 150000
+                                      && d.logoDataUrl.matches('^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$')))
+        && str(d.homeGround, 0, 80)
+        && d.colors is map && d.colors.keys().hasOnly(['primary', 'secondary']) && hex(d.colors.primary) && hex(d.colors.secondary)
+        && d.ownerUid is string
+        && tokens(d.searchTokens)
+        && d.updatedAt == request.time;
+    }
+
+    match /teams/{teamId} {
+      allow read: if true;
+      // The owner's roster entry must be created in the same batch
+      allow create: if signedIn() && validTeam(incoming()) && incoming().ownerUid == uid()
+                    && incoming().createdAt == request.time
+                    && existsAfter(memberPath(teamId, uid()));
+      allow update: if isTeamAdmin(teamId) && validTeam(incoming()) && unchanged(['createdAt'])
+                    && (incoming().ownerUid == existing().ownerUid
+                        // ownership transfer: only by the owner, to a member made owner in the same batch
+                        || (existing().ownerUid == uid() && getAfter(memberPath(teamId, incoming().ownerUid)).data.role == 'owner'));
+      allow delete: if signedIn() && existing().ownerUid == uid();
+
+      // Join-link code: admins only. (Rules can still read it to check a join.)
+      match /private/{docId} {
+        allow read: if isTeamAdmin(teamId);
+        allow create, update: if (isTeamAdmin(teamId) || creatingTeam(teamId))
+                              && docId == 'invite'
+                              && incoming().keys().hasOnly(['code', 'updatedAt'])
+                              && str(incoming().code, 16, 64) && incoming().updatedAt == request.time;
+        allow delete: if isTeamAdmin(teamId);
+      }
+
+      match /activity/{entryId} {
+        allow read: if isMember(teamId);
+        allow create: if isMember(teamId) && validActivity(incoming());
+        allow update, delete: if false;
+      }
+    }
+
+    function validActivity(d) {
+      return d.keys().hasOnly(['actorUid', 'actorName', 'message', 'link', 'createdAt'])
+        && d.actorUid == uid()
+        && str(d.actorName, 1, 60)
+        && str(d.message, 1, 300)
+        && (d.link == null || appLink(d.link))
+        && d.createdAt == request.time;
+    }
+
+    // ── Rosters ───────────────────────────────────────────────────────────
+    function validMember(d) {
+      return d.keys().hasOnly(['teamId', 'uid', 'role', 'displayName', 'photoURL', 'jerseyNumber', 'playerRole', 'via', 'inviteId', 'joinCode', 'joinedAt'])
+        && d.teamId is string && d.uid is string
+        && d.role in ['owner', 'admin', 'captain', 'viceCaptain', 'player']
+        && str(d.displayName, 1, 60)
+        && nullableStr(d.photoURL, 2000)
+        && (d.jerseyNumber == null || intIn(d.jerseyNumber, 0, 999))
+        && d.playerRole in ['batter', 'bowler', 'allRounder', 'wicketkeeper']
+        && d.via in ['owner', 'invite', 'link'];
+    }
+
+    // The invitation being accepted in this same batch is addressed to the requester
+    function acceptingInvite(inviteId, teamId) {
+      let path = /databases/$(database)/documents/invitations/$(inviteId);
+      let inv = get(path).data;
+      return inv.teamId == teamId && inv.status == 'pending'
+        && (inv.inviteeUid == uid() || (inv.inviteeEmail != null && verifiedEmail() && inv.inviteeEmail == tokenEmail()))
+        && getAfter(path).data.status == 'accepted';
+    }
+
+    match /teamMembers/{memberId} {
+      allow read: if true;
+
+      // Players only ever add themselves: as the creator, via the join link, or by accepting an invitation
+      allow create: if signedIn() && validMember(incoming())
+                    && incoming().uid == uid()
+                    && memberId == incoming().teamId + '_' + uid()
+                    && incoming().joinedAt == request.time
+                    && (
+                      (incoming().role == 'owner' && incoming().via == 'owner' && creatingTeam(incoming().teamId))
+                      || (incoming().role == 'player' && incoming().via == 'link'
+                          && exists(invitePath(incoming().teamId))
+                          && incoming().joinCode == get(invitePath(incoming().teamId)).data.code)
+                      || (incoming().role == 'player' && incoming().via == 'invite'
+                          && acceptingInvite(incoming().inviteId, incoming().teamId))
+                    );
+
+      allow update: if signedIn() && validMember(incoming())
+                    && unchanged(['teamId', 'uid', 'via', 'inviteId', 'joinCode', 'joinedAt'])
+                    && (
+                      // a player refreshing the profile fields copied onto the roster
+                      (existing().uid == uid() && onlyChanged(['displayName', 'photoURL', 'jerseyNumber', 'playerRole']))
+                      // owners/admins change other non-owners' roles (never to owner)
+                      || (isTeamAdmin(existing().teamId) && onlyChanged(['role']) && existing().uid != uid()
+                          && existing().role != 'owner' && incoming().role != 'owner')
+                      // ownership transfer batch (teams.ownerUid changes in the same batch)
+                      || (onlyChanged(['role']) && get(teamPath(existing().teamId)).data.ownerUid == uid() && (
+                            (incoming().role == 'owner' && getAfter(teamPath(existing().teamId)).data.ownerUid == existing().uid)
+                            || (existing().uid == uid() && incoming().role == 'admin'
+                                && getAfter(teamPath(existing().teamId)).data.ownerUid != uid())
+                         ))
+                    );
+
+      allow delete: if signedIn() && (
+                      (existing().uid == uid() && existing().role != 'owner')                                   // leave
+                      || (isTeamAdmin(existing().teamId) && existing().uid != uid() && existing().role != 'owner') // remove
+                      || (!existsAfter(teamPath(existing().teamId)) && get(teamPath(existing().teamId)).data.ownerUid == uid()) // team deleted
+                    );
+    }
+
+    // ── Invitations ───────────────────────────────────────────────────────
+    function isInvitee(inv) {
+      return inv.inviteeUid == uid() || (inv.inviteeEmail != null && verifiedEmail() && inv.inviteeEmail == tokenEmail());
+    }
+
+    match /invitations/{inviteId} {
+      allow read: if signedIn() && (isInvitee(existing()) || existing().inviterUid == uid() || isTeamAdmin(existing().teamId));
+
+      allow create: if isTeamAdmin(incoming().teamId)
+                    && incoming().keys().hasOnly(['teamId', 'teamName', 'inviterUid', 'inviterName', 'inviteeUid', 'inviteeEmail',
+                                                  'inviteeName', 'status', 'createdAt', 'respondedAt'])
+                    && incoming().inviterUid == uid()
+                    && str(incoming().inviterName, 1, 60)
+                    && incoming().teamName == get(teamPath(incoming().teamId)).data.name
+                    && incoming().status == 'pending'
+                    && incoming().createdAt == request.time
+                    && incoming().respondedAt == null
+                    && nullableStr(incoming().inviteeName, 60)
+                    && (
+                      (incoming().inviteeUid is string && incoming().inviteeEmail == null
+                        && !isMemberOf(incoming().teamId, incoming().inviteeUid))
+                      || (incoming().inviteeUid == null && incoming().inviteeEmail is string
+                        && incoming().inviteeEmail.size() <= 254
+                        && incoming().inviteeEmail == incoming().inviteeEmail.lower()
+                        && incoming().inviteeEmail.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$'))
+                    );
+
+      allow update: if signedIn() && existing().status == 'pending'
+                    && unchanged(['teamId', 'teamName', 'inviterUid', 'inviterName', 'inviteeEmail', 'inviteeName', 'createdAt'])
+                    && incoming().respondedAt == request.time
+                    && (
+                      // the invitee accepts (with their roster entry in the same batch) or declines
+                      (isInvitee(existing()) && incoming().inviteeUid == uid()
+                        && onlyChanged(['status', 'inviteeUid', 'respondedAt'])
+                        && (incoming().status == 'declined'
+                            || (incoming().status == 'accepted' && existsAfter(memberPath(existing().teamId, uid())))))
+                      // team admins withdraw it
+                      || (isTeamAdmin(existing().teamId) && incoming().status == 'revoked' && onlyChanged(['status', 'respondedAt']))
+                    );
+
+      allow delete: if false;
+    }
+
+    // ── Fixtures ──────────────────────────────────────────────────────────
+    function validSide(s) {
+      return s is map
+        && s.keys().hasOnly(['teamId', 'ttId', 'name', 'shortName', 'color', 'placeholder'])
+        && (s.teamId == null || s.teamId is string)
+        && (s.ttId == null || s.ttId is string)
+        && str(s.name, 0, 60)
+        && str(s.shortName, 0, 4)
+        && (s.color == null || hex(s.color))
+        && nullableStr(s.placeholder, 40);
+    }
+
+    function validFixture(d) {
+      return d.keys().hasOnly(['ownerTeamId', 'tournamentId', 'tournamentName', 'teamIds', 'home', 'away', 'startsAt', 'venue', 'overs',
+                               'matchType', 'status', 'cancelReason', 'notes', 'stage', 'result', 'createdBy', 'createdAt', 'updatedAt'])
+        && (d.ownerTeamId is string || d.tournamentId is string)
+        && nullableStr(d.tournamentName, 60)
+        && validSide(d.home) && validSide(d.away)
+        // teamIds lists exactly the in-app teams playing, and a team fixture includes its owner
+        && d.teamIds is list
+        && d.teamIds.toSet() == [d.home.teamId, d.away.teamId].toSet().difference([null].toSet())
+        && (d.ownerTeamId == null || d.ownerTeamId in d.teamIds)
+        && d.startsAt is timestamp
+        && str(d.venue, 0, 120)
+        && intIn(d.overs, 1, 100)
+        && d.matchType in ['T20', 'ODI', 'Custom']
+        && d.status in ['scheduled', 'cancelled', 'completed']
+        && nullableStr(d.cancelReason, 300)
+        && str(d.notes, 0, 1000)
+        && (d.stage == null || d.stage is map)
+        && (d.result == null || d.result is map)
+        && d.updatedAt == request.time;
+    }
+
+    match /fixtures/{fixtureId} {
+      allow read: if true;
+      allow create: if canManageFixtureData(incoming()) && validFixture(incoming())
+                    && incoming().createdBy == uid() && incoming().createdAt == request.time
+                    && incoming().status == 'scheduled' && incoming().result == null;
+      allow update: if canManageFixtureData(existing()) && validFixture(incoming())
+                    && unchanged(['ownerTeamId', 'tournamentId', 'createdBy', 'createdAt']);
+      allow delete: if canManageFixtureData(existing());
+
+      // Playing XI per in-app team: that team's captains/admins, or the fixture's organisers
+      match /lineups/{teamId} {
+        allow read: if true;
+        allow create, update: if signedIn()
+                              && teamId in get(fixturePath(fixtureId)).data.teamIds
+                              && (isTeamManager(teamId) || canManageFixture(fixtureId))
+                              && incoming().keys().hasOnly(['teamId', 'uids', 'updatedBy', 'updatedAt'])
+                              && incoming().teamId == teamId
+                              && incoming().uids is list && incoming().uids.size() <= 20
+                              && incoming().updatedBy == uid()
+                              && incoming().updatedAt == request.time;
+        allow delete: if signedIn() && (isTeamManager(teamId) || canManageFixture(fixtureId));
+      }
+    }
+
+    // ── Availability (RSVP) ───────────────────────────────────────────────
+    match /availability/{rsvpId} {
+      // Your own RSVP (even before it exists), or anyone's on your team
+      allow get: if signedIn() && (rsvpId.split('_')[1] == uid() || isMember(existing().teamId));
+      allow list: if isMember(existing().teamId);
+      allow create, update: if signedIn()
+                            && incoming().keys().hasOnly(['fixtureId', 'teamId', 'uid', 'displayName', 'status', 'updatedAt'])
+                            && incoming().uid == uid()
+                            && rsvpId == incoming().fixtureId + '_' + uid()
+                            && isMember(incoming().teamId)
+                            && incoming().teamId in get(fixturePath(incoming().fixtureId)).data.teamIds
+                            && incoming().status in ['available', 'maybe', 'unavailable']
+                            && str(incoming().displayName, 1, 60)
+                            && incoming().updatedAt == request.time;
+      allow delete: if signedIn() && existing().uid == uid();
+    }
+
+    // ── Results and stats ─────────────────────────────────────────────────
+    function validResult(d, fixtureId) {
+      return d.keys().hasOnly(['fixtureId', 'tournamentId', 'ownerTeamId', 'teamIds', 'homeTeamId', 'awayTeamId', 'oversLimit', 'battedFirst',
+                               'winner', 'advancing', 'margin', 'innings', 'manOfTheMatch', 'batting', 'bowling', 'revision', 'enteredBy', 'enteredAt'])
+        && d.fixtureId == fixtureId
+        && d.teamIds is list && d.teamIds.size() <= 2
+        && intIn(d.oversLimit, 1, 100)
+        && d.battedFirst in ['home', 'away']
+        && d.winner in ['home', 'away', 'tie', 'noResult']
+        && (d.advancing == null || d.advancing in ['home', 'away'])
+        && str(d.margin, 0, 80)
+        && (d.innings == null || d.innings is map)
+        && (d.manOfTheMatch == null || d.manOfTheMatch is map)
+        && d.batting is list && d.batting.size() <= 30
+        && d.bowling is list && d.bowling.size() <= 30
+        && intIn(d.revision, 1, 1000)
+        && d.enteredBy is string
+        && d.enteredAt is timestamp;
+    }
+
+    match /matchResults/{fixtureId} {
+      allow read: if true;
+      allow create, update: if canManageFixture(fixtureId) && validResult(incoming(), fixtureId);
+      allow delete: if canManageFixture(fixtureId);
+
+      // Earlier versions, kept for "undo last result"
+      match /history/{revision} {
+        allow read, create, delete: if canManageFixture(fixtureId);
+        allow update: if false;
+      }
+    }
+
+    function validStats(d) {
+      return d.keys().hasOnly(['uid', 'fixtureId', 'teamId', 'tournamentId', 'playedAt', 'opponent', 'batted', 'runs', 'balls', 'fours', 'sixes',
+                               'out', 'bowled', 'ballsBowled', 'maidens', 'runsConceded', 'wickets', 'manOfTheMatch'])
+        && d.uid is string && d.fixtureId is string
+        && (d.teamId == null || d.teamId is string)
+        && d.playedAt is timestamp
+        && str(d.opponent, 0, 60)
+        && d.batted is bool && d.out is bool && d.bowled is bool && d.manOfTheMatch is bool
+        && intIn(d.runs, 0, 999) && intIn(d.balls, 0, 999) && intIn(d.fours, 0, 99) && intIn(d.sixes, 0, 99)
+        && intIn(d.ballsBowled, 0, 999) && intIn(d.maidens, 0, 99) && intIn(d.runsConceded, 0, 999) && intIn(d.wickets, 0, 10);
+    }
+
+    // One document per player per match; careers are summed from these
+    match /playerStats/{statId} {
+      allow read: if true;
+      allow create, update: if canManageFixture(incoming().fixtureId) && validStats(incoming())
+                            && statId == incoming().fixtureId + '_' + incoming().uid;
+      allow delete: if canManageFixture(existing().fixtureId);
+    }
+
+    // ── Tournaments ───────────────────────────────────────────────────────
+    function validTournament(d) {
+      return d.keys().hasOnly(['name', 'searchTokens', 'startDate', 'endDate', 'format', 'overs', 'matchType', 'teamCount', 'entryRules', 'venue',
+                               'ownerUid', 'ownerName', 'adminUids', 'status', 'points', 'groupCount', 'qualifiersPerGroup', 'doubleRoundRobin',
+                               'fixturesGenerated', 'knockoutGenerated', 'createdAt', 'updatedAt'])
+        && str(d.name, 3, 60)
+        && tokens(d.searchTokens)
+        && day(d.startDate) && day(d.endDate) && d.endDate >= d.startDate
+        && d.format in ['league', 'knockout', 'groups']
+        && intIn(d.overs, 1, 100)
+        && d.matchType in ['T20', 'ODI', 'Custom']
+        && intIn(d.teamCount, 2, 64)
+        && str(d.entryRules, 0, 2000)
+        && str(d.venue, 0, 120)
+        && str(d.ownerName, 1, 60)
+        && d.adminUids is list && d.adminUids.size() <= 10
+        && d.status in ['setup', 'live', 'completed']
+        && d.points is map && d.points.keys().hasOnly(['win', 'tie', 'noResult', 'loss'])
+        && intIn(d.points.win, 0, 10) && intIn(d.points.tie, 0, 10) && intIn(d.points.noResult, 0, 10) && intIn(d.points.loss, 0, 10)
+        && intIn(d.groupCount, 1, 8) && intIn(d.qualifiersPerGroup, 1, 8)
+        && d.doubleRoundRobin is bool && d.fixturesGenerated is bool && d.knockoutGenerated is bool
+        && d.updatedAt == request.time;
+    }
+
+    match /tournaments/{tournamentId} {
+      allow read: if true;
+      allow create: if signedIn() && validTournament(incoming())
+                    && incoming().ownerUid == uid() && incoming().adminUids.size() == 0
+                    && incoming().status == 'setup' && incoming().fixturesGenerated == false
+                    && incoming().createdAt == request.time;
+      allow update: if isTournamentAdminData(existing()) && validTournament(incoming())
+                    && unchanged(['ownerUid', 'createdAt'])
+                    // only the owner changes who the co-admins are
+                    && (incoming().adminUids == existing().adminUids || existing().ownerUid == uid());
+      allow delete: if signedIn() && existing().ownerUid == uid();
+
+      match /activity/{entryId} {
+        allow read: if true;
+        allow create: if isTournamentAdmin(tournamentId) && validActivity(incoming());
+        allow update, delete: if false;
+      }
+    }
+
+    match /tournamentTeams/{entryId} {
+      function validEntry(d) {
+        return d.keys().hasOnly(['tournamentId', 'teamId', 'name', 'shortName', 'color', 'group', 'seed', 'addedAt'])
+          && d.tournamentId is string
+          && (d.teamId == null || d.teamId is string)
+          && str(d.name, 1, 60) && str(d.shortName, 1, 4)
+          && hex(d.color)
+          && (d.group == null || (d.group is string && d.group.matches('^[A-H]$')))
+          && intIn(d.seed, 1, 1000);
+      }
+      allow read: if true;
+      allow create: if isTournamentAdmin(incoming().tournamentId) && validEntry(incoming())
+                    && incoming().addedAt == request.time
+                    && (incoming().teamId == null || exists(teamPath(incoming().teamId)));
+      allow update: if isTournamentAdmin(existing().tournamentId) && validEntry(incoming())
+                    && unchanged(['tournamentId', 'teamId', 'addedAt']);
+      allow delete: if isTournamentAdmin(existing().tournamentId);
+    }
+
+    // ── Notifications ─────────────────────────────────────────────────────
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && existing().uid == uid();
+      allow update: if signedIn() && existing().uid == uid() && onlyChanged(['read']) && incoming().read is bool;
+      allow delete: if signedIn() && existing().uid == uid();
+
+      // Sent by a team's managers to its members, or by a fixture's organisers to the playing teams
+      allow create: if signedIn()
+                    && incoming().keys().hasOnly(['uid', 'type', 'title', 'body', 'link', 'teamId', 'fixtureId', 'tournamentId',
+                                                  'actorUid', 'actorName', 'read', 'createdAt'])
+                    && incoming().type in ['fixture_new', 'fixture_updated', 'fixture_cancelled', 'rsvp_reminder', 'result_posted', 'lineup_set', 'role_changed']
+                    && str(incoming().title, 1, 120)
+                    && str(incoming().body, 0, 500)
+                    && appLink(incoming().link)
+                    && incoming().actorUid == uid()
+                    && str(incoming().actorName, 1, 60)
+                    && incoming().read == false
+                    && incoming().createdAt == request.time
+                    && nullableStr(incoming().tournamentId, 40)
+                    && isMemberOf(incoming().teamId, incoming().uid)
+                    && (
+                      isTeamManager(incoming().teamId)
+                      || (incoming().fixtureId is string
+                          && incoming().teamId in get(fixturePath(incoming().fixtureId)).data.teamIds
+                          && canManageFixture(incoming().fixtureId))
+                    );
+    }
+
+    // ── Outgoing email (Trigger Email extension) ──────────────────────────
+    // Write-only from clients, template-based only, and tied to a real invitation or notification
+    // sent by the same person, so the queue can't be used to email arbitrary addresses or text.
+    match /mail/{mailId} {
+      allow read, update, delete: if false;
+      allow create: if signedIn()
+                    && incoming().createdBy == uid()
+                    && incoming().createdAt == request.time
+                    && incoming().template is map && incoming().template.keys().hasOnly(['name', 'data'])
+                    && incoming().template.data is map && incoming().template.data.size() <= 5
+                    && (
+                      (incoming().keys().hasOnly(['to', 'template', 'invitationId', 'createdBy', 'createdAt'])
+                        && incoming().template.name == 'team-invite'
+                        && get(/databases/$(database)/documents/invitations/$(incoming().invitationId)).data.inviterUid == uid()
+                        && get(/databases/$(database)/documents/invitations/$(incoming().invitationId)).data.inviteeEmail == incoming().to)
+                      || (incoming().keys().hasOnly(['toUids', 'template', 'notificationId', 'createdBy', 'createdAt'])
+                        && incoming().template.name == 'notification'
+                        && incoming().toUids is list && incoming().toUids.size() == 1
+                        && get(/databases/$(database)/documents/notifications/$(incoming().notificationId)).data.actorUid == uid()
+                        && get(/databases/$(database)/documents/notifications/$(incoming().notificationId)).data.uid == incoming().toUids[0])
+                    );
+    }
+
+    // Email templates for the extension: managed in the console / seed script only
+    match /templates/{templateId} {
+      allow read, write: if false;
+    }
+  }
+}
