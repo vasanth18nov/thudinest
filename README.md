@@ -12,7 +12,8 @@ Deployed via Netlify → add your Netlify URL here.
 - **Game Hub** — Indian Rummy, Chess (Hard AI), Ping Pong with power-ups, and
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
-  batting game — see below.
+  batting game, and **Guest Rush** (`/guest-rush/`), a 3D homestay game —
+  see below.
 
 ## Adding Property Photos
 
@@ -189,12 +190,38 @@ side's entry in `HOME_TEAMS` (name, shirt text, kit colours, anthem file);
 the start card builds its squad buttons from them. A new side also needs a
 `data-team` button in the start card, and its players' commentary clips.
 
+## Guest Rush (`/guest-rush/`)
+
+A single-file 3D game (`guest-rush/index.html`, no build step). You are the
+host of a tropical homestay at sunset. Guests arrive at the gate one at a
+time with a request: carry their bags from the car up to their room, find a
+lost phone charger in the house, water the droopy plants with the hose,
+fetch a cold drink from the kitchen fridge, or guide a lost friend back to
+the gate. Each job scores points (more for speed and streaks) and a host
+tip; timers shrink as the evening goes on, and three missed guests end it.
+
+Controls: WASD / arrows to move (Shift walks), Space to pick up or drop,
+E to interact, C for follow / top-down camera, M to mute, P or Esc to pause.
+On phones: a joystick on the left half, and Interact / Camera buttons.
+
+Three.js r170 and its add-ons load from jsDelivr. The characters are the
+Ready Player Me and Michelle glTF models from the three.js examples,
+re-dressed at load time (batik shirts, pelekat sarongs, songkok, tudung).
+Their idle, walk, run, carry, pick-up and wave clips are baked for the rig by
+a small pose solver, so any Mixamo-style humanoid works: change `MODEL_URL`
+(and optionally `MODEL_URL_ALT`) at the top of the script. If a model fails
+to load, a simple placeholder is used and a warning is logged. Textures are
+painted procedurally except the hardwood, water normals and the sunset HDR
+environment, which come from the three.js examples on jsDelivr. Sound is all
+Web Audio synthesis. `?debug` exposes `window.__gr` for test bots.
+
 ## Files
 
 ```
 index.html      ← main site (landing page + game hub, all in one)
 bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
 cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks)
+guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 images/         ← add your property photos here
 README.md       ← this file
 ```
