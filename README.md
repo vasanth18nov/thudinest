@@ -75,8 +75,14 @@ progress all size themselves off that array automatically.
 A standalone 3D cricket game: your side against a **World XI**, as a T20 under floodlights (2, 5, 10 or 20 overs, coloured kits,
 white ball) or a Test match in daylight (15, 30 or 90 overs, or until all
 out; whites, red ball, white sightscreens, a slip cordon, bowlers in spells).
-Your side bats first; then the World XI chase, either batted by a
-player (pass the device to a friend) or by the computer, and the game gives
+A coin toss decides who bats first: call it, and if you win, choose to bat
+or bowl. When your side bats you play the shots; when it fields you bowl:
+pick the line and length (arrow keys, or tap the pitch), the variation
+(outswinger, inswinger, seam or slower ball; the spinners' stock ball, arm
+ball and wrong'un) and the bowler, then stop the release meter in the gold.
+The computer bats against you, reading the ball and the match situation.
+When your side bats first, the World XI chase can instead be batted by a
+friend on the same device or played out by the computer. The game gives
 the result (won by runs or wickets, tie, or a draw in a timed Test). The
 side is chosen on the start card: **Thudinest Coimbatore** (blue and gold;
 a 13-player squad of Kavin, Harsha, Sabari, Thananjay, Vikrant Sahoo,
