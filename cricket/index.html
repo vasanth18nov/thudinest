@@ -3224,10 +3224,14 @@ const Voice = (() => {
     if (/compact|eloquence/i.test(v.name)) s -= 8;
     return s;
   };
+  /* Some browsers' privacy layers break the voice list (Brave on iOS throws from getVoices), so a failure here only
+     means no spoken fallback, never a stadium that won't load. */
   const pick = () => {
     if (!ok) return;
     let best = null, bs = -1;
-    for (const v of window.speechSynthesis.getVoices() || []) { const s = score(v); if (s > bs) { bs = s; best = v; } }
+    try {
+      for (const v of window.speechSynthesis.getVoices() || []) { if (!v) continue; const s = score(v); if (s > bs) { bs = s; best = v; } }
+    } catch (e) { best = null; }
     voice = best;
   };
   if (ok) { pick(); try { window.speechSynthesis.addEventListener('voiceschanged', pick); } catch (e) { /* older engines fire no event */ } }
@@ -3235,7 +3239,7 @@ const Voice = (() => {
   const clean = (t) => t.replace(/[—·…]/g, ', ').replace(/km\/h/g, 'kilometres an hour').replace(/\s+,/g, ',');
   return {
     get on() { return on; },
-    set(v) { on = v; if (!v && ok) { window.speechSynthesis.cancel(); pending = 0; live(0); } },
+    set(v) { on = v; if (!v && ok) { try { window.speechSynthesis.cancel(); } catch (e) { /* speech is optional */ } pending = 0; live(0); } },
     /* parts: a string, or [{ t, mood }] spoken back to back so the big calls land with a beat before the colour */
     say(parts, interrupt) {
       if (!ok || !on || Sound.muted || !parts) return;
