@@ -122,6 +122,9 @@ body {
 .seg button, .iconbtn { font: 600 13px/1 var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; border-radius: 3px; padding: 8px 11px; cursor: pointer; }
 .seg button.on { background: var(--chalk); color: var(--night); }
 .iconbtn.declare { width: auto; padding: 8px 12px; background: var(--panel); border: 1px solid var(--rule); color: var(--gold); pointer-events: auto; }
+/* auto play: gold while the computer is playing for you */
+.iconbtn.autobtn { width: auto; padding: 8px 11px; }
+.iconbtn.autobtn.on { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
 .seg button:focus-visible, .iconbtn:focus-visible, .btn:focus-visible, .touch button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .iconbtn { pointer-events: auto; background: var(--panel); border: 1px solid var(--rule); display: grid; place-items: center; padding: 8px; width: 38px; height: 38px; color: var(--chalk); }
 .iconbtn svg { width: 18px; height: 18px; }
@@ -419,6 +422,7 @@ body.is-touch .bottom { display: none; }
   .top-right .lg, #gunName { display: none; }
   .top-right .sm { display: inline; }
   .iconbtn { width: 31px; height: 31px; padding: 6px; }
+  .iconbtn.autobtn { width: auto; padding: 6px 8px; font-size: 11px; letter-spacing: 0.06em; }
   .gun { padding: 5px 8px; min-width: 0; }
   .gun .lbl { font-size: 9px; letter-spacing: 0.08em; }
   .gun-speed b { font-size: 22px; }
@@ -499,6 +503,7 @@ body.is-touch .bottom { display: none; }
           <button id="viewBroad" type="button"><span class="lg">Broadcast</span><span class="sm">TV</span></button>
         </div>
         <button id="declareBtn" class="iconbtn declare" type="button" title="Declare the innings (Test)" hidden>Declare</button>
+        <button id="autoBtn" class="iconbtn autobtn" type="button" title="Auto play (A): the computer bats or bowls for you" aria-pressed="false" hidden>Auto</button>
         <button id="muteBtn" class="iconbtn" type="button" aria-label="Mute sound" title="Sound (M)">
           <svg id="icoSound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
           <svg id="icoMute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6"/><path d="m22 9-6 6"/></svg>
@@ -561,7 +566,7 @@ body.is-touch .bottom { display: none; }
       <div><kbd>S</kbd>Variation</div>
       <div><kbd>B</kbd>Change bowler</div>
       <div><kbd>Space</kbd>Bowl, then release</div>
-      <div><kbd>C</kbd>Camera</div>
+      <div><kbd>A</kbd>Auto play</div>
     </div>
     <div class="keys" id="keys">
       <div><kbd id="kLeft">←</kbd><span id="kLeftLbl">Leg side</span></div>
@@ -613,6 +618,7 @@ body.is-touch .bottom { display: none; }
       <li><kbd>C</kbd><span><b>Camera</b> · batsman or broadcast</span></li>
       <li><kbd>V</kbd><span><b>Voice</b> · spoken commentary</span></li>
       <li><kbd>M</kbd><span><b>Sound</b> · crowd and effects</span></li>
+      <li><kbd>A</kbd><span><b>Auto play</b> · the computer bats or bowls for you</span></li>
     </ul>
     </div>
     <div class="start-setup">
@@ -2779,7 +2785,7 @@ const game = {
   del: null, flight: null, swing: null, play: null, outcome: null,
   intent: { side: 0, foot: 'auto', loft: false, defend: false }, shift: false,
   paused: false, slowT: 0, slowScale: 1, deadT: 0, markerOn: false, best: {}, active: false, resume: false, skip: false,
-  batFirst: 'home', bowlMode: 'user', aim: null, bowlGo: false, meter: null, tossNote: '', camSaved: null,
+  batFirst: 'home', bowlMode: 'user', aim: null, bowlGo: false, meter: null, tossNote: '', camSaved: null, auto: false, autoP: 0.84,
 };
 const teamName = (t) => TEAMS[t].name;
 /* the user bowls whenever their side is in the field, unless a friend is batting for the World XI on this device and the computer bowls */
@@ -3012,7 +3018,7 @@ function release() {
   game.flight = { sim: simulateDelivery(d), t: 0, bounced: false, stumped: false, kept: false };
   { const c = crossInfo(game.flight.sim, ZC.backV); game.flight.leaveAt = c ? c.t - 0.22 : 99; }
   game.state = 'flight'; game.t = 0;
-  if (d.user) planAI();
+  if (d.user || (game.auto && !userBowls())) planAI();
   bowler.relT = 0;
   Replay.mark('release');
   $('gunSpeed').textContent = d.kmh.toFixed(1);
@@ -5133,7 +5139,10 @@ function updateGame(dt) {
   if (st === 'between') {
     bowler.rig.root.updateMatrixWorld(true);
     bowler.handMarker.getWorldPosition(ball.position);
-    if (userBowls()) { if (game.bowlGo && game.t > 1.0) startRunup(); }
+    if (userBowls()) {
+      if (game.auto && !game.bowlGo && game.t > (game.leadIn || 1.9)) { autoAim(); startBowl(); }
+      if (game.bowlGo && game.t > 1.0) startRunup();
+    }
     else if (game.t > (game.leadIn || 1.9)) startRunup();
   } else if (st === 'runup') {
     bowler.rig.root.updateMatrixWorld(true);
@@ -5146,7 +5155,7 @@ function updateGame(dt) {
       updateShotHUD();
     }
     if (!game.runupSaid && game.t > d.runT - (d.pace ? 1.3 : 1.0)) { game.runupSaid = true; Comm.runup(d, game.balls % 6 === 0); }
-    if (d.user) drawMeter(game.t / d.runT);
+    if (d.user) { drawMeter(game.t / d.runT); if (game.auto && game.meter && !game.meter.hit && game.t / d.runT >= game.autoP) meterHit(); }
     if (game.t >= d.runT) release();
   } else if (st === 'flight') {
     const F = game.flight, S = F.sim;
@@ -5520,6 +5529,7 @@ function planAI() {
   } else if (!test) { const done = game.balls / game.total; agg += done > 0.8 ? 0.22 : done > 0.6 ? 0.08 : 0; } // the last overs, however long the innings
   if (game.wkts >= 7) agg -= 0.1;
   if (game.freeHitNow || d.noBall) agg += 0.35;
+  if (!userBowls() && !test) agg += 0.06; // and a touch more positively
   agg = clamp(agg + (confOf(bat) - 40) / 300, 0, 0.9);
   // how hard the ball is to play
   const onStumps = Math.abs(x) < 0.2, corridor = x >= 0.2 && x < 0.55;
@@ -5545,7 +5555,7 @@ function planAI() {
   if (!block && !leave) loft = chance(clamp(0.45 * agg * (bad ? 1.6 : 1) * (len === 'yorker' ? 0.3 : len === 'bouncer' ? 0.5 : 1), 0, 0.7));
   if (leave) { F.ai = { leave: true, done: true }; return; }
   // the timing
-  const skill = (idx < 6 ? 1 : idx < 8 ? 0.84 : 0.66) * (0.9 + confOf(bat) / 400) * { easy: 0.8, normal: 1, hard: 1.15 }[game.diff];
+  const skill = (idx < 6 ? 1 : idx < 8 ? 0.84 : 0.66) * (0.9 + confOf(bat) / 400) * (userBowls() ? { easy: 0.8, normal: 1, hard: 1.15 }[game.diff] : 1.15); // batting for the user, it plays its best
   const sigma = 0.05 * (0.7 + 0.8 * D) / skill * (block ? 0.7 : 1) * (loft ? 1.35 : 1); // going big is harder to time
   const bias = surprise && d.variation === 'Slower ball' ? rand(0.03, 0.07) : 0; // early on the slower ball
   const dt = bias + randn() * sigma;
@@ -5553,6 +5563,25 @@ function planAI() {
   if (!c) { F.ai = { leave: true, done: true }; return; }
   F.ai = { at: c.t - SWING_T - dt, foot, side, loft, block };
 }
+/* auto bowling: a sensible plan for the bowler and the stage of the innings, released well most of the time */
+function autoAim() {
+  const A = bowlAim(), pace = game.del.pace, kind = game.bowl[game.bowler].kind;
+  const death = !isTest() && Number.isFinite(game.total) && game.balls / game.total > 0.75;
+  const len = pace ? weighted(death ? [['yorker', 30], ['full', 20], ['good', 30], ['short', 15], ['bouncer', 5]] : isTest() ? [['full', 25], ['good', 60], ['short', 10], ['bouncer', 5]] : [['yorker', 10], ['full', 22], ['good', 45], ['short', 15], ['bouncer', 8]])
+    : weighted([['full', 25], ['good', 60], ['short', 15]]);
+  const Z = pace ? { yorker: [-1.2, -1.8], full: [-2.8, -4.2], good: [-4.6, -7.0], short: [-7.6, -9.6], bouncer: [-10.0, -11.2] } : { full: [-2.2, -3.4], good: [-3.6, -5.6], short: [-6.0, -7.4] };
+  A.z = rand(Z[len][0], Z[len][1]);
+  A.x = clamp(0.14 + randn() * 0.13, -0.4, 0.7);
+  A.v = kind === 'fast' || kind === 'fastmed' ? weighted([[0, 30], [1, 30], [2, 25], [3, 15]]) : weighted([[0, 65], [1, 20], [2, 15]]);
+  game.autoP = METER.centre + randn() * 0.035;
+  showAim();
+}
+function setAuto(on) {
+  game.auto = on;
+  const b = $('autoBtn'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+  if (game.active) showToast(on ? `Auto play on: the computer ${userBowls() ? 'bowls' : 'bats'} for you. Tap Auto to take over` : 'Auto play off: over to you', 2.6);
+}
+$('autoBtn').addEventListener('click', () => { setAuto(!game.auto); canvas.focus({ preventScroll: true }); });
 function aiSwing(ai) {
   if (ai.leave) return;
   game.intent = { side: ai.side, foot: ai.foot, loft: ai.loft, defend: ai.block };
@@ -5571,6 +5600,7 @@ const TOUCH_LBL = { sweep: ['Sweep', 'Vary'], loft: ['Loft', 'Bowler'], block: [
 /* switch the HUD and controls between batting and bowling; the camera goes behind the bowler while you bowl */
 function setBowlingUI() {
   const on = userBowls();
+  $('autoBtn').hidden = !game.active;
   document.body.classList.toggle('bowling', on);
   document.querySelectorAll('.touch [data-k]').forEach((b) => { const L = TOUCH_LBL[b.dataset.k]; if (L) b.textContent = L[on ? 1 : 0]; });
   if (on && game.camSaved === null) { game.camSaved = cam.view; setView('broadcast'); }
@@ -5640,6 +5670,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key === 'l' || e.key === 'L') act('loft');
   else if (e.key === 's' || e.key === 'S') act('sweep');
   else if (e.key === 'b' || e.key === 'B') act('bowler');
+  else if (e.key === 'a' || e.key === 'A') setAuto(!game.auto);
   else if (e.key === 'c' || e.key === 'C') setView(cam.view === 'batsman' ? 'broadcast' : 'batsman');
   else if (e.key === 'm' || e.key === 'M') toggleMute();
   else if (e.key === 'v' || e.key === 'V') toggleVoice();

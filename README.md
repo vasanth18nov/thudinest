@@ -81,6 +81,8 @@ pick the line and length (arrow keys, or tap the pitch), the variation
 (outswinger, inswinger, seam or slower ball; the spinners' stock ball, arm
 ball and wrong'un) and the bowler, then stop the release meter in the gold.
 The computer bats against you, reading the ball and the match situation.
+Auto play (the Auto button, or A) hands your job to the computer, batting
+or bowling, until you tap it again to take over.
 When your side bats first, the World XI chase can instead be batted by a
 friend on the same device or played out by the computer. The game gives
 the result (won by runs or wickets, tie, or a draw in a timed Test). The
