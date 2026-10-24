@@ -27,3 +27,6 @@ AlisonsConstruction/images/
 kavin/*.jpg
 kavin/*.mp4
 !kavin/media/*.mp4
+kavin/*.png
+kavin/*.PNG
+kavin/*.HEIC

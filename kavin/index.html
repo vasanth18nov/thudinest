@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#06102a">
 <meta property="og:title" content="Kavin Krishna">
 <meta property="og:description" content="13 years old. Student. Footballer. Animal Lover.">
-<meta property="og:image" content="https://thudinest.com/kavin/img/profile.jpg">
+<meta property="og:image" content="https://thudinest.com/kavin/img/top.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +68,8 @@
     background: linear-gradient(90deg, var(--blue), var(--lime), var(--sun), var(--coral));
     transform-origin: 0 50%; transform: scaleX(0);
   }
+  .progress-ball { position: fixed; top: 2px; left: 0; z-index: 51; font-size: 14px; line-height: 1; pointer-events: none; }
+  html:not(.motion) .progress-ball { display: none; }
   .nav {
     position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 40;
     display: flex; align-items: center; gap: 4px;
@@ -129,20 +131,25 @@
   .hero-sub span:nth-child(3) { color: var(--lime); }
   .hero-sub span:nth-child(4) { color: var(--sun); }
   .hero-photo { position: relative; margin: 0; justify-self: center; width: min(100%, 420px); }
-  .hero-photo .frame {
-    aspect-ratio: 4 / 5; border-radius: 36px; overflow: hidden;
-    box-shadow: var(--shadow), 0 0 0 8px rgba(255, 255, 255, .06);
-    transform: rotate(3deg);
+  /* Round profile picture with a story-style ring that spins as you scroll */
+  .hero-photo .ring {
+    position: absolute; inset: -14px; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--blue), var(--lime), var(--sun), var(--coral), var(--blue));
+    box-shadow: 0 0 70px rgba(59, 130, 255, .35);
   }
-  .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+  .hero-photo .frame {
+    position: relative; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+    border: 8px solid var(--navy); box-shadow: var(--shadow);
+  }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 45% 35%; }
   .sticker {
     position: absolute; display: grid; place-items: center;
     width: 76px; height: 76px; border-radius: 50%; font-size: 40px;
     background: var(--white); box-shadow: var(--shadow);
   }
-  .sticker.s1 { left: -26px; top: 12%; }
-  .sticker.s2 { right: -22px; top: 46%; background: var(--sun); }
-  .sticker.s3 { left: 8%; bottom: -26px; background: var(--lime); }
+  .sticker.s1 { left: -30px; top: 4%; }
+  .sticker.s2 { right: -30px; top: 48%; background: var(--sun); }
+  .sticker.s3 { left: 6%; bottom: -10px; background: var(--lime); }
   .scroll-cue {
     position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
     font-size: 14px; font-weight: 500; color: var(--muted);
@@ -167,23 +174,26 @@
   .reveal-text strong { color: var(--lime); font-weight: 700; }
   .reveal-text .w { display: inline; }
 
-  .gallery {
-    position: relative; margin-top: clamp(60px, 10vw, 120px);
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 2vw, 28px);
-    width: min(1280px, 100% - 32px); margin-inline: auto; align-items: start;
+  /* Memory lane: scrolling down slides this film strip sideways */
+  .lane { position: relative; margin-top: clamp(60px, 10vw, 120px); overflow: hidden; }
+  html.motion .lane { height: 100vh; height: 100svh; display: flex; align-items: center; }
+  html:not(.motion) .lane { overflow-x: auto; padding-bottom: 40px; }
+  .lane-track {
+    display: flex; align-items: center; gap: clamp(18px, 3vw, 44px);
+    padding-inline: max(16px, 6vw); width: max-content; will-change: transform;
   }
-  .gallery figure { margin: 0; }
-  .gallery figure:nth-child(2) { margin-top: 90px; }
-  .gallery figure:nth-child(3) { margin-top: 30px; }
-  .gallery figure:nth-child(4) { margin-top: 130px; }
+  .lane-intro { flex: none; width: clamp(220px, 26vw, 360px); }
+  .lane-intro h3 { font-size: clamp(2.4rem, 5vw, 4.4rem); font-weight: 800; }
+  .lane-intro p { color: var(--muted); margin-top: 14px; }
+  .lane figure { margin: 0; flex: none; width: clamp(220px, 25vw, 340px); will-change: transform; }
   /* Shared responsive photo container: rounded corners + soft drop shadow */
   .photo {
     border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
     background: rgba(255, 255, 255, .06);
   }
   .photo img { width: 100%; height: 100%; object-fit: cover; }
-  .gallery .photo { aspect-ratio: 3 / 4; }
-  .gallery figcaption, .card figcaption { margin-top: 12px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  .lane .photo { aspect-ratio: 3 / 4; }
+  .lane figcaption, .card figcaption { margin-top: 12px; font-size: 14px; font-weight: 500; color: var(--muted); }
 
   /* Flight scene (pinned) */
   .flight { position: relative; height: 100vh; height: 100svh; min-height: 600px; margin-top: clamp(40px, 8vw, 100px); }
@@ -229,6 +239,27 @@
     box-shadow: var(--shadow);
   }
 
+  /* ---------- Name in the sand (pinned; the photo grows to full screen) ---------- */
+  .sand { position: relative; height: 100vh; height: 100svh; min-height: 520px; background: #0a1a44; overflow: hidden; }
+  .sand-media { position: absolute; inset: 0; will-change: clip-path; }
+  .sand-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 70%; }
+  .sand-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(6, 16, 42, .5), transparent 30%, transparent 55%, rgba(6, 16, 42, .8));
+  }
+  .sand-text { position: absolute; left: 16px; right: 16px; top: clamp(130px, 22vh, 220px); text-align: center; }
+  .sand-text p { font: 800 clamp(1.8rem, 5vw, 4rem)/1.05 var(--display); letter-spacing: -.02em; text-shadow: 0 4px 30px rgba(0, 0, 0, .55); }
+  .sand-text p span { color: var(--lime); }
+  html.motion .sand-text p { position: absolute; left: 0; right: 0; top: 0; }
+  /* Wide screens: captions sit to the left so they never cover Kavin (he stands mid-photo) */
+  @media (min-aspect-ratio: 1/1) {
+    .sand-text { left: max(16px, 5vw); right: auto; width: min(36vw, 520px); text-align: left; }
+  }
+  /* On tall phone screens show the whole photo (with the name) instead of a cropped slice */
+  @media (max-aspect-ratio: 1/1) {
+    .sand-media { inset: 50% 0 auto; translate: 0 -60%; aspect-ratio: 4 / 3; }
+  }
+
   /* ---------- Passions ---------- */
   .passions { position: relative; background: #0a1a44; padding-top: clamp(100px, 14vw, 180px); }
   .passions-intro { padding-bottom: clamp(60px, 9vw, 110px); }
@@ -261,6 +292,12 @@
   .football h3 span { color: var(--lime); }
   .football .facts li { background: rgba(200, 255, 62, .12); color: var(--lime); border: 1px solid rgba(200, 255, 62, .3); }
   .football .card .photo { box-shadow: var(--shadow), 0 0 0 4px rgba(200, 255, 62, .25); }
+  .shirt { display: flex; align-items: flex-end; gap: 14px; margin-top: 30px; }
+  .shirt b {
+    font: 800 clamp(5rem, 12vw, 9rem)/.8 var(--display); font-variant-numeric: tabular-nums;
+    color: transparent; -webkit-text-stroke: 3px var(--lime); min-width: 1.2em;
+  }
+  .shirt small { font-weight: 700; color: var(--lime); text-transform: uppercase; letter-spacing: .14em; font-size: 13px; line-height: 1.3; padding-bottom: 6px; }
   .ball { position: absolute; top: clamp(150px, 22vw, 290px); left: 0; width: clamp(56px, 7vw, 92px); filter: drop-shadow(0 16px 14px rgba(0, 0, 0, .45)); will-change: transform; }
   .video-card { position: relative; }
   .video-card video { width: 100%; height: 100%; object-fit: cover; }
@@ -345,10 +382,7 @@
     .sticker { width: 52px; height: 52px; font-size: 27px; }
     .sticker.s1 { left: -14px; } .sticker.s2 { right: -18px; } .sticker.s3 { bottom: -16px; }
     .eyebrow { display: none; }
-    .gallery { grid-template-columns: 1fr 1fr; }
-    .gallery figure:nth-child(2) { margin-top: 70px; }
-    .gallery figure:nth-child(3) { margin-top: -40px; }
-    .gallery figure:nth-child(4) { margin-top: 30px; }
+    .lane figure, .lane-intro { width: 64vw; }
     .flight-stage { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-content: center; gap: 8px; padding-top: 64px; }
     .map { width: min(100%, 52svh * 1.25); order: -1; }
     .flight-copy { min-height: 250px; }
@@ -372,6 +406,7 @@
 <body>
 
 <div class="progress" aria-hidden="true"></div>
+<div class="progress-ball" aria-hidden="true">⚽</div>
 
 <nav class="nav" aria-label="Sections">
   <a class="logo" href="#top" data-scroll>KK</a>
@@ -399,9 +434,10 @@
         </p>
       </div>
       <figure class="hero-photo">
+        <div class="ring" aria-hidden="true"></div>
         <div class="frame">
-          <!-- File: kavin/img/profile.jpg (name your main portrait photo "profile.jpg") -->
-          <img src="/kavin/img/profile.jpg" alt="Kavin Krishna smiling" width="1200" height="1600" fetchpriority="high">
+          <!-- File: kavin/img/top.jpg (the profile picture — made from kavin/toppicture.png) -->
+          <img src="/kavin/img/top.jpg" alt="Kavin Krishna with his yellow backpack" width="942" height="789" fetchpriority="high">
         </div>
         <span class="sticker s1" aria-hidden="true">⚽</span>
         <span class="sticker s2" aria-hidden="true">🐶</span>
@@ -416,7 +452,7 @@
     <div class="container journey-head">
       <div>
         <p class="kicker">Chapter 01 — The Journey</p>
-        <h2 class="h2">From Malaysia<br>to Coimbatore.</h2>
+        <h2 class="h2" data-split>From Malaysia<br>to Coimbatore.</h2>
       </div>
       <p class="reveal-text" data-words>
         Kavin's story starts in <strong>Malaysia</strong> — sunny days by the water, long drives up into misty green hills, and his favourite people always in the frame.
@@ -425,28 +461,49 @@
       </p>
     </div>
 
-    <!-- Parallax photo strip: each column drifts at its own speed -->
-    <div class="gallery">
-      <figure data-speed="0.6">
-        <!-- File: kavin/img/little-kavin.jpg -->
-        <div class="photo"><img src="/kavin/img/little-kavin.jpg" alt="Little Kavin in a red cap" loading="lazy"></div>
-        <figcaption>Where it all began</figcaption>
-      </figure>
-      <figure data-speed="1.4">
-        <!-- File: kavin/img/malaysia-colours.jpg -->
-        <div class="photo"><img src="/kavin/img/malaysia-colours.jpg" alt="Kavin with two younger girls in front of a colourful wall" loading="lazy"></div>
-        <figcaption>Colourful days</figcaption>
-      </figure>
-      <figure data-speed="0.9">
-        <!-- File: kavin/img/malaysia-lake.jpg -->
-        <div class="photo"><img src="/kavin/img/malaysia-lake.jpg" alt="Kids on a jetty by the water" loading="lazy"></div>
-        <figcaption>Lakeside crew</figcaption>
-      </figure>
-      <figure data-speed="1.8">
-        <!-- File: kavin/img/yellow.jpg -->
-        <div class="photo"><img src="/kavin/img/yellow.jpg" alt="Kavin in a yellow T-shirt" loading="lazy"></div>
-        <figcaption>Holiday mode: on</figcaption>
-      </figure>
+    <!-- Memory lane: pinned; scrolling down slides this strip sideways -->
+    <div class="lane">
+      <div class="lane-track">
+        <div class="lane-intro">
+          <h3 data-split>Memory lane →</h3>
+          <p>A few favourite moments along the way.</p>
+        </div>
+        <figure>
+          <!-- File: kavin/img/little-kavin.jpg -->
+          <div class="photo"><img src="/kavin/img/little-kavin.jpg" alt="Little Kavin in a red cap"></div>
+          <figcaption>Where it all began</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/smile.jpg -->
+          <div class="photo"><img src="/kavin/img/smile.jpg" alt="Kavin in a SMILE ALWAYS T-shirt"></div>
+          <figcaption>Smile always 😄</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/malaysia-colours.jpg -->
+          <div class="photo"><img src="/kavin/img/malaysia-colours.jpg" alt="Kavin with two younger girls in front of a colourful wall"></div>
+          <figcaption>Colourful days</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/malaysia-lake.jpg -->
+          <div class="photo"><img src="/kavin/img/malaysia-lake.jpg" alt="Kids on a jetty by the water"></div>
+          <figcaption>Lakeside crew</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/family.jpg -->
+          <div class="photo"><img src="/kavin/img/family.jpg" alt="Kavin smiling with a family member"></div>
+          <figcaption>Family time ❤️</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/yellow.jpg -->
+          <div class="photo"><img src="/kavin/img/yellow.jpg" alt="Kavin in a yellow T-shirt"></div>
+          <figcaption>Holiday mode: on</figcaption>
+        </figure>
+        <figure>
+          <!-- File: kavin/img/profile.jpg -->
+          <div class="photo"><img src="/kavin/img/profile.jpg" alt="Kavin grinning against a blue background"></div>
+          <figcaption>That grin, though</figcaption>
+        </figure>
+      </div>
     </div>
 
     <!-- Pinned flight scene: the route draws itself as you scroll -->
@@ -535,11 +592,23 @@
     </div>
   </section>
 
+  <!-- Name in the sand: pinned; the photo grows from a card to full screen as you scroll -->
+  <section class="sand" aria-label="Kavin's name written in the sand">
+    <div class="sand-media">
+      <!-- File: kavin/img/kavin-sand.jpg -->
+      <img src="/kavin/img/kavin-sand.jpg" alt="Kavin on a beach with KAVIN written in the sand" width="1600" height="1200">
+    </div>
+    <div class="sand-text">
+      <p class="l1">Some names get written in the sand…</p>
+      <p class="l2">…this one's going to be <span>heard on the pitch.</span></p>
+    </div>
+  </section>
+
   <!-- ======================= 3. THE PASSIONS ======================= -->
   <section class="passions">
     <div class="container passions-intro">
       <p class="kicker">Chapter 02 — The Passions</p>
-      <h2 class="h2">Two things he'd<br>never give up.</h2>
+      <h2 class="h2" data-split>Two things he'd<br>never give up.</h2>
     </div>
 
     <!-- Block A: Football -->
@@ -561,6 +630,7 @@
             <li>🏅 Medal winner</li>
             <li>#25 on his back</li>
           </ul>
+          <div class="shirt"><b class="count">25</b><small>Shirt<br>number</small></div>
         </div>
         <div class="cards cards-left">
           <figure class="card tall" data-from="left" data-rot="-2">
@@ -652,7 +722,7 @@
     <div class="container finale-grid">
       <div>
         <p class="kicker">Chapter 03 — What's next</p>
-        <h2 class="h2">Kavin,<br>animated.</h2>
+        <h2 class="h2" data-split>Kavin,<br>animated.</h2>
         <p class="lead">Footballer, animal lover, Coimbatore's newest local — and apparently a cartoon star too. The story's only just getting started.</p>
       </div>
       <div class="phone">
@@ -722,10 +792,28 @@
   ScrollTrigger.config({ ignoreMobileResize: true });
 
   // ---------- Text splitting ----------
+  // Wrap every letter in a .char (inside a .word so lines never break mid-word); keeps <br> etc.
+  const splitChars = el => {
+    [...el.childNodes].forEach(n => {
+      if (n.nodeType === 1) { splitChars(n); return; }
+      if (n.nodeType !== 3) return;
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(part => {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.append(' '); return; }
+        const w = document.createElement('span');
+        w.className = 'word';
+        [...part].forEach(c => {
+          const s = document.createElement('span');
+          s.className = 'char'; s.textContent = c; w.append(s);
+        });
+        frag.append(w);
+      });
+      n.replaceWith(frag);
+    });
+  };
   $$('[data-split]').forEach(el => {
-    el.innerHTML = el.textContent.trim().split(' ').map(word =>
-      `<span class="word">${[...word].map(c => `<span class="char">${c}</span>`).join('')}</span>`
-    ).join(' ');
+    splitChars(el);
     if (el.classList.contains('accent')) {
       // Gradient text can't survive per-letter transforms, so tint each letter along the gradient instead
       const chars = $$('.char', el);
@@ -774,33 +862,46 @@
     scale: .82, yPercent: -8, opacity: 0, filter: 'blur(6px)', ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
   });
-  gsap.to('.hero-photo .frame', {
-    rotate: -6, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+  // While leaving the hero: title lines drift apart, the ring spins, the photo zooms, stickers fly off
+  const heroScrub = () => ({ trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true });
+  gsap.to('.hero-title .line:first-child', { xPercent: -18, ease: 'none', scrollTrigger: heroScrub() });
+  gsap.to('.hero-title .line.accent', { xPercent: 14, ease: 'none', scrollTrigger: heroScrub() });
+  gsap.to('.hero-photo .ring', { rotate: 360, ease: 'none', scrollTrigger: heroScrub() });
+  gsap.to('.hero-photo img', { scale: 1.3, ease: 'none', scrollTrigger: heroScrub() });
+  gsap.to('.sticker', { x: i => [-160, 180, -80][i], scale: 1.7, ease: 'none', scrollTrigger: heroScrub() });
+
+  // Little football rides along the progress bar
+  gsap.to('.progress-ball', {
+    x: () => innerWidth - 18, rotate: 1440, ease: 'none',
+    scrollTrigger: { start: 0, end: 'max', scrub: true, invalidateOnRefresh: true }
   });
 
   // ---------- 2. Journey ----------
-  gsap.from('.journey-head .h2', {
-    yPercent: 40, opacity: 0, ease: 'none',
-    scrollTrigger: { trigger: '.journey', start: 'top 85%', end: 'top 30%', scrub: true }
-  });
   $$('[data-words]').forEach(el => {
     gsap.fromTo($$('.w', el), { opacity: .14 }, {
       opacity: 1, stagger: .1, ease: 'none',
       scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 50%', scrub: true }
     });
   });
-  $$('.gallery figure').forEach(fig => {
-    const speed = parseFloat(fig.dataset.speed);
-    gsap.fromTo(fig, { y: 120 * speed }, {
-      y: -120 * speed, ease: 'none',
-      scrollTrigger: { trigger: '.gallery', start: 'top bottom', end: 'bottom top', scrub: true }
-    });
-    gsap.fromTo($('img', fig), { scale: 1.25 }, {
-      scale: 1, ease: 'none',
-      scrollTrigger: { trigger: fig, start: 'top bottom', end: 'bottom top', scrub: true }
-    });
+  // Memory lane: pinned, and vertical scroll moves the strip sideways
+  const track = $('.lane-track');
+  const laneDist = () => track.scrollWidth - innerWidth;
+  const lane = gsap.to(track, {
+    x: () => -laneDist(), ease: 'none',
+    scrollTrigger: { trigger: '.lane', start: 'top top', end: () => '+=' + laneDist(), pin: true, scrub: true, invalidateOnRefresh: true }
   });
+  $$('.lane figure').forEach((fig, i) => {
+    const inLane = { trigger: fig, containerAnimation: lane, start: 'left right', end: 'right left', scrub: true };
+    gsap.fromTo(fig, { rotate: i % 2 ? 7 : -7, y: i % 2 ? 60 : -60 }, { rotate: i % 2 ? -3 : 3, y: i % 2 ? -20 : 20, ease: 'none', scrollTrigger: { ...inLane } });
+    gsap.fromTo($('img', fig), { xPercent: -9, scale: 1.25 }, { xPercent: 9, scale: 1.25, ease: 'none', scrollTrigger: { ...inLane } });
+  });
+  // Photos lean into the scroll: the faster you scroll, the more they skew
+  const skewTo = gsap.quickTo('.lane .photo', 'skewX', { duration: .4, ease: 'power3' });
+  ScrollTrigger.create({
+    trigger: '.lane', start: 'top bottom', end: 'bottom top',
+    onUpdate: self => skewTo(gsap.utils.clamp(-12, 12, self.getVelocity() / -250))
+  });
+  ScrollTrigger.addEventListener('scrollEnd', () => skewTo(0));
 
   // Flight scene: pinned; route + plane are scroll-scrubbed 1:1
   const route = $('#route');
@@ -834,10 +935,26 @@
   gsap.to('.flight-bar span', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '.flight', start: 'top top', end: '+=320%', scrub: true } });
   gsap.to('.cbe-pin .pulse', { attr: { r: 44 }, opacity: 0, duration: 1.4, repeat: -1, ease: 'power1.out', transformOrigin: 'center' });
 
+  // ---------- Name in the sand ----------
+  gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '.sand', start: 'top top', end: '+=200%', pin: true, scrub: true }
+  })
+    .fromTo('.sand-media', { clipPath: 'inset(30% 32% 30% 32% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1 })
+    .fromTo('.sand-media img', { scale: 1.6 }, { scale: 1, duration: 1 }, 0)
+    .fromTo('.sand-text .l1', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: .3 }, .6)
+    .to('.sand-text .l1', { opacity: 0, y: -50, duration: .3 }, 1.2)
+    .fromTo('.sand-text .l2', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: .3 }, 1.4)
+    .to({}, { duration: .4 });
+
   // ---------- 3. Passions ----------
-  gsap.from('.passions-intro .h2', {
-    xPercent: -12, opacity: 0, ease: 'none',
-    scrollTrigger: { trigger: '.passions-intro', start: 'top 90%', end: 'top 40%', scrub: true }
+  // Shirt number counts up 0 → 25 with the scroll
+  const count = $('.count');
+  const shirt = { n: 0 };
+  count.textContent = '0';
+  gsap.to(shirt, {
+    n: 25, ease: 'none', onUpdate: () => { count.textContent = Math.round(shirt.n); },
+    scrollTrigger: { trigger: '.shirt', start: 'top 95%', end: 'top 50%', scrub: true }
   });
 
   $$('.block').forEach(block => {
@@ -863,6 +980,12 @@
       { xPercent: fromLeft ? -130 : 130, rotate: fromLeft ? -16 : 16, opacity: 0 },
       { xPercent: 0, rotate: parseFloat(card.dataset.rot), opacity: 1, ease: 'none',
         scrollTrigger: { trigger: card, start: 'top 100%', end: 'top 50%', scrub: true } });
+  });
+  // Pet cards also swing open in 3D as they arrive
+  $$('.pets .card').forEach(card => {
+    gsap.fromTo(card.firstElementChild,
+      { rotationY: -80, transformPerspective: 900, transformOrigin: '100% 50%' },
+      { rotationY: 0, ease: 'none', scrollTrigger: { trigger: card, start: 'top 100%', end: 'top 45%', scrub: true } });
   });
 
   // The ball rolls across the pitch — distance and spin both tied to scroll
@@ -895,6 +1018,15 @@
   gsap.from('.tbc h2 span', {
     yPercent: 100, opacity: 0, stagger: .2, ease: 'none',
     scrollTrigger: { trigger: '.tbc', start: 'top 95%', end: 'top 55%', scrub: true }
+  });
+
+  // Big headings build letter by letter, in step with the scroll
+  // (created last so their positions account for every pinned section above them)
+  $$('.h2[data-split], .lane-intro h3').forEach(h => {
+    gsap.from($$('.char', h), {
+      yPercent: 80, rotate: 10, opacity: 0, stagger: .04, ease: 'none',
+      scrollTrigger: { trigger: h, start: 'top 90%', end: 'top 45%', scrub: true }
+    });
   });
 
   addEventListener('load', () => ScrollTrigger.refresh());
