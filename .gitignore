@@ -21,3 +21,9 @@ worker/.wrangler/
 # Alisons Construction raw source photos (originals carry GPS EXIF);
 # the site uses the stripped, resized copies in AlisonsConstruction/assets/img
 AlisonsConstruction/images/
+
+# Kavin page raw source photos/videos (iPhone originals carry GPS EXIF);
+# the page uses the stripped, resized copies in kavin/img and kavin/media
+kavin/*.jpg
+kavin/*.mp4
+!kavin/media/*.mp4

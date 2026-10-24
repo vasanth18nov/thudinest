@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kavin Krishna</title>
+<meta name="description" content="Hi, I'm Kavin Krishna. 13 years old. Student. Footballer. Animal lover. From Malaysia to Coimbatore.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#06102a">
+<meta property="og:title" content="Kavin Krishna">
+<meta property="og:description" content="13 years old. Student. Footballer. Animal Lover.">
+<meta property="og:image" content="https://thudinest.com/kavin/img/profile.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #06102a;
+    --navy-2: #0a1a44;
+    --blue: #3b82ff;
+    --sky: #8cc8ff;
+    --lime: #c8ff3e;
+    --green: #19c37d;
+    --pitch: #05301e;
+    --coral: #ff7a59;
+    --sun: #ffc145;
+    --cream: #fff4e8;
+    --ink: #1a1220;
+    --white: #f4f7ff;
+    --muted: #a9b6d8;
+    --radius: 28px;
+    --shadow: 0 30px 60px -20px rgba(0, 0, 0, .55), 0 12px 24px -12px rgba(0, 0, 0, .4);
+    --display: "Bricolage Grotesque", system-ui, sans-serif;
+    --body: "DM Sans", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+  img, video { display: block; max-width: 100%; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: .95; letter-spacing: -.02em; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .container { width: min(1180px, 100% - 32px); margin-inline: auto; }
+  .kicker {
+    font: 700 13px/1 var(--body);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 18px;
+  }
+  .h2 { font-size: clamp(2.6rem, 8vw, 6.5rem); font-weight: 800; }
+
+  /* ---------- Progress + nav ---------- */
+  .progress {
+    position: fixed; inset: 0 0 auto 0; height: 4px; z-index: 50;
+    background: linear-gradient(90deg, var(--blue), var(--lime), var(--sun), var(--coral));
+    transform-origin: 0 50%; transform: scaleX(0);
+  }
+  .nav {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 40;
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px; border-radius: 999px;
+    background: rgba(6, 16, 42, .55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, .1);
+  }
+  .nav a {
+    text-decoration: none; font-weight: 700; font-size: 14px;
+    padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+  }
+  .nav a:hover { background: rgba(255, 255, 255, .1); }
+  .nav .logo { background: var(--lime); color: var(--navy); font-family: var(--display); }
+  .nav .logo:hover { background: var(--lime); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; height: 100vh; height: 100svh; min-height: 560px;
+    display: grid; place-items: center; overflow: hidden;
+    background:
+      radial-gradient(60vmax 60vmax at 85% 15%, rgba(59, 130, 255, .45), transparent 60%),
+      radial-gradient(50vmax 50vmax at 5% 95%, rgba(25, 195, 125, .35), transparent 60%),
+      var(--navy);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 75%);
+  }
+  .hero-inner {
+    position: relative; width: min(1180px, 100% - 32px);
+    display: grid; grid-template-columns: 1.25fr .75fr; align-items: center; gap: clamp(24px, 5vw, 72px);
+    will-change: transform, opacity;
+  }
+  .eyebrow {
+    display: inline-flex; gap: 8px; align-items: center;
+    padding: 8px 16px; border-radius: 999px; margin-bottom: 22px;
+    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
+    font-weight: 500; font-size: 15px;
+  }
+  .hero-title { font-size: clamp(3rem, 9.4vw, 8.6rem); font-weight: 800; }
+  .hero-title .line { display: block; overflow: hidden; padding: .04em 0 .1em; }
+  .hero-title .accent {
+    background: linear-gradient(90deg, var(--sky), var(--lime) 60%, var(--sun));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-title .accent.split { background: none; color: var(--lime); }
+  .word { display: inline-block; white-space: nowrap; }
+  .char { display: inline-block; will-change: transform; }
+  .hero-sub {
+    margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px;
+    font: 700 clamp(1rem, 2vw, 1.3rem)/1 var(--body);
+  }
+  .hero-sub span { padding: 12px 18px; border-radius: 999px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); }
+  .hero-sub span:nth-child(1) { color: var(--sky); }
+  .hero-sub span:nth-child(2) { color: var(--white); }
+  .hero-sub span:nth-child(3) { color: var(--lime); }
+  .hero-sub span:nth-child(4) { color: var(--sun); }
+  .hero-photo { position: relative; margin: 0; justify-self: center; width: min(100%, 420px); }
+  .hero-photo .frame {
+    aspect-ratio: 4 / 5; border-radius: 36px; overflow: hidden;
+    box-shadow: var(--shadow), 0 0 0 8px rgba(255, 255, 255, .06);
+    transform: rotate(3deg);
+  }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+  .sticker {
+    position: absolute; display: grid; place-items: center;
+    width: 76px; height: 76px; border-radius: 50%; font-size: 40px;
+    background: var(--white); box-shadow: var(--shadow);
+  }
+  .sticker.s1 { left: -26px; top: 12%; }
+  .sticker.s2 { right: -22px; top: 46%; background: var(--sun); }
+  .sticker.s3 { left: 8%; bottom: -26px; background: var(--lime); }
+  .scroll-cue {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .scroll-cue i { width: 2px; height: 36px; background: linear-gradient(var(--lime), transparent); animation: cue 1.6s ease-in-out infinite; transform-origin: top; }
+  @keyframes cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* ---------- Journey ---------- */
+  .journey {
+    position: relative; z-index: 2;
+    border-radius: 44px 44px 0 0;
+    background: linear-gradient(180deg, var(--navy-2), #0b2463 55%, #0a1a44);
+    box-shadow: 0 -40px 80px rgba(0, 0, 0, .5);
+    padding-top: clamp(80px, 14vw, 160px);
+  }
+  .journey-head { display: grid; gap: 34px; }
+  .reveal-text {
+    font: 500 clamp(1.35rem, 3.2vw, 2.4rem)/1.35 var(--display);
+    max-width: 30ch; letter-spacing: -.01em;
+  }
+  .reveal-text strong { color: var(--lime); font-weight: 700; }
+  .reveal-text .w { display: inline; }
+
+  .gallery {
+    position: relative; margin-top: clamp(60px, 10vw, 120px);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 2vw, 28px);
+    width: min(1280px, 100% - 32px); margin-inline: auto; align-items: start;
+  }
+  .gallery figure { margin: 0; }
+  .gallery figure:nth-child(2) { margin-top: 90px; }
+  .gallery figure:nth-child(3) { margin-top: 30px; }
+  .gallery figure:nth-child(4) { margin-top: 130px; }
+  /* Shared responsive photo container: rounded corners + soft drop shadow */
+  .photo {
+    border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+    background: rgba(255, 255, 255, .06);
+  }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery .photo { aspect-ratio: 3 / 4; }
+  .gallery figcaption, .card figcaption { margin-top: 12px; font-size: 14px; font-weight: 500; color: var(--muted); }
+
+  /* Flight scene (pinned) */
+  .flight { position: relative; height: 100vh; height: 100svh; min-height: 600px; margin-top: clamp(40px, 8vw, 100px); }
+  .flight-stage {
+    height: 100%; width: min(1280px, 100% - 32px); margin-inline: auto;
+    display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: clamp(20px, 4vw, 60px);
+  }
+  .flight-copy { position: relative; min-height: 320px; }
+  .stop h3 { font-size: clamp(2.2rem, 5vw, 4.2rem); font-weight: 800; margin: 6px 0 16px; }
+  .stop p { color: #d5def5; max-width: 34ch; }
+  .stop .tag { font: 700 13px/1 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--sun); }
+  html.motion .stop { position: absolute; inset: 0 0 auto 0; }
+  .school {
+    display: inline-flex; align-items: center; gap: 14px; margin-top: 22px;
+    padding: 14px 20px 14px 14px; border-radius: 20px;
+    background: var(--white); color: var(--navy); box-shadow: var(--shadow);
+  }
+  .school .crest { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-size: 26px; background: linear-gradient(135deg, var(--blue), var(--green)); }
+  .school b { display: block; font-family: var(--display); font-size: 20px; line-height: 1.1; }
+  .school small { font-size: 13px; color: #4b5578; font-weight: 500; }
+  .flight-bar { position: absolute; left: 0; bottom: -40px; width: 160px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+  .flight-bar span { display: block; height: 100%; background: var(--lime); transform-origin: 0 50%; transform: scaleX(0); }
+  html:not(.motion) .flight-bar { display: none; }
+
+  .map { position: relative; width: min(100%, 95vh * 1.25); aspect-ratio: 5 / 4; justify-self: center; }
+  .map svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .land { fill: rgba(140, 200, 255, .13); stroke: rgba(140, 200, 255, .35); stroke-width: 2; }
+  .sea-label { fill: rgba(140, 200, 255, .45); font: italic 500 22px var(--body); letter-spacing: .1em; }
+  .place-label { fill: var(--white); font: 800 30px var(--display); }
+  .polaroid {
+    position: absolute; margin: 0; padding: 10px 10px 0; width: 25%;
+    background: var(--white); border-radius: 18px; box-shadow: var(--shadow);
+  }
+  .polaroid .photo { aspect-ratio: 1; border-radius: 12px; box-shadow: none; }
+  .polaroid figcaption { color: var(--navy); font: 700 clamp(10px, 1.2vw, 14px)/1 var(--body); text-align: center; padding: 10px 0 12px; }
+  .polaroid.p1 { left: 44%; top: 28%; rotate: -7deg; }
+  .polaroid.p2 { left: 70%; top: 6%; rotate: 6deg; }
+  .polaroid.p3 { left: 52%; top: 58%; rotate: -3deg; }
+  .home-tag {
+    position: absolute; left: 26%; top: 40%; translate: -50% -175%;
+    padding: 10px 16px; border-radius: 14px; white-space: nowrap;
+    background: var(--lime); color: var(--navy); font: 800 clamp(13px, 1.6vw, 18px)/1 var(--display);
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Passions ---------- */
+  .passions { position: relative; background: #0a1a44; padding-top: clamp(100px, 14vw, 180px); }
+  .passions-intro { padding-bottom: clamp(60px, 9vw, 110px); }
+  .block { position: relative; overflow: hidden; padding: clamp(80px, 12vw, 150px) 0; }
+  .marquee { font: 800 clamp(5rem, 18vw, 16rem)/1 var(--display); white-space: nowrap; letter-spacing: -.03em; pointer-events: none; user-select: none; }
+  .marquee .track { display: inline-block; will-change: transform; }
+  .block-grid { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(32px, 6vw, 80px); align-items: center; margin-top: clamp(30px, 5vw, 60px); }
+  .block h3 { font-size: clamp(2.4rem, 6vw, 5rem); font-weight: 800; margin-bottom: 20px; }
+  .block-copy p { font-size: clamp(1.05rem, 1.6vw, 1.25rem); max-width: 36ch; }
+  .facts { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 0; padding: 0; list-style: none; }
+  .facts li { padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: 15px; }
+  .cards { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2vw, 22px); }
+  .card { margin: 0; will-change: transform; }
+  .card .photo { aspect-ratio: 4 / 5; }
+  .card.wide { grid-column: span 2; }
+  .card.wide .photo { aspect-ratio: 16 / 10; }
+  .card.tall { grid-row: span 2; display: flex; flex-direction: column; }
+  .card.tall .photo { flex: 1; aspect-ratio: auto; min-height: 0; }
+
+  /* Block A: Football */
+  .football {
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 90px, transparent 90px 180px),
+      radial-gradient(80vmax 50vmax at 80% 0%, rgba(200, 255, 62, .14), transparent 60%),
+      var(--pitch);
+    border-radius: 44px 44px 0 0;
+  }
+  .football .marquee { color: transparent; -webkit-text-stroke: 2px rgba(200, 255, 62, .35); }
+  .football .kicker { color: var(--lime); }
+  .football h3 span { color: var(--lime); }
+  .football .facts li { background: rgba(200, 255, 62, .12); color: var(--lime); border: 1px solid rgba(200, 255, 62, .3); }
+  .football .card .photo { box-shadow: var(--shadow), 0 0 0 4px rgba(200, 255, 62, .25); }
+  .ball { position: absolute; top: clamp(150px, 22vw, 290px); left: 0; width: clamp(56px, 7vw, 92px); filter: drop-shadow(0 16px 14px rgba(0, 0, 0, .45)); will-change: transform; }
+  .video-card { position: relative; }
+  .video-card video { width: 100%; height: 100%; object-fit: cover; }
+  .video-card .badge {
+    position: absolute; left: 14px; bottom: 14px;
+    padding: 8px 12px; border-radius: 12px; background: rgba(5, 48, 30, .8); backdrop-filter: blur(6px);
+    font: 700 13px/1 var(--body); color: var(--lime);
+  }
+
+  /* Block B: Pets */
+  .pets {
+    background:
+      radial-gradient(70vmax 50vmax at 10% 10%, rgba(255, 193, 69, .35), transparent 60%),
+      radial-gradient(60vmax 50vmax at 100% 100%, rgba(255, 122, 89, .3), transparent 60%),
+      var(--cream);
+    color: var(--ink);
+    border-radius: 44px 44px 0 0; margin-top: -44px;
+  }
+  .pets .marquee { color: rgba(255, 122, 89, .16); text-align: right; }
+  .pets .kicker { color: #d4502f; }
+  .pets h3 span { color: var(--coral); }
+  .pets .block-grid { grid-template-columns: 1.1fr .9fr; }
+  .pets .block-copy { order: 2; }
+  .pets .facts li { background: #fff; color: #b8431f; box-shadow: 0 8px 20px -10px rgba(184, 67, 31, .4); }
+  .pet-card {
+    border-radius: var(--radius); padding: 22px; box-shadow: 0 30px 50px -24px rgba(120, 50, 20, .45);
+    display: flex; flex-direction: column; justify-content: space-between; aspect-ratio: 4 / 5;
+  }
+  .pet-card svg { width: 72%; align-self: center; margin-block: auto; }
+  .pet-card b { font: 800 clamp(1.2rem, 2vw, 1.6rem)/1.1 var(--display); }
+  .pet-card small { display: block; margin-top: 6px; font-size: 14px; line-height: 1.4; opacity: .8; }
+  .pet-card.cat { background: linear-gradient(160deg, #ffb36b, var(--coral)); color: #3a1405; }
+  .pet-card.dog { background: linear-gradient(160deg, #ffe08a, var(--sun)); color: #3d2a00; }
+  .pet-photo .photo { box-shadow: 0 30px 50px -24px rgba(120, 50, 20, .45); position: relative; }
+  .pet-photo .fallback { display: none; }
+  .pet-photo.missing img { display: none; }
+  .pet-photo.missing .fallback {
+    position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; text-align: center;
+    background: linear-gradient(135deg, #fff, #ffe9d6); color: #b8431f;
+    font: 800 clamp(1.3rem, 2.6vw, 2rem)/1.2 var(--display);
+  }
+  .pet-photo.missing .fallback span { font-size: clamp(3rem, 7vw, 5rem); letter-spacing: .1em; }
+  .pets .card figcaption { color: #8a5a44; }
+  .paws { position: absolute; inset: 0; pointer-events: none; }
+  .paw { position: absolute; width: clamp(22px, 3vw, 36px); fill: rgba(255, 122, 89, .35); }
+
+  /* ---------- Finale ---------- */
+  .finale {
+    position: relative; overflow: hidden;
+    background: radial-gradient(70vmax 60vmax at 50% 0%, rgba(59, 130, 255, .35), transparent 65%), var(--navy);
+    border-radius: 44px 44px 0 0; margin-top: -44px;
+    padding: clamp(100px, 14vw, 170px) 0 60px;
+  }
+  .finale-grid { display: grid; grid-template-columns: 1fr auto; gap: clamp(32px, 6vw, 90px); align-items: center; }
+  .finale p.lead { font-size: clamp(1.1rem, 1.8vw, 1.35rem); color: #d5def5; max-width: 38ch; margin-top: 22px; }
+  .phone {
+    position: relative; width: clamp(220px, 26vw, 320px); aspect-ratio: 9 / 16;
+    border-radius: 40px; overflow: hidden; border: 8px solid #10183a;
+    box-shadow: var(--shadow), 0 0 0 2px rgba(255, 255, 255, .12), 0 0 80px rgba(59, 130, 255, .35);
+  }
+  .phone video { width: 100%; height: 100%; object-fit: cover; }
+  .sound {
+    position: absolute; right: 12px; bottom: 12px; border: 0; cursor: pointer;
+    padding: 10px 14px; border-radius: 999px; background: rgba(6, 16, 42, .75); color: #fff;
+    font: 700 13px/1 var(--body); backdrop-filter: blur(6px);
+  }
+  .tbc { margin-top: clamp(90px, 14vw, 170px); text-align: center; }
+  .tbc h2 { font-size: clamp(3rem, 12vw, 11rem); font-weight: 800; }
+  .tbc h2 span { display: inline-block; }
+  .tbc p { margin-top: 18px; color: var(--muted); }
+  footer { text-align: center; padding: 70px 16px 30px; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--sky); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    body { font-size: 17px; }
+    .nav a:not(.logo) { padding: 8px 10px; font-size: 13px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 26px; text-align: left; }
+    .hero-photo { width: min(46vw, 230px); justify-self: start; order: -1; }
+    .hero-title { font-size: clamp(2.6rem, 11.5vw, 5rem); }
+    .hero-sub span { padding: 9px 14px; }
+    .sticker { width: 52px; height: 52px; font-size: 27px; }
+    .sticker.s1 { left: -14px; } .sticker.s2 { right: -18px; } .sticker.s3 { bottom: -16px; }
+    .eyebrow { display: none; }
+    .gallery { grid-template-columns: 1fr 1fr; }
+    .gallery figure:nth-child(2) { margin-top: 70px; }
+    .gallery figure:nth-child(3) { margin-top: -40px; }
+    .gallery figure:nth-child(4) { margin-top: 30px; }
+    .flight-stage { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-content: center; gap: 8px; padding-top: 64px; }
+    .map { width: min(100%, 52svh * 1.25); order: -1; }
+    .flight-copy { min-height: 250px; }
+    .stop h3 { margin: 4px 0 10px; }
+    .stop p { font-size: 16px; }
+    .school { margin-top: 14px; padding: 10px 16px 10px 10px; }
+    .flight-bar { bottom: auto; top: -12px; }
+    .block-grid, .pets .block-grid { grid-template-columns: 1fr; }
+    .pets .block-copy { order: 0; }
+    .finale-grid { grid-template-columns: 1fr; justify-items: start; }
+    .phone { justify-self: center; }
+  }
+  @media (max-width: 860px) {
+    html:not(.motion) .flight { height: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue i { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Sections">
+  <a class="logo" href="#top" data-scroll>KK</a>
+  <a href="#journey" data-scroll>Journey</a>
+  <a href="#football" data-scroll>Football</a>
+  <a href="#pets" data-scroll>Pets</a>
+</nav>
+
+<main>
+
+  <!-- ======================= 1. HERO ======================= -->
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">👋 Welcome to my corner of the internet</p>
+        <h1 class="hero-title">
+          <span class="line" data-split>Hi, I'm</span>
+          <span class="line accent" data-split>Kavin Krishna.</span>
+        </h1>
+        <p class="hero-sub">
+          <span>13 years old.</span>
+          <span>Student.</span>
+          <span>Footballer.</span>
+          <span>Animal Lover.</span>
+        </p>
+      </div>
+      <figure class="hero-photo">
+        <div class="frame">
+          <!-- File: kavin/img/profile.jpg (name your main portrait photo "profile.jpg") -->
+          <img src="/kavin/img/profile.jpg" alt="Kavin Krishna smiling" width="1200" height="1600" fetchpriority="high">
+        </div>
+        <span class="sticker s1" aria-hidden="true">⚽</span>
+        <span class="sticker s2" aria-hidden="true">🐶</span>
+        <span class="sticker s3" aria-hidden="true">🐱</span>
+      </figure>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Scroll to start the story<i></i></div>
+  </section>
+
+  <!-- ======================= 2. THE JOURNEY ======================= -->
+  <section class="journey" id="journey">
+    <div class="container journey-head">
+      <div>
+        <p class="kicker">Chapter 01 — The Journey</p>
+        <h2 class="h2">From Malaysia<br>to Coimbatore.</h2>
+      </div>
+      <p class="reveal-text" data-words>
+        Kavin's story starts in <strong>Malaysia</strong> — sunny days by the water, long drives up into misty green hills, and his favourite people always in the frame.
+        Then came the biggest adventure yet: packing up a whole life and flying across the Bay of Bengal to <strong>Coimbatore</strong>, where the Western Ghats sit on the horizon.
+        New city, new friends, new school — and he's taken every bit of it in his stride.
+      </p>
+    </div>
+
+    <!-- Parallax photo strip: each column drifts at its own speed -->
+    <div class="gallery">
+      <figure data-speed="0.6">
+        <!-- File: kavin/img/little-kavin.jpg -->
+        <div class="photo"><img src="/kavin/img/little-kavin.jpg" alt="Little Kavin in a red cap" loading="lazy"></div>
+        <figcaption>Where it all began</figcaption>
+      </figure>
+      <figure data-speed="1.4">
+        <!-- File: kavin/img/malaysia-colours.jpg -->
+        <div class="photo"><img src="/kavin/img/malaysia-colours.jpg" alt="Kavin with two younger girls in front of a colourful wall" loading="lazy"></div>
+        <figcaption>Colourful days</figcaption>
+      </figure>
+      <figure data-speed="0.9">
+        <!-- File: kavin/img/malaysia-lake.jpg -->
+        <div class="photo"><img src="/kavin/img/malaysia-lake.jpg" alt="Kids on a jetty by the water" loading="lazy"></div>
+        <figcaption>Lakeside crew</figcaption>
+      </figure>
+      <figure data-speed="1.8">
+        <!-- File: kavin/img/yellow.jpg -->
+        <div class="photo"><img src="/kavin/img/yellow.jpg" alt="Kavin in a yellow T-shirt" loading="lazy"></div>
+        <figcaption>Holiday mode: on</figcaption>
+      </figure>
+    </div>
+
+    <!-- Pinned flight scene: the route draws itself as you scroll -->
+    <div class="flight">
+      <div class="flight-stage">
+        <div class="flight-copy">
+          <div class="stop" data-stop="0">
+            <span class="tag">Stop 01</span>
+            <h3>Malaysia 🇲🇾</h3>
+            <p>Growing up between beaches, theme-park colours and cool highland air. Every weekend felt like a new adventure.</p>
+          </div>
+          <div class="stop" data-stop="1">
+            <span class="tag">In the air</span>
+            <h3>Big move ✈️</h3>
+            <p>Bags packed, goodbyes said, and a few thousand kilometres of ocean below. A brand-new chapter was loading…</p>
+          </div>
+          <div class="stop" data-stop="2">
+            <span class="tag">Stop 02 · Home now</span>
+            <h3>Coimbatore 🇮🇳</h3>
+            <p>A new city, new friends, and a whole new routine. These days you'll find him at school, on the pitch, or making friends with every dog on the street.</p>
+            <div class="school">
+              <span class="crest" aria-hidden="true">🎓</span>
+              <span><b>Sarvvam School</b><small>Where Kavin studies today</small></span>
+            </div>
+          </div>
+          <div class="flight-bar" aria-hidden="true"><span></span></div>
+        </div>
+
+        <div class="map">
+          <svg viewBox="0 0 1000 800" role="img" aria-label="A flight path from Malaysia to Coimbatore, India">
+            <defs>
+              <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.6" fill="rgba(140,200,255,.18)"/>
+              </pattern>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <rect width="1000" height="800" rx="40" fill="url(#dots)"/>
+            <!-- Rough, playful outlines: southern India, Sri Lanka, the Malay peninsula and Sumatra -->
+            <path class="land" d="M0,0 L520,0 L470,120 L400,200 L350,330 L300,430 L265,400 L220,300 L170,180 L120,90 L0,60 Z"/>
+            <ellipse class="land" cx="372" cy="478" rx="28" ry="46"/>
+            <path class="land" d="M560,0 L700,0 L690,120 L682,240 L720,330 L760,430 L800,560 L830,660 L800,700 L760,640 L720,520 L680,420 L640,330 L600,250 L590,140 Z"/>
+            <path class="land" d="M540,560 L600,580 L700,700 L760,800 L680,800 L600,690 Z"/>
+            <text class="sea-label" x="430" y="300">BAY OF BENGAL</text>
+
+            <path id="route-ghost" d="M770,590 C690,420 470,170 260,320" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="3" stroke-dasharray="4 12" stroke-linecap="round"/>
+            <path id="route" d="M770,590 C690,420 470,170 260,320" fill="none" stroke="#c8ff3e" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
+
+            <g class="pin my-pin">
+              <circle cx="770" cy="590" r="14" fill="#ffc145"/>
+              <circle cx="770" cy="590" r="28" fill="none" stroke="#ffc145" stroke-opacity=".5" stroke-width="3"/>
+              <text class="place-label" x="800" y="625">Malaysia</text>
+            </g>
+            <g class="pin cbe-pin">
+              <circle cx="260" cy="320" r="14" fill="#c8ff3e"/>
+              <circle class="pulse" cx="260" cy="320" r="28" fill="none" stroke="#c8ff3e" stroke-width="3"/>
+              <text class="place-label" x="120" y="372">Coimbatore</text>
+            </g>
+            <g id="plane">
+              <path d="M-26,-4 L10,-4 L24,0 L10,4 L-26,4 Z" fill="#fff"/>
+              <path d="M-4,-4 L-14,-26 L-6,-26 L10,-4 Z M-4,4 L-14,26 L-6,26 L10,4 Z" fill="#fff"/>
+              <path d="M-24,-4 L-30,-14 L-24,-14 L-16,-4 Z M-24,4 L-30,14 L-24,14 L-16,4 Z" fill="#fff"/>
+            </g>
+          </svg>
+
+          <figure class="polaroid p1">
+            <!-- File: kavin/img/malaysia.jpg -->
+            <div class="photo"><img src="/kavin/img/malaysia.jpg" alt="Kavin and two girls posing by the waterfront" loading="lazy"></div>
+            <figcaption>Malaysia days</figcaption>
+          </figure>
+          <figure class="polaroid p2">
+            <!-- File: kavin/img/malaysia-highlands.jpg -->
+            <div class="photo"><img src="/kavin/img/malaysia-highlands.jpg" alt="Kids sitting on a car roof under blue skies" loading="lazy"></div>
+            <figcaption>Road trips</figcaption>
+          </figure>
+          <figure class="polaroid p3">
+            <!-- File: kavin/img/adventure.jpg -->
+            <div class="photo"><img src="/kavin/img/adventure.jpg" alt="Kavin on a bench by the sea" loading="lazy"></div>
+            <figcaption>Sea breeze</figcaption>
+          </figure>
+          <div class="home-tag">📍 Home now</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 3. THE PASSIONS ======================= -->
+  <section class="passions">
+    <div class="container passions-intro">
+      <p class="kicker">Chapter 02 — The Passions</p>
+      <h2 class="h2">Two things he'd<br>never give up.</h2>
+    </div>
+
+    <!-- Block A: Football -->
+    <article class="block football" id="football">
+      <div class="marquee" aria-hidden="true"><span class="track">FOOTBALL • FOOTBALL • FOOTBALL •</span></div>
+      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="47" fill="#fff" stroke="#0b1020" stroke-width="3"/>
+        <polygon points="50,32 66,44 60,63 40,63 34,44" fill="#0b1020"/>
+        <path d="M50,32 L50,6 M66,44 L90,36 M60,63 L74,84 M40,63 L26,84 M34,44 L10,36" stroke="#0b1020" stroke-width="3" fill="none"/>
+        <path d="M38,8 L50,6 L62,8 M86,26 L90,36 L92,50 M80,80 L74,84 L62,94 M38,94 L26,84 L20,80 M8,50 L10,36 L14,26" stroke="#0b1020" stroke-width="7" fill="none" stroke-linejoin="round"/>
+      </svg>
+      <div class="container block-grid">
+        <div class="block-copy">
+          <p class="kicker">Block A · On the pitch</p>
+          <h3>Football is his <span>happy place.</span></h3>
+          <p>Give Kavin a ball and a patch of grass and he'll play until the floodlights switch off — chasing every pass, celebrating every goal like it's a cup final, and proudly wearing number 25.</p>
+          <ul class="facts">
+            <li>⚽ Plays every chance he gets</li>
+            <li>🏅 Medal winner</li>
+            <li>#25 on his back</li>
+          </ul>
+        </div>
+        <div class="cards cards-left">
+          <figure class="card tall" data-from="left" data-rot="-2">
+            <!-- File: kavin/img/football.jpg (Kavin in his football kit) -->
+            <div class="photo"><img src="/kavin/img/football.jpg" alt="Kavin in a red football kit wearing a medal" loading="lazy" style="object-position:50% 40%"></div>
+            <figcaption>Kit on, medal earned 🏅</figcaption>
+          </figure>
+          <figure class="card" data-from="left" data-rot="3">
+            <!-- File: kavin/media/kavin-25.mp4 (poster: kavin/img/kavin-25-poster.jpg) -->
+            <div class="photo video-card">
+              <video src="/kavin/media/kavin-25.mp4" poster="/kavin/img/kavin-25-poster.jpg" muted loop playsinline preload="none" data-autoplay aria-label="Kavin in a number 25 shirt in a stadium"></video>
+              <span class="badge">KAVIN · 25</span>
+            </div>
+          </figure>
+          <figure class="card" data-from="left" data-rot="-3">
+            <!-- File: kavin/img/sporty.jpg -->
+            <div class="photo"><img src="/kavin/img/sporty.jpg" alt="Kavin in a neon green sports top" loading="lazy"></div>
+            <figcaption>Always ready to play</figcaption>
+          </figure>
+        </div>
+      </div>
+    </article>
+
+    <!-- Block B: Animals -->
+    <article class="block pets" id="pets">
+      <div class="paws" aria-hidden="true"></div>
+      <div class="marquee" aria-hidden="true"><span class="track">CATS 🐱 DOGS 🐶 CATS 🐱 DOGS 🐶</span></div>
+      <div class="container block-grid">
+        <div class="block-copy">
+          <p class="kicker">Block B · Furry friends</p>
+          <h3>Cats, dogs &amp; <span>everything fluffy.</span></h3>
+          <p>Kavin's heart has room for every four-legged friend. Cats with their sleepy stares, dogs with their wild zoomies — he loves them all, and he'll never say no to a cuddle. Cats or dogs? He refuses to pick.</p>
+          <ul class="facts">
+            <li>🐱 Cat whisperer</li>
+            <li>🐶 Dog's best friend</li>
+            <li>🐾 Never walks past a pet</li>
+          </ul>
+        </div>
+        <div class="cards cards-right">
+          <figure class="card wide pet-photo" data-from="right" data-rot="2">
+            <div class="photo">
+              <!-- File: kavin/img/pets.jpg — add a photo of Kavin with a cat or dog and name it "pets.jpg".
+                   Until that file exists, the illustrated fallback below is shown instead. -->
+              <img src="/kavin/img/pets.jpg" alt="Kavin with his furry friends" loading="lazy" onerror="this.closest('.pet-photo').classList.add('missing')">
+              <div class="fallback"><span>🐶🐾🐱</span>Friends with every pet he meets</div>
+            </div>
+          </figure>
+          <figure class="card" data-from="right" data-rot="-3">
+            <div class="pet-card cat">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <path d="M24,56 L28,12 L58,38 Z M96,56 L92,12 L62,38 Z" fill="#fff1e2"/>
+                <path d="M32,46 L33,24 L48,38 Z M88,46 L87,24 L72,38 Z" fill="#ff9aa2"/>
+                <circle cx="60" cy="68" r="40" fill="#fff1e2"/>
+                <ellipse cx="45" cy="64" rx="5" ry="7.5" fill="#3a1405"/>
+                <ellipse cx="75" cy="64" rx="5" ry="7.5" fill="#3a1405"/>
+                <circle cx="47" cy="61" r="1.8" fill="#fff"/><circle cx="77" cy="61" r="1.8" fill="#fff"/>
+                <path d="M55,78 L65,78 L60,84 Z" fill="#ff7a8a"/>
+                <path d="M60,84 q-6,8 -13,3 M60,84 q6,8 13,3" stroke="#3a1405" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M14,72 L38,76 M14,84 L38,82 M106,72 L82,76 M106,84 L82,82" stroke="#3a1405" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+                <ellipse cx="36" cy="80" rx="7" ry="4" fill="#ffb3b3" opacity=".7"/><ellipse cx="84" cy="80" rx="7" ry="4" fill="#ffb3b3" opacity=".7"/>
+              </svg>
+              <div><b>Team Cat</b><small>Sleepy stares, tiny paws, maximum attitude.</small></div>
+            </div>
+          </figure>
+          <figure class="card" data-from="right" data-rot="3">
+            <div class="pet-card dog">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <ellipse cx="24" cy="58" rx="14" ry="30" fill="#8a4f1d" transform="rotate(18 24 58)"/>
+                <ellipse cx="96" cy="58" rx="14" ry="30" fill="#8a4f1d" transform="rotate(-18 96 58)"/>
+                <ellipse cx="60" cy="64" rx="36" ry="40" fill="#f3c98b"/>
+                <ellipse cx="74" cy="50" rx="12" ry="10" fill="#e3a964"/>
+                <circle cx="46" cy="58" r="5.5" fill="#3d2a00"/><circle cx="74" cy="58" r="5.5" fill="#3d2a00"/>
+                <circle cx="48" cy="56" r="1.8" fill="#fff"/><circle cx="76" cy="56" r="1.8" fill="#fff"/>
+                <ellipse cx="60" cy="84" rx="19" ry="14" fill="#fff6e8"/>
+                <ellipse cx="60" cy="77" rx="7.5" ry="5.5" fill="#3d2a00"/>
+                <path d="M60,82 L60,88 M60,88 q-7,6 -12,1 M60,88 q7,6 12,1" stroke="#3d2a00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M55,92 q5,14 10,0 Z" fill="#ff7a8a"/>
+              </svg>
+              <div><b>Team Dog</b><small>Waggy tails and zoomies — instant best friends.</small></div>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ======================= FINALE ======================= -->
+  <section class="finale">
+    <div class="container finale-grid">
+      <div>
+        <p class="kicker">Chapter 03 — What's next</p>
+        <h2 class="h2">Kavin,<br>animated.</h2>
+        <p class="lead">Footballer, animal lover, Coimbatore's newest local — and apparently a cartoon star too. The story's only just getting started.</p>
+      </div>
+      <div class="phone">
+        <!-- File: kavin/media/cartoon.mp4 (poster: kavin/img/cartoon-poster.jpg) -->
+        <video src="/kavin/media/cartoon.mp4" poster="/kavin/img/cartoon-poster.jpg" muted loop playsinline preload="none" data-autoplay aria-label="A cartoon version of Kavin in a number 25 football shirt"></video>
+        <button class="sound" type="button" aria-pressed="false">🔇 Sound</button>
+      </div>
+    </div>
+    <div class="container tbc">
+      <h2 aria-label="To be continued…"><span>To</span> <span>be</span> <span>continued…</span></h2>
+      <p>Check back soon for the next chapter.</p>
+    </div>
+    <footer>Made with ⚽ &amp; 🐾 for Kavin · <a href="https://thudinest.com/">thudinest.com</a></footer>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+  // Videos only play while on screen (works with or without motion)
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.play().catch(() => {}); } else { e.target.pause(); }
+    });
+  }, { threshold: .25 });
+  $$('video[data-autoplay]').forEach(v => io.observe(v));
+
+  const soundBtn = $('.sound');
+  soundBtn.addEventListener('click', () => {
+    const v = $('.phone video');
+    v.muted = !v.muted;
+    if (!v.muted) v.play().catch(() => {});
+    soundBtn.textContent = v.muted ? '🔇 Sound' : '🔊 Sound on';
+    soundBtn.setAttribute('aria-pressed', String(!v.muted));
+  });
+
+  if (!window.gsap || !window.ScrollTrigger) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+  // Smooth scrolling, kept in lock-step with ScrollTrigger
+  let lenis = null;
+  if (!reduced && window.Lenis) {
+    lenis = new Lenis({ lerp: 0.1 });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  }
+  $$('[data-scroll]').forEach(a => a.addEventListener('click', e => {
+    const target = $(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    lenis ? lenis.scrollTo(target, { offset: 0 }) : target.scrollIntoView();
+  }));
+
+  // Top progress bar
+  gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
+
+  if (reduced) return;
+  document.documentElement.classList.add('motion');
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  // ---------- Text splitting ----------
+  $$('[data-split]').forEach(el => {
+    el.innerHTML = el.textContent.trim().split(' ').map(word =>
+      `<span class="word">${[...word].map(c => `<span class="char">${c}</span>`).join('')}</span>`
+    ).join(' ');
+    if (el.classList.contains('accent')) {
+      // Gradient text can't survive per-letter transforms, so tint each letter along the gradient instead
+      const chars = $$('.char', el);
+      const stops = ['#8cc8ff', '#c8ff3e', '#ffc145'];
+      chars.forEach((c, i) => {
+        const t = i / Math.max(chars.length - 1, 1) * (stops.length - 1);
+        const k = Math.min(Math.floor(t), stops.length - 2);
+        c.style.color = gsap.utils.interpolate(stops[k], stops[k + 1], t - k);
+      });
+      el.classList.add('split');
+    }
+  });
+  $$('[data-words]').forEach(el => {
+    const walk = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.append(' '); return; }
+            const s = document.createElement('span');
+            s.className = 'w'; s.textContent = part; frag.append(s);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1) { walk(n); }
+      });
+    };
+    walk(el);
+  });
+
+  // ---------- 1. Hero ----------
+  const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  intro
+    .from('.hero-title .char', { yPercent: 115, rotate: 12, duration: 1.1, stagger: .035 })
+    .from('.hero-photo .frame', { scale: .6, rotate: -14, opacity: 0, duration: 1.3 }, 0.15)
+    .from('.sticker', { scale: 0, rotate: -90, duration: .9, stagger: .12, ease: 'back.out(2.2)' }, 0.7)
+    .from('.hero-sub span', { y: 30, opacity: 0, duration: .8, stagger: .09 }, 0.6)
+    .from('.eyebrow, .scroll-cue', { y: 16, opacity: 0, duration: .8 }, 0.9);
+
+  // Stickers bob gently forever
+  $$('.sticker').forEach((s, i) => gsap.to(s, { y: i % 2 ? 10 : -10, rotate: i % 2 ? 8 : -8, duration: 2 + i * .4, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 1.6 }));
+
+  // Hero stays pinned while the Journey panel slides over it; it shrinks and fades in sync
+  ScrollTrigger.create({ trigger: '.hero', start: 'top top', end: 'bottom top', pin: true, pinSpacing: false });
+  gsap.to('.hero-inner', {
+    scale: .82, yPercent: -8, opacity: 0, filter: 'blur(6px)', ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+  });
+  gsap.to('.hero-photo .frame', {
+    rotate: -6, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+  });
+
+  // ---------- 2. Journey ----------
+  gsap.from('.journey-head .h2', {
+    yPercent: 40, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '.journey', start: 'top 85%', end: 'top 30%', scrub: true }
+  });
+  $$('[data-words]').forEach(el => {
+    gsap.fromTo($$('.w', el), { opacity: .14 }, {
+      opacity: 1, stagger: .1, ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 50%', scrub: true }
+    });
+  });
+  $$('.gallery figure').forEach(fig => {
+    const speed = parseFloat(fig.dataset.speed);
+    gsap.fromTo(fig, { y: 120 * speed }, {
+      y: -120 * speed, ease: 'none',
+      scrollTrigger: { trigger: '.gallery', start: 'top bottom', end: 'bottom top', scrub: true }
+    });
+    gsap.fromTo($('img', fig), { scale: 1.25 }, {
+      scale: 1, ease: 'none',
+      scrollTrigger: { trigger: fig, start: 'top bottom', end: 'bottom top', scrub: true }
+    });
+  });
+
+  // Flight scene: pinned; route + plane are scroll-scrubbed 1:1
+  const route = $('#route');
+  const len = route.getTotalLength();
+  gsap.set(route, { strokeDasharray: len, strokeDashoffset: len });
+  const planePath = { path: '#route', align: '#route', alignOrigin: [.5, .5], autoRotate: true };
+  gsap.set('#plane', { motionPath: { ...planePath, end: 0 } });
+
+  const flight = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '.flight', start: 'top top', end: '+=320%', pin: true, scrub: true }
+  });
+  flight
+    .from('.polaroid', { scale: .4, opacity: 0, y: 120, rotate: i => [-30, 25, -20][i], stagger: .2, duration: .7, ease: 'back.out(1.4)' })
+    .from('.my-pin', { scale: 0, transformOrigin: '770px 590px', duration: .3, ease: 'back.out(2)' }, .2)
+    .to({}, { duration: .4 })
+    .addLabel('fly')
+    .to('.stop[data-stop="0"]', { opacity: 0, y: -40, duration: .35 }, 'fly')
+    .to('.polaroid', { opacity: 0, scale: .7, y: -80, stagger: .1, duration: .6 }, 'fly')
+    .fromTo('.stop[data-stop="1"]', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .35 }, 'fly+=.25')
+    .to(route, { strokeDashoffset: 0, duration: 2 }, 'fly')
+    .to('#plane', { motionPath: planePath, duration: 2 }, 'fly')
+    .to('.stop[data-stop="1"]', { opacity: 0, y: -40, duration: .3 }, 'fly+=1.6')
+    .from('.cbe-pin', { scale: 0, transformOrigin: '260px 320px', duration: .35, ease: 'back.out(2.5)' }, 'fly+=1.8')
+    .fromTo('.stop[data-stop="2"]', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .4 }, 'fly+=1.9')
+    .from('.home-tag', { opacity: 0, y: 20, scale: .6, duration: .3, ease: 'back.out(2)' }, 'fly+=2')
+    .from('.school', { opacity: 0, x: -40, duration: .35 }, 'fly+=2.15')
+    .to('#plane', { opacity: 0, duration: .2 }, 'fly+=2')
+    .to({}, { duration: .5 });
+  gsap.set('.stop[data-stop="1"], .stop[data-stop="2"]', { opacity: 0 });
+  gsap.to('.flight-bar span', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '.flight', start: 'top top', end: '+=320%', scrub: true } });
+  gsap.to('.cbe-pin .pulse', { attr: { r: 44 }, opacity: 0, duration: 1.4, repeat: -1, ease: 'power1.out', transformOrigin: 'center' });
+
+  // ---------- 3. Passions ----------
+  gsap.from('.passions-intro .h2', {
+    xPercent: -12, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '.passions-intro', start: 'top 90%', end: 'top 40%', scrub: true }
+  });
+
+  $$('.block').forEach(block => {
+    const dir = block.classList.contains('pets') ? 1 : -1;
+    gsap.fromTo($('.marquee .track', block), { xPercent: dir < 0 ? 0 : -30 }, {
+      xPercent: dir < 0 ? -30 : 0, ease: 'none',
+      scrollTrigger: { trigger: block, start: 'top bottom', end: 'bottom top', scrub: true }
+    });
+    gsap.from($('.block-copy', block), {
+      y: 80, opacity: 0, ease: 'none',
+      scrollTrigger: { trigger: $('.block-grid', block), start: 'top 90%', end: 'top 45%', scrub: true }
+    });
+    gsap.from($$('.facts li', block), {
+      scale: .6, opacity: 0, stagger: .15, ease: 'none',
+      scrollTrigger: { trigger: $('.facts', block), start: 'top 95%', end: 'top 65%', scrub: true }
+    });
+  });
+
+  // Cards slide in from their side, moving exactly with the scroll
+  $$('.card').forEach(card => {
+    const fromLeft = card.dataset.from === 'left';
+    gsap.fromTo(card,
+      { xPercent: fromLeft ? -130 : 130, rotate: fromLeft ? -16 : 16, opacity: 0 },
+      { xPercent: 0, rotate: parseFloat(card.dataset.rot), opacity: 1, ease: 'none',
+        scrollTrigger: { trigger: card, start: 'top 100%', end: 'top 50%', scrub: true } });
+  });
+
+  // The ball rolls across the pitch — distance and spin both tied to scroll
+  gsap.fromTo('.ball', { x: () => -120, rotate: 0 }, {
+    x: () => innerWidth + 40, rotate: 900, ease: 'none',
+    scrollTrigger: { trigger: '.football', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
+  });
+
+  // Paw-print trail across the pets block
+  const paws = $('.paws');
+  const pawSvg = '<svg class="paw" viewBox="0 0 40 40"><ellipse cx="20" cy="27" rx="9" ry="8"/><ellipse cx="9" cy="16" rx="4" ry="5"/><ellipse cx="17" cy="10" rx="4" ry="5"/><ellipse cx="25" cy="10" rx="4" ry="5"/><ellipse cx="32" cy="16" rx="4" ry="5"/></svg>';
+  for (let i = 0; i < 12; i++) {
+    paws.insertAdjacentHTML('beforeend', pawSvg);
+    const p = paws.lastElementChild;
+    const t = i / 11;
+    p.style.left = `${4 + t * 88}%`;
+    p.style.top = `${88 - t * 70 + (i % 2 ? 4 : -4)}%`;
+    p.style.rotate = `${40 + (i % 2 ? 14 : -14)}deg`;
+  }
+  gsap.from('.paw', {
+    scale: 0, opacity: 0, stagger: .2, ease: 'none',
+    scrollTrigger: { trigger: '.pets', start: 'top 70%', end: 'bottom 60%', scrub: true }
+  });
+
+  // ---------- Finale ----------
+  gsap.fromTo('.phone', { scale: .7, rotate: 8, y: 80 }, {
+    scale: 1, rotate: -2, y: 0, ease: 'none',
+    scrollTrigger: { trigger: '.finale', start: 'top 90%', end: 'top 10%', scrub: true }
+  });
+  gsap.from('.tbc h2 span', {
+    yPercent: 100, opacity: 0, stagger: .2, ease: 'none',
+    scrollTrigger: { trigger: '.tbc', start: 'top 95%', end: 'top 55%', scrub: true }
+  });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+</body>
+</html>
