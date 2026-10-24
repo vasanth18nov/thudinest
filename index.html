@@ -2019,24 +2019,42 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
    ===================================================================== */
 @media (min-width: 1024px) {
   .tn-hero { align-items: stretch; justify-content: center; padding: 120px clamp(32px, 6vw, 110px) 120px; }
-  .tn-hero-bg {
-    left: auto; width: 66%;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 12%, #000 30%);
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 12%, #000 30%);
+  /* Full-bleed photo; the house and peacock sit right of centre, the copy on the left over a soft shade. */
+  .tn-hero-bg { background-position: 0% 58%, 0 0; }
+  .tn-hero-bg::after {
+    background:
+      linear-gradient(to right, rgba(8,8,17,0.86) 0%, rgba(8,8,17,0.62) 26%, rgba(8,8,17,0.18) 44%, rgba(8,8,17,0) 56%),
+      linear-gradient(to top, #080811 0%, rgba(8,8,17,0) 18%),
+      linear-gradient(to bottom, rgba(8,8,17,0.55) 0%, rgba(8,8,17,0) 14%);
   }
-  .tn-hero-bg::after { background: linear-gradient(to top, #080811 0%, rgba(8,8,17,0) 26%), linear-gradient(to bottom, rgba(8,8,17,0.6) 0%, rgba(8,8,17,0) 16%); }
-  .tn-hero-content { text-align: left; max-width: 660px; margin: 0; }
+  .tn-hero::before { display: none; }
+  .tn-orb { display: none; }
+  .tn-hero-content { text-align: left; max-width: max(44vw, 600px); margin: 0; }
+  .tn-hero-actions { flex-wrap: nowrap; gap: 12px; }
+  .tn-hero-actions .tn-btn-primary, .tn-hero-actions .tn-btn-ghost { padding: 13px 22px; white-space: nowrap; }
+  .tn-hero-tagline { max-width: 520px; }
   .tn-hero-content::before { display: none; }
-  .tn-hero-name { font-size: clamp(3.4rem, 5vw, 5.4rem); display: inline-block; padding-right: 0.08em; }
+  .tn-hero-name { font-size: clamp(3.2rem, 4.6vw, 5.2rem); display: inline-block; padding-right: 0.08em; }
   .tn-hero-byline { letter-spacing: 4px; }
   .tn-hero-tagline { margin-left: 0; max-width: 470px; font-size: 1.12rem; }
   .tn-hero-actions, .tn-hero-facts { justify-content: flex-start; }
   /* the photo has the real peacock; the feather is a quiet flourish in the empty corner under the copy */
-  .tn-feather { right: auto; top: auto; left: clamp(10px, 3vw, 60px); bottom: -4%; height: min(44vh, 440px); transform-origin: 50% 100%; }
-  .tn-feather.ready { opacity: 0.85; }
+  .tn-feather { right: auto; top: auto; left: clamp(10px, 3vw, 60px); bottom: -6%; height: min(38vh, 380px); transform-origin: 50% 100%; }
+  .tn-feather.ready { opacity: 0.8; }
   @keyframes tn-feather-sway {
     0%, 100% { transform: translate3d(0, 0, 0) rotate(52deg); }
     50%      { transform: translate3d(4px, -6px, 0) rotate(48deg); }
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .tn-hero-content { max-width: 600px; }
+  .tn-hero-name { font-size: 3.4rem; }
+  .tn-hero-byline { letter-spacing: 2.5px; font-size: 0.72rem; }
+  .tn-hero-bg::after {
+    background:
+      linear-gradient(to right, rgba(8,8,17,0.88) 0%, rgba(8,8,17,0.66) 34%, rgba(8,8,17,0.2) 52%, rgba(8,8,17,0) 62%),
+      linear-gradient(to top, #080811 0%, rgba(8,8,17,0) 18%),
+      linear-gradient(to bottom, rgba(8,8,17,0.55) 0%, rgba(8,8,17,0) 14%);
   }
 }
 @media (max-width: 1023px) {
@@ -2073,6 +2091,17 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
   .tn-wa-row { grid-column: 1 / -1; }
   .tn-book-btn { padding: 22px 24px; }
   .tn-feat { gap: 22px; margin-top: 44px; }
+  /* body copy that read fine on a phone looked tiny on a monitor */
+  .tn-label { font-size: 0.74rem; }
+  .tn-split-sub, .tn-feat-sub { font-size: 0.95rem; }
+  .tn-split-ttl { font-size: 1.45rem; }
+  .tn-feat-ttl { font-size: 1.35rem; }
+  .tn-rule-txt { font-size: 0.95rem; }
+  .tn-tile-name { font-size: 0.92rem; }
+  .tn-compare { font-size: 0.95rem; }
+  .tn-photo-label { font-size: 0.76rem; }
+  .tn-strip-item { font-size: 0.92rem; }
+  .tn-footer { font-size: 0.9rem; }
   .tn-rules, .tn-grid { margin-top: 44px; }
 }
 
