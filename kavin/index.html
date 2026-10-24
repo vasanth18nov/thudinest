@@ -656,7 +656,7 @@
       <div class="letters-art">
         <span class="lt-ring" aria-hidden="true"></span>
         <span class="lt-orbit" aria-hidden="true"></span>
-        <canvas id="lt-cv" role="img" aria-label="Tiny letters of Kavin's name forming his name, a football, his number 25 shirt, a cat, a dog, a plane, a graduation cap and a heart."></canvas>
+        <canvas id="lt-cv" role="img" aria-label="Tiny letters of Kavin's name forming his name, a football, his number 25 shirt, a cat, a dog, a plane, a graduation cap, a game controller, the Roblox logo, a gaming PC and a heart that says DAD."></canvas>
         <div class="lt-chip" aria-live="polite">
           <span class="lt-no" id="lt-no">01</span>
           <span id="lt-name">Kavin</span>
@@ -940,17 +940,59 @@
       x.strokeStyle = PAL[4]; x.lineWidth = 2.4 * u; x.beginPath(); x.moveTo(50 * u, 36 * u); x.lineTo(82 * u, 44 * u); x.lineTo(82 * u, 66 * u); x.stroke();
       x.fillStyle = PAL[4]; oval(x, 50, 36, 3.5, 3.5, u); x.beginPath(); x.roundRect(78 * u, 64 * u, 8 * u, 14 * u, 2 * u); x.fill();
     }
+    function drawPad(x, w) {
+      const u = w / 100;
+      x.save(); x.translate(8 * u, 26 * u); x.scale(0.84, 0.84);
+      x.beginPath(); x.moveTo(26 * u, 6 * u); x.lineTo(74 * u, 6 * u);
+      x.bezierCurveTo(96 * u, 6 * u, 102 * u, 56 * u, 92 * u, 64 * u); x.bezierCurveTo(84 * u, 70 * u, 74 * u, 52 * u, 66 * u, 46 * u); x.lineTo(34 * u, 46 * u);
+      x.bezierCurveTo(26 * u, 52 * u, 16 * u, 70 * u, 8 * u, 64 * u); x.bezierCurveTo(-2 * u, 56 * u, 4 * u, 6 * u, 26 * u, 6 * u); x.closePath();
+      x.fillStyle = PAL[3]; x.fill();
+      x.fillStyle = PAL[0]; x.beginPath(); x.roundRect(38 * u, 9 * u, 24 * u, 16 * u, 3 * u); x.fill();     // touchpad
+      x.fillStyle = PAL[2]; x.fillRect(17 * u, 21 * u, 14 * u, 5 * u); x.fillRect(21.5 * u, 16.5 * u, 5 * u, 14 * u); // d-pad
+      x.fillStyle = PAL[1]; oval(x, 37, 37, 5.5, 5.5, u); oval(x, 63, 37, 5.5, 5.5, u);                        // sticks
+      // △ ○ × □ face buttons on dark pads so the symbols read
+      x.fillStyle = PAL[0]; [[78, 12.5], [87, 22], [78, 31.5], [69, 22]].forEach(([a, b]) => oval(x, a, b, 5.6, 5.6, u));
+      x.lineWidth = 2.6 * u; x.lineCap = 'round'; x.lineJoin = 'round';
+      x.strokeStyle = PAL[7]; x.beginPath(); x.moveTo(78 * u, 9.5 * u); x.lineTo(81 * u, 15 * u); x.lineTo(75 * u, 15 * u); x.closePath(); x.stroke();
+      x.strokeStyle = PAL[6]; x.beginPath(); x.arc(87 * u, 22 * u, 3 * u, 0, 7); x.stroke();
+      x.strokeStyle = PAL[2]; x.beginPath(); x.moveTo(75.5 * u, 29 * u); x.lineTo(80.5 * u, 34 * u); x.moveTo(80.5 * u, 29 * u); x.lineTo(75.5 * u, 34 * u); x.stroke();
+      x.strokeStyle = PAL[4]; x.strokeRect(66.5 * u, 19.5 * u, 5 * u, 5 * u);
+      x.restore();
+    }
+    function drawRoblox(x, w) {
+      const u = w / 100;
+      x.save(); x.translate(50 * u, 36 * u); x.rotate(0.26);
+      x.fillStyle = PAL[3]; x.fillRect(-24 * u, -24 * u, 48 * u, 48 * u);
+      x.clearRect(-7 * u, -7 * u, 14 * u, 14 * u);
+      x.restore();
+      x.fillStyle = PAL[2]; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `800 ${19 * u}px ${FONT}`; x.fillText('ROBLOX', 50 * u, 74 * u);
+    }
+    function drawPC(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[0]; x.beginPath(); x.roundRect(12 * u, 8 * u, 76 * u, 46 * u, 5 * u); x.fill();        // screen
+      x.strokeStyle = PAL[2]; x.lineWidth = 4 * u; x.stroke();                                                     // bezel
+      x.fillStyle = PAL[5]; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `800 ${28 * u}px ${FONT}`; x.fillText('GG', 50 * u, 32 * u);
+      x.fillStyle = PAL[2]; x.fillRect(45 * u, 56 * u, 10 * u, 6 * u); x.fillRect(33 * u, 62 * u, 34 * u, 4 * u);  // stand
+      x.fillStyle = PAL[3]; x.beginPath(); x.roundRect(12 * u, 69 * u, 66 * u, 9 * u, 3 * u); x.fill();          // keyboard
+      oval(x, 86, 73.5, 4, 5.5, u);                                                                                // mouse
+      [6, 4, 5, 7, 2, 1].forEach((c, i) => { x.fillStyle = PAL[c]; x.fillRect((12 + i * 11) * u, 80 * u, 11 * u, 3.5 * u); }); // RGB strip
+    }
     function drawHeart(x, w) {
       const u = w / 100;
       x.fillStyle = PAL[6];
       x.beginPath(); x.moveTo(50 * u, 86 * u);
       x.bezierCurveTo(8 * u, 58 * u, 10 * u, 18 * u, 33 * u, 18 * u); x.bezierCurveTo(43 * u, 18 * u, 50 * u, 26 * u, 50 * u, 32 * u);
       x.bezierCurveTo(50 * u, 26 * u, 57 * u, 18 * u, 67 * u, 18 * u); x.bezierCurveTo(90 * u, 18 * u, 92 * u, 58 * u, 50 * u, 86 * u); x.fill();
-      x.fillStyle = PAL[3]; oval(x, 31, 34, 5, 8, u, -0.6);
+      // DAD is cut out of the heart: empty letters read better than white-on-coral at low particle counts
+      x.globalCompositeOperation = 'destination-out';
+      x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `700 ${31 * u}px ${FONT}`;
+      x.fillText('DAD', 50 * u, 49 * u);
+      x.globalCompositeOperation = 'source-over';
     }
     const SCENES = [
       ['Kavin', drawWord], ['Footballer', drawBall], ['Number 25', drawShirt], ['Team Cat', drawCat],
-      ['Team Dog', drawDog], ['Malaysia → Coimbatore', drawPlane], ['Student at Sarvvam', drawCap], ['Big heart', drawHeart]
+      ['Team Dog', drawDog], ['Malaysia → Coimbatore', drawPlane], ['Student at Sarvvam', drawCap],
+      ['PlayStation', drawPad], ['Roblox', drawRoblox], ['PC gamer', drawPC], ['Daddy lover', drawHeart]
     ];
 
     let S = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 7, running = false, visible = false, last = 0, mx = -1e4, my = -1e4;
