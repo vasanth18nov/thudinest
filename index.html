@@ -2926,6 +2926,12 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
   .tl-banner-title { font-size: 1.6rem; text-shadow: none; }
   .tl-hero::before { width: 520px; height: 520px; right: -200px; top: 120px; }
 }
+
+/* Logo mark: a small peacock feather */
+.tl-logo-mark { width: 24px; height: 30px; flex: none; background: none !important; border-radius: 0; filter: drop-shadow(0 0 8px rgba(61,220,132,0.35)); transform-origin: 50% 90%; transition: transform 0.4s cubic-bezier(.2,.8,.2,1); }
+.tl-logo-mark::after { display: none; }
+.tl-logo:hover .tl-logo-mark { transform: rotate(-10deg) scale(1.08); }
+.tl-logo { gap: 6px; }
 </style>
 </head>
 <body>
@@ -2938,6 +2944,24 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 
   <!-- Icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <radialGradient id="tl-plume-eye" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#8f9bff"/><stop offset=".5" stop-color="#3e56dd"/><stop offset="1" stop-color="#1a2580"/></radialGradient>
+      <linearGradient id="tl-plume-vane" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3ddc84"/><stop offset=".55" stop-color="#1f9a5a"/><stop offset="1" stop-color="#1c5f45"/></linearGradient>
+    </defs>
+    <symbol id="i-plume" viewBox="0 0 32 40">
+      <g transform="rotate(20 16 20)">
+        <g stroke="#3ddc84" stroke-width=".9" stroke-linecap="round" opacity=".75">
+          <path d="M16 24 9.5 22M16 27 10 26M16 30 11 29.5M16 24 22.5 22M16 27 22 26M16 30 21 29.5"/>
+        </g>
+        <path d="M16 1.5C25.5 4.5 27.5 15 23.5 22.5 21.6 26 18.6 28 16 30 13.4 28 10.4 26 8.5 22.5 4.5 15 6.5 4.5 16 1.5Z" fill="url(#tl-plume-vane)"/>
+        <ellipse cx="16" cy="13" rx="7.6" ry="8.6" fill="#f2b48a"/>
+        <ellipse cx="16" cy="13.4" rx="6" ry="6.9" fill="#34d27c"/>
+        <ellipse cx="16" cy="13.8" rx="4.4" ry="5.2" fill="#56cce6"/>
+        <path d="M16 10.2c2.4-1.4 4.2.6 3.4 3.1-.6 1.9-2.3 3.4-3.4 4.6-1.1-1.2-2.8-2.7-3.4-4.6-.8-2.5 1-4.5 3.4-3.1Z" fill="url(#tl-plume-eye)"/>
+        <ellipse cx="14.9" cy="12.6" rx=".9" ry="1.4" fill="#fff" opacity=".55"/>
+        <path d="M16 21v18" stroke="#cdf5df" stroke-width="1.1" stroke-linecap="round"/>
+      </g>
+    </symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5Zm0 17.1a7.7 7.7 0 0 1-3.9-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 1 1 12 19.6Zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.3 6.3 0 0 1-3.1-2.7c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.2-.2-.4-.3Z" fill="currentColor"/></symbol>
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -2969,7 +2993,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 
   <!-- Floating pill nav -->
   <header class="tl-nav" id="tl-nav">
-    <a class="tl-logo" href="#top" data-jump="top" aria-label="Thudinest home"><span class="tl-logo-mark" aria-hidden="true"><i></i></span><span>thudi<b>nest</b></span></a>
+    <a class="tl-logo" href="#top" data-jump="top" aria-label="Thudinest home"><svg class="tl-logo-mark" viewBox="0 0 32 40" aria-hidden="true"><use href="#i-plume"/></svg><span>thudi<b>nest</b></span></a>
     <nav class="tl-links" aria-label="Main">
       <a href="#top" data-jump="top" data-spy="top" class="on">Home</a>
       <a href="#stay" data-jump data-spy="stay">Stay</a>
@@ -3353,7 +3377,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
     <div class="tl-wrap">
       <div class="tl-foot-grid">
         <div class="tl-foot-brand">
-          <a class="tl-logo light" href="#top" data-jump="top"><span class="tl-logo-mark" aria-hidden="true"><i></i></span><span>thudi<b>nest</b></span></a>
+          <a class="tl-logo light" href="#top" data-jump="top"><svg class="tl-logo-mark" viewBox="0 0 32 40" aria-hidden="true"><use href="#i-plume"/></svg><span>thudi<b>nest</b></span></a>
           <p>A cozy container homestay on MTP Road, Thudiyalur, Coimbatore. Plus free website hosting, live surveys and browser games.</p>
         </div>
         <div><h4>Explore</h4><a href="#stay" data-jump>Stay</a><a href="#space" data-jump>The space</a><a href="#find" data-jump>Find us</a><a href="#faq" data-jump>FAQ</a></div>
