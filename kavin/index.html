@@ -260,6 +260,48 @@
     .sand-media { inset: 50% 0 auto; translate: 0 -60%; aspect-ratio: 4 / 3; }
   }
 
+  /* ---------- Kavin in letters (the particle ring from the thudinest.com hero) ---------- */
+  .letters {
+    position: relative;
+    background: radial-gradient(60vmax 50vmax at 75% 50%, rgba(59, 130, 255, .22), transparent 65%), #0a1a44;
+  }
+  .letters-stage {
+    min-height: 100vh; min-height: 100svh; width: min(1180px, 100% - 32px); margin-inline: auto;
+    display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(24px, 5vw, 70px); padding-block: 40px;
+  }
+  .letters-copy p:not(.kicker) { color: #d5def5; max-width: 34ch; margin-top: 22px; font-size: clamp(1.05rem, 1.6vw, 1.25rem); }
+  .letters-art { position: relative; width: min(100%, 78svh); aspect-ratio: 1; justify-self: center; }
+  .lt-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1.5px solid rgba(140, 200, 255, .35);
+    box-shadow: 0 0 80px rgba(59, 130, 255, .15), inset 0 0 80px rgba(59, 130, 255, .08);
+  }
+  .lt-ring::before { content: ""; position: absolute; inset: 9%; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, .12); animation: lt-spin 60s linear infinite; }
+  .lt-orbit { position: absolute; inset: 0; border-radius: 50%; animation: lt-spin 18s linear infinite; pointer-events: none; }
+  .lt-orbit::before {
+    content: ""; position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px;
+    border-radius: 50%; background: var(--lime); box-shadow: 0 0 18px 2px var(--lime);
+  }
+  @keyframes lt-spin { to { transform: rotate(360deg); } }
+  #lt-cv { position: absolute; inset: 5%; width: 90%; height: 90%; display: block; border-radius: 50%; touch-action: pan-y; }
+  html:not(.motion) #lt-cv { cursor: pointer; }
+  .lt-chip {
+    position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 999px; white-space: nowrap;
+    background: rgba(6, 16, 42, .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 20px 50px rgba(0, 0, 0, .5);
+    font-weight: 700; font-size: 15px;
+  }
+  .lt-no { width: 30px; height: 30px; border-radius: 50%; background: var(--lime); color: var(--navy); display: grid; place-items: center; font: 800 12px/1 var(--display); }
+  .lt-bar { width: 64px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+  .lt-bar i { display: block; height: 100%; background: var(--lime); transform-origin: 0 50%; transform: scaleX(0); }
+  @media (max-width: 860px) {
+    .letters-stage { grid-template-columns: 1fr; align-content: center; gap: 18px; padding-top: 70px; }
+    .letters-art { width: min(100%, 50svh); }
+    .letters-copy p:not(.kicker) { margin-top: 12px; font-size: 16px; }
+    .lt-chip { font-size: 13px; }
+  }
+
   /* ---------- Passions ---------- */
   .passions { position: relative; background: #0a1a44; padding-top: clamp(100px, 14vw, 180px); }
   .passions-intro { padding-bottom: clamp(60px, 9vw, 110px); }
@@ -604,6 +646,27 @@
     </div>
   </section>
 
+  <!-- Kavin in letters: the particle ring from the thudinest.com hero; here the scroll picks each picture -->
+  <section class="letters" aria-label="Kavin, drawn in letters">
+    <div class="letters-stage">
+      <div class="letters-copy">
+        <p class="kicker">Interlude — Kavin, in letters</p>
+        <h2 class="h2" data-split>Made of<br>k·a·v·i·n.</h2>
+        <p>Every speck in this circle is a tiny letter from his name. Keep scrolling and watch them burst apart and rebuild into the things he loves.</p>
+      </div>
+      <div class="letters-art">
+        <span class="lt-ring" aria-hidden="true"></span>
+        <span class="lt-orbit" aria-hidden="true"></span>
+        <canvas id="lt-cv" role="img" aria-label="Tiny letters of Kavin's name forming his name, a football, his number 25 shirt, a cat, a dog, a plane, a graduation cap and a heart."></canvas>
+        <div class="lt-chip" aria-live="polite">
+          <span class="lt-no" id="lt-no">01</span>
+          <span id="lt-name">Kavin</span>
+          <span class="lt-bar" aria-hidden="true"><i id="lt-bar"></i></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ======================= 3. THE PASSIONS ======================= -->
   <section class="passions">
     <div class="container passions-intro">
@@ -787,6 +850,221 @@
   // Top progress bar
   gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
 
+  // ---------- Kavin in letters ----------
+  // The particle ring from the thudinest.com hero: thousands of tiny k/a/v/i/n letters that burst
+  // apart and spring into each picture. Scroll picks the picture (tap to step with reduced motion).
+  const letters = (() => {
+    const cv = $('#lt-cv'), ctx = cv.getContext('2d');
+    //           0 deep blue  1 blue     2 sky      3 white    4 sun      5 lime     6 coral    7 green
+    const PAL = ['#2f5fd0', '#3b82ff', '#8cc8ff', '#f4f7ff', '#ffc145', '#c8ff3e', '#ff7a59', '#19c37d'];
+    const CHARS = 'kavin', MOVE = 1300, FONT = '"Bricolage Grotesque", sans-serif';
+    const noEl = $('#lt-no'), nameEl = $('#lt-name'), barEl = $('#lt-bar');
+
+    // ---- scene drawings (square canvas of side w; u = 1% of it) ----
+    const poly = (x, pts, u) => { x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a * u, b * u) : x.moveTo(a * u, b * u)); x.closePath(); x.fill(); };
+    const oval = (x, cx, cy, rx, ry, u, rot = 0) => { x.beginPath(); x.ellipse(cx * u, cy * u, rx * u, ry * u, rot, 0, 7); x.fill(); };
+    const pent = (x, cx, cy, r, rot) => {
+      x.beginPath();
+      for (let k = 0; k < 5; k++) { const a = rot + k * Math.PI * 2 / 5; x[k ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+      x.closePath(); x.fill();
+    };
+    function drawWord(x, w) {
+      x.textBaseline = 'middle';
+      let fs = 100; x.font = `800 ${fs}px ${FONT}`;
+      fs = fs * (w * 0.8) / x.measureText('KAVIN').width; x.font = `800 ${fs}px ${FONT}`;
+      let cx = (w - x.measureText('KAVIN').width) / 2;
+      [...'KAVIN'].forEach((ch, i) => {
+        x.lineWidth = fs * 0.07; x.strokeStyle = PAL[0]; x.strokeText(ch, cx, w / 2);
+        x.fillStyle = PAL[[5, 2, 4, 6, 1][i]]; x.fillText(ch, cx, w / 2); cx += x.measureText(ch).width;
+      });
+    }
+    function drawBall(x, w) {
+      const u = w / 100, c = 50 * u, up = -Math.PI / 2;
+      x.fillStyle = PAL[3]; oval(x, 50, 50, 38, 38, u);
+      x.save(); x.beginPath(); x.arc(c, c, 38 * u, 0, 7); x.clip();
+      x.fillStyle = PAL[0]; pent(x, c, c, 11 * u, up);
+      x.strokeStyle = PAL[0]; x.lineWidth = 2.6 * u;
+      for (let k = 0; k < 5; k++) {
+        const a = up + k * Math.PI * 2 / 5;
+        x.beginPath(); x.moveTo(c + Math.cos(a) * 11 * u, c + Math.sin(a) * 11 * u); x.lineTo(c + Math.cos(a) * 26 * u, c + Math.sin(a) * 26 * u); x.stroke();
+        pent(x, c + Math.cos(a) * 34 * u, c + Math.sin(a) * 34 * u, 10 * u, a + Math.PI);
+      }
+      x.restore();
+      x.strokeStyle = PAL[2]; x.lineWidth = 2.6 * u; x.beginPath(); x.arc(c, c, 38 * u, 0, 7); x.stroke();
+    }
+    function drawShirt(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[6];
+      x.beginPath(); x.moveTo(34 * u, 12 * u); x.lineTo(12 * u, 25 * u); x.lineTo(21 * u, 42 * u); x.lineTo(30 * u, 37 * u);
+      x.lineTo(30 * u, 88 * u); x.lineTo(70 * u, 88 * u); x.lineTo(70 * u, 37 * u); x.lineTo(79 * u, 42 * u); x.lineTo(88 * u, 25 * u);
+      x.lineTo(66 * u, 12 * u); x.quadraticCurveTo(50 * u, 24 * u, 34 * u, 12 * u); x.closePath(); x.fill();
+      x.fillStyle = PAL[3]; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `800 ${32 * u}px ${FONT}`; x.fillText('25', 50 * u, 58 * u);
+    }
+    function drawCat(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[6]; poly(x, [[20, 42], [24, 10], [46, 28]], u); poly(x, [[80, 42], [76, 10], [54, 28]], u);
+      x.fillStyle = PAL[4]; poly(x, [[27, 34], [28, 19], [39, 27]], u); poly(x, [[73, 34], [72, 19], [61, 27]], u);
+      x.fillStyle = PAL[6]; oval(x, 50, 56, 33, 30, u);
+      x.fillStyle = PAL[5]; oval(x, 38, 52, 6.5, 8, u); oval(x, 62, 52, 6.5, 8, u);
+      x.fillStyle = PAL[0]; oval(x, 38, 52, 2.2, 6, u); oval(x, 62, 52, 2.2, 6, u);
+      x.fillStyle = PAL[3]; oval(x, 50, 71, 12, 8, u);
+      x.fillStyle = PAL[0]; poly(x, [[45.5, 64], [54.5, 64], [50, 69]], u);
+      x.strokeStyle = PAL[3]; x.lineWidth = 1.8 * u; x.lineCap = 'round';
+      [[36, 69, 6, 62], [36, 74, 6, 78], [64, 69, 94, 62], [64, 74, 94, 78]].forEach(([a, b, c, d]) => { x.beginPath(); x.moveTo(a * u, b * u); x.lineTo(c * u, d * u); x.stroke(); });
+    }
+    function drawDog(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[6]; oval(x, 22, 50, 11, 25, u, 0.35); oval(x, 78, 50, 11, 25, u, -0.35);
+      x.fillStyle = PAL[4]; oval(x, 50, 54, 28, 32, u);
+      x.fillStyle = PAL[0]; oval(x, 40, 47, 4.5, 4.5, u); oval(x, 60, 47, 4.5, 4.5, u);
+      x.fillStyle = PAL[3]; oval(x, 50, 70, 15, 11, u);
+      x.fillStyle = PAL[0]; oval(x, 50, 64, 6, 4.5, u);
+      x.fillStyle = PAL[6]; oval(x, 50, 82, 5, 6, u);
+    }
+    function drawPlane(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[5]; for (let i = 0; i < 5; i++) oval(x, 8 + i * 4.5, 90 - i * 3.6, 2.2, 2.2, u);
+      x.save(); x.translate(52 * u, 48 * u); x.rotate(-0.55);
+      x.fillStyle = PAL[3];
+      x.beginPath(); x.roundRect(-36 * u, -6 * u, 72 * u, 12 * u, 6 * u); x.fill();
+      poly(x, [[-6, -4], [-20, -36], [-10, -36], [16, -4]], u); poly(x, [[-6, 4], [-20, 36], [-10, 36], [16, 4]], u);
+      poly(x, [[-30, -4], [-40, -18], [-33, -18], [-22, -4]], u); poly(x, [[-30, 4], [-40, 18], [-33, 18], [-22, 4]], u);
+      x.fillStyle = PAL[2]; oval(x, 28, 0, 5, 3, u);
+      x.restore();
+    }
+    function drawCap(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[2];
+      x.beginPath(); x.moveTo(28 * u, 44 * u); x.lineTo(72 * u, 44 * u); x.lineTo(72 * u, 64 * u); x.quadraticCurveTo(50 * u, 76 * u, 28 * u, 64 * u); x.closePath(); x.fill();
+      x.fillStyle = PAL[1]; poly(x, [[50, 18], [92, 36], [50, 54], [8, 36]], u);
+      x.strokeStyle = PAL[4]; x.lineWidth = 2.4 * u; x.beginPath(); x.moveTo(50 * u, 36 * u); x.lineTo(82 * u, 44 * u); x.lineTo(82 * u, 66 * u); x.stroke();
+      x.fillStyle = PAL[4]; oval(x, 50, 36, 3.5, 3.5, u); x.beginPath(); x.roundRect(78 * u, 64 * u, 8 * u, 14 * u, 2 * u); x.fill();
+    }
+    function drawHeart(x, w) {
+      const u = w / 100;
+      x.fillStyle = PAL[6];
+      x.beginPath(); x.moveTo(50 * u, 86 * u);
+      x.bezierCurveTo(8 * u, 58 * u, 10 * u, 18 * u, 33 * u, 18 * u); x.bezierCurveTo(43 * u, 18 * u, 50 * u, 26 * u, 50 * u, 32 * u);
+      x.bezierCurveTo(50 * u, 26 * u, 57 * u, 18 * u, 67 * u, 18 * u); x.bezierCurveTo(90 * u, 18 * u, 92 * u, 58 * u, 50 * u, 86 * u); x.fill();
+      x.fillStyle = PAL[3]; oval(x, 31, 34, 5, 8, u, -0.6);
+    }
+    const SCENES = [
+      ['Kavin', drawWord], ['Footballer', drawBall], ['Number 25', drawShirt], ['Team Cat', drawCat],
+      ['Team Dog', drawDog], ['Malaysia → Coimbatore', drawPlane], ['Student at Sarvvam', drawCap], ['Big heart', drawHeart]
+    ];
+
+    let S = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 7, running = false, visible = false, last = 0, mx = -1e4, my = -1e4;
+    let cur = 0, nxt = 0, want = 0, phase = 'hold', t0 = 0, built = false;
+
+    const nearestPal = (r, g, b) => {
+      let best = 0, bd = 1e9;
+      PAL.forEach((hex, i) => { const c = parseInt(hex.slice(1), 16), d = ((c >> 16) - r) ** 2 + (((c >> 8) & 255) - g) ** 2 + ((c & 255) - b) ** 2; if (d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    // Rasterise a scene at half size and pick N target points (with colours) from its pixels
+    function sample(draw) {
+      const sc = 0.5, sw = Math.max(1, Math.round(S * sc));
+      const oc = document.createElement('canvas'); oc.width = oc.height = sw;
+      const x = oc.getContext('2d', { willReadFrequently: true }); draw(x, sw);
+      const d = x.getImageData(0, 0, sw, sw).data, pts = [], step = Math.max(1, Math.round(glyph * 0.58 * sc));
+      for (let yy = 0; yy < sw; yy += step) for (let xx = 0; xx < sw; xx += step) {
+        const i = (yy * sw + xx) * 4; if (d[i + 3] < 140) continue;
+        pts.push([xx / sc + (Math.random() - 0.5) * step, yy / sc + (Math.random() - 0.5) * step, nearestPal(d[i], d[i + 1], d[i + 2])]);
+      }
+      for (let k = pts.length - 1; k > 0; k--) { const j = (Math.random() * (k + 1)) | 0; [pts[k], pts[j]] = [pts[j], pts[k]]; }
+      const out = new Float32Array(N * 3);
+      for (let n = 0; n < N; n++) {
+        const p = pts.length ? pts[n % pts.length] : [S / 2, S / 2, 1], rep = n >= pts.length;
+        out[n * 3] = p[0] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 1] = p[1] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 2] = p[2];
+      }
+      return out;
+    }
+    function buildSprites() {
+      sprites = PAL.map(col => [...CHARS].map(ch => {
+        const s = Math.ceil(glyph * 1.4 * DPR), c = document.createElement('canvas'); c.width = c.height = s;
+        const x = c.getContext('2d'); x.font = `700 ${Math.round(glyph * DPR)}px ui-monospace, Menlo, monospace`;
+        x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(ch, s / 2, s / 2 + DPR * 0.5);
+        return c;
+      }));
+    }
+    function layout() {
+      const r = cv.getBoundingClientRect(); if (!r.width) return;
+      S = r.width; DPR = Math.min(devicePixelRatio || 1, 2);
+      cv.width = cv.height = Math.round(S * DPR);
+      glyph = S < 420 ? 6 : 7;
+      const n = Math.round(Math.min(S < 420 ? 1500 : 2600, (S * S) / (S < 420 ? 95 : 120)));
+      if (!P || n !== N) {
+        N = n; P = new Float32Array(N * 7);
+        for (let i = 0; i < N; i++) {
+          const a = Math.random() * Math.PI * 2, rad = S * 0.46 * Math.sqrt(Math.random());
+          P[i * 7] = S / 2 + Math.cos(a) * rad; P[i * 7 + 1] = S / 2 + Math.sin(a) * rad;
+          P[i * 7 + 4] = (Math.random() * CHARS.length) | 0; P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.35 + Math.random() * 0.65;
+        }
+      }
+      buildSprites();
+      T = SCENES.map(sc => sample(sc[1]));
+      built = true;
+    }
+    const label = i => { noEl.textContent = String(i + 1).padStart(2, '0'); nameEl.textContent = SCENES[i][0]; };
+    function advance(now) {
+      nxt = want; phase = 'move'; t0 = now; label(nxt);
+      for (let i = 0; i < N; i++) { P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.3 + Math.random() * 0.7; }
+    }
+    const ease = t => { t = Math.min(1, Math.max(0, t)); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+    function tick(now) {
+      if (!running) return;
+      requestAnimationFrame(tick);
+      if (!built) return;
+      const dt = Math.min(2.5, (now - (last || now)) / 16.67); last = now;
+      if (phase === 'hold' && want !== cur) advance(now);
+      let A = T[cur], B = T[cur], tt = 0;
+      if (phase === 'move') {
+        A = T[cur]; B = T[nxt]; tt = ease((now - t0) / MOVE);
+        if (now - t0 >= MOVE) { cur = nxt; phase = 'hold'; A = B = T[cur]; tt = 0; }
+      }
+      const burst = phase === 'move' ? Math.sin(Math.PI * tt) : 0, R = S * 0.36, time = now * 0.001;
+      const k = 1 - Math.pow(1 - 0.09, dt), damp = Math.pow(0.8, dt);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, S, S);
+      ctx.lineCap = 'round'; ctx.lineWidth = glyph * 0.55;
+      const gs = glyph * 1.4, half = gs / 2;
+      for (let i = 0; i < N; i++) {
+        const o = i * 7, j = i * 3, ang = P[o + 5] + time * 0.3, br = burst * R * P[o + 6];
+        let tx = A[j] + (B[j] - A[j]) * tt + Math.cos(ang) * br, ty = A[j + 1] + (B[j + 1] - A[j + 1]) * tt + Math.sin(ang) * br;
+        tx += Math.sin(time * 1.3 + i) * 0.5; ty += Math.cos(time * 1.1 + i * 0.7) * 0.5;
+        let x = P[o], y = P[o + 1], vx = P[o + 2], vy = P[o + 3];
+        if (reduced) { x = tx; y = ty; vx = vy = 0; }
+        else {
+          const dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy;
+          if (d2 < 4200) { const f = (1 - d2 / 4200) * 2 * dt, dd = Math.sqrt(d2 + 1); vx += dx / dd * f; vy += dy / dd * f; }
+          vx = (vx + (tx - x) * k) * damp; vy = (vy + (ty - y) * k) * damp; x += vx * dt; y += vy * dt;
+        }
+        P[o] = x; P[o + 1] = y; P[o + 2] = vx; P[o + 3] = vy;
+        const c = (tt < 0.5 ? A[j + 2] : B[j + 2]) | 0, sp = vx * vx + vy * vy;
+        if (sp > 1.6) { const len = Math.min(5, Math.sqrt(sp) * 0.9 + 1); ctx.strokeStyle = PAL[c]; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * len, y - vy * len); ctx.stroke(); }
+        else ctx.drawImage(sprites[c][P[o + 4]], x - half, y - half, gs, gs);
+      }
+    }
+    const setRunning = on => { if (on === running) return; running = on; if (on) { last = 0; requestAnimationFrame(tick); } };
+
+    if (reduced) cv.addEventListener('click', () => { want = (want + 1) % SCENES.length; });
+    cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    cv.addEventListener('pointerleave', () => { mx = my = -1e4; });
+    let resizeT = 0;
+    addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(layout, 200); });
+    document.addEventListener('visibilitychange', () => setRunning(visible && !document.hidden));
+    const fontsReady = document.fonts ? document.fonts.load(`800 100px ${FONT}`).catch(() => {}) : Promise.resolve();
+    Promise.race([fontsReady, new Promise(r => setTimeout(r, 2500))]).then(() => {
+      layout(); label(0);
+      new IntersectionObserver(e => { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }).observe(cv);
+    });
+
+    return {
+      count: SCENES.length,
+      go(i, frac) { want = i; barEl.style.transform = `scaleX(${frac})`; }
+    };
+  })();
+
   if (reduced) return;
   document.documentElement.classList.add('motion');
   ScrollTrigger.config({ ignoreMobileResize: true });
@@ -946,6 +1224,16 @@
     .to('.sand-text .l1', { opacity: 0, y: -50, duration: .3 }, 1.2)
     .fromTo('.sand-text .l2', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: .3 }, 1.4)
     .to({}, { duration: .4 });
+
+  // ---------- Kavin in letters: pinned; each slice of scroll calls up the next picture ----------
+  ScrollTrigger.create({
+    trigger: '.letters', start: 'top top', end: () => '+=' + innerHeight * letters.count * 0.6,
+    pin: true, invalidateOnRefresh: true,
+    onUpdate: self => {
+      const f = self.progress * letters.count, i = Math.min(letters.count - 1, Math.floor(f));
+      letters.go(i, self.progress === 1 ? 1 : f - i);
+    }
+  });
 
   // ---------- 3. Passions ----------
   // Shirt number counts up 0 → 25 with the scroll
