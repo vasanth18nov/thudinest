@@ -1045,7 +1045,7 @@ body {
 .tn-hero-bg {
   position: absolute; inset: 0; z-index: 0;
   background:
-    url('./images/1.png') center/cover no-repeat,
+    url('./images/hero-peacock.jpg') 50% 62%/cover no-repeat,
     linear-gradient(150deg, #0f0b05 0%, #07090e 52%, #050d07 100%);
 }
 .tn-hero-bg::after {
@@ -2011,6 +2011,71 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 }
 @media (prefers-reduced-motion: reduce) { .tn-feather, .tn-feather img { animation: none !important; } }
 
+
+/* =====================================================================
+   HERO LAYOUT: the photo is the star, so text never sits on the peacock.
+   Desktop: copy on the left, photo filling the right and fading in.
+   Phones/tablets: photo across the top, copy underneath.
+   ===================================================================== */
+@media (min-width: 1024px) {
+  .tn-hero { align-items: stretch; justify-content: center; padding: 120px clamp(32px, 6vw, 110px) 120px; }
+  .tn-hero-bg {
+    left: auto; width: 66%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 12%, #000 30%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 12%, #000 30%);
+  }
+  .tn-hero-bg::after { background: linear-gradient(to top, #080811 0%, rgba(8,8,17,0) 26%), linear-gradient(to bottom, rgba(8,8,17,0.6) 0%, rgba(8,8,17,0) 16%); }
+  .tn-hero-content { text-align: left; max-width: 660px; margin: 0; }
+  .tn-hero-content::before { display: none; }
+  .tn-hero-name { font-size: clamp(3.4rem, 5vw, 5.4rem); display: inline-block; padding-right: 0.08em; }
+  .tn-hero-byline { letter-spacing: 4px; }
+  .tn-hero-tagline { margin-left: 0; max-width: 470px; font-size: 1.12rem; }
+  .tn-hero-actions, .tn-hero-facts { justify-content: flex-start; }
+  /* the photo has the real peacock; the feather is a quiet flourish in the empty corner under the copy */
+  .tn-feather { right: auto; top: auto; left: clamp(10px, 3vw, 60px); bottom: -4%; height: min(44vh, 440px); transform-origin: 50% 100%; }
+  .tn-feather.ready { opacity: 0.85; }
+  @keyframes tn-feather-sway {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(52deg); }
+    50%      { transform: translate3d(4px, -6px, 0) rotate(48deg); }
+  }
+}
+@media (max-width: 1023px) {
+  .tn-hero { --hero-photo: min(60svh, 70vw); justify-content: flex-start; padding: 0 20px 76px; min-height: 0; }
+  .tn-hero-bg {
+    bottom: auto; height: var(--hero-photo); background-position: 50% 68%, 0 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+  }
+  .tn-hero-bg::after { background: linear-gradient(to bottom, rgba(8,8,17,0.55) 0%, rgba(8,8,17,0) 20%); }
+  .tn-hero-content { margin-top: calc(var(--hero-photo) - 18px); }
+  .tn-hero-content::before { display: none; }
+  .tn-hero::before { display: none; }
+  .tn-feather { display: none; }
+}
+@media (max-width: 600px) { .tn-hero { --hero-photo: min(62svh, 104vw); } }
+
+
+/* =====================================================================
+   DESKTOP: use the width. Wider column, section intros side by side
+   (heading left, description right), contact actions as a grid.
+   ===================================================================== */
+@media (min-width: 1024px) {
+  .tn-sec, .tn-split-wrap { max-width: 1200px; padding-left: 40px; padding-right: 40px; }
+  .tn-sec { padding-top: 96px; padding-bottom: 96px; display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 10fr); column-gap: clamp(40px, 5vw, 80px); align-items: start; }
+  .tn-sec > * { grid-column: 1 / -1; }
+  .tn-sec > .tn-label { grid-column: 1; grid-row: 1; }
+  .tn-sec > .tn-heading { grid-column: 1; grid-row: 2; margin-bottom: 0; font-size: clamp(2.1rem, 2.9vw, 2.75rem); text-wrap: balance; }
+  .tn-sec > .tn-body { grid-column: 2; grid-row: 1 / span 2; align-self: end; max-width: 580px; font-size: 1.05rem; }
+  .tn-sec > button, .tn-sec > a { justify-self: start; }
+  .tn-gallery-wrap { max-width: 1200px !important; padding-left: 40px !important; padding-right: 40px !important; }
+  .tn-gallery { grid-template-rows: 270px 270px; }
+  .tn-book-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 40px; }
+  .tn-wa-row { grid-column: 1 / -1; }
+  .tn-book-btn { padding: 22px 24px; }
+  .tn-feat { gap: 22px; margin-top: 44px; }
+  .tn-rules, .tn-grid { margin-top: 44px; }
+}
+
 /* ---- prefers-reduced-motion (accessibility) ---- */
 @media (prefers-reduced-motion: reduce) {
   .tn-orb-1, .tn-orb-2, .tn-orb-3,
@@ -2529,7 +2594,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
     </div>
 
     <!-- Photo Gallery -->
-    <div class="tn-reveal" style="max-width:1080px;margin:0 auto;padding:0 24px 72px">
+    <div class="tn-reveal tn-gallery-wrap" style="max-width:1080px;margin:0 auto;padding:0 24px 72px">
       <div class="tn-gallery">
         <button type="button" class="tn-photo tn-photo-p1" data-full="./images/exterior.jpg" aria-label="Enlarge photo: Exterior, container home">
           <span class="tn-photo-icon">&#127968;</span>
