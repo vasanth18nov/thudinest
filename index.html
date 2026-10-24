@@ -1650,10 +1650,10 @@ th.tn-compare-us { color: #7dd3fc !important; }
   font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.3px;
 }
 
-/* Scroll progress bar */
+/* Scroll progress bar (rides the bottom edge of the nav) */
 .tn-progress-track {
-  position: sticky; top: 0; left: 0; width: 100%; height: 3px;
-  background: rgba(255,255,255,0.05); z-index: 600;
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: transparent; z-index: 1; pointer-events: none;
 }
 .tn-progress-fill {
   height: 100%; width: 0%;
@@ -1853,6 +1853,124 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .game-card { width: 140px; padding: 22px 12px; }
   .game-cards { gap: 12px; }
 }
+
+
+/* =====================================================================
+   NAV, HERO ACTIONS, MOBILE ACTION BAR, PHONE TABLES
+   ===================================================================== */
+.tn-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 700;
+  display: flex; align-items: center; gap: 22px;
+  padding: 14px max(24px, env(safe-area-inset-right)) 14px max(24px, env(safe-area-inset-left));
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(to bottom, rgba(8,8,17,0.55), rgba(8,8,17,0));
+  transition: background 0.3s, padding 0.3s, box-shadow 0.3s;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+.tn-nav.solid {
+  background: rgba(8,8,17,0.86); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.07), 0 10px 30px rgba(0,0,0,0.35);
+  padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 10px;
+}
+.tn-nav-brand {
+  font-family: 'Orbitron', 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.02rem; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+  background: linear-gradient(100deg, #f5c842, #22d3ee 60%, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  opacity: 0; transform: translateY(-4px); transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+}
+.tn-nav.solid .tn-nav-brand { opacity: 1; transform: none; pointer-events: auto; }
+.tn-nav-links { display: flex; gap: 4px; margin-left: auto; }
+.tn-nav-links a {
+  position: relative; color: rgba(255,255,255,0.72); text-decoration: none; font-size: 0.86rem; font-weight: 600;
+  padding: 8px 12px; border-radius: 999px; transition: color 0.2s, background 0.2s;
+}
+.tn-nav-links a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+.tn-nav-links a.active { color: #fff; background: rgba(245,200,66,0.12); box-shadow: inset 0 0 0 1px rgba(245,200,66,0.3); }
+.tn-nav-links .tn-nav-sheet-wa { display: none; }
+.tn-nav-book {
+  flex: none; text-decoration: none; font-size: 0.84rem; font-weight: 800; color: #1a1205;
+  background: linear-gradient(135deg, #f7d26a, #f5b942); border-radius: 999px; padding: 10px 18px;
+  box-shadow: 0 6px 20px rgba(245,200,66,0.25); transition: transform 0.2s, box-shadow 0.2s;
+}
+.tn-nav-book:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(245,200,66,0.4); }
+.tn-nav-menu { display: none; flex: none; width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.06); cursor: pointer; padding: 0; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.tn-nav-menu span { display: block; width: 18px; height: 2px; border-radius: 2px; background: #fff; transition: transform 0.25s, opacity 0.2s; }
+.tn-nav-menu[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.tn-nav-menu[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.tn-nav-menu[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.tn-nav a:focus-visible, .tn-nav button:focus-visible, .tn-btn-primary:focus-visible, .tn-btn-ghost:focus-visible { outline: 3px solid #f5c842; outline-offset: 2px; }
+#tn-about, #tn-featured, #tn-hosting, #tn-survey, #tn-book { scroll-margin-top: 70px; }
+
+/* Hero: legible copy over the photo, and real buttons */
+.tn-hero-content::before {
+  content: ''; position: absolute; inset: -60px -40px -40px; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 55%, rgba(8,8,17,0.72) 0%, rgba(8,8,17,0.45) 45%, transparent 72%);
+}
+.tn-hero-byline { color: #bfe8fb; text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
+.tn-hero-tagline { color: rgba(255,255,255,0.84); text-shadow: 0 2px 12px rgba(0,0,0,0.8); margin-bottom: 30px; }
+.tn-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none; min-height: 48px;
+  padding: 14px 30px; border-radius: 100px; font-size: 0.92rem; font-weight: 800; letter-spacing: 0.3px; color: #1a1205;
+  background: linear-gradient(135deg, #f7d26a, #f5b942); box-shadow: 0 10px 30px rgba(245,200,66,0.32);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.tn-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(245,200,66,0.45); }
+.tn-hero-facts { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 26px; padding: 0; }
+.tn-hero-facts li {
+  font-size: 0.76rem; font-weight: 600; color: rgba(255,255,255,0.82); padding: 6px 12px; border-radius: 999px;
+  background: rgba(8,8,17,0.5); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
+
+/* Phone action bar: Book + WhatsApp, after the hero, out of the way near the contact section */
+.tn-actionbar { display: none; }
+@media (max-width: 760px) {
+  .tn-nav { gap: 10px; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .tn-nav-brand { font-size: 0.92rem; }
+  .tn-nav-book { margin-left: auto; padding: 9px 14px; font-size: 0.8rem; }
+  .tn-nav-menu { display: flex; }
+  .tn-nav-links {
+    position: absolute; top: 100%; left: 12px; right: 12px; margin: 6px 0 0; flex-direction: column; gap: 2px; padding: 10px;
+    background: rgba(12,12,24,0.97); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    opacity: 0; transform: translateY(-8px); pointer-events: none; visibility: hidden; transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  }
+  .tn-nav.open .tn-nav-links { opacity: 1; transform: none; pointer-events: auto; visibility: visible; }
+  .tn-nav-links a { font-size: 1rem; padding: 14px 16px; border-radius: 12px; }
+  .tn-nav-links .tn-nav-sheet-wa { display: block; margin-top: 6px; color: #4ade80; background: rgba(37,211,102,0.08); box-shadow: inset 0 0 0 1px rgba(37,211,102,0.25); }
+  .tn-nav.open { background: rgba(8,8,17,0.92); }
+  .tn-nav.open .tn-nav-brand { opacity: 1; pointer-events: auto; }
+
+  .tn-hero-actions { flex-direction: column; align-items: stretch; }
+  .tn-btn-primary { justify-content: center; padding: 17px 24px; font-size: 1rem; }
+
+  .tn-actionbar {
+    position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 650;
+    display: flex; gap: 8px; padding: 8px; border-radius: 18px;
+    background: rgba(12,12,24,0.88); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    transform: translateY(140%); transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  .tn-actionbar.show { transform: none; }
+  .tn-actionbar a { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 12px; text-decoration: none; font-size: 0.92rem; font-weight: 800; }
+  .tn-ab-book { flex: 1.6; color: #1a1205; background: linear-gradient(135deg, #f7d26a, #f5b942); }
+  .tn-ab-wa { flex: 1; color: #4ade80; background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3); }
+  .tn-footer { padding-bottom: 104px !important; }
+
+  /* Comparison tables: one card per row instead of a table that runs off the screen */
+  .tn-compare-wrap { overflow: visible; }
+  .tn-compare { min-width: 0; }
+  .tn-compare thead { display: none; }
+  .tn-compare tbody, .tn-compare tr { display: block; }
+  .tn-compare tr { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .tn-compare tbody tr:last-child { border-bottom: none; }
+  .tn-compare td { display: block; padding: 0; border: none; white-space: normal; background: none !important; }
+  .tn-compare td:first-child { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.4px; color: rgba(255,255,255,0.45) !important; margin-bottom: 4px; }
+  .tn-compare td.tn-compare-us { font-size: 1rem; margin-bottom: 6px; }
+  .tn-compare td.tn-compare-us::before { content: attr(data-label) " \00b7  "; font-size: 0.7rem; font-weight: 700; color: #7dd3fc; letter-spacing: 0.5px; }
+  .tn-compare td:not(:first-child):not(.tn-compare-us) { font-size: 0.8rem; line-height: 1.55; color: rgba(255,255,255,0.55); }
+  .tn-compare td:not(:first-child):not(.tn-compare-us)::before { content: attr(data-label) ": "; color: rgba(255,255,255,0.35); }
+}
+@media (prefers-reduced-motion: reduce) { .tn-nav, .tn-nav-links, .tn-actionbar, .tn-nav-brand { transition: none !important; } }
 
 /* ---- prefers-reduced-motion (accessibility) ---- */
 @media (prefers-reduced-motion: reduce) {
@@ -2083,7 +2201,20 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 <!-- ===== THUDINEST LANDING SCREEN ===== -->
 <div id="screen-landing" class="screen" style="display:flex">
 
-  <div class="tn-progress-track"><div class="tn-progress-fill" id="tn-progress-fill"></div></div>
+  <nav class="tn-nav" id="tn-nav" aria-label="Main">
+    <a class="tn-nav-brand" href="#top" data-top>Thudinest</a>
+    <div class="tn-nav-links" id="tn-nav-links">
+      <a href="#tn-about" data-spy>Stay</a>
+      <a href="#tn-featured" data-spy>Games</a>
+      <a href="#tn-hosting" data-spy>Hosting</a>
+      <a href="#tn-survey" data-spy>Survey</a>
+      <a href="#tn-book" data-spy>Contact</a>
+      <a class="tn-nav-sheet-wa" href="https://wa.me/919698026106" target="_blank" rel="noopener">&#128172; WhatsApp +91 96980 26106</a>
+    </div>
+    <a class="tn-nav-book" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book a stay</a>
+    <button class="tn-nav-menu" id="tn-nav-menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="tn-nav-links"><span></span><span></span><span></span></button>
+    <div class="tn-progress-track"><div class="tn-progress-fill" id="tn-progress-fill"></div></div>
+  </nav>
 
   <!-- Hero -->
   <section class="tn-hero">
@@ -2094,9 +2225,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     <div class="tn-hero-content">
       <h1 class="tn-hero-name">Thudinest</h1>
       <div class="tn-hero-byline">Homestays &middot; Web Hosting &middot; Surveys &middot; Games</div>
-      <div class="tn-hero-dual">&#127760; Not just a stay &#8212; we also host websites, run live surveys, and offer free games.</div>
-      <p class="tn-hero-tagline">A cozy homestay in Coimbatore &#8212; and a free home for your website, live surveys, and a little fun, too.</p>
+      <p class="tn-hero-tagline">A cozy container homestay on MTP Road, Coimbatore &#8212; and a free home for your website, live surveys and a little fun, too.</p>
       <div class="tn-hero-actions">
+        <a class="tn-btn-primary" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Book your stay</a>
+        <a class="tn-btn-ghost" href="#tn-featured" data-jump>&#127918; Play free games</a>
         <div class="tn-contact-wrap">
           <button class="tn-btn-ghost" id="contact-toggle" onclick="toggleContactDrop(event)">&#128222; Contact Us &#9662;</button>
           <div id="tn-contact-drop" class="tn-contact-drop">
@@ -2113,11 +2245,14 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
           </div>
         </div>
       </div>
-      <div style="margin-top:22px">
-        <button style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.38);font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px" onclick="document.getElementById('tn-about').scrollIntoView({behavior:'smooth'})">Explore the Space &nbsp;&#8595;</button>
-      </div>
+      <ul class="tn-hero-facts" aria-label="Highlights">
+        <li>&#128205; Thudiyalur, Coimbatore</li>
+        <li>&#9889; Instant booking</li>
+        <li>&#128663; Free parking</li>
+        <li>&#128246; Free Wi-Fi</li>
+      </ul>
     </div>
-    <div class="tn-scroll-hint"><span>Scroll</span><span style="font-size:0.95rem">&#8595;</span></div>
+    <a class="tn-scroll-hint" href="#tn-about" data-jump aria-label="Scroll to the homestay"><span>Explore</span><span style="font-size:0.95rem">&#8595;</span></a>
   </section>
 
   <!-- Stay, Host & Play -->
@@ -2208,7 +2343,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   <hr class="tn-hr">
 
   <!-- Why Host With Us -->
-  <div class="tn-sec tn-reveal">
+  <div class="tn-sec tn-reveal" id="tn-hosting">
     <div class="tn-label" style="color:#7dd3fc">ThudinestHosting</div>
     <h2 class="tn-heading">Your Own Website, Live in Minutes</h2>
     <p class="tn-body">No coding, no server setup, no hosting bills. Tell us about your business, add a few photos, and your page is published automatically &#8212; free, with an access code from us.</p>
@@ -2270,7 +2405,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   <hr class="tn-hr">
 
   <!-- Why Survey With Us -->
-  <div class="tn-sec tn-reveal">
+  <div class="tn-sec tn-reveal" id="tn-survey">
     <div class="tn-label" style="color:#bef264">ThudinestSurvey</div>
     <h2 class="tn-heading">Get Instant Feedback, Live</h2>
     <p class="tn-body">No app to install, no account for you or your respondents. Write a few questions, share a QR code, and watch answers turn into a live word cloud and charts as they come in.</p>
@@ -2424,7 +2559,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   <hr class="tn-hr">
 
   <!-- Book & Contact -->
-  <div class="tn-sec tn-reveal">
+  <div class="tn-sec tn-reveal" id="tn-book">
     <div class="tn-label">Book Your Stay</div>
     <h2 class="tn-heading">Reserve &amp; Get in Touch</h2>
     <p class="tn-body">Book instantly on Airbnb, get directions on Maps, or reach us directly on WhatsApp &#8212; we're happy to help with any questions!</p>
@@ -2484,6 +2619,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     </div>
   </div>
 
+  <div class="tn-actionbar" id="tn-actionbar" aria-hidden="true">
+    <a class="tn-ab-book" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" tabindex="-1">&#127968; Book on Airbnb</a>
+    <a class="tn-ab-wa" href="https://wa.me/919698026106" target="_blank" rel="noopener" tabindex="-1" aria-label="WhatsApp us">&#128172; WhatsApp</a>
+  </div>
 </div>
 
 <!-- ===== GAME HUB HOME SCREEN ===== -->
@@ -6076,6 +6215,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
   document.querySelectorAll('.tn-reveal').forEach(el => revealObs.observe(el));
+});
+
+// =====================================================================
+// LANDING NAV: solid on scroll, section highlight, phone menu, action bar,
+// smooth in-page jumps, and labels for the phone version of the tables
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('tn-nav'), menu = document.getElementById('tn-nav-menu'), bar = document.getElementById('tn-actionbar');
+  if (!nav) return;
+  const hero = document.querySelector('.tn-hero'), book = document.getElementById('tn-book');
+  const setMenu = (open) => { nav.classList.toggle('open', open); menu.setAttribute('aria-expanded', String(open)); menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); };
+  menu.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !nav.contains(e.target)) setMenu(false); });
+  const jump = (sel) => { const el = document.querySelector(sel); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  document.querySelectorAll('#screen-landing a[data-spy], #screen-landing a[data-jump]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); setMenu(false); jump(a.getAttribute('href')); }));
+  nav.querySelector('[data-top]').addEventListener('click', (e) => { e.preventDefault(); setMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  const onScroll = () => {
+    const y = window.scrollY, heroEnd = hero ? hero.offsetHeight - 80 : 400;
+    nav.classList.toggle('solid', y > 40);
+    if (bar) {
+      const r = book ? book.getBoundingClientRect() : null, nearBook = r && r.top < window.innerHeight && r.bottom > 0;
+      const show = y > heroEnd && !nearBook;
+      bar.classList.toggle('show', show); bar.setAttribute('aria-hidden', String(!show));
+      bar.querySelectorAll('a').forEach((a) => { a.tabIndex = show ? 0 : -1; });
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  const links = [...nav.querySelectorAll('a[data-spy]')], targets = links.map((a) => document.querySelector(a.getAttribute('href')));
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { const i = targets.indexOf(en.target); links.forEach((l, j) => l.classList.toggle('active', j === i)); } });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  targets.forEach((t) => t && spy.observe(t));
+  document.querySelectorAll('.tn-compare').forEach((tbl) => {
+    const heads = [...tbl.querySelectorAll('thead th')].map((th) => th.textContent.trim());
+    tbl.querySelectorAll('tbody tr').forEach((tr) => [...tr.children].forEach((td, i) => td.setAttribute('data-label', heads[i] || '')));
+  });
 });
 
 // =====================================================================
