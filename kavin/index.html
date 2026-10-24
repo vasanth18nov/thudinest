@@ -283,8 +283,7 @@
     border-radius: 50%; background: var(--lime); box-shadow: 0 0 18px 2px var(--lime);
   }
   @keyframes lt-spin { to { transform: rotate(360deg); } }
-  #lt-cv { position: absolute; inset: 5%; width: 90%; height: 90%; display: block; border-radius: 50%; touch-action: pan-y; }
-  html:not(.motion) #lt-cv { cursor: pointer; }
+  #lt-cv { position: absolute; inset: 5%; width: 90%; height: 90%; display: block; border-radius: 50%; touch-action: pan-y; cursor: pointer; }
   .lt-chip {
     position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%);
     display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 999px; white-space: nowrap;
@@ -646,13 +645,13 @@
     </div>
   </section>
 
-  <!-- Kavin in letters: the particle ring from the thudinest.com hero; here the scroll picks each picture -->
+  <!-- Kavin in letters: the particle ring from the thudinest.com hero; a new picture every 3 seconds -->
   <section class="letters" aria-label="Kavin, drawn in letters">
     <div class="letters-stage">
       <div class="letters-copy">
         <p class="kicker">Interlude — Kavin, in letters</p>
         <h2 class="h2" data-split>Made of<br>k·a·v·i·n.</h2>
-        <p>Every speck in this circle is a tiny letter from his name. Keep scrolling and watch them burst apart and rebuild into the things he loves.</p>
+        <p>Every speck in this circle is a tiny letter from his name. Watch them burst apart and rebuild into the things he loves — tap the circle to skip ahead.</p>
       </div>
       <div class="letters-art">
         <span class="lt-ring" aria-hidden="true"></span>
@@ -852,12 +851,13 @@
 
   // ---------- Kavin in letters ----------
   // The particle ring from the thudinest.com hero: thousands of tiny k/a/v/i/n letters that burst
-  // apart and spring into each picture. Scroll picks the picture (tap to step with reduced motion).
-  const letters = (() => {
+  // apart and spring into each picture. Plays on its own, a new picture every 3 seconds
+  // (HOLD + MOVE); tap the circle to skip ahead. Still, tap-to-step, with reduced motion.
+  (() => {
     const cv = $('#lt-cv'), ctx = cv.getContext('2d');
     //           0 deep blue  1 blue     2 sky      3 white    4 sun      5 lime     6 coral    7 green
     const PAL = ['#2f5fd0', '#3b82ff', '#8cc8ff', '#f4f7ff', '#ffc145', '#c8ff3e', '#ff7a59', '#19c37d'];
-    const CHARS = 'kavin', MOVE = 1300, FONT = '"Bricolage Grotesque", sans-serif';
+    const CHARS = 'kavin', HOLD = 1800, MOVE = 1200, FONT = '"Bricolage Grotesque", sans-serif';
     const noEl = $('#lt-no'), nameEl = $('#lt-name'), barEl = $('#lt-bar');
 
     // ---- scene drawings (square canvas of side w; u = 1% of it) ----
@@ -1017,11 +1017,17 @@
       requestAnimationFrame(tick);
       if (!built) return;
       const dt = Math.min(2.5, (now - (last || now)) / 16.67); last = now;
-      if (phase === 'hold' && want !== cur) advance(now);
+      if (!t0) t0 = now + 600; // let the opening name settle a moment longer
+      if (phase === 'hold') {
+        const hp = (now - t0) / HOLD;
+        barEl.style.transform = `scaleX(${Math.max(0, Math.min(1, hp))})`;
+        if (hp >= 1 && !reduced) want = (cur + 1) % SCENES.length;
+        if (want !== cur) advance(now);
+      }
       let A = T[cur], B = T[cur], tt = 0;
       if (phase === 'move') {
-        A = T[cur]; B = T[nxt]; tt = ease((now - t0) / MOVE);
-        if (now - t0 >= MOVE) { cur = nxt; phase = 'hold'; A = B = T[cur]; tt = 0; }
+        A = T[cur]; B = T[nxt]; tt = ease((now - t0) / MOVE); barEl.style.transform = 'scaleX(0)';
+        if (now - t0 >= MOVE) { cur = nxt; phase = 'hold'; t0 = now; A = B = T[cur]; tt = 0; }
       }
       const burst = phase === 'move' ? Math.sin(Math.PI * tt) : 0, R = S * 0.36, time = now * 0.001;
       const k = 1 - Math.pow(1 - 0.09, dt), damp = Math.pow(0.8, dt);
@@ -1047,7 +1053,8 @@
     }
     const setRunning = on => { if (on === running) return; running = on; if (on) { last = 0; requestAnimationFrame(tick); } };
 
-    if (reduced) cv.addEventListener('click', () => { want = (want + 1) % SCENES.length; });
+    // A tap mid-burst queues the picture after the incoming one
+    cv.addEventListener('click', () => { want = ((phase === 'move' ? nxt : cur) + 1) % SCENES.length; });
     cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
     cv.addEventListener('pointerleave', () => { mx = my = -1e4; });
     let resizeT = 0;
@@ -1058,11 +1065,6 @@
       layout(); label(0);
       new IntersectionObserver(e => { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }).observe(cv);
     });
-
-    return {
-      count: SCENES.length,
-      go(i, frac) { want = i; barEl.style.transform = `scaleX(${frac})`; }
-    };
   })();
 
   if (reduced) return;
@@ -1224,16 +1226,6 @@
     .to('.sand-text .l1', { opacity: 0, y: -50, duration: .3 }, 1.2)
     .fromTo('.sand-text .l2', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: .3 }, 1.4)
     .to({}, { duration: .4 });
-
-  // ---------- Kavin in letters: pinned; each slice of scroll calls up the next picture ----------
-  ScrollTrigger.create({
-    trigger: '.letters', start: 'top top', end: () => '+=' + innerHeight * letters.count * 0.6,
-    pin: true, invalidateOnRefresh: true,
-    onUpdate: self => {
-      const f = self.progress * letters.count, i = Math.min(letters.count - 1, Math.floor(f));
-      letters.go(i, self.progress === 1 ? 1 : f - i);
-    }
-  });
 
   // ---------- 3. Passions ----------
   // Shirt number counts up 0 → 25 with the scroll
