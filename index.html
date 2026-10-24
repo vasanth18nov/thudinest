@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="theme-color" content="#080811">
+<meta name="theme-color" content="#060d0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Thudinest &#183; Homestays, Web Hosting &amp; Games</title>
@@ -2456,18 +2456,6 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 .tl-scroll span { width: 18px; height: 28px; border-radius: 10px; border: 1.5px solid #b9c0cb; position: relative; }
 .tl-scroll span::after { content: ''; position: absolute; left: 50%; top: 6px; width: 2px; height: 6px; margin-left: -1px; border-radius: 2px; background: var(--muted); animation: tl-wheel 1.8s ease-in-out infinite; }
 
-/* ---------- Particle story (scroll-pinned canvas) ---------- */
-.tl-story { position: relative; height: 430svh; margin-top: clamp(20px, 4vw, 60px); }
-.tl-story-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
-.tl-story-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
-.tl-story-cap { position: absolute; left: 0; right: 0; top: calc(96px + env(safe-area-inset-top, 0px)); width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); pointer-events: none; }
-.tl-story-cap .tl-eyebrow { margin-bottom: 8px; transition: opacity 0.3s; }
-.tl-story-sub { margin: 0; font: 700 clamp(1.15rem, 2vw, 1.6rem)/1.25 var(--f-head); letter-spacing: -0.02em; color: var(--ink); max-width: 22em; transition: opacity 0.3s; }
-.tl-story-cap.fade .tl-eyebrow, .tl-story-cap.fade .tl-story-sub { opacity: 0; }
-.tl-story-chip { position: absolute; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 9px 16px 9px 9px; background: #fff; border-radius: 999px; box-shadow: var(--shadow-lg); white-space: nowrap; }
-@media (max-width: 700px) { .tl-story { height: 380svh; } .tl-story-cap { top: calc(84px + env(safe-area-inset-top, 0px)); } .tl-story-chip { left: 16px; transform: none; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); } }
-@media (prefers-reduced-motion: reduce) { .tl-story { height: 300svh; } }
-
 /* ---------- Statement ---------- */
 .tl-statement { padding: clamp(90px, 12vw, 170px) 0 0; }
 .tl-fill { font: 800 clamp(2rem, 4.6vw, 3.8rem)/1.12 var(--f-head); letter-spacing: -0.035em; margin: 0 0 34px; max-width: 18em; }
@@ -2809,6 +2797,135 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
   .tl-in { opacity: 1; transform: none; }
   .tl-marquee-track { animation: none; }
 }
+
+/* =====================================================================
+   DARK THEME. Deep teal-black, glassy cards with hairline borders,
+   neon-mint accents and soft glows.
+   ===================================================================== */
+#screen-landing {
+  --bg: #060d0f; --card: #0d181b; --card-2: #132226; --ink: #eef5f2; --ink-2: #c2d3cd; --muted: #86a199; --line: rgba(255,255,255,0.08);
+  --green: #3ddc84; --green-d: #5fe69d; --green-t: rgba(61,220,132,0.12); --peach: #f2b48a; --dark: #0a1e22; --dark-2: #12333a;
+  --shadow: inset 0 0 0 1px rgba(255,255,255,0.07), 0 14px 34px rgba(0,0,0,0.35);
+  --shadow-lg: inset 0 0 0 1px rgba(255,255,255,0.08), 0 30px 70px rgba(0,0,0,0.5);
+  background: radial-gradient(1200px 700px at 85% -10%, rgba(61,220,132,0.10), transparent 60%), radial-gradient(900px 600px at -10% 30%, rgba(86,204,230,0.07), transparent 60%), var(--bg);
+  color-scheme: dark;
+}
+#screen-landing ::selection { background: rgba(61,220,132,0.35); color: #fff; }
+.tl-eyebrow::before { box-shadow: 11px 0 0 -1px var(--peach), 0 0 12px rgba(61,220,132,0.8); }
+.tl-h1 em, .tl-h2 em { background: linear-gradient(95deg, #3ddc84 0%, #9ef0c4 55%, #f2b48a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tl-btn-dark { background: #eef5f2; color: #06120d; box-shadow: 0 12px 30px rgba(238,245,242,0.12); }
+.tl-btn-green { color: #03160b; box-shadow: 0 0 0 1px rgba(61,220,132,0.4), 0 12px 34px rgba(61,220,132,0.35); }
+.tl-btn-green .tl-ic { background: #03160b; color: var(--green); }
+.tl-btn-light { background: var(--card-2); color: var(--ink); }
+.tl-btn-light:hover { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.4), 0 14px 34px rgba(0,0,0,0.4); }
+.tl-btn-white { color: #06120d; }
+.tl-link { border-bottom-color: var(--green); }
+.tl-chip { background: rgba(19,34,38,0.8); }
+
+.tl-nav { background: rgba(9,19,21,0.66); border-color: rgba(255,255,255,0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.45); }
+.tl-nav.scrolled { background: rgba(9,19,21,0.85); box-shadow: 0 12px 44px rgba(0,0,0,0.6); }
+.tl-links a { color: var(--ink-2); }
+.tl-links a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.tl-links a.on { background: rgba(255,255,255,0.08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+.tl-logo-mark i { background: var(--bg); box-shadow: inset 0 0 0 3px #7d8bff; }
+.tl-burger { background: var(--card-2); box-shadow: inset 0 0 0 1px var(--line); }
+.tl-burger span { background: var(--ink); }
+.tl-menu { background: radial-gradient(700px 500px at 100% 0%, rgba(61,220,132,0.14), transparent 60%), #060d0f; }
+
+/* Hero: aurora glow behind the particle ring */
+.tl-hero::before { content: ''; position: absolute; width: 900px; height: 900px; right: -220px; top: -160px; border-radius: 50%; background: radial-gradient(circle, rgba(61,220,132,0.16), rgba(86,204,230,0.06) 45%, transparent 70%); filter: blur(10px); pointer-events: none; animation: tl-aurora 14s ease-in-out infinite alternate; }
+.tl-hero::after { content: ''; position: absolute; width: 520px; height: 520px; left: -200px; bottom: -160px; border-radius: 50%; background: radial-gradient(circle, rgba(242,180,138,0.10), transparent 70%); pointer-events: none; }
+.tl-dot-bg { background-image: radial-gradient(rgba(255,255,255,0.07) 1.2px, transparent 1.3px); }
+.tl-ring { border: 1.5px solid rgba(61,220,132,0.35); box-shadow: 0 0 80px rgba(61,220,132,0.10), inset 0 0 80px rgba(61,220,132,0.06); }
+.tl-ring::before { border-color: rgba(255,255,255,0.10); }
+.tl-hero-cv { position: absolute; inset: 5%; width: 90%; height: 90%; display: block; cursor: pointer; border-radius: 50%; touch-action: pan-y; }
+.tl-orbit { position: absolute; inset: 0; border-radius: 50%; animation: tl-spin 18s linear infinite; pointer-events: none; }
+.tl-orbit::before { content: ''; position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px 2px var(--green); }
+.tl-slide-chip, .tl-float-card { background: rgba(13,24,27,0.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09), 0 20px 50px rgba(0,0,0,0.5); }
+.tl-slide-no { color: #03160b; }
+.tl-chip-bar { width: 64px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.12); overflow: hidden; margin-left: 4px; }
+.tl-chip-bar i { display: block; height: 100%; background: var(--green); border-radius: 4px; transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 10px var(--green); }
+.tl-scroll span { border-color: rgba(255,255,255,0.25); }
+
+/* Photo banner */
+.tl-banner { padding: clamp(40px, 6vw, 80px) 0 0; }
+.tl-banner-fig { position: relative; margin: 0; border-radius: clamp(26px, 3.4vw, 40px); overflow: hidden; aspect-ratio: 16 / 7.2; box-shadow: var(--shadow-lg); }
+.tl-banner-fig img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; display: block; transform: scale(1.04); animation: tl-kenburns 22s ease-in-out infinite alternate; }
+.tl-banner-fig::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,13,15,0.92) 0%, rgba(6,13,15,0.35) 38%, transparent 60%), linear-gradient(to right, rgba(6,13,15,0.55), transparent 55%); pointer-events: none; }
+.tl-banner-fig figcaption { position: absolute; z-index: 1; left: clamp(20px, 4vw, 52px); right: clamp(20px, 4vw, 52px); bottom: clamp(20px, 4vw, 48px); display: grid; gap: 16px; justify-items: start; }
+.tl-banner-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-banner-title { font: 800 clamp(1.7rem, 3.6vw, 3.1rem)/1.04 var(--f-head); letter-spacing: -0.035em; color: #fff; max-width: 14em; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+
+/* Statement */
+.tl-fill .w { color: #1f3236; }
+.tl-fill .w.on { color: var(--ink); }
+
+/* Tabs, panels, illustrations */
+.tl-tab { background: var(--card); }
+.tl-tab:hover { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.25), 0 14px 34px rgba(0,0,0,0.35); }
+.tl-tab-ico, .tl-am > span { background: linear-gradient(145deg, #1a2d31, #101d20); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06); }
+.tl-tab-go { box-shadow: inset 0 0 0 1.5px rgba(61,220,132,0.35); }
+.tl-tab.on { background: linear-gradient(135deg, rgba(61,220,132,0.14), rgba(61,220,132,0.04)); border-color: rgba(61,220,132,0.6); box-shadow: 0 0 40px rgba(61,220,132,0.12); }
+.tl-tab.on .tl-tab-ico, .tl-am.hot > span { background: linear-gradient(145deg, #4be592, #1f9a55); color: #03160b; box-shadow: 0 8px 24px rgba(61,220,132,0.35); }
+.tl-tab.on .tl-tab-go { color: #03160b; }
+.tl-panel { background-color: var(--card); background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1.2px); }
+.tl-panel-foot { background: var(--green-t); box-shadow: inset 0 0 0 1px rgba(61,220,132,0.2); }
+.tl-mini-card, .tl-browser, .tl-bars, .tl-survey-top, .tl-cloud, .tl-map-label, .tl-map-tag { background: var(--card-2); }
+.tl-steps::before { border-top-color: rgba(255,255,255,0.14); }
+.tl-steps li span, .tl-route-pin span { background: var(--card-2); color: var(--ink-2); }
+.tl-steps li:first-child span, .tl-route-pin.a span { background: var(--green); color: #03160b; }
+.tl-photo-mock li, .tl-ph span { background: rgba(9,19,21,0.82); color: var(--ink); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.tl-route, .tl-art-ui { background: #0a1517; }
+.tl-browser-bar { background: #0f1c1f; }
+.tl-browser-bar i { background: #2a3e42; }
+.tl-browser-bar span { background: #13262a; }
+.tl-browser-body b { background: linear-gradient(120deg, rgba(61,220,132,0.35), rgba(86,204,230,0.18) 60%, rgba(242,180,138,0.3)); }
+.tl-browser-body > i, .tl-browser-grid span, .tl-bars span { background: #1b2e32; }
+.tl-bars span b { color: #03160b; }
+.tl-cloud span:nth-child(2n) { color: #56cce6; }
+
+/* Accordion */
+.tl-acc-item { background: var(--card); }
+.tl-acc-item:not(.on):hover { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.35), 0 20px 50px rgba(0,0,0,0.4); }
+.tl-acc-item.on { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.22), 0 30px 70px rgba(0,0,0,0.5), 0 0 60px rgba(61,220,132,0.06); }
+
+/* Gallery, amenities, projects, process */
+.tl-ph { background: #0d181b; }
+.tl-am, .tl-proj, .tl-process > div, .tl-qs details, .tl-pills span { background: var(--card); }
+.tl-am:hover, .tl-proj:hover, .tl-process > div:hover { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.35), 0 20px 50px rgba(0,0,0,0.45), 0 0 40px rgba(61,220,132,0.08); }
+.tl-process > div { transition: box-shadow 0.3s, transform 0.3s; }
+.tl-process > div:hover { transform: translateY(-3px); }
+
+/* Dark panel and CTA stand out from the dark page with a glow */
+.tl-dark { background: linear-gradient(160deg, #0d2629 0%, #08191c 70%); box-shadow: inset 0 0 0 1px rgba(61,220,132,0.16), 0 0 120px rgba(61,220,132,0.06); }
+.tl-num { background: #0f2d31; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 0 0 10px #0b2225; }
+.tl-why > div:first-child .tl-num { box-shadow: 0 0 0 10px #0b2225, 0 0 40px rgba(61,220,132,0.6); color: #03160b; }
+.tl-marquee span { color: #16272a; }
+.tl-marquee span:nth-of-type(2n) { color: transparent; -webkit-text-stroke: 1.5px rgba(61,220,132,0.55); }
+.tl-map { background: #0b1618; }
+.tl-pin-dot { color: #03160b; box-shadow: 0 0 0 6px #0b1618, 0 0 40px rgba(61,220,132,0.6); }
+.tl-qs summary span { background: var(--card-2); }
+.tl-qs details[open] summary span { color: #03160b; }
+.tl-qs details[open] { box-shadow: inset 0 0 0 1px rgba(61,220,132,0.28), 0 30px 70px rgba(0,0,0,0.5); }
+.tl-note { background: rgba(242,180,138,0.07); box-shadow: inset 0 0 0 1px rgba(242,180,138,0.25); }
+.tl-note span { background: rgba(242,180,138,0.15); color: var(--peach); }
+.tl-note p { color: #f3d2bb; }
+.tl-cta { background: radial-gradient(600px 400px at 85% 0%, rgba(61,220,132,0.22), transparent 60%), linear-gradient(150deg, #0e2b2e, #081a1d); box-shadow: inset 0 0 0 1px rgba(61,220,132,0.22), 0 40px 100px rgba(0,0,0,0.5); }
+.tl-cta-ring { border-color: rgba(61,220,132,0.16); }
+.tl-cta-ring.b { border-color: rgba(86,204,230,0.10); }
+.tl-foot { background: #040909; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.tl-top { background: var(--card-2); color: var(--ink); }
+
+@keyframes tl-aurora { from { transform: translate(0, 0) scale(1); } to { transform: translate(-60px, 40px) scale(1.12); } }
+@keyframes tl-kenburns { from { transform: scale(1.04) translate(0, 0); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+@media (max-width: 700px) {
+  .tl-banner-fig { aspect-ratio: auto; background: var(--card); }
+  .tl-banner-fig img { aspect-ratio: 4 / 3.3; height: auto; object-position: 50% 72%; }
+  .tl-banner-fig::after { display: none; }
+  .tl-banner-fig figcaption { position: static; padding: 20px 20px 22px; }
+  .tl-banner-title { font-size: 1.6rem; text-shadow: none; }
+  .tl-hero::before { width: 520px; height: 520px; right: -200px; top: 120px; }
+}
 </style>
 </head>
 <body>
@@ -2904,17 +3021,12 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
         </div>
         <div class="tl-hero-art tl-in">
           <span class="tl-ring" aria-hidden="true"></span>
-          <div class="tl-slides" id="tl-slides">
-            <img src="./images/hero-peacock.jpg" alt="Thudinest container home with a peacock on the lawn" class="on" width="1364" height="768" fetchpriority="high">
-            <img src="./images/exterior.jpg" alt="The two-level container home and its garden" width="1200" height="900" loading="lazy">
-            <img src="./images/bedroom.jpg" alt="The bedroom" width="1200" height="900" loading="lazy">
-            <img src="./images/gallery/living.jpg" alt="Living area with a work desk" width="1600" height="1200" loading="lazy">
-          </div>
-          <img class="tl-feather" src="./images/peacock-feather.svg" alt="" aria-hidden="true" width="400" height="1200">
+          <span class="tl-orbit" aria-hidden="true"></span>
+          <canvas class="tl-hero-cv" id="tl-hero-cv" aria-label="Animated letters forming Thudinest, the home, a peacock feather, the bed, Wi-Fi, a map pin, hosting, cricket, games and WhatsApp. Tap to skip ahead." role="img"></canvas>
           <div class="tl-slide-chip" aria-live="polite">
-            <span class="tl-slide-no" id="tl-slide-no">01</span>
-            <span class="tl-slide-name" id="tl-slide-name">Garden &amp; peacock</span>
-            <span class="tl-slide-dots" id="tl-slide-dots"><i class="on"></i><i></i><i></i><i></i></span>
+            <span class="tl-slide-no" id="tl-hero-no">01</span>
+            <span class="tl-slide-name" id="tl-hero-name">Thudinest</span>
+            <span class="tl-chip-bar" aria-hidden="true"><i id="tl-hero-bar"></i></span>
           </div>
           <div class="tl-float-card" aria-hidden="true"><span class="tl-fc-ico"><svg><use href="#i-check"/></svg></span><span><b>Instant booking</b><small>on Airbnb</small></span></div>
         </div>
@@ -2923,19 +3035,17 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
     </section>
 
 
-    <!-- Particle story: ascii characters that form THUDINEST, then the home, hosting and games, as you scroll -->
-    <section class="tl-story" id="tl-story" aria-label="Thudinest: stay, host, survey and play">
-      <div class="tl-story-pin">
-        <canvas class="tl-story-cv" id="tl-story-cv" aria-hidden="true"></canvas>
-        <div class="tl-story-cap">
-          <p class="tl-eyebrow" id="tl-story-eyebrow">Keep scrolling</p>
-          <p class="tl-story-sub" id="tl-story-sub">Watch the letters find their place.</p>
-        </div>
-        <div class="tl-story-chip" aria-hidden="true">
-          <span class="tl-slide-no" id="tl-story-no">01</span>
-          <span class="tl-slide-name" id="tl-story-name">Thudinest</span>
-          <span class="tl-slide-dots" id="tl-story-dots"><i class="on"></i><i></i><i></i><i></i><i></i></span>
-        </div>
+    <!-- The home, in a photo -->
+    <section class="tl-banner">
+      <div class="tl-wrap">
+        <figure class="tl-banner-fig tl-in">
+          <img src="./images/hero-peacock.jpg" alt="Thudinest container home with a peacock on the lawn" width="1364" height="768" loading="lazy">
+          <figcaption>
+            <span class="tl-banner-tags"><span class="tl-chip"><i></i>Thudinest No. 2</span><span class="tl-chip"><i></i>Thudiyalur, Coimbatore</span></span>
+            <span class="tl-banner-title">Peacocks on the lawn. A home of your own.</span>
+            <a class="tl-btn tl-btn-green" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -3005,8 +3115,8 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
             <span class="tl-tag">Close to care</span>
             <div class="tl-route">
               <svg viewBox="0 0 420 170" aria-hidden="true">
-                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#d9dde6" stroke-width="18" stroke-linecap="round"/>
-                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="10 10"/>
+                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#1d3236" stroke-width="18" stroke-linecap="round"/>
+                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#35525a" stroke-width="2" stroke-dasharray="10 10"/>
                 <path class="tl-route-go" d="M70 118 C 150 112, 170 58, 260 60 S 340 96, 350 96" fill="none" stroke="#33b06a" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 9"/>
               </svg>
               <div class="tl-route-pin a"><span><svg><use href="#i-home"/></svg></span><b>Thudinest</b><small>MTP Road</small></div>
@@ -3172,13 +3282,13 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
         </div>
         <div class="tl-map tl-in">
           <svg viewBox="0 0 520 380" aria-hidden="true">
-            <defs><pattern id="tl-grid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="#cfd6e0"/></pattern></defs>
+            <defs><pattern id="tl-grid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="#1f3438"/></pattern></defs>
             <rect width="520" height="380" fill="url(#tl-grid)"/>
-            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round"/>
-            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#e3e7ee" stroke-width="2" stroke-dasharray="12 12"/>
-            <path d="M160 -10 C 170 120, 230 250, 210 400" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
-            <path d="M330 400 C 340 300, 380 240, 470 230" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
-            <text x="400" y="104" font-size="13" font-weight="700" fill="#9aa3af" transform="rotate(-22 400 104)" font-family="JetBrains Mono, monospace">MTP ROAD</text>
+            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#17292c" stroke-width="30" stroke-linecap="round"/>
+            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#2c474d" stroke-width="2" stroke-dasharray="12 12"/>
+            <path d="M160 -10 C 170 120, 230 250, 210 400" fill="none" stroke="#14262a" stroke-width="16" stroke-linecap="round"/>
+            <path d="M330 400 C 340 300, 380 240, 470 230" fill="none" stroke="#14262a" stroke-width="12" stroke-linecap="round"/>
+            <text x="400" y="104" font-size="13" font-weight="700" fill="#5f7d76" transform="rotate(-22 400 104)" font-family="JetBrains Mono, monospace">MTP ROAD</text>
           </svg>
           <div class="tl-map-pin"><span class="tl-pulse"></span><span class="tl-pin-dot"><svg><use href="#i-home"/></svg></span></div>
           <div class="tl-map-label"><b>Thudinest No. 2</b><small>Poombuhar Nagar, Thudiyalur</small></div>
@@ -8575,113 +8685,161 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 <script>
 // =====================================================================
-// PARTICLE STORY: a few thousand small characters ("t h u d i n e s t")
-// that scroll-scrub between scenes: a loose cloud, the word THUDINEST,
-// the container home, a monitor with survey bars and a game controller.
-// Between scenes each particle bursts outward and springs to its next
-// spot, drawn as a streak while it moves and as a letter once it lands.
+// HERO PARTICLES: a ring of small "thudinest" characters that plays on
+// its own, morphing through scenes (the word, the home, a peacock
+// feather, the bed, Wi-Fi, the map pin, hosting & surveys, cricket,
+// games, WhatsApp). Between scenes each character bursts out and springs
+// to its next spot, drawn as a streak in flight and a letter at rest.
+// Tap the ring to skip ahead. Pauses off-screen; still for reduced motion.
 // =====================================================================
 (function () {
-  var sec = document.getElementById('tl-story'), cv = document.getElementById('tl-story-cv');
-  if (!sec || !cv || !cv.getContext) return;
+  var cv = document.getElementById('tl-hero-cv');
+  if (!cv || !cv.getContext) return;
   var ctx = cv.getContext('2d'), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var PAL = ['#0f3d33', '#1d5c46', '#2f8f5b', '#43b96a', '#9ed9b4', '#e6b48f'];
+  //          0 deep green  1 green    2 mint     3 pale     4 peach    5 cyan     6 indigo   7 white
+  var PAL = ['#2a7d5c', '#34d27c', '#86e8b2', '#cdf5df', '#f2b48a', '#56cce6', '#7d8bff', '#eef5f2'];
   var CHARS = 'thudinest';
+  var HOLD = 2700, MOVE = 1500;
   var SCENES = [
-    { no: '01', name: 'Keep scrolling', eyebrow: 'Keep scrolling', sub: 'Watch the letters find their place.' },
-    { no: '02', name: 'Thudinest', eyebrow: 'Thudinest', sub: 'Stay · Host · Survey · Play' },
-    { no: '03', name: 'The stay', eyebrow: 'The stay', sub: 'A cozy container home on MTP Road.' },
-    { no: '04', name: 'Hosting & surveys', eyebrow: 'Hosting & surveys', sub: 'Your own page and live results, free.' },
-    { no: '05', name: 'Free games', eyebrow: 'Free games', sub: '19 games in your browser, zero downloads.' }
+    ['Thudinest', drawWord], ['Container home', drawHouse], ['Peacock garden', drawFeather], ['Cozy bedroom', drawBed],
+    ['Free Wi-Fi', drawWifi], ['On MTP Road', drawPin], ['Hosting & surveys', drawMonitor], ['3D cricket', drawCricket],
+    ['19 free games', drawController], ['WhatsApp us', drawChat]
   ];
-  var W = 0, H = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 10, running = false, visible = false, last = 0, mx = -1e4, my = -1e4, sceneShown = -1;
-  var noEl = document.getElementById('tl-story-no'), nameEl = document.getElementById('tl-story-name'), dots = Array.prototype.slice.call(document.querySelectorAll('#tl-story-dots i'));
-  var capEl = sec.querySelector('.tl-story-cap'), eyeEl = document.getElementById('tl-story-eyebrow'), subEl = document.getElementById('tl-story-sub');
+  var noEl = document.getElementById('tl-hero-no'), nameEl = document.getElementById('tl-hero-name'), barEl = document.getElementById('tl-hero-bar');
+  var S = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 8, running = false, visible = false, last = 0, mx = -1e4, my = -1e4;
+  var cur = 0, nxt = 0, phase = 'hold', t0 = 0, built = false;
 
-  // ---- Scene drawings, rendered off-screen and sampled for particle targets ----
-  function frame(ox, oy, w, h, r, c, lw, x) { x.beginPath(); x.roundRect(ox, oy, w, h, r); x.lineWidth = lw; x.strokeStyle = c; x.stroke(); }
-  function drawWord(x, w, h) {
-    var lines = w / h < 0.95 ? ['THUDI', 'NEST'] : ['THUDINEST'];
+  // ---------- scene drawings (square canvas of side w) ----------
+  function rr(x, X, Y, W, H, R) { x.beginPath(); x.roundRect(X, Y, W, H, R); }
+  function drawWord(x, w) {
+    x.textBaseline = 'middle'; x.lineJoin = 'round';
     var fs = 100; x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif';
-    var widest = Math.max.apply(null, lines.map(function (l) { return x.measureText(l).width; }));
-    fs = Math.min(fs * (w * 0.78) / widest, (h * (lines.length > 1 ? 0.62 : 0.4)) / lines.length * 1.25);
-    x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif'; x.textBaseline = 'middle'; x.lineJoin = 'round';
-    var cols = [1, 0, 2, 3, 5, 3, 2, 4, 1], k = 0, lh = fs * 0.98, y0 = h * 0.52 - (lines.length - 1) * lh / 2;
-    lines.forEach(function (line, li) {
-      var lw = x.measureText(line).width, cx = (w - lw) / 2, y = y0 + li * lh;
+    var widest = Math.max(x.measureText('THUDI').width, x.measureText('NEST').width);
+    fs = fs * (w * 0.78) / widest; x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif';
+    var cols = [2, 1, 5, 1, 4, 2, 1, 3, 5], k = 0, lh = fs * 0.95;
+    ['THUDI', 'NEST'].forEach(function (line, li) {
+      var cx = (w - x.measureText(line).width) / 2, y = w / 2 + (li - 0.5) * lh;
       for (var i = 0; i < line.length; i++) {
-        var ch = line[i], cw = x.measureText(ch).width;
-        x.lineWidth = Math.max(4, fs * 0.07); x.strokeStyle = PAL[0]; x.strokeText(ch, cx, y);
-        x.fillStyle = PAL[cols[k % cols.length]]; x.fillText(ch, cx, y);
-        cx += cw; k++;
+        var ch = line[i]; x.lineWidth = fs * 0.07; x.strokeStyle = PAL[0]; x.strokeText(ch, cx, y);
+        x.fillStyle = PAL[cols[k++ % cols.length]]; x.fillText(ch, cx, y); cx += x.measureText(ch).width;
       }
     });
   }
-  function drawHouse(x, w, h) {
-    var S = Math.min(w * 0.8, h * 0.74), ox = (w - S) / 2, oy = h * 0.53 - S * 0.47, u = S / 100;
-    x.fillStyle = PAL[0]; x.fillRect(ox + 4 * u, oy + 6 * u, 92 * u, 6 * u);                    // roof slab
-    x.fillStyle = PAL[4]; x.fillRect(ox + 12 * u, oy + 12 * u, 76 * u, 28 * u);                 // glass storey
-    x.fillStyle = PAL[2]; for (var i = 0; i <= 4; i++) x.fillRect(ox + (12 + i * 18.6) * u, oy + 12 * u, 2.2 * u, 28 * u);
-    x.fillStyle = PAL[1]; x.fillRect(ox + 8 * u, oy + 38 * u, 84 * u, 4 * u);                   // balcony
-    x.fillStyle = PAL[0]; x.fillRect(ox + 16 * u, oy + 42 * u, 68 * u, 34 * u);                 // container
-    x.fillStyle = PAL[4]; x.fillRect(ox + 42 * u, oy + 48 * u, 14 * u, 22 * u);                 // door
-    x.fillStyle = PAL[5]; [[24, 48], [74, 48], [30, 60], [68, 60]].forEach(function (p) { x.beginPath(); x.arc(ox + p[0] * u, oy + p[1] * u, 1.8 * u, 0, 7); x.fill(); });
-    x.fillStyle = PAL[3]; x.beginPath(); x.ellipse(ox + 12 * u, oy + 74 * u, 12 * u, 10 * u, 0, 0, 7); x.ellipse(ox + 88 * u, oy + 72 * u, 13 * u, 12 * u, 0, 0, 7); x.fill();
-    x.fillStyle = PAL[2]; x.fillRect(ox + 2 * u, oy + 78 * u, 96 * u, 6 * u);                   // lawn
+  function drawHouse(x, w) {
+    var u = w / 100, o = 10 * u;
+    x.save(); x.translate(o, o + 4 * u); x.scale(0.8, 0.8);
+    x.fillStyle = PAL[0]; x.fillRect(4 * u, 6 * u, 92 * u, 6 * u);
+    x.fillStyle = PAL[3]; x.fillRect(12 * u, 12 * u, 76 * u, 28 * u);
+    x.fillStyle = PAL[1]; for (var i = 0; i <= 4; i++) x.fillRect((12 + i * 18.6) * u, 12 * u, 2.2 * u, 28 * u);
+    x.fillStyle = PAL[2]; x.fillRect(8 * u, 38 * u, 84 * u, 4 * u);
+    x.fillStyle = PAL[0]; x.fillRect(16 * u, 42 * u, 68 * u, 36 * u);
+    x.fillStyle = PAL[5]; x.fillRect(42 * u, 48 * u, 14 * u, 24 * u);
+    x.fillStyle = PAL[4]; [[24, 50], [76, 50], [30, 62], [70, 62]].forEach(function (p) { x.beginPath(); x.arc(p[0] * u, p[1] * u, 2 * u, 0, 7); x.fill(); });
+    x.fillStyle = PAL[1]; x.beginPath(); x.ellipse(10 * u, 76 * u, 12 * u, 11 * u, 0, 0, 7); x.ellipse(90 * u, 74 * u, 13 * u, 13 * u, 0, 0, 7); x.fill();
+    x.fillStyle = PAL[2]; x.fillRect(0, 80 * u, 100 * u, 6 * u);
+    x.restore();
   }
-  function drawMonitor(x, w, h) {
-    var S = Math.min(w * 0.72, h * 0.72), ox = (w - S) / 2, oy = h * 0.52 - S * 0.44, u = S / 100;
-    frame(ox + 4 * u, oy + 4 * u, 92 * u, 62 * u, 6 * u, PAL[0], 6 * u, x);
-    var bars = [[16, 26, 2], [32, 42, 3], [48, 34, 5], [64, 50, 3], [80, 20, 4]];
-    bars.forEach(function (b) { x.fillStyle = PAL[b[2]]; x.fillRect(ox + (b[0] - 5) * u, oy + (60 - b[1]) * u, 10 * u, b[1] * u); });
-    x.fillStyle = PAL[0]; x.fillRect(ox + 44 * u, oy + 69 * u, 12 * u, 12 * u); x.fillRect(ox + 30 * u, oy + 81 * u, 40 * u, 5 * u);
+  function drawFeather(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 36 * u;
+    x.save(); x.translate(cx, 50 * u); x.rotate(-0.32); x.translate(-cx, -50 * u);
+    x.strokeStyle = PAL[2]; x.lineCap = 'round';
+    for (var i = 0; i < 70; i++) {                              // barbs fanning from the shaft
+      var t = i / 70, y = 14 * u + t * 72 * u, len = (t < 0.55 ? 22 + 10 * Math.sin(t / 0.55 * Math.PI) : 22 - (t - 0.55) * 28) * u;
+      x.lineWidth = 0.9 * u; x.strokeStyle = t < 0.6 ? PAL[1] : PAL[0];
+      [-1, 1].forEach(function (s) { x.beginPath(); x.moveTo(cx, y); x.quadraticCurveTo(cx + s * len * 0.5, y - 4 * u, cx + s * len, y - 9 * u); x.stroke(); });
+    }
+    x.lineWidth = 1.6 * u; x.strokeStyle = PAL[3]; x.beginPath(); x.moveTo(cx, 12 * u); x.lineTo(cx, 94 * u); x.stroke();
+    var e = [[17, 21, PAL[4]], [13.5, 17, PAL[1]], [10.5, 13.5, PAL[5]], [6.5, 9, PAL[6]]];
+    e.forEach(function (r) { x.fillStyle = r[2]; x.beginPath(); x.ellipse(cx, cy, r[0] * u, r[1] * u, 0, 0, 7); x.fill(); });
+    x.restore();
   }
-  function drawController(x, w, h) {
-    var S = Math.min(w * 0.76, h * 0.8), ox = (w - S) / 2, oy = h * 0.53 - S * 0.33, u = S / 100;
-    x.beginPath(); x.moveTo(ox + 26 * u, oy + 6 * u); x.lineTo(ox + 74 * u, oy + 6 * u);
-    x.bezierCurveTo(ox + 96 * u, oy + 6 * u, ox + 102 * u, oy + 56 * u, ox + 92 * u, oy + 64 * u);
-    x.bezierCurveTo(ox + 84 * u, oy + 70 * u, ox + 74 * u, oy + 52 * u, ox + 66 * u, oy + 46 * u); x.lineTo(ox + 34 * u, oy + 46 * u);
-    x.bezierCurveTo(ox + 26 * u, oy + 52 * u, ox + 16 * u, oy + 70 * u, ox + 8 * u, oy + 64 * u);
-    x.bezierCurveTo(ox - 2 * u, oy + 56 * u, ox + 4 * u, oy + 6 * u, ox + 26 * u, oy + 6 * u); x.closePath();
-    x.fillStyle = PAL[2]; x.fill(); x.lineWidth = 4 * u; x.strokeStyle = PAL[0]; x.stroke();
-    x.fillStyle = PAL[4]; x.fillRect(ox + 18 * u, oy + 20 * u, 16 * u, 5 * u); x.fillRect(ox + 23.5 * u, oy + 14.5 * u, 5 * u, 16 * u);
-    [[72, 16, 5], [80, 23, 3], [64, 23, 4], [72, 30, 1]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.beginPath(); x.arc(ox + b[0] * u, oy + b[1] * u, 4 * u, 0, 7); x.fill(); });
+  function drawBed(x, w) {
+    var u = w / 100;
+    x.fillStyle = PAL[0]; rr(x, 12 * u, 24 * u, 8 * u, 56 * u, 2 * u); x.fill(); rr(x, 80 * u, 50 * u, 8 * u, 30 * u, 2 * u); x.fill();
+    x.fillStyle = PAL[0]; x.fillRect(12 * u, 66 * u, 76 * u, 6 * u);
+    x.fillStyle = PAL[3]; rr(x, 20 * u, 52 * u, 64 * u, 14 * u, 3 * u); x.fill();
+    x.fillStyle = PAL[7]; rr(x, 22 * u, 42 * u, 18 * u, 11 * u, 5 * u); x.fill();
+    x.fillStyle = PAL[1]; rr(x, 40 * u, 48 * u, 46 * u, 18 * u, 4 * u); x.fill();
+    x.fillStyle = PAL[4]; for (var i = 0; i < 4; i++) { x.beginPath(); x.arc((48 + i * 10) * u, 57 * u, 2 * u, 0, 7); x.fill(); }
+    x.fillStyle = PAL[2]; x.fillRect(14 * u, 72 * u, 4 * u, 8 * u); x.fillRect(82 * u, 72 * u, 4 * u, 8 * u);
+    x.fillStyle = PAL[5]; x.font = '800 ' + 12 * u + 'px Outfit, sans-serif'; x.fillText('z', 60 * u, 28 * u); x.font = '800 ' + 9 * u + 'px Outfit, sans-serif'; x.fillText('z', 71 * u, 18 * u);
   }
+  function drawWifi(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 72 * u; x.lineCap = 'round';
+    [[44, PAL[0]], [31, PAL[1]], [18, PAL[2]]].forEach(function (a) { x.lineWidth = 8 * u; x.strokeStyle = a[1]; x.beginPath(); x.arc(cx, cy, a[0] * u, Math.PI * 1.22, Math.PI * 1.78); x.stroke(); });
+    x.fillStyle = PAL[4]; x.beginPath(); x.arc(cx, cy, 6 * u, 0, 7); x.fill();
+  }
+  function drawPin(x, w) {
+    var u = w / 100, cx = 50 * u;
+    x.fillStyle = PAL[0]; x.beginPath(); x.ellipse(cx, 86 * u, 22 * u, 5 * u, 0, 0, 7); x.fill();
+    x.fillStyle = PAL[1]; x.beginPath(); x.moveTo(cx, 82 * u);
+    x.bezierCurveTo(cx - 6 * u, 70 * u, cx - 28 * u, 52 * u, cx - 28 * u, 36 * u); x.arc(cx, 36 * u, 28 * u, Math.PI, 0); x.bezierCurveTo(cx + 28 * u, 52 * u, cx + 6 * u, 70 * u, cx, 82 * u); x.fill();
+    x.fillStyle = PAL[3]; x.beginPath(); x.arc(cx, 36 * u, 13 * u, 0, 7); x.fill();
+    x.fillStyle = PAL[4]; x.beginPath(); x.moveTo(cx - 7 * u, 38 * u); x.lineTo(cx, 30 * u); x.lineTo(cx + 7 * u, 38 * u); x.closePath(); x.fill(); x.fillRect(cx - 5 * u, 38 * u, 10 * u, 6 * u);
+  }
+  function drawMonitor(x, w) {
+    var u = w / 100;
+    rr(x, 10 * u, 16 * u, 80 * u, 54 * u, 6 * u); x.lineWidth = 6 * u; x.strokeStyle = PAL[0]; x.stroke();
+    [[22, 22, 1], [36, 34, 2], [50, 28, 4], [64, 42, 1], [78, 18, 5]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.fillRect((b[0] - 5) * u, (64 - b[1]) * u, 9 * u, b[1] * u); });
+    x.fillStyle = PAL[0]; x.fillRect(44 * u, 73 * u, 12 * u, 10 * u); x.fillRect(32 * u, 83 * u, 36 * u, 5 * u);
+  }
+  function drawCricket(x, w) {
+    var u = w / 100;
+    x.save(); x.translate(44 * u, 52 * u); x.rotate(-0.62);
+    x.fillStyle = PAL[0]; rr(x, -3.5 * u, -46 * u, 7 * u, 26 * u, 3 * u); x.fill();                // handle
+    x.fillStyle = PAL[4]; for (var i = 0; i < 5; i++) x.fillRect(-4 * u, (-44 + i * 5) * u, 8 * u, 2 * u);
+    x.fillStyle = PAL[3]; rr(x, -9 * u, -20 * u, 18 * u, 62 * u, 6 * u); x.fill();                  // blade
+    x.fillStyle = PAL[2]; x.fillRect(-2 * u, -16 * u, 4 * u, 54 * u);
+    x.restore();
+    x.fillStyle = '#e8574f'; x.beginPath(); x.arc(74 * u, 72 * u, 11 * u, 0, 7); x.fill();
+    x.strokeStyle = PAL[7]; x.lineWidth = 1.4 * u; x.beginPath(); x.arc(64 * u, 72 * u, 10 * u, -0.9, 0.9); x.stroke(); x.beginPath(); x.arc(84 * u, 72 * u, 10 * u, Math.PI - 0.9, Math.PI + 0.9); x.stroke();
+    x.fillStyle = PAL[1]; x.fillRect(8 * u, 86 * u, 84 * u, 4 * u);
+  }
+  function drawController(x, w) {
+    var u = w / 100, ox = 8 * u, oy = 28 * u, k = 0.84;
+    x.save(); x.translate(ox, oy); x.scale(k, k);
+    x.beginPath(); x.moveTo(26 * u, 6 * u); x.lineTo(74 * u, 6 * u);
+    x.bezierCurveTo(96 * u, 6 * u, 102 * u, 56 * u, 92 * u, 64 * u); x.bezierCurveTo(84 * u, 70 * u, 74 * u, 52 * u, 66 * u, 46 * u); x.lineTo(34 * u, 46 * u);
+    x.bezierCurveTo(26 * u, 52 * u, 16 * u, 70 * u, 8 * u, 64 * u); x.bezierCurveTo(-2 * u, 56 * u, 4 * u, 6 * u, 26 * u, 6 * u); x.closePath();
+    x.fillStyle = PAL[1]; x.fill(); x.lineWidth = 4 * u; x.strokeStyle = PAL[0]; x.stroke();
+    x.fillStyle = PAL[3]; x.fillRect(18 * u, 20 * u, 16 * u, 5 * u); x.fillRect(23.5 * u, 14.5 * u, 5 * u, 16 * u);
+    [[72, 16, 4], [80, 23, 5], [64, 23, 6], [72, 30, 7]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.beginPath(); x.arc(b[0] * u, b[1] * u, 4 * u, 0, 7); x.fill(); });
+    x.restore();
+  }
+  function drawChat(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 46 * u;
+    x.fillStyle = PAL[1]; x.beginPath(); x.arc(cx, cy, 34 * u, 0, 7); x.fill();
+    x.beginPath(); x.moveTo(26 * u, 66 * u); x.lineTo(16 * u, 86 * u); x.lineTo(38 * u, 76 * u); x.closePath(); x.fill();
+    x.fillStyle = PAL[0]; x.beginPath(); x.arc(cx, cy, 26 * u, 0, 7); x.fill();
+    x.fillStyle = PAL[3]; [-11, 0, 11].forEach(function (d, i) { x.fillStyle = [PAL[3], PAL[4], PAL[3]][i]; x.beginPath(); x.arc(cx + d * u, cy, 4.5 * u, 0, 7); x.fill(); });
+  }
+
   function nearestPal(r, g, b) {
     var best = 0, bd = 1e9;
     for (var i = 0; i < PAL.length; i++) { var c = parseInt(PAL[i].slice(1), 16), d = Math.pow((c >> 16) - r, 2) + Math.pow(((c >> 8) & 255) - g, 2) + Math.pow((c & 255) - b, 2); if (d < bd) { bd = d; best = i; } }
-    return best;
+    return best === 7 && r > 200 && g < 120 ? 4 : best;
   }
+  var RED = '#e8574f';
   function sample(draw) {
-    var sc = 0.5, sw = Math.max(1, Math.round(W * sc)), sh = Math.max(1, Math.round(H * sc));
-    var oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
-    var x = oc.getContext('2d', { willReadFrequently: true }); draw(x, sw, sh);
-    var d = x.getImageData(0, 0, sw, sh).data, pts = [], step = Math.max(1, Math.round(glyph * 0.62 * sc));
-    for (var yy = 0; yy < sh; yy += step) for (var xx = 0; xx < sw; xx += step) {
+    var sc = 0.5, sw = Math.max(1, Math.round(S * sc));
+    var oc = document.createElement('canvas'); oc.width = oc.height = sw;
+    var x = oc.getContext('2d', { willReadFrequently: true }); draw(x, sw);
+    var d = x.getImageData(0, 0, sw, sw).data, pts = [], step = Math.max(1, Math.round(glyph * 0.58 * sc));
+    for (var yy = 0; yy < sw; yy += step) for (var xx = 0; xx < sw; xx += step) {
       var i = (yy * sw + xx) * 4; if (d[i + 3] < 140) continue;
-      pts.push([xx / sc + (Math.random() - 0.5) * step, yy / sc + (Math.random() - 0.5) * step, nearestPal(d[i], d[i + 1], d[i + 2])]);
+      var red = d[i] > 200 && d[i + 1] < 110 && d[i + 2] < 110;
+      pts.push([xx / sc + (Math.random() - 0.5) * step, yy / sc + (Math.random() - 0.5) * step, red ? 8 : nearestPal(d[i], d[i + 1], d[i + 2])]);
     }
     for (var k = pts.length - 1; k > 0; k--) { var j = (Math.random() * (k + 1)) | 0, t = pts[k]; pts[k] = pts[j]; pts[j] = t; }
     var out = new Float32Array(N * 3);
     for (var n = 0; n < N; n++) {
-      var p = pts.length ? pts[n % pts.length] : [W / 2, H / 2, 2], rep = n >= pts.length;
-      out[n * 3] = p[0] + (rep ? (Math.random() - 0.5) * 3 : 0); out[n * 3 + 1] = p[1] + (rep ? (Math.random() - 0.5) * 3 : 0); out[n * 3 + 2] = p[2];
+      var p = pts.length ? pts[n % pts.length] : [S / 2, S / 2, 1], rep = n >= pts.length;
+      out[n * 3] = p[0] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 1] = p[1] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 2] = p[2];
     }
     return out;
   }
-  function cloud() {
-    var out = new Float32Array(N * 3), R = Math.min(W, H) * 0.34, cx = W / 2, cy = H * 0.53;
-    for (var n = 0; n < N; n++) {
-      var a = Math.random() * Math.PI * 2, r = R * Math.sqrt(Math.random()) * (Math.random() < 0.3 ? 1.35 : 1);
-      out[n * 3] = cx + Math.cos(a) * r * 1.25; out[n * 3 + 1] = cy + Math.sin(a) * r * 0.9;
-      out[n * 3 + 2] = r > R * 0.9 ? (Math.random() < 0.7 ? 0 : 1) : [2, 3, 3, 4, 5][(Math.random() * 5) | 0];
-    }
-    return out;
-  }
-
-  // ---- Glyph sprites: one small canvas per (colour, character) ----
   function buildSprites() {
-    sprites = PAL.map(function (col) {
+    sprites = PAL.concat([RED]).map(function (col) {
       return CHARS.split('').map(function (ch) {
         var s = Math.ceil(glyph * 1.4 * DPR), c = document.createElement('canvas'); c.width = c.height = s;
         var x = c.getContext('2d'); x.font = '700 ' + Math.round(glyph * DPR) + 'px "JetBrains Mono", ui-monospace, monospace';
@@ -8690,83 +8848,88 @@ document.addEventListener('DOMContentLoaded',()=>{
       });
     });
   }
+  var COLORS = PAL.concat([RED]);
 
   function layout() {
     var r = cv.getBoundingClientRect(); if (!r.width) return;
-    W = r.width; H = r.height; DPR = Math.min(window.devicePixelRatio || 1, 2);
-    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
-    var small = W < 700;
-    glyph = small ? 7 : 10;
-    var want = Math.round(Math.min(small ? 1800 : 3200, (W * H) / (small ? 180 : 300)));
-    var fresh = !P || want !== N;
-    N = want;
-    if (fresh) {
-      P = new Float32Array(N * 7); // x, y, vx, vy, char, burst angle, burst radius
-      for (var i = 0; i < N; i++) { P[i * 7] = Math.random() * W; P[i * 7 + 1] = Math.random() * H; P[i * 7 + 4] = (Math.random() * CHARS.length) | 0; P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.35 + Math.random() * 0.65; }
+    S = r.width; DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = cv.height = Math.round(S * DPR);
+    glyph = S < 420 ? 6 : 7;
+    var want = Math.round(Math.min(S < 420 ? 1500 : 2600, (S * S) / (S < 420 ? 95 : 120)));
+    if (!P || want !== N) {
+      N = want; P = new Float32Array(N * 7);
+      for (var i = 0; i < N; i++) {
+        var a = Math.random() * Math.PI * 2, rad = S * 0.46 * Math.sqrt(Math.random());
+        P[i * 7] = S / 2 + Math.cos(a) * rad; P[i * 7 + 1] = S / 2 + Math.sin(a) * rad;
+        P[i * 7 + 4] = (Math.random() * CHARS.length) | 0; P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.35 + Math.random() * 0.65;
+      }
     }
     buildSprites();
-    T = [cloud(), sample(drawWord), sample(drawHouse), sample(drawMonitor), sample(drawController)];
+    T = SCENES.map(function (sc) { return sample(sc[1]); });
+    built = true;
   }
 
-  function progress() {
-    var r = sec.getBoundingClientRect(), span = r.height - window.innerHeight;
-    return span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+  function label(i) { noEl.textContent = (i + 1 < 10 ? '0' : '') + (i + 1); nameEl.textContent = SCENES[i][0]; }
+  function advance(now) {
+    nxt = (cur + 1) % SCENES.length; phase = 'move'; t0 = now; label(nxt);
+    for (var i = 0; i < N; i++) { P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.3 + Math.random() * 0.7; }
   }
-  var ease = function (t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
-
-  function showScene(i) {
-    if (i === sceneShown) return; sceneShown = i; var sc = SCENES[i];
-    noEl.textContent = sc.no; nameEl.textContent = sc.name; dots.forEach(function (d, j) { d.classList.toggle('on', j === i); });
-    capEl.classList.add('fade');
-    setTimeout(function () { eyeEl.textContent = sc.eyebrow; subEl.textContent = sc.sub; capEl.classList.remove('fade'); }, 220);
-  }
+  var ease = function (t) { t = Math.min(1, Math.max(0, t)); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
 
   function tick(now) {
     if (!running) return;
     requestAnimationFrame(tick);
+    if (!built) return;
     var dt = Math.min(2.5, (now - (last || now)) / 16.67); last = now;
-    var s = progress() * (T.length - 1), a = Math.min(T.length - 2, Math.floor(s)), lt = s - a;
-    var tt = ease((lt - 0.28) / 0.44), burst = Math.sin(Math.PI * tt), A = T[a], B = T[a + 1];
-    showScene(Math.round(s));
-    var R = Math.min(W, H) * 0.42, time = now * 0.001, k = 1 - Math.pow(1 - 0.085, dt), damp = Math.pow(0.8, dt);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
+    if (!t0) t0 = now + 1000; // let the opening word settle a little longer
+    var A, B, tt = 0;
+    if (phase === 'hold') {
+      A = B = T[cur];
+      var hp = (now - t0) / HOLD; barEl.style.transform = 'scaleX(' + Math.max(0, Math.min(1, hp)) + ')';
+      if (hp >= 1 && !reduce) advance(now);
+    }
+    if (phase === 'move') {
+      A = T[cur]; B = T[nxt]; tt = ease((now - t0) / MOVE); barEl.style.transform = 'scaleX(0)';
+      if (now - t0 >= MOVE) { cur = nxt; phase = 'hold'; t0 = now; A = B = T[cur]; tt = 0; }
+    }
+    var burst = phase === 'move' ? Math.sin(Math.PI * tt) : 0, R = S * 0.36, time = now * 0.001;
+    var k = 1 - Math.pow(1 - 0.09, dt), damp = Math.pow(0.8, dt);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, S, S);
     ctx.lineCap = 'round'; ctx.lineWidth = glyph * 0.55;
     var gs = glyph * 1.4, half = gs / 2;
     for (var i = 0; i < N; i++) {
-      var o = i * 7, j = i * 3;
-      var ang = P[o + 5] + time * 0.2, br = burst * R * P[o + 6];
-      var tx = A[j] + (B[j] - A[j]) * tt + Math.cos(ang) * br, ty = A[j + 1] + (B[j + 1] - A[j + 1]) * tt + Math.sin(ang) * br * 0.75;
-      tx += Math.sin(time * 1.3 + i) * 0.6; ty += Math.cos(time * 1.1 + i * 0.7) * 0.6;
+      var o = i * 7, j = i * 3, ang = P[o + 5] + time * 0.3, br = burst * R * P[o + 6];
+      var tx = A[j] + (B[j] - A[j]) * tt + Math.cos(ang) * br, ty = A[j + 1] + (B[j + 1] - A[j + 1]) * tt + Math.sin(ang) * br;
+      tx += Math.sin(time * 1.3 + i) * 0.5; ty += Math.cos(time * 1.1 + i * 0.7) * 0.5;
       var x = P[o], y = P[o + 1], vx = P[o + 2], vy = P[o + 3];
       if (reduce) { x = tx; y = ty; vx = vy = 0; }
       else {
         var dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy;
-        if (d2 < 9000) { var f = (1 - d2 / 9000) * 2.2 * dt; vx += dx / Math.sqrt(d2 + 1) * f; vy += dy / Math.sqrt(d2 + 1) * f; }
+        if (d2 < 4200) { var f = (1 - d2 / 4200) * 2 * dt, dd = Math.sqrt(d2 + 1); vx += dx / dd * f; vy += dy / dd * f; }
         vx = (vx + (tx - x) * k) * damp; vy = (vy + (ty - y) * k) * damp; x += vx * dt; y += vy * dt;
       }
       P[o] = x; P[o + 1] = y; P[o + 2] = vx; P[o + 3] = vy;
       var c = (tt < 0.5 ? A[j + 2] : B[j + 2]) | 0, sp = vx * vx + vy * vy;
-      if (sp > 2.2) {
-        var len = Math.min(5, Math.sqrt(sp) * 0.9 + 1);
-        ctx.strokeStyle = PAL[c]; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * len, y - vy * len); ctx.stroke();
-      } else ctx.drawImage(sprites[c][P[o + 4]], x - half, y - half, gs, gs);
+      if (sp > 1.6) { var len = Math.min(5, Math.sqrt(sp) * 0.9 + 1); ctx.strokeStyle = COLORS[c]; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * len, y - vy * len); ctx.stroke(); }
+      else ctx.drawImage(sprites[c][P[o + 4]], x - half, y - half, gs, gs);
     }
   }
   function setRunning(on) { if (on === running) return; running = on; if (on) { last = 0; requestAnimationFrame(tick); } }
 
-  var resizeT = 0;
-  window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(layout, 200); });
+  cv.addEventListener('click', function () { if (phase === 'hold') { if (reduce) { cur = (cur + 1) % SCENES.length; label(cur); requestAnimationFrame(function (n) { var r = running; running = true; tick(n); running = r; }); } else advance(performance.now()); } });
   cv.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
   cv.addEventListener('pointerleave', function () { mx = my = -1e4; });
+  var resizeT = 0; window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(layout, 200); });
   document.addEventListener('visibilitychange', function () { setRunning(visible && !document.hidden); });
   var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 100px Outfit'), document.fonts.load('700 10px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
   Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 2500); })]).then(function () {
-    layout();
-    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }, { rootMargin: '100px 0px' }).observe(sec);
+    layout(); label(0);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }).observe(cv);
     else { visible = true; setRunning(true); }
   });
-  window.__tlStory = { progress: progress, get n() { return N; } };
+  window.__tlHero = { get scene() { return cur; }, get n() { return N; }, next: function () { advance(performance.now()); } };
 })();
 </script>
+
 </body>
 </html>
