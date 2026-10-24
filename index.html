@@ -10,7 +10,7 @@
 <title>Thudinest &#183; Homestays, Web Hosting &amp; Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ===== RESET ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2325,6 +2325,479 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
   #trv-qtext { font-size: .96rem; }
 }
 </style>
+<style id="tl-style">
+/* =====================================================================
+   THUDINEST LANDING: light, soft cards, bold Outfit headlines with a
+   green accent, mono eyebrows, pill buttons with an arrow badge, a dark
+   teal panel for emphasis. Everything is scoped to #screen-landing.
+   ===================================================================== */
+#screen-landing {
+  --bg: #f2f3f7; --card: #ffffff; --ink: #1f1c1d; --ink-2: #3a3f47; --muted: #646b76; --line: rgba(31,28,29,0.1);
+  --green: #33b06a; --green-d: #23874a; --green-t: #e4f3ea; --peach: #e8a27a; --dark: #0b2a2e; --dark-2: #12393e;
+  --shadow: 0 1px 2px rgba(31,28,29,0.04), 0 10px 30px rgba(31,28,29,0.07);
+  --shadow-lg: 0 2px 6px rgba(31,28,29,0.05), 0 24px 60px rgba(31,28,29,0.12);
+  --radius: 26px;
+  --f-head: 'Outfit', 'Figtree', system-ui, sans-serif; --f-body: 'Figtree', system-ui, sans-serif; --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  display: block; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; user-select: text; -webkit-user-select: text; overflow-x: clip;
+}
+#screen-landing *, #screen-landing *::before, #screen-landing *::after { box-sizing: border-box; }
+:where(#screen-landing) a { color: inherit; }
+:where(#screen-landing) svg { width: 1em; height: 1em; }
+:where(#screen-landing) button { font: inherit; color: inherit; }
+#screen-landing ::selection { background: #bfe6cf; }
+#screen-landing [id] { scroll-margin-top: 96px; }
+
+.tl-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+.tl-sec { padding: clamp(80px, 11vw, 150px) 0 0; }
+.tl-eyebrow {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 18px;
+  font: 600 12.5px/1.3 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--green-d);
+}
+.tl-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 11px 0 0 -1px var(--peach); margin-right: 12px; flex: none; }
+.tl-h1 {
+  font: 800 clamp(2.9rem, 6.4vw, 5.6rem)/0.98 var(--f-head); letter-spacing: -0.045em; margin: 0 0 26px; color: var(--ink);
+}
+.tl-h1 em, .tl-h2 em { font-style: normal; color: var(--green); }
+.tl-h2 { font: 800 clamp(2.1rem, 4.2vw, 3.5rem)/1.04 var(--f-head); letter-spacing: -0.035em; margin: 0 0 18px; color: var(--ink); text-wrap: balance; }
+.tl-lede { font-size: clamp(1.05rem, 1.4vw, 1.22rem); color: var(--ink-2); max-width: 34em; margin: 0 0 32px; }
+.tl-p { color: var(--muted); margin: 0 0 26px; max-width: 34em; }
+.tl-mono { font-family: var(--f-mono); font-size: 12.5px; letter-spacing: 0.08em; color: var(--green-d); }
+.tl-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.tl-head { display: grid; grid-template-columns: 1fr; gap: 8px 60px; align-items: end; margin-bottom: 44px; }
+.tl-head .tl-p { margin-bottom: 18px; }
+
+/* Buttons: a pill with a circular arrow badge */
+.tl-btn {
+  display: inline-flex; align-items: center; gap: 14px; min-height: 52px; padding: 6px 7px 6px 24px; border-radius: 999px; border: 0;
+  font: 600 0.98rem/1 var(--f-body); text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s, background 0.25s;
+}
+.tl-btn .tl-ic { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; transition: transform 0.3s cubic-bezier(.2,.8,.2,1); flex: none; }
+.tl-btn:hover { transform: translateY(-2px); }
+.tl-btn:hover .tl-ic { transform: rotate(45deg); }
+.tl-btn:focus-visible, .tl-tab:focus-visible, .tl-acc-tab:focus-visible, .tl-ph:focus-visible, #screen-landing summary:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.tl-btn-dark { background: var(--ink); color: #fff; box-shadow: 0 10px 24px rgba(31,28,29,0.22); }
+.tl-btn-dark .tl-ic, .tl-btn-light .tl-ic { background: var(--green); color: #fff; }
+.tl-btn-light { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.tl-btn-green { background: var(--green); color: #fff; box-shadow: 0 10px 26px rgba(51,176,106,0.32); }
+.tl-btn-green .tl-ic, .tl-btn-white .tl-ic { background: #fff; color: var(--green-d); }
+.tl-btn-white { background: #fff; color: var(--ink); }
+.tl-btn-white .tl-ic { background: var(--green); color: #fff; }
+.tl-btn-ghost { background: rgba(255,255,255,0.08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+.tl-btn-ghost .tl-ic { background: #25d366; color: #fff; }
+.tl-link { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--ink); padding-bottom: 3px; }
+.tl-link svg { transition: transform 0.25s; }
+.tl-link:hover svg { transform: translate(3px, -3px); }
+.tl-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.tl-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-size: 0.86rem; font-weight: 500; color: var(--ink-2); }
+.tl-chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.tl-tag { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--green-t); color: var(--green-d); font: 600 11px/1 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ---------- Nav ---------- */
+.tl-nav {
+  position: fixed; z-index: 800; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+  width: min(1240px, calc(100% - 28px)); display: flex; align-items: center; gap: 18px; padding: 9px 10px 9px 22px;
+  background: rgba(255,255,255,0.82); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.9); border-radius: 999px; box-shadow: 0 8px 30px rgba(31,28,29,0.08);
+  font-family: var(--f-body); transition: box-shadow 0.3s, background 0.3s;
+}
+.tl-nav.scrolled { box-shadow: 0 10px 34px rgba(31,28,29,0.14); background: rgba(255,255,255,0.92); }
+.tl-logo { display: inline-flex; align-items: center; gap: 9px; font: 700 1.32rem/1 var(--f-head); letter-spacing: -0.03em; text-decoration: none; color: var(--ink); flex: none; }
+.tl-logo b { color: var(--green); font-weight: 700; }
+.tl-logo-mark { position: relative; width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(from 200deg, #1f6fb2, #33b06a, #d4b13f, #1f6fb2); display: grid; place-items: center; }
+.tl-logo-mark i { width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #173a7a; }
+.tl-logo-mark::after { content: ''; position: absolute; top: -3px; right: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--peach); }
+.tl-logo.light { color: #fff; }
+.tl-links { display: flex; gap: 2px; margin: 0 auto; }
+.tl-links a { position: relative; padding: 9px 14px; border-radius: 999px; text-decoration: none; font-size: 0.93rem; font-weight: 500; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
+.tl-links a:hover { background: rgba(31,28,29,0.05); color: var(--ink); }
+.tl-links a.on { background: #fff; color: var(--ink); box-shadow: 0 2px 10px rgba(31,28,29,0.08); }
+.tl-links a.on::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--green); }
+.tl-nav-cta { min-height: 44px; padding-left: 18px; font-size: 0.92rem; }
+.tl-nav-cta .tl-ic { width: 32px; height: 32px; font-size: 15px; }
+.tl-burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--ink); cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin-left: auto; }
+.tl-burger span { width: 18px; height: 2px; border-radius: 2px; background: #fff; transition: transform 0.3s; }
+.tl-burger[aria-expanded="true"] span:first-child { transform: translateY(4px) rotate(45deg); }
+.tl-burger[aria-expanded="true"] span:last-child { transform: translateY(-4px) rotate(-45deg); }
+.tl-menu {
+  position: fixed; inset: 0; z-index: 790; background: var(--dark); color: #fff; padding: calc(110px + env(safe-area-inset-top, 0px)) 24px 40px;
+  display: flex; flex-direction: column; gap: 28px; overflow-y: auto; opacity: 0; transition: opacity 0.3s;
+}
+.tl-menu[hidden] { display: none; }
+.tl-menu.open { opacity: 1; }
+.tl-menu nav a { display: flex; align-items: baseline; gap: 18px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font: 700 2rem/1.1 var(--f-head); letter-spacing: -0.03em; text-decoration: none; color: #fff; transform: translateY(14px); opacity: 0; transition: transform 0.45s cubic-bezier(.2,.8,.2,1), opacity 0.45s; }
+.tl-menu.open nav a { transform: none; opacity: 1; }
+.tl-menu nav a small { font: 500 12px/1 var(--f-mono); color: var(--green); letter-spacing: 0.08em; }
+.tl-menu-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ---------- Hero ---------- */
+.tl-hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: calc(120px + env(safe-area-inset-top, 0px)) 0 90px; overflow: hidden; }
+.tl-dot-bg { position: absolute; inset: 0; background-image: radial-gradient(rgba(31,28,29,0.07) 1.2px, transparent 1.3px); background-size: 26px 26px; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 70% 40%, #000, transparent 75%); mask-image: radial-gradient(ellipse 70% 60% at 70% 40%, #000, transparent 75%); pointer-events: none; }
+.tl-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(30px, 5vw, 80px); align-items: center; }
+.tl-hero-art { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; }
+.tl-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid #c9e9d5; }
+.tl-ring::before { content: ''; position: absolute; inset: 9%; border-radius: 50%; border: 1px dashed #d4dbe5; animation: tl-spin 60s linear infinite; }
+.tl-slides { position: relative; width: 84%; aspect-ratio: 4 / 3.15; border-radius: 30px; overflow: hidden; box-shadow: var(--shadow-lg); background: #dde3ea; transform: rotate(-2deg); }
+.tl-slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 1s ease, transform 6s ease; }
+.tl-slides img.on { opacity: 1; transform: scale(1); }
+.tl-feather { position: absolute; width: 13%; height: auto; right: 2%; top: 4%; transform: rotate(-16deg); animation: tl-hue 28s linear infinite, tl-sway 9s ease-in-out infinite; will-change: transform, filter; pointer-events: none; filter: hue-rotate(0deg) drop-shadow(0 8px 14px rgba(31,28,29,0.18)); }
+.tl-slide-chip { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 9px 16px 9px 9px; background: #fff; border-radius: 999px; box-shadow: var(--shadow-lg); white-space: nowrap; }
+.tl-slide-no { width: 30px; height: 30px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font: 600 11px/1 var(--f-mono); }
+.tl-slide-name { font-weight: 600; font-size: 0.92rem; }
+.tl-slide-dots { display: flex; gap: 5px; margin-left: 4px; }
+.tl-slide-dots i { width: 7px; height: 7px; border-radius: 999px; background: #d6dbe2; transition: width 0.4s, background 0.4s; }
+.tl-slide-dots i.on { width: 22px; background: #bfe6cf; }
+.tl-float-card { position: absolute; left: 0; top: 18%; display: flex; align-items: center; gap: 10px; padding: 10px 16px 10px 10px; background: #fff; border-radius: 18px; box-shadow: var(--shadow-lg); animation: tl-float 6s ease-in-out infinite; }
+.tl-float-card b { display: block; font-size: 0.9rem; }
+.tl-float-card small { color: var(--muted); font-size: 0.78rem; }
+.tl-fc-ico { width: 34px; height: 34px; border-radius: 11px; background: var(--green-t); color: var(--green-d); display: grid; place-items: center; font-size: 17px; }
+.tl-scroll { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 11px/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+.tl-scroll span { width: 18px; height: 28px; border-radius: 10px; border: 1.5px solid #b9c0cb; position: relative; }
+.tl-scroll span::after { content: ''; position: absolute; left: 50%; top: 6px; width: 2px; height: 6px; margin-left: -1px; border-radius: 2px; background: var(--muted); animation: tl-wheel 1.8s ease-in-out infinite; }
+
+/* ---------- Statement ---------- */
+.tl-statement { padding: clamp(90px, 12vw, 170px) 0 0; }
+.tl-fill { font: 800 clamp(2rem, 4.6vw, 3.8rem)/1.12 var(--f-head); letter-spacing: -0.035em; margin: 0 0 34px; max-width: 18em; }
+.tl-fill .w { color: #cdd2da; transition: color 0.35s; }
+.tl-fill .w.on { color: var(--ink); }
+.tl-fill em { font-style: normal; }
+.tl-fill em .w.on { color: var(--green); }
+
+/* ---------- Split section + tabs ---------- */
+.tl-split { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 70px); align-items: start; }
+.tl-tabs { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.tl-tab {
+  position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; text-align: left; padding: 16px 16px; border-radius: 20px; border: 1.5px solid transparent;
+  background: var(--card); box-shadow: var(--shadow); cursor: pointer; transition: border-color 0.25s, background 0.25s, transform 0.25s;
+}
+.tl-tab:hover { transform: translateX(4px); }
+.tl-tab-ico { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(145deg, #f4f5f8, #e3e6ec); display: grid; place-items: center; font-size: 20px; color: var(--ink-2); box-shadow: inset 0 1px 0 #fff; }
+.tl-tab-txt b { display: block; font: 700 1.05rem/1.25 var(--f-head); letter-spacing: -0.01em; }
+.tl-tab-txt small { color: var(--muted); font-size: 0.86rem; }
+.tl-tab-go { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px #cfe9d8; color: var(--green-d); font-size: 15px; }
+.tl-tab-bar { position: absolute; left: 76px; right: 20px; bottom: 9px; height: 3px; border-radius: 3px; background: transparent; overflow: hidden; }
+.tl-tab-bar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 3px; }
+.tl-tab.on { border-color: var(--green); background: var(--green-t); }
+.tl-tab.on .tl-tab-ico { background: linear-gradient(145deg, #45c27c, #23874a); color: #fff; box-shadow: 0 8px 18px rgba(35,135,74,0.3); }
+.tl-tab.on .tl-tab-txt b { color: var(--green-d); }
+.tl-tab.on .tl-tab-go { background: var(--green); color: #fff; box-shadow: none; }
+.tl-tab.on .tl-tab-bar { background: rgba(35,135,74,0.12); }
+.tl-tab.on .tl-tab-bar i { animation: tl-bar var(--tl-tab-ms, 6500ms) linear forwards; }
+.tl-tabs.paused .tl-tab.on .tl-tab-bar i { animation-play-state: paused; }
+.tl-panels { position: relative; }
+.tl-panel {
+  position: relative; padding: clamp(24px, 3vw, 36px); border-radius: 32px; background: var(--card); box-shadow: var(--shadow-lg); min-height: 520px;
+  background-image: radial-gradient(rgba(31,28,29,0.06) 1px, transparent 1.2px); background-size: 20px 20px;
+  animation: tl-panel-in 0.5s cubic-bezier(.2,.8,.2,1);
+}
+.tl-panel h3 { font: 800 1.7rem/1.1 var(--f-head); letter-spacing: -0.03em; margin: 0 0 8px; }
+.tl-panel > p { color: var(--muted); margin: 0 0 16px; max-width: 30em; font-size: 0.98rem; }
+.tl-panel-foot { position: absolute; left: clamp(24px, 3vw, 36px); right: clamp(24px, 3vw, 36px); bottom: clamp(24px, 3vw, 36px); padding: 16px 18px; border-radius: 16px; background: var(--green-t); color: var(--green-d); font-weight: 600; font-size: 0.95rem; }
+.tl-journey { margin: 28px 0 90px; display: grid; gap: 28px; }
+.tl-mini-card { width: 210px; padding: 10px; border-radius: 18px; background: #fff; box-shadow: var(--shadow-lg); }
+.tl-mini-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; display: block; margin-bottom: 10px; }
+.tl-mini-card b { display: block; font: 700 1rem/1.2 var(--f-head); }
+.tl-mini-card small { display: block; color: var(--muted); font-size: 0.8rem; margin-bottom: 8px; }
+.tl-ok { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; background: var(--green-t); color: var(--green-d); font-size: 0.78rem; font-weight: 600; }
+.tl-steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+.tl-steps::before { content: ''; position: absolute; left: 12%; right: 12%; top: 26px; border-top: 2px dashed #d3d8e0; }
+.tl-steps li { position: relative; text-align: center; font-size: 0.86rem; font-weight: 600; color: var(--ink-2); }
+.tl-steps li span { width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); display: grid; place-items: center; font-size: 20px; color: var(--ink-2); }
+.tl-steps li:first-child span { background: var(--green); color: #fff; box-shadow: 0 10px 22px rgba(51,176,106,0.35); }
+.tl-photo-mock { position: relative; margin: 26px 0 90px; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.tl-photo-mock img { display: block; width: 100%; height: 280px; object-fit: cover; }
+.tl-photo-mock ul { position: absolute; left: 14px; bottom: 14px; margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-photo-mock li { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,0.94); font-size: 0.84rem; font-weight: 600; box-shadow: var(--shadow); }
+.tl-photo-mock li svg { color: var(--green-d); }
+.tl-route { position: relative; margin: 30px 0 90px; height: 240px; border-radius: 22px; background: #f4f6f9; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.tl-route > svg { position: absolute; inset: 20px 0 0; width: 100%; height: 75%; }
+.tl-route-go { animation: tl-dash 2.4s linear infinite; }
+.tl-route-pin { position: absolute; display: grid; justify-items: center; text-align: center; gap: 2px; }
+.tl-route-pin span { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; background: #fff; box-shadow: var(--shadow-lg); margin-bottom: 4px; }
+.tl-route-pin.a span { background: var(--green); color: #fff; }
+.tl-route-pin b { font-size: 0.88rem; }
+.tl-route-pin small { color: var(--muted); font-size: 0.76rem; }
+.tl-route-pin.a { left: 7%; top: 45%; }
+.tl-route-pin.b { right: 9%; top: 26%; }
+.tl-biz { position: relative; margin: 26px 0 90px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: end; }
+.tl-browser { border-radius: 16px; background: #fff; box-shadow: var(--shadow-lg); overflow: hidden; }
+.tl-browser-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f4f5f8; border-bottom: 1px solid var(--line); }
+.tl-browser-bar i { width: 9px; height: 9px; border-radius: 50%; background: #dadfe6; }
+.tl-browser-bar span { margin-left: 8px; font: 500 10.5px/1 var(--f-mono); color: var(--muted); background: #fff; padding: 5px 9px; border-radius: 6px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-browser-body { padding: 16px; display: grid; gap: 8px; }
+.tl-browser-body b { height: 70px; border-radius: 10px; background: linear-gradient(120deg, #bfe6cf, #e6f4ec 60%, #f8e3d4); }
+.tl-browser-body > i { height: 9px; border-radius: 9px; background: #e7eaef; }
+.tl-browser-body > i.s { width: 60%; }
+.tl-browser-btn { justify-self: start; margin-top: 4px; padding: 8px 12px; border-radius: 999px; background: #25d366; color: #fff; font-size: 0.75rem; font-weight: 700; }
+.tl-browser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tl-browser-grid span { height: 54px; border-radius: 9px; background: #eef1f5; }
+.tl-bars { padding: 16px; border-radius: 16px; background: #fff; box-shadow: var(--shadow-lg); display: grid; gap: 8px; }
+.tl-bars small { font: 600 10.5px/1 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-d); }
+.tl-bars span { position: relative; height: 28px; border-radius: 9px; background: #f0f2f6; overflow: hidden; }
+.tl-bars span::before { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--w); background: linear-gradient(90deg, #45c27c, #33b06a); border-radius: 9px; }
+.tl-bars span b { position: relative; padding-left: 10px; line-height: 28px; font-size: 0.8rem; color: #fff; font-weight: 600; }
+
+/* ---------- Accordion ---------- */
+.tl-acc { display: flex; gap: 12px; min-height: 520px; }
+.tl-acc-item { position: relative; flex: 0 0 76px; border-radius: 30px; background: var(--card); box-shadow: var(--shadow-lg); overflow: hidden; transition: flex 0.6s cubic-bezier(.2,.8,.2,1); }
+.tl-acc-item.on { flex: 1 1 auto; }
+.tl-acc-tab { position: absolute; inset: 0; z-index: 2; width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 28px; }
+.tl-acc-tab small { font: 600 12px/1 var(--f-mono); color: var(--green-d); }
+.tl-acc-tab span { writing-mode: vertical-rl; font: 700 1.25rem/1 var(--f-head); letter-spacing: -0.01em; color: var(--ink-2); }
+.tl-acc-item.on .tl-acc-tab { display: none; }
+.tl-acc-body { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; align-items: center; padding: clamp(28px, 3.4vw, 48px); opacity: 0; visibility: hidden; transition: opacity 0.3s; min-width: 720px; }
+.tl-acc-item.on .tl-acc-body { opacity: 1; visibility: visible; transition: opacity 0.5s 0.25s; }
+.tl-acc-copy h3 { font: 800 clamp(1.8rem, 2.8vw, 2.5rem)/1.05 var(--f-head); letter-spacing: -0.035em; margin: 10px 0 12px; }
+.tl-strong { font-weight: 600; color: var(--ink-2); margin: 0 0 16px; }
+.tl-ticks { list-style: none; padding: 0; margin: 0 0 26px; display: grid; gap: 10px; }
+.tl-ticks li { position: relative; padding-left: 22px; color: var(--ink-2); font-size: 0.97rem; }
+.tl-ticks li::before { content: ''; position: absolute; left: 3px; top: 0.62em; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px var(--green-t); }
+.tl-acc-art { height: 100%; max-height: 420px; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.tl-acc-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tl-art-ui { display: grid; place-items: center; background: #f4f6f9; padding: 24px; box-shadow: inset 0 0 0 1px var(--line); }
+.tl-browser.big { width: 100%; max-width: 380px; }
+.tl-survey { width: 100%; max-width: 360px; display: grid; gap: 12px; }
+.tl-survey-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+.tl-live { font: 600 10.5px/1 var(--f-mono); letter-spacing: 0.1em; padding: 5px 8px; border-radius: 999px; background: var(--green-t); color: var(--green-d); text-transform: uppercase; }
+.tl-live::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 6px; animation: tl-blink 1.4s infinite; }
+.tl-cloud { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; padding: 16px; border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+.tl-cloud span { font: 700 calc(var(--s) * 1rem)/1.1 var(--f-head); color: var(--green-d); }
+.tl-cloud span:nth-child(2n) { color: #1f6fb2; }
+.tl-cloud span:nth-child(3n) { color: var(--peach); }
+
+/* ---------- Gallery & amenities ---------- */
+.tl-gallery { display: grid; grid-template-columns: 1.5fr 1fr 1fr; grid-template-rows: 260px 260px; gap: 12px; }
+.tl-ph { position: relative; padding: 0; border: 0; border-radius: 24px; overflow: hidden; cursor: zoom-in; background: #dde3ea; box-shadow: var(--shadow); }
+.tl-ph-big { grid-row: span 2; }
+.tl-ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(.2,.8,.2,1); }
+.tl-ph:hover img { transform: scale(1.05); }
+.tl-ph span { position: absolute; left: 12px; bottom: 12px; padding: 7px 12px; border-radius: 999px; background: rgba(255,255,255,0.92); font-size: 0.82rem; font-weight: 600; color: var(--ink); box-shadow: var(--shadow); }
+.tl-amen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 26px; }
+.tl-am { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 14px; align-items: center; padding: 16px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); transition: transform 0.25s; }
+.tl-am:hover { transform: translateY(-3px); }
+.tl-am > span { grid-row: span 2; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 20px; background: linear-gradient(145deg, #f4f5f8, #e3e6ec); color: var(--ink-2); }
+.tl-am.hot > span { background: linear-gradient(145deg, #45c27c, #23874a); color: #fff; box-shadow: 0 8px 18px rgba(35,135,74,0.3); }
+.tl-am b { font: 700 0.98rem/1.2 var(--f-head); }
+.tl-am small { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.83rem; }
+.tl-am small i { width: 6px; height: 6px; border-radius: 50%; background: var(--peach); }
+.tl-am.hot small { color: var(--green-d); font-weight: 600; }
+.tl-am.hot small i { background: var(--green); }
+
+/* ---------- Projects (games) ---------- */
+.tl-projects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+.tl-proj { display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 22px; border-radius: 28px; background: var(--card); box-shadow: var(--shadow); text-decoration: none; transition: transform 0.3s, box-shadow 0.3s; }
+.tl-proj:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+.tl-proj-img { position: relative; display: block; aspect-ratio: 16 / 10; border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
+.tl-proj-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+.tl-proj:hover .tl-proj-img img { transform: scale(1.05); }
+.tl-proj-img em { position: absolute; top: 12px; right: 12px; font: 700 11px/1 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; font-style: normal; background: var(--peach); color: #3b1d0a; padding: 6px 10px; border-radius: 999px; }
+.tl-proj .tl-tag { align-self: flex-start; margin: 0 10px; }
+.tl-proj b { font: 800 1.45rem/1.1 var(--f-head); letter-spacing: -0.03em; margin: 2px 10px 0; }
+.tl-proj small { color: var(--muted); font-size: 0.93rem; margin: 0 10px; }
+
+/* ---------- Dark panel ---------- */
+.tl-dark { margin: clamp(80px, 11vw, 150px) clamp(14px, 3vw, 50px) 0; border-radius: clamp(28px, 4vw, 48px); background: var(--dark); color: #fff; position: relative; overflow: hidden; }
+.tl-dark::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.2px); background-size: 22px 22px; -webkit-mask-image: linear-gradient(120deg, transparent 30%, #000 75%); mask-image: linear-gradient(120deg, transparent 30%, #000 75%); }
+.tl-dark-in { position: relative; max-width: 1240px; margin: 0 auto; padding: clamp(60px, 8vw, 110px) clamp(20px, 4vw, 48px); }
+.tl-dark .tl-eyebrow { color: #6fd39a; }
+.tl-dark .tl-h2 { color: #fff; }
+.tl-dark .tl-p { color: #9fb9b1; }
+.tl-why { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 20px; text-align: center; }
+.tl-why::before { content: ''; position: absolute; left: 16%; right: 16%; top: 36px; border-top: 1px solid rgba(255,255,255,0.14); }
+.tl-num { position: relative; width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 50%; display: grid; place-items: center; background: var(--dark-2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 0 0 10px var(--dark); font: 700 1.3rem/1 var(--f-head); }
+.tl-why > div:first-child .tl-num { background: var(--green); box-shadow: 0 0 0 10px var(--dark), 0 0 40px rgba(51,176,106,0.5); }
+.tl-why b { display: block; font: 700 1.2rem/1.2 var(--f-head); margin-bottom: 8px; }
+.tl-why p { color: #9fb9b1; margin: 0 auto; max-width: 22em; font-size: 0.95rem; }
+
+/* ---------- Marquee ---------- */
+.tl-marquee { padding: clamp(70px, 9vw, 120px) 0 0; overflow: hidden; white-space: nowrap; }
+.tl-marquee-track { display: inline-flex; align-items: center; gap: clamp(30px, 4vw, 60px); animation: tl-marq 30s linear infinite; }
+.tl-marquee span { font: 800 clamp(3.4rem, 9vw, 8rem)/1 var(--f-head); letter-spacing: -0.05em; color: var(--ink); }
+.tl-marquee span:nth-of-type(2n) { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+.tl-marquee i { width: 14px; height: 14px; border-radius: 50%; background: var(--peach); flex: none; }
+
+/* ---------- Location ---------- */
+.tl-loc { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 70px); align-items: center; }
+.tl-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; }
+.tl-pills span { padding: 7px 13px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-size: 0.85rem; font-weight: 500; color: var(--ink-2); }
+.tl-map { position: relative; aspect-ratio: 520 / 380; border-radius: 32px; overflow: hidden; background: #eef1f5; box-shadow: var(--shadow-lg); }
+.tl-map > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tl-map-pin { position: absolute; left: 55%; top: 44%; transform: translate(-50%, -50%); }
+.tl-pin-dot { position: relative; width: 52px; height: 52px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 22px; box-shadow: 0 0 0 6px #fff, 0 14px 30px rgba(35,135,74,0.45); }
+.tl-pulse { position: absolute; inset: -14px; border-radius: 50%; background: rgba(51,176,106,0.25); animation: tl-pulse 2.2s ease-out infinite; }
+.tl-map-label { position: absolute; left: 55%; top: 44%; transform: translate(-50%, 46px); padding: 10px 14px; background: #fff; border-radius: 14px; box-shadow: var(--shadow-lg); text-align: center; white-space: nowrap; }
+.tl-map-label b { display: block; font: 700 0.95rem/1.2 var(--f-head); }
+.tl-map-label small { color: var(--muted); font-size: 0.78rem; }
+.tl-map-tag { position: absolute; display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; background: #fff; box-shadow: var(--shadow); font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
+.tl-map-tag svg { color: var(--green-d); }
+.tl-map-tag.hosp { left: 8%; top: 14%; }
+.tl-map-tag.food { right: 7%; top: 18%; }
+.tl-map-tag.shop { left: 12%; bottom: 13%; }
+.tl-process { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+.tl-process > div { padding: 20px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tl-process span { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 19px; background: var(--green-t); color: var(--green-d); margin-bottom: 14px; }
+.tl-process b { display: block; font: 700 1.02rem/1.25 var(--f-head); margin-bottom: 4px; }
+.tl-process p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* ---------- FAQ ---------- */
+.tl-faq { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 70px); align-items: start; }
+.tl-faq-l { position: sticky; top: 110px; }
+.tl-note { display: flex; gap: 12px; align-items: flex-start; margin-top: 26px; padding: 14px 16px; border-radius: 18px; background: #fff3ec; box-shadow: inset 0 0 0 1px #f6d6c2; }
+.tl-note span { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: #fde3d4; color: #b4532a; font-size: 17px; flex: none; }
+.tl-note p { margin: 4px 0 0; font-size: 0.93rem; color: #7a3a1c; }
+.tl-qs { display: grid; gap: 12px; }
+.tl-qs details { border-radius: 22px; background: var(--card); box-shadow: var(--shadow); transition: box-shadow 0.3s; }
+.tl-qs details[open] { box-shadow: var(--shadow-lg); }
+.tl-qs summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 20px 20px 24px; cursor: pointer; font: 700 1.1rem/1.3 var(--f-head); letter-spacing: -0.01em; }
+.tl-qs summary::-webkit-details-marker { display: none; }
+.tl-qs summary span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: #eef0f4; font-size: 17px; flex: none; transition: transform 0.3s, background 0.3s, color 0.3s; }
+.tl-qs details[open] summary span { transform: rotate(45deg); background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(51,176,106,0.4); }
+.tl-qs details p { margin: 0; padding: 0 24px 22px; color: var(--ink-2); font-size: 0.98rem; }
+.tl-qs details p a { color: var(--green-d); font-weight: 600; }
+
+/* ---------- CTA ---------- */
+.tl-cta { position: relative; overflow: hidden; margin: clamp(80px, 11vw, 150px) auto 0; width: min(1040px, calc(100% - 28px)); padding: clamp(50px, 7vw, 90px) clamp(26px, 6vw, 80px); border-radius: clamp(28px, 4vw, 48px); background: var(--dark); color: #fff; }
+.tl-cta-ring { position: absolute; border-radius: 50%; border: clamp(40px, 6vw, 70px) solid #1d5a3f; opacity: 0.7; pointer-events: none; }
+.tl-cta-ring.a { width: 380px; height: 380px; right: -110px; top: -170px; }
+.tl-cta-ring.b { width: 220px; height: 220px; right: 60px; bottom: -150px; border-color: #173f44; }
+.tl-cta .tl-eyebrow { color: #6fd39a; position: relative; }
+.tl-cta .tl-h2 { color: #fff; max-width: 11em; font-size: clamp(2.3rem, 5vw, 4.2rem); position: relative; }
+.tl-cta .tl-row { position: relative; margin: 30px 0 30px; }
+.tl-cta-lines { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font: 500 13px/1.4 var(--f-mono); color: #9fb9b1; }
+.tl-cta-lines a { text-decoration: none; }
+.tl-cta-lines a:hover { color: #fff; }
+
+/* ---------- Footer ---------- */
+.tl-foot { margin-top: clamp(80px, 10vw, 120px); background: var(--dark); color: #c4d4cf; padding: 80px 0 30px; position: relative; overflow: hidden; }
+.tl-foot::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1.2px); background-size: 22px 22px; pointer-events: none; }
+.tl-foot .tl-wrap { position: relative; }
+.tl-foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.1fr; gap: 40px; }
+.tl-foot-brand p { color: #9fb9b1; margin: 18px 0 0; max-width: 22em; font-size: 0.97rem; }
+.tl-foot h4 { margin: 4px 0 16px; font: 600 12px/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: #7f9a93; }
+.tl-foot-grid a:not(.tl-logo) { display: block; text-decoration: none; color: #e6efec; margin: 0 0 12px; font-size: 0.97rem; }
+.tl-foot-grid a:not(.tl-logo):hover { color: #6fd39a; }
+.tl-socials { display: flex; gap: 10px; margin-top: 16px; }
+.tl-socials a { width: 42px !important; height: 42px; border-radius: 50%; display: grid !important; place-items: center; margin: 0 !important; font-size: 20px; }
+.tl-socials a.wa { background: #25d366; color: #fff !important; box-shadow: 0 0 20px rgba(37,211,102,0.4); }
+.tl-socials a.ab { background: #ff385c; color: #fff !important; }
+.tl-foot-area { margin: 50px 0 0; font-size: 0.9rem; color: #9fb9b1; }
+.tl-foot-area b { color: #fff; }
+.tl-foot-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.88rem; color: #9fb9b1; }
+.tl-foot-bottom .tl-mono { color: #6fd39a; }
+
+/* ---------- Floating buttons ---------- */
+.tl-fab { position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 700; display: grid; gap: 12px; justify-items: center; }
+.tl-top { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: var(--ink); box-shadow: var(--shadow-lg); cursor: pointer; display: grid; place-items: center; font-size: 17px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
+.tl-top.show { opacity: 1; transform: none; pointer-events: auto; }
+.tl-wa { width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #fff; display: grid; place-items: center; font-size: 28px; box-shadow: 0 0 0 6px rgba(37,211,102,0.18), 0 14px 30px rgba(37,211,102,0.4); transition: transform 0.25s; }
+.tl-wa:hover { transform: scale(1.07); }
+
+/* ---------- Photo viewer ---------- */
+.tl-lb { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 64px 76px; background: rgba(11,42,46,0.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.tl-lb[hidden] { display: none; }
+.tl-lb img { max-width: min(1400px, 100%); max-height: 100%; border-radius: 18px; object-fit: contain; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+.tl-lb-cap { position: absolute; left: 0; right: 0; bottom: 20px; margin: 0; text-align: center; font: 500 13px/1 var(--f-mono); color: #c4d4cf; letter-spacing: 0.06em; }
+.tl-lb-btn { position: absolute; width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.1); color: #fff; font-size: 1.4rem; cursor: pointer; display: grid; place-items: center; }
+.tl-lb-btn:hover { background: var(--green); }
+.tl-lb-btn.x { top: 16px; right: 16px; }
+.tl-lb-btn.p { left: 16px; top: 50%; margin-top: -24px; }
+.tl-lb-btn.n { right: 16px; top: 50%; margin-top: -24px; }
+
+/* ---------- Reveal on scroll ---------- */
+.tl-in { opacity: 0; transform: translateY(26px); transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1); }
+.tl-in.seen { opacity: 1; transform: none; }
+
+@keyframes tl-spin { to { transform: rotate(360deg); } }
+@keyframes tl-hue { to { filter: hue-rotate(360deg) drop-shadow(0 8px 14px rgba(31,28,29,0.18)); } }
+@keyframes tl-sway { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(-10deg) translateY(-6px); } }
+@keyframes tl-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes tl-wheel { 0% { opacity: 1; transform: translateY(0); } 80% { opacity: 0; transform: translateY(8px); } 100% { opacity: 0; } }
+@keyframes tl-bar { from { width: 0; } to { width: 100%; } }
+@keyframes tl-panel-in { from { opacity: 0; transform: translateY(12px) scale(0.99); } }
+@keyframes tl-dash { to { stroke-dashoffset: -60; } }
+@keyframes tl-blink { 50% { opacity: 0.3; } }
+@keyframes tl-marq { to { transform: translateX(-50%); } }
+@keyframes tl-pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
+
+/* ---------- Desktop ---------- */
+@media (min-width: 1024px) {
+  .tl-head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); }
+}
+/* ---------- Tablet ---------- */
+@media (max-width: 1100px) {
+  .tl-links a { padding: 9px 10px; font-size: 0.88rem; }
+}
+@media (max-width: 1023px) {
+  .tl-links, .tl-nav-cta { display: none; }
+  .tl-burger { display: flex; }
+  .tl-nav { padding-left: 18px; }
+  .tl-hero { min-height: 0; padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
+  .tl-hero-grid, .tl-split, .tl-loc, .tl-faq { grid-template-columns: 1fr; }
+  .tl-hero-art { max-width: 620px; width: 100%; margin: 0 auto; }
+  .tl-faq-l { position: static; }
+  .tl-acc { flex-direction: column; min-height: 0; }
+  .tl-acc-item { flex: none !important; }
+  .tl-acc-tab { position: relative; flex-direction: row; justify-content: flex-start; padding: 22px 24px; gap: 14px; }
+  .tl-acc-tab span { writing-mode: horizontal-tb; }
+  .tl-acc-tab::after { content: '+'; margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: #eef0f4; display: grid; place-items: center; font-weight: 700; }
+  .tl-acc-body { position: relative; inset: auto; min-width: 0; grid-template-columns: 1fr; display: none; }
+  .tl-acc-item.on .tl-acc-body { display: grid; }
+  .tl-acc-art { height: 260px; }
+  .tl-amen { grid-template-columns: repeat(2, 1fr); }
+  .tl-process { grid-template-columns: repeat(2, 1fr); }
+  .tl-foot-grid { grid-template-columns: 1fr 1fr; }
+  .tl-panel { min-height: 0; }
+}
+/* ---------- Phone ---------- */
+@media (max-width: 700px) {
+  #screen-landing { font-size: 16px; }
+  .tl-nav { width: calc(100% - 24px); top: calc(10px + env(safe-area-inset-top, 0px)); padding: 7px 7px 7px 16px; }
+  .tl-logo { font-size: 1.2rem; }
+  .tl-burger { width: 44px; height: 44px; }
+  .tl-hero { padding-bottom: 70px; }
+  .tl-scroll { display: none; }
+  .tl-float-card { top: 6%; left: -4px; transform: scale(0.88); transform-origin: left top; }
+  .tl-slide-chip { bottom: 4%; padding: 7px 12px 7px 7px; }
+  .tl-slide-name { font-size: 0.84rem; }
+  .tl-btn { min-height: 50px; padding-left: 20px; font-size: 0.95rem; }
+  .tl-hero .tl-row .tl-btn { flex: 1 1 auto; justify-content: space-between; }
+  .tl-tab-bar { left: 72px; }
+  .tl-panel { padding: 22px; border-radius: 26px; }
+  .tl-panel-foot { position: static; margin-top: 18px; }
+  .tl-journey, .tl-photo-mock, .tl-route, .tl-biz { margin-bottom: 0; }
+  .tl-steps li { font-size: 0.74rem; }
+  .tl-steps li span { width: 44px; height: 44px; font-size: 17px; }
+  .tl-steps::before { top: 21px; }
+  .tl-photo-mock img { height: 220px; }
+  .tl-biz { grid-template-columns: 1fr; }
+  .tl-route-pin.b { right: 5%; }
+  .tl-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 230px 150px 150px; }
+  .tl-ph-big { grid-row: auto; grid-column: span 2; }
+  .tl-amen { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tl-am { padding: 12px; column-gap: 10px; }
+  .tl-am > span { width: 38px; height: 38px; font-size: 17px; }
+  .tl-am b { font-size: 0.88rem; }
+  .tl-am small { font-size: 0.76rem; }
+  .tl-projects { grid-template-columns: 1fr; }
+  .tl-why { grid-template-columns: 1fr; gap: 34px; }
+  .tl-why::before { display: none; }
+  .tl-process { grid-template-columns: 1fr; }
+  .tl-map-tag { font-size: 0.72rem; padding: 6px 9px; }
+  .tl-qs summary { font-size: 1rem; padding: 18px 16px 18px 20px; }
+  .tl-cta .tl-row .tl-btn { flex: 1 1 auto; justify-content: space-between; }
+  .tl-foot-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .tl-foot-brand { grid-column: 1 / -1; }
+  .tl-lb { padding: 64px 12px 100px; }
+  .tl-lb-btn.p, .tl-lb-btn.n { top: auto; bottom: 18px; margin-top: 0; }
+  .tl-lb-cap { bottom: 74px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #screen-landing *, #screen-landing *::before, #screen-landing *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  .tl-in { opacity: 1; transform: none; }
+  .tl-marquee-track { animation: none; }
+}
+</style>
 </head>
 <body>
 
@@ -2334,432 +2807,440 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 <!-- ===== THUDINEST LANDING SCREEN ===== -->
 <div id="screen-landing" class="screen" style="display:flex">
 
-  <nav class="tn-nav" id="tn-nav" aria-label="Main">
-    <a class="tn-nav-brand" href="#top" data-top>Thudinest</a>
-    <div class="tn-nav-links" id="tn-nav-links">
-      <a href="#tn-about" data-spy>Stay</a>
-      <a href="#tn-featured" data-spy>Games</a>
-      <a href="#tn-hosting" data-spy>Hosting</a>
-      <a href="#tn-survey" data-spy>Survey</a>
-      <a href="#tn-book" data-spy>Contact</a>
-      <a class="tn-nav-sheet-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener">&#128172; WhatsApp +60 11-6116 5161</a>
-    </div>
-    <a class="tn-nav-book" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book a stay</a>
-    <button class="tn-nav-menu" id="tn-nav-menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="tn-nav-links"><span></span><span></span><span></span></button>
-    <div class="tn-progress-track"><div class="tn-progress-fill" id="tn-progress-fill"></div></div>
-  </nav>
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5Zm0 17.1a7.7 7.7 0 0 1-3.9-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 1 1 12 19.6Zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.3 6.3 0 0 1-3.1-2.7c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.2-.2-.4-.3Z" fill="currentColor"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-laptop" viewBox="0 0 24 24"><path d="M5 6h14v9H5zM3 18h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-hosp" viewBox="0 0 24 24"><path d="M5 20V6h14v14M10 10h4M12 8v4M9 20v-4h6v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9h16l-1-4H5zM5 9v10h14V9M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18v-7h18v7M3 15h18M6 11V8h5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bath" viewBox="0 0 24 24"><path d="M4 12h16v2a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM6 12V6a2 2 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M3 12a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3zM5 17v2M19 17v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M9 3v3M12 3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4zM4 16v2M20 16v2M7.5 13h.01M16.5 13h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-soap" viewBox="0 0 24 24"><path d="M7 10h10v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM10 10V7h4v3M12 7V4h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="14" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11 11 8-8M16 6l2 2M14 8l2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-game" viewBox="0 0 24 24"><path d="M6 9h12a4 4 0 0 1 3.8 5.3l-.8 2.4a2.5 2.5 0 0 1-4.3.8L15 16H9l-1.7 1.5a2.5 2.5 0 0 1-4.3-.8l-.8-2.4A4 4 0 0 1 6 9ZM8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4zM10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
 
-  <!-- Hero -->
-  <section class="tn-hero">
-    <div class="tn-hero-bg"></div>
-    <div class="tn-orb tn-orb-1"></div>
-    <div class="tn-orb tn-orb-2"></div>
-    <div class="tn-orb tn-orb-3"></div>
-    <!-- Peacock feather accent. To use an HD photo instead, drop a transparent PNG in images/ and change src
-         (and --feather-ratio in the CSS if its width:height is not 1:3). -->
-    <div class="tn-feather" id="tn-feather" aria-hidden="true">
-      <img src="./images/peacock-feather.svg" alt="" width="400" height="1200" decoding="async" fetchpriority="low">
+  <!-- Floating pill nav -->
+  <header class="tl-nav" id="tl-nav">
+    <a class="tl-logo" href="#top" data-jump="top" aria-label="Thudinest home"><span class="tl-logo-mark" aria-hidden="true"><i></i></span><span>thudi<b>nest</b></span></a>
+    <nav class="tl-links" aria-label="Main">
+      <a href="#top" data-jump="top" data-spy="top" class="on">Home</a>
+      <a href="#stay" data-jump data-spy="stay">Stay</a>
+      <a href="#space" data-jump data-spy="space">The space</a>
+      <a href="#extras" data-jump data-spy="extras">Hosting &amp; surveys</a>
+      <a href="#games" data-jump data-spy="games">Games</a>
+      <a href="#faq" data-jump data-spy="faq">FAQ</a>
+      <a href="#contact" data-jump data-spy="contact">Contact</a>
+    </nav>
+    <a class="tl-btn tl-btn-green tl-nav-cta" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book a stay<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+    <button class="tl-burger" id="tl-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="tl-menu"><span></span><span></span></button>
+  </header>
+
+  <!-- Phone menu -->
+  <div class="tl-menu" id="tl-menu" hidden>
+    <nav aria-label="Menu">
+      <a href="#top" data-jump="top"><small>01</small>Home</a>
+      <a href="#stay" data-jump><small>02</small>Stay</a>
+      <a href="#space" data-jump><small>03</small>The space</a>
+      <a href="#extras" data-jump><small>04</small>Hosting &amp; surveys</a>
+      <a href="#games" data-jump><small>05</small>Games</a>
+      <a href="#faq" data-jump><small>06</small>FAQ</a>
+      <a href="#contact" data-jump><small>07</small>Contact</a>
+    </nav>
+    <div class="tl-menu-actions">
+      <a class="tl-btn tl-btn-green" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+      <a class="tl-btn tl-btn-ghost" href="https://wa.me/601161165161" target="_blank" rel="noopener">WhatsApp<span class="tl-ic"><svg><use href="#i-wa"/></svg></span></a>
     </div>
-    <div class="tn-hero-content">
-      <h1 class="tn-hero-name">Thudinest</h1>
-      <div class="tn-hero-byline">Homestays &middot; Web Hosting &middot; Surveys &middot; Games</div>
-      <p class="tn-hero-tagline">A cozy container homestay on MTP Road, Coimbatore &#8212; and a free home for your website, live surveys and a little fun, too.</p>
-      <div class="tn-hero-actions">
-        <a class="tn-btn-primary" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Book your stay</a>
-        <a class="tn-btn-ghost" href="#tn-featured" data-jump>&#127918; Play free games</a>
-        <div class="tn-contact-wrap">
-          <button class="tn-btn-ghost" id="contact-toggle" onclick="toggleContactDrop(event)">&#128222; Contact Us &#9662;</button>
-          <div id="tn-contact-drop" class="tn-contact-drop">
-            <div class="tn-contact-drop-label">Chat with us on WhatsApp</div>
-            <a href="https://wa.me/601161165161" target="_blank" rel="noopener" class="tn-contact-wa">
-              <span class="tn-contact-wa-ico">&#128172;</span>+60 11-6116 5161
-            </a>
-            <a href="https://wa.me/919698026106" target="_blank" rel="noopener" class="tn-contact-wa">
-              <span class="tn-contact-wa-ico">&#128172;</span>+91 96980 26106
-            </a>
-            <a href="https://wa.me/917092713486" target="_blank" rel="noopener" class="tn-contact-wa">
-              <span class="tn-contact-wa-ico">&#128172;</span>+91 70927 13486
-            </a>
+  </div>
+
+  <main class="tl" id="top">
+
+    <!-- Hero -->
+    <section class="tl-hero">
+      <span class="tl-dot-bg" aria-hidden="true"></span>
+      <div class="tl-wrap tl-hero-grid">
+        <div class="tl-hero-copy">
+          <p class="tl-eyebrow tl-in">Container homestay · Thudiyalur · Coimbatore</p>
+          <h1 class="tl-h1 tl-in">A cozy little home on <em>MTP Road.</em></h1>
+          <p class="tl-lede tl-in">Thudinest is a compact container homestay in Thudiyalur, Coimbatore, with instant booking, easy parking and free Wi-Fi. And while you're here: free website hosting, live surveys and 19 browser games.</p>
+          <div class="tl-row tl-in">
+            <a class="tl-btn tl-btn-dark" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+            <a class="tl-btn tl-btn-light" href="#space" data-jump>See the space<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+          </div>
+          <div class="tl-chips tl-in">
+            <span class="tl-chip"><i></i>Instant booking</span>
+            <span class="tl-chip"><i></i>Free parking &amp; Wi-Fi</span>
+          </div>
+        </div>
+        <div class="tl-hero-art tl-in">
+          <span class="tl-ring" aria-hidden="true"></span>
+          <div class="tl-slides" id="tl-slides">
+            <img src="./images/hero-peacock.jpg" alt="Thudinest container home with a peacock on the lawn" class="on" width="1364" height="768" fetchpriority="high">
+            <img src="./images/exterior.jpg" alt="The two-level container home and its garden" width="1200" height="900" loading="lazy">
+            <img src="./images/bedroom.jpg" alt="The bedroom" width="1200" height="900" loading="lazy">
+            <img src="./images/gallery/living.jpg" alt="Living area with a work desk" width="1600" height="1200" loading="lazy">
+          </div>
+          <img class="tl-feather" src="./images/peacock-feather.svg" alt="" aria-hidden="true" width="400" height="1200">
+          <div class="tl-slide-chip" aria-live="polite">
+            <span class="tl-slide-no" id="tl-slide-no">01</span>
+            <span class="tl-slide-name" id="tl-slide-name">Garden &amp; peacock</span>
+            <span class="tl-slide-dots" id="tl-slide-dots"><i class="on"></i><i></i><i></i><i></i></span>
+          </div>
+          <div class="tl-float-card" aria-hidden="true"><span class="tl-fc-ico"><svg><use href="#i-check"/></svg></span><span><b>Instant booking</b><small>on Airbnb</small></span></div>
+        </div>
+      </div>
+      <a class="tl-scroll" href="#intro" data-jump aria-label="Scroll down"><span></span>Scroll</a>
+    </section>
+
+    <!-- Statement that fills in as you scroll -->
+    <section class="tl-statement" id="intro">
+      <div class="tl-wrap">
+        <p class="tl-fill" id="tl-fill">Not just a place to sleep. A quiet, <em>photogenic</em> home right on <em>MTP Road,</em> close to VG Hospital, restaurants and shops, with everything you need for a <em>short, easy getaway.</em></p>
+        <a class="tl-link" href="#space" data-jump>More about the space <svg><use href="#i-arrow"/></svg></a>
+      </div>
+    </section>
+
+    <!-- Who it's for: rotating tabs -->
+    <section class="tl-sec" id="stay">
+      <div class="tl-wrap tl-split">
+        <div class="tl-split-l">
+          <p class="tl-eyebrow tl-in">Who it's for</p>
+          <h2 class="tl-h2 tl-in">Made for short, easy stays.</h2>
+          <p class="tl-p tl-in">The guests we see most, and what a stay looks like for each. Pick one, or let them play.</p>
+          <div class="tl-tabs tl-in" role="tablist" aria-label="Who it's for">
+            <button class="tl-tab on" role="tab" aria-selected="true" aria-controls="tl-panel-0" id="tl-tab-0" data-i="0">
+              <span class="tl-tab-ico"><svg><use href="#i-heart"/></svg></span><span class="tl-tab-txt"><b>Couples &amp; solo travellers</b><small>Private, peaceful and all yours</small></span><span class="tl-tab-go"><svg><use href="#i-chev"/></svg></span><span class="tl-tab-bar"><i></i></span>
+            </button>
+            <button class="tl-tab" role="tab" aria-selected="false" aria-controls="tl-panel-1" id="tl-tab-1" data-i="1" tabindex="-1">
+              <span class="tl-tab-ico"><svg><use href="#i-laptop"/></svg></span><span class="tl-tab-txt"><b>Remote workers</b><small>A desk, free Wi-Fi and quiet nights</small></span><span class="tl-tab-go"><svg><use href="#i-chev"/></svg></span><span class="tl-tab-bar"><i></i></span>
+            </button>
+            <button class="tl-tab" role="tab" aria-selected="false" aria-controls="tl-panel-2" id="tl-tab-2" data-i="2" tabindex="-1">
+              <span class="tl-tab-ico"><svg><use href="#i-hosp"/></svg></span><span class="tl-tab-txt"><b>Hospital visits</b><small>VG Hospital is close by</small></span><span class="tl-tab-go"><svg><use href="#i-chev"/></svg></span><span class="tl-tab-bar"><i></i></span>
+            </button>
+            <button class="tl-tab" role="tab" aria-selected="false" aria-controls="tl-panel-3" id="tl-tab-3" data-i="3" tabindex="-1">
+              <span class="tl-tab-ico"><svg><use href="#i-store"/></svg></span><span class="tl-tab-txt"><b>Small businesses</b><small>A free website and live surveys</small></span><span class="tl-tab-go"><svg><use href="#i-chev"/></svg></span><span class="tl-tab-bar"><i></i></span>
+            </button>
+          </div>
+        </div>
+        <div class="tl-panels tl-in">
+          <div class="tl-panel on" role="tabpanel" id="tl-panel-0" aria-labelledby="tl-tab-0">
+            <h3>Couples &amp; solo travellers</h3>
+            <p>A private little home with a bedroom, attached bathroom, living area and kitchenette, just for you.</p>
+            <span class="tl-tag">Your stay</span>
+            <div class="tl-journey">
+              <div class="tl-mini-card"><img src="./images/exterior.jpg" alt="" width="1200" height="900" loading="lazy"><b>Thudinest No. 2</b><small>Thudiyalur, Coimbatore</small><span class="tl-ok"><svg><use href="#i-check"/></svg>Instant booking</span></div>
+              <ol class="tl-steps">
+                <li><span><svg><use href="#i-cal"/></svg></span>Book on Airbnb</li>
+                <li><span><svg><use href="#i-key"/></svg></span>Check in</li>
+                <li><span><svg><use href="#i-sofa"/></svg></span>Settle in</li>
+                <li><span><svg><use href="#i-heart"/></svg></span>Come back</li>
+              </ol>
+            </div>
+            <div class="tl-panel-foot">A quiet, private stay on MTP Road</div>
+          </div>
+          <div class="tl-panel" role="tabpanel" id="tl-panel-1" aria-labelledby="tl-tab-1" hidden>
+            <h3>Remote workers</h3>
+            <p>A work desk by the window, free Wi-Fi and quiet hours after 10 PM: easy to get a few days of work done.</p>
+            <span class="tl-tag">Work from here</span>
+            <div class="tl-photo-mock">
+              <img src="./images/gallery/living.jpg" alt="The work desk by the window" width="1600" height="1200" loading="lazy">
+              <ul>
+                <li><svg><use href="#i-wifi"/></svg>Free Wi-Fi</li>
+                <li><svg><use href="#i-laptop"/></svg>Work desk</li>
+                <li><svg><use href="#i-moon"/></svg>Quiet after 10 PM</li>
+              </ul>
+            </div>
+            <div class="tl-panel-foot">Stay a few days and get work done</div>
+          </div>
+          <div class="tl-panel" role="tabpanel" id="tl-panel-2" aria-labelledby="tl-tab-2" hidden>
+            <h3>Hospital visits</h3>
+            <p>Visiting someone at VG Hospital? Stay a short distance away on MTP Road, with restaurants and shops nearby.</p>
+            <span class="tl-tag">Close to care</span>
+            <div class="tl-route">
+              <svg viewBox="0 0 420 170" aria-hidden="true">
+                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#d9dde6" stroke-width="18" stroke-linecap="round"/>
+                <path d="M10 120 C 120 120, 150 50, 260 60 S 380 110, 410 80" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="10 10"/>
+                <path class="tl-route-go" d="M70 118 C 150 112, 170 58, 260 60 S 340 96, 350 96" fill="none" stroke="#33b06a" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 9"/>
+              </svg>
+              <div class="tl-route-pin a"><span><svg><use href="#i-home"/></svg></span><b>Thudinest</b><small>MTP Road</small></div>
+              <div class="tl-route-pin b"><span><svg><use href="#i-hosp"/></svg></span><b>VG Hospital</b><small>Short distance</small></div>
+            </div>
+            <div class="tl-panel-foot">Restaurants and shops nearby, too</div>
+          </div>
+          <div class="tl-panel" role="tabpanel" id="tl-panel-3" aria-labelledby="tl-tab-3" hidden>
+            <h3>Small businesses</h3>
+            <p>Got an access code from us? Publish a free single-page website in minutes, or run a live survey with a QR code.</p>
+            <span class="tl-tag">Free extras</span>
+            <div class="tl-biz">
+              <div class="tl-browser"><div class="tl-browser-bar"><i></i><i></i><i></i><span>thudinest.com/p/your-shop</span></div><div class="tl-browser-body"><b></b><i></i><i></i><i class="s"></i><span class="tl-browser-btn">WhatsApp us</span></div></div>
+              <div class="tl-bars"><small>Live survey</small><span style="--w:82%"><b>Great</b></span><span style="--w:54%"><b>Good</b></span><span style="--w:22%"><b>Okay</b></span></div>
+            </div>
+            <div class="tl-panel-foot">Live in about two minutes</div>
           </div>
         </div>
       </div>
-      <ul class="tn-hero-facts" aria-label="Highlights">
-        <li>&#128205; Thudiyalur, Coimbatore</li>
-        <li>&#9889; Instant booking</li>
-        <li>&#128663; Free parking</li>
-        <li>&#128246; Free Wi-Fi</li>
-      </ul>
-    </div>
-    <a class="tn-scroll-hint" href="#tn-about" data-jump aria-label="Scroll to the homestay"><span>Explore</span><span style="font-size:0.95rem">&#8595;</span></a>
-  </section>
+    </section>
 
-  <!-- Stay, Host & Play -->
-  <div class="tn-split-wrap tn-reveal">
-    <p class="tn-split-kicker-top">Stay &middot; Host &middot; Survey &middot; Play</p>
-    <div class="tn-split">
-      <div class="tn-split-card stay" onclick="window.open('https://airbnb.com/h/thudinest','_blank')">
-        <span class="tn-split-badge">Book Now</span>
-        <span class="tn-split-icon">&#127968;</span>
-        <div class="tn-split-kicker">Stay With Us</div>
-        <h3 class="tn-split-ttl">Reserve Your Getaway</h3>
-        <p class="tn-split-sub">A cozy container home right on MTP Road, Thudiyalur &#8212; instant booking, easy parking &amp; free Wi-Fi.</p>
-        <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-split-cta" onclick="event.stopPropagation()">&#128197; Book on Airbnb</a>
-      </div>
-      <div class="tn-split-card hosting" onclick="location.href='/publish/'">
-        <span class="tn-split-badge">Free</span>
-        <span class="tn-split-icon">&#127760;</span>
-        <div class="tn-split-kicker">ThudinestHosting</div>
-        <h3 class="tn-split-ttl">Publish Your Own Page</h3>
-        <p class="tn-split-sub">Got an access code from us? Create a free single-page website for your business in minutes &#8212; no charge, ever.</p>
-        <a href="/publish/" class="tn-split-cta" onclick="event.stopPropagation()">&#128640; Get Hosting</a>
-      </div>
-      <div class="tn-split-card survey" onclick="location.href='/survey/create/'">
-        <span class="tn-split-badge">Free</span>
-        <span class="tn-split-icon">&#128202;</span>
-        <div class="tn-split-kicker">ThudinestSurvey</div>
-        <h3 class="tn-split-ttl">Ask, Share, Watch Live</h3>
-        <p class="tn-split-sub">Create a quick survey, share the QR code, and watch answers turn into live word clouds and charts &#8212; no sign-up for you or your respondents.</p>
-        <a href="/survey/create/" class="tn-split-cta" onclick="event.stopPropagation()">&#128202; Create a Survey</a>
-      </div>
-      <div class="tn-split-card games" onclick="showScreen('home')">
-        <span class="tn-split-badge">Just for Fun</span>
-        <span class="tn-split-icon">&#127918;</span>
-        <div class="tn-split-kicker">Entertainment</div>
-        <h3 class="tn-split-ttl">19 Games, Zero Downloads</h3>
-        <p class="tn-split-sub">3D cricket under floodlights, a homestay host rush and a bazooka physics puzzle &#8212; plus Rummy, Chess, Carrom, Tetris, Kovai Quiz and more.</p>
-        <div class="tn-split-pills">
-          <span class="tn-pill gold">&#127951; Floodlit Over</span>
-          <span class="tn-pill orange">&#129523; Guest Rush</span>
-          <span class="tn-pill lime">&#128165; Bazooka Man</span>
-          <span class="tn-pill green">&#127183; Rummy</span>
-          <span class="tn-pill purple">&#9823; Chess</span>
+    <!-- Four things: horizontal accordion -->
+    <section class="tl-sec" id="extras">
+      <div class="tl-wrap">
+        <div class="tl-head">
+          <div><p class="tl-eyebrow tl-in">What we do</p><h2 class="tl-h2 tl-in">Four things, one Thudinest.</h2></div>
+          <p class="tl-p tl-in">A homestay first, with a few free extras we built along the way. Every one of them works on your phone.</p>
         </div>
-        <button class="tn-split-cta" onclick="event.stopPropagation(); showScreen('home')">&#9654; Play Now</button>
+        <div class="tl-acc tl-in" id="tl-acc">
+          <article class="tl-acc-item on" data-i="0">
+            <button class="tl-acc-tab" type="button" aria-expanded="true"><small>01</small><span>Stay</span></button>
+            <div class="tl-acc-body">
+              <div class="tl-acc-copy">
+                <small class="tl-mono">01 / 04</small>
+                <h3>Stay with us</h3>
+                <p class="tl-strong">A cozy container home right on MTP Road, Thudiyalur.</p>
+                <ul class="tl-ticks"><li>Instant booking on Airbnb</li><li>Free parking and free Wi-Fi</li><li>Towels, soap and drinking water provided</li><li>Bedroom, attached bathroom and kitchenette</li></ul>
+                <a class="tl-btn tl-btn-green" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+              </div>
+              <div class="tl-acc-art"><img src="./images/exterior.jpg" alt="Thudinest container home" width="1200" height="900" loading="lazy"></div>
+            </div>
+          </article>
+          <article class="tl-acc-item" data-i="1">
+            <button class="tl-acc-tab" type="button" aria-expanded="false"><small>02</small><span>Website hosting</span></button>
+            <div class="tl-acc-body">
+              <div class="tl-acc-copy">
+                <small class="tl-mono">02 / 04</small>
+                <h3>Website hosting</h3>
+                <p class="tl-strong">Your own page, live in minutes, free with an access code from us.</p>
+                <ul class="tl-ticks"><li>Fill in your business details and pick a theme</li><li>Add your photos and logo</li><li>Live at your own link in about two minutes</li><li>Edit any time, no coding</li></ul>
+                <a class="tl-btn tl-btn-green" href="/publish/">Get hosting<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+              </div>
+              <div class="tl-acc-art tl-art-ui">
+                <div class="tl-browser big"><div class="tl-browser-bar"><i></i><i></i><i></i><span>thudinest.com/p/your-shop</span></div><div class="tl-browser-body"><b></b><i></i><i></i><i class="s"></i><div class="tl-browser-grid"><span></span><span></span><span></span></div><span class="tl-browser-btn">WhatsApp us</span></div></div>
+              </div>
+            </div>
+          </article>
+          <article class="tl-acc-item" data-i="2">
+            <button class="tl-acc-tab" type="button" aria-expanded="false"><small>03</small><span>Live surveys</span></button>
+            <div class="tl-acc-body">
+              <div class="tl-acc-copy">
+                <small class="tl-mono">03 / 04</small>
+                <h3>Live surveys</h3>
+                <p class="tl-strong">Ask, share a QR code and watch the answers arrive.</p>
+                <ul class="tl-ticks"><li>Open text or multiple choice questions</li><li>Anyone can scan and answer, no sign-up</li><li>A live word cloud and bar charts</li><li>A private results link only you have</li></ul>
+                <a class="tl-btn tl-btn-green" href="/survey/create/">Create a survey<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+              </div>
+              <div class="tl-acc-art tl-art-ui">
+                <div class="tl-survey"><div class="tl-survey-top"><b>How was your stay?</b><span class="tl-live">Live</span></div>
+                  <div class="tl-cloud"><span style="--s:1.6">cozy</span><span style="--s:1.1">quiet</span><span style="--s:1.35">clean</span><span style="--s:.9">garden</span><span style="--s:1.2">easy parking</span><span style="--s:1">peaceful</span><span style="--s:.85">Wi-Fi</span></div>
+                  <div class="tl-bars"><span style="--w:78%"><b>Excellent</b></span><span style="--w:46%"><b>Good</b></span><span style="--w:12%"><b>Okay</b></span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="tl-acc-item" data-i="3">
+            <button class="tl-acc-tab" type="button" aria-expanded="false"><small>04</small><span>Free games</span></button>
+            <div class="tl-acc-body">
+              <div class="tl-acc-copy">
+                <small class="tl-mono">04 / 04</small>
+                <h3>Free games</h3>
+                <p class="tl-strong">Nineteen browser games for slow evenings. No download, no account.</p>
+                <ul class="tl-ticks"><li>Floodlit Over: 3D cricket under the lights</li><li>Guest Rush: run a homestay at sunset</li><li>Bazooka Man: a physics puzzle</li><li>Rummy, Chess, Carrom, Tetris and more</li></ul>
+                <button class="tl-btn tl-btn-green" type="button" onclick="showScreen('home')">Open the game hub<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></button>
+              </div>
+              <div class="tl-acc-art"><img src="./images/games/guest-rush.jpg" alt="Guest Rush, a 3D homestay game" width="800" height="450" loading="lazy"></div>
+            </div>
+          </article>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <hr class="tn-hr">
-
-  <!-- Featured games -->
-  <div class="tn-sec tn-reveal" id="tn-featured">
-    <div class="tn-label" style="color:#c19bfa">Featured Games</div>
-    <h2 class="tn-heading">Play Something Bigger</h2>
-    <p class="tn-body">Free in your browser, on a phone or a laptop. No download, no account &#8212; tap and play.</p>
-    <div class="tn-feat">
-      <a class="tn-feat-card cricket" href="/cricket/">
-        <span class="tn-feat-shot"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under stadium floodlights" width="800" height="450" loading="lazy" decoding="async"></span>
-        <span class="tn-feat-body">
-          <span class="tn-feat-tag">3D &middot; Cricket</span>
-          <span class="tn-feat-ttl">Floodlit Over</span>
-          <span class="tn-feat-sub">Thudinest Coimbatore take on the World XI. Call the toss, time your shots, bowl spells, with ball-by-ball commentary.</span>
-          <span class="tn-feat-cta">&#9654; Play Floodlit Over</span>
-        </span>
-      </a>
-      <a class="tn-feat-card guest" href="/guest-rush/">
-        <span class="tn-feat-shot"><img src="./images/games/guest-rush.jpg" alt="Guest Rush: guests in batik and tudung outside a two-storey homestay at sunset" width="800" height="450" loading="lazy" decoding="async"><span class="tn-feat-new">New</span></span>
-        <span class="tn-feat-body">
-          <span class="tn-feat-tag">3D &middot; Homestay host</span>
-          <span class="tn-feat-ttl">Guest Rush</span>
-          <span class="tn-feat-sub">Run a tropical homestay at sunset: carry bags upstairs, find a lost charger, water the garden and welcome every guest in time.</span>
-          <span class="tn-feat-cta">&#9654; Play Guest Rush</span>
-        </span>
-      </a>
-      <a class="tn-feat-card bazooka" href="/bazooka-man/">
-        <span class="tn-feat-shot"><img src="./images/games/bazooka-man.jpg" alt="Bazooka Man: aiming a rocket arc at bots behind glass and a red barrel" width="800" height="450" loading="lazy" decoding="async"></span>
-        <span class="tn-feat-body">
-          <span class="tn-feat-tag">Physics puzzle &middot; 10 levels</span>
-          <span class="tn-feat-ttl">Bazooka Man</span>
-          <span class="tn-feat-sub">Aim, fire and bounce rockets off walls to clear the bots. Chain the barrels for three stars on every level.</span>
-          <span class="tn-feat-cta">&#9654; Play Bazooka Man</span>
-        </span>
-      </a>
-    </div>
-    <button class="tn-feat-all" onclick="showScreen('home')">&#127918; See all 19 games</button>
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Why Host With Us -->
-  <div class="tn-sec tn-reveal" id="tn-hosting">
-    <div class="tn-label" style="color:#7dd3fc">ThudinestHosting</div>
-    <h2 class="tn-heading">Your Own Website, Live in Minutes</h2>
-    <p class="tn-body">No coding, no server setup, no hosting bills. Tell us about your business, add a few photos, and your page is published automatically &#8212; free, with an access code from us.</p>
-
-    <div class="tn-rules" style="margin-top:32px">
-      <div class="tn-rule"><span class="tn-rule-ico">&#9997;&#65039;</span><div class="tn-rule-txt"><strong>Fill in your details</strong> &#8212; business name, description, contact info, and a theme that fits (Retail, Education, Construction, Personal &amp; more).</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128248;</span><div class="tn-rule-txt"><strong>Add your photos and logo</strong> &#8212; drag, drop, done. No editing software needed.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128640;</span><div class="tn-rule-txt"><strong>Hit publish</strong> &#8212; your page goes live at your own link within about 2 minutes.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128257;</span><div class="tn-rule-txt"><strong>Update anytime</strong> &#8212; come back and edit your page whenever your details change.</div></div>
-    </div>
-
-    <div class="tn-compare-wrap">
-      <table class="tn-compare">
-        <thead>
-          <tr>
-            <th></th>
-            <th class="tn-compare-us">ThudinestHosting</th>
-            <th>Traditional Website</th>
-            <th>DIY Builders</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Cost</td>
-            <td class="tn-compare-us">Free</td>
-            <td>&#8377;&#8377;&#8377; + developer fees</td>
-            <td>Monthly subscription</td>
-          </tr>
-          <tr>
-            <td>Time to go live</td>
-            <td class="tn-compare-us">~2 minutes</td>
-            <td>Days to weeks</td>
-            <td>Hours to days</td>
-          </tr>
-          <tr>
-            <td>Coding required</td>
-            <td class="tn-compare-us">None</td>
-            <td>Yes, or hire someone</td>
-            <td>Usually none</td>
-          </tr>
-          <tr>
-            <td>Hosting included</td>
-            <td class="tn-compare-us">Yes, free forever</td>
-            <td>Separate ongoing cost</td>
-            <td>Tied to subscription</td>
-          </tr>
-          <tr>
-            <td>Mobile-ready</td>
-            <td class="tn-compare-us">Always</td>
-            <td>Depends on developer</td>
-            <td>Usually</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Why Survey With Us -->
-  <div class="tn-sec tn-reveal" id="tn-survey">
-    <div class="tn-label" style="color:#bef264">ThudinestSurvey</div>
-    <h2 class="tn-heading">Get Instant Feedback, Live</h2>
-    <p class="tn-body">No app to install, no account for you or your respondents. Write a few questions, share a QR code, and watch answers turn into a live word cloud and charts as they come in.</p>
-
-    <div class="tn-rules" style="margin-top:32px">
-      <div class="tn-rule"><span class="tn-rule-ico">&#9997;&#65039;</span><div class="tn-rule-txt"><strong>Write your questions</strong> &#8212; open text or multiple choice, mix and match.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128241;</span><div class="tn-rule-txt"><strong>Share the QR code</strong> &#8212; anyone can scan and answer, no sign-up or app needed.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128202;</span><div class="tn-rule-txt"><strong>Watch results live</strong> &#8212; a word cloud for open answers, bar charts for choices, updating every couple of seconds.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128274;</span><div class="tn-rule-txt"><strong>Only you see results</strong> &#8212; a private results link is yours alone, no login required.</div></div>
-    </div>
-
-    <div class="tn-compare-wrap">
-      <table class="tn-compare">
-        <thead>
-          <tr>
-            <th></th>
-            <th class="tn-compare-us">ThudinestSurvey</th>
-            <th>Paper Forms</th>
-            <th>Paid Survey Tools</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Cost</td>
-            <td class="tn-compare-us">Free</td>
-            <td>Printing costs</td>
-            <td>Monthly subscription</td>
-          </tr>
-          <tr>
-            <td>Sign-up required</td>
-            <td class="tn-compare-us">None, for anyone</td>
-            <td>None</td>
-            <td>Usually yes</td>
-          </tr>
-          <tr>
-            <td>Results</td>
-            <td class="tn-compare-us">Live, as answers arrive</td>
-            <td>Manual counting</td>
-            <td>After manual export</td>
-          </tr>
-          <tr>
-            <td>Visualizations</td>
-            <td class="tn-compare-us">Word cloud + charts, built in</td>
-            <td>None</td>
-            <td>Extra setup</td>
-          </tr>
-          <tr>
-            <td>Setup time</td>
-            <td class="tn-compare-us">~1 minute</td>
-            <td>Print &amp; distribute</td>
-            <td>Minutes to hours</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Feature strip -->
-  <div class="tn-strip">
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#128205;</span>Prime Roadside Location</div>
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#128274;</span>Private &amp; Peaceful</div>
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#128663;</span>Easy Parking</div>
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#128230;</span>Container Design</div>
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#9992;&#65039;</span>Short Getaways</div>
-    <div class="tn-strip-item"><span class="tn-strip-icon">&#128246;</span>Free Wi-Fi</div>
-  </div>
-
-  <!-- About -->
-  <div id="tn-about">
-    <div class="tn-sec tn-reveal">
-      <div class="tn-label">About This Space</div>
-      <h2 class="tn-heading">Welcome to Thudinest</h2>
-      <p class="tn-body">A home located right on MTP Road in Thudiyalur &#8212; one of Coimbatore's prime spots. This compact yet comfy stay is perfect for couples, solo travelers, or remote workers looking for something unique. Enjoy easy access, ample parking, and a relaxing vibe in a home that's as photogenic as it is peaceful.</p>
-    </div>
-
-    <!-- Photo Gallery -->
-    <div class="tn-reveal tn-gallery-wrap" style="max-width:1080px;margin:0 auto;padding:0 24px 72px">
-      <div class="tn-gallery">
-        <button type="button" class="tn-photo tn-photo-p1" data-full="./images/exterior.jpg" aria-label="Enlarge photo: Exterior, container home">
-          <span class="tn-photo-icon">&#127968;</span>
-          <span class="tn-photo-label">Exterior &#183; Container Home</span>
-        </button>
-        <button type="button" class="tn-photo tn-photo-p2" data-full="./images/bedroom.jpg" aria-label="Enlarge photo: Bedroom">
-          <span class="tn-photo-icon">&#128719;</span>
-          <span class="tn-photo-label">Bedroom</span>
-        </button>
-        <button type="button" class="tn-photo tn-photo-p3" data-full="./images/bathroom.jpg" aria-label="Enlarge photo: Bathroom">
-          <span class="tn-photo-icon">&#128705;</span>
-          <span class="tn-photo-label">Bathroom</span>
-        </button>
-        <button type="button" class="tn-photo tn-photo-p4" data-full="./images/gallery/living.jpg" aria-label="Enlarge photo: Living area and work desk">
-          <span class="tn-photo-icon">&#128186;</span>
-          <span class="tn-photo-label">Living &#183; Desk</span>
-        </button>
-        <button type="button" class="tn-photo tn-photo-p5" data-full="./images/gallery/seating.jpg" aria-label="Enlarge photo: Seating corner">
-          <span class="tn-photo-icon">&#129681;</span>
-          <span class="tn-photo-label">Seating Corner</span>
-        </button>
-        <span class="tn-gallery-hint" aria-hidden="true">&#128269; Tap a photo to enlarge</span>
+    <!-- The space -->
+    <section class="tl-sec" id="space">
+      <div class="tl-wrap">
+        <div class="tl-head">
+          <div><p class="tl-eyebrow tl-in">The space</p><h2 class="tl-h2 tl-in">Small on space. Big on comfort.</h2></div>
+          <p class="tl-p tl-in">A compact two-level container home, clean and well kept, with a bedroom, attached bathroom, living area and basic kitchen. Tap a photo to see it full size.</p>
+        </div>
+        <div class="tl-gallery tl-in">
+          <button type="button" class="tl-ph tl-ph-big" data-full="./images/exterior.jpg"><img src="./images/exterior.jpg" alt="Exterior of the container home and garden" width="1200" height="900" loading="lazy"><span>Exterior</span></button>
+          <button type="button" class="tl-ph" data-full="./images/bedroom.jpg"><img src="./images/bedroom.jpg" alt="The bedroom" width="1200" height="900" loading="lazy"><span>Bedroom</span></button>
+          <button type="button" class="tl-ph" data-full="./images/bathroom.jpg"><img src="./images/bathroom.jpg" alt="The attached bathroom" width="1200" height="900" loading="lazy"><span>Bathroom</span></button>
+          <button type="button" class="tl-ph" data-full="./images/gallery/living.jpg"><img src="./images/gallery/living.jpg" alt="Living area with a work desk" width="1600" height="1200" loading="lazy"><span>Living &amp; desk</span></button>
+          <button type="button" class="tl-ph" data-full="./images/gallery/seating.jpg"><img src="./images/gallery/seating.jpg" alt="Seating corner by the door" width="1600" height="900" loading="lazy"><span>Seating corner</span></button>
+        </div>
+        <div class="tl-amen tl-in">
+          <div class="tl-am hot"><span><svg><use href="#i-bed"/></svg></span><b>Comfortable bedroom</b><small><i></i>Rest well</small></div>
+          <div class="tl-am"><span><svg><use href="#i-bath"/></svg></span><b>Attached bathroom</b><small><i></i>Just for you</small></div>
+          <div class="tl-am"><span><svg><use href="#i-sofa"/></svg></span><b>Living area</b><small><i></i>Desk and seating</small></div>
+          <div class="tl-am"><span><svg><use href="#i-cup"/></svg></span><b>Kitchen amenities</b><small><i></i>Basic kitchenette</small></div>
+          <div class="tl-am"><span><svg><use href="#i-wifi"/></svg></span><b>Free Wi-Fi</b><small><i></i>Stay connected</small></div>
+          <div class="tl-am"><span><svg><use href="#i-car"/></svg></span><b>Free parking</b><small><i></i>Easy, on site</small></div>
+          <div class="tl-am"><span><svg><use href="#i-soap"/></svg></span><b>Towels &amp; soap</b><small><i></i>Provided</small></div>
+          <div class="tl-am"><span><svg><use href="#i-drop"/></svg></span><b>Drinking water</b><small><i></i>Provided</small></div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <hr class="tn-hr">
-
-  <!-- The Space -->
-  <div class="tn-sec tn-reveal">
-    <div class="tn-label">The Space</div>
-    <h2 class="tn-heading">Everything You Need</h2>
-    <p class="tn-body">Cozy, clean, and well-maintained. The property includes a comfortable bedroom, attached bathroom, living area, and basic kitchen amenities &#8212; all thoughtfully designed for a relaxing stay.</p>
-    <div class="tn-grid">
-      <div class="tn-tile"><span class="tn-tile-icon">&#128719;</span><span class="tn-tile-name">Comfortable Bedroom</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#128703;</span><span class="tn-tile-name">Attached Bathroom</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#128715;</span><span class="tn-tile-name">Living Area</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#127859;</span><span class="tn-tile-name">Kitchen Amenities</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#128246;</span><span class="tn-tile-name">Free Wi-Fi</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#128663;</span><span class="tn-tile-name">Free Parking</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#129524;</span><span class="tn-tile-name">Towels &amp; Soap</span></div>
-      <div class="tn-tile"><span class="tn-tile-icon">&#128167;</span><span class="tn-tile-name">Drinking Water</span></div>
-    </div>
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Guest Access -->
-  <div class="tn-sec tn-reveal">
-    <div class="tn-label">Guest Access</div>
-    <h2 class="tn-heading">Yours to Enjoy</h2>
-    <p class="tn-body">Guests have full access to the bedroom, bathroom, living area, and kitchenette. Free Wi-Fi and parking are available. VG Hospital, restaurants, and shops are all just a short distance away on MTP Road.</p>
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Notes & Rules -->
-  <div class="tn-sec tn-reveal">
-    <div class="tn-label">Good to Know</div>
-    <h2 class="tn-heading">House Rules &amp; Notes</h2>
-    <div class="tn-rules">
-      <div class="tn-rule"><span class="tn-rule-ico">&#128230;</span><div class="tn-rule-txt">This is a tiny home &#8212; space is compact but thoughtfully designed for comfort.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#128739;</span><div class="tn-rule-txt">Located right on MTP Road, easily accessible. There may be some light traffic noise.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#127973;</span><div class="tn-rule-txt">VG Hospital, restaurants, and shops are all close by for your convenience.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#129524;</span><div class="tn-rule-txt">Basic essentials provided: towels, soap, and drinking water.</div></div>
-      <div class="tn-rule"><span class="tn-rule-ico">&#127769;</span><div class="tn-rule-txt">Please respect quiet hours after 10 PM.</div></div>
-      <div class="tn-rule warn"><span class="tn-rule-ico">&#9888;&#65039;</span><div class="tn-rule-txt"><strong>Please note:</strong> Unmarried couples are not allowed to stay.</div></div>
-    </div>
-  </div>
-
-  <hr class="tn-hr">
-
-  <!-- Book & Contact -->
-  <div class="tn-sec tn-reveal" id="tn-book">
-    <div class="tn-label">Book Your Stay</div>
-    <h2 class="tn-heading">Reserve &amp; Get in Touch</h2>
-    <p class="tn-body">Book instantly on Airbnb, get directions on Maps, or reach us directly on WhatsApp &#8212; we're happy to help with any questions!</p>
-    <div class="tn-book-actions">
-      <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" class="tn-book-btn tn-airbnb">
-        <span class="tn-book-ico">&#127968;</span>
-        <span class="tn-book-lab">
-          <span class="tn-book-lab-main">Book on Airbnb</span>
-          <span class="tn-book-lab-sub">airbnb.com/h/thudinest</span>
-        </span>
-      </a>
-      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" class="tn-book-btn tn-gmaps">
-        <span class="tn-book-ico">&#128205;</span>
-        <span class="tn-book-lab">
-          <span class="tn-book-lab-main">Get Directions on Google Maps</span>
-          <span class="tn-book-lab-sub">Poombuhar Nagar, Thudiyalur, Coimbatore</span>
-        </span>
-      </a>
-      <div class="tn-wa-row">
-        <a href="https://wa.me/601161165161" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
-          <span class="tn-book-ico">&#128172;</span>
-          <span class="tn-book-lab">
-            <span class="tn-book-lab-main">WhatsApp</span>
-            <span class="tn-book-lab-sub">+60 11-6116 5161</span>
-          </span>
-        </a>
-        <a href="https://wa.me/919698026106" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
-          <span class="tn-book-ico">&#128172;</span>
-          <span class="tn-book-lab">
-            <span class="tn-book-lab-main">WhatsApp</span>
-            <span class="tn-book-lab-sub">+91 96980 26106</span>
-          </span>
-        </a>
-        <a href="https://wa.me/917092713486" target="_blank" rel="noopener" class="tn-book-btn tn-wa">
-          <span class="tn-book-ico">&#128172;</span>
-          <span class="tn-book-lab">
-            <span class="tn-book-lab-main">WhatsApp</span>
-            <span class="tn-book-lab-sub">+91 70927 13486</span>
-          </span>
-        </a>
+    <!-- Featured games -->
+    <section class="tl-sec" id="games">
+      <div class="tl-wrap">
+        <div class="tl-head">
+          <div><p class="tl-eyebrow tl-in">Play for free</p><h2 class="tl-h2 tl-in">Games for slow evenings.</h2></div>
+          <p class="tl-p tl-in">Nineteen games in your browser, on a phone or a laptop. Three of our favourites:</p>
+        </div>
+        <div class="tl-projects tl-in">
+          <a class="tl-proj" href="/cricket/"><span class="tl-proj-img"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy"></span><span class="tl-tag">3D · Cricket</span><b>Floodlit Over</b><small>Thudinest Coimbatore take on the World XI, ball by ball.</small></a>
+          <a class="tl-proj" href="/guest-rush/"><span class="tl-proj-img"><img src="./images/games/guest-rush.jpg" alt="Guest Rush: guests outside a homestay at sunset" width="800" height="450" loading="lazy"><em>New</em></span><span class="tl-tag">3D · Homestay host</span><b>Guest Rush</b><small>Carry bags, find a charger, water the garden, beat the clock.</small></a>
+          <a class="tl-proj" href="/bazooka-man/"><span class="tl-proj-img"><img src="./images/games/bazooka-man.jpg" alt="Bazooka Man: aiming at bots and a barrel" width="800" height="450" loading="lazy"></span><span class="tl-tag">Physics puzzle</span><b>Bazooka Man</b><small>Bounce rockets off walls and chain the barrels.</small></a>
+        </div>
+        <button class="tl-btn tl-btn-light tl-in" type="button" onclick="showScreen('home')">All 19 games<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></button>
       </div>
+    </section>
+
+    <!-- Why: dark panel -->
+    <section class="tl-dark tl-in">
+      <div class="tl-dark-in">
+        <div class="tl-head">
+          <div><p class="tl-eyebrow">Why Thudinest</p><h2 class="tl-h2">Easy to find, easy to stay.</h2></div>
+          <p class="tl-p">Three things that make a short stay here simple, from the moment you book.</p>
+        </div>
+        <div class="tl-why">
+          <div><span class="tl-num">01</span><b>Prime roadside location</b><p>Right on MTP Road in Thudiyalur: easy to reach and easy to find.</p></div>
+          <div><span class="tl-num">02</span><b>Private &amp; peaceful</b><p>The whole tiny home is yours, with quiet hours after 10 PM.</p></div>
+          <div><span class="tl-num">03</span><b>Instant booking</b><p>Book in a few taps on Airbnb, with free parking when you arrive.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="tl-marquee" aria-hidden="true"><div class="tl-marquee-track"><span>Cozy</span><i></i><span>Private</span><i></i><span>Photogenic</span><i></i><span>On MTP Road</span><i></i><span>Cozy</span><i></i><span>Private</span><i></i><span>Photogenic</span><i></i><span>On MTP Road</span><i></i></div></div>
+
+    <!-- Location -->
+    <section class="tl-sec" id="find">
+      <div class="tl-wrap tl-loc">
+        <div>
+          <p class="tl-eyebrow tl-in">Find us</p>
+          <h2 class="tl-h2 tl-in">Right on MTP Road, Thudiyalur.</h2>
+          <p class="tl-p tl-in">Poombuhar Nagar, Thudiyalur, Coimbatore. VG Hospital, restaurants and shops are all a short distance away. Being on the main road, there may be some light traffic noise.</p>
+          <div class="tl-pills tl-in"><span>MTP Road</span><span>Thudiyalur</span><span>Poombuhar Nagar</span><span>VG Hospital nearby</span><span>Restaurants</span><span>Shops</span><span>Coimbatore</span></div>
+          <a class="tl-btn tl-btn-light tl-in" href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">Get directions<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+        </div>
+        <div class="tl-map tl-in">
+          <svg viewBox="0 0 520 380" aria-hidden="true">
+            <defs><pattern id="tl-grid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="#cfd6e0"/></pattern></defs>
+            <rect width="520" height="380" fill="url(#tl-grid)"/>
+            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round"/>
+            <path d="M-20 300 C 120 280, 200 200, 300 180 S 470 120, 540 60" fill="none" stroke="#e3e7ee" stroke-width="2" stroke-dasharray="12 12"/>
+            <path d="M160 -10 C 170 120, 230 250, 210 400" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+            <path d="M330 400 C 340 300, 380 240, 470 230" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+            <text x="400" y="104" font-size="13" font-weight="700" fill="#9aa3af" transform="rotate(-22 400 104)" font-family="JetBrains Mono, monospace">MTP ROAD</text>
+          </svg>
+          <div class="tl-map-pin"><span class="tl-pulse"></span><span class="tl-pin-dot"><svg><use href="#i-home"/></svg></span></div>
+          <div class="tl-map-label"><b>Thudinest No. 2</b><small>Poombuhar Nagar, Thudiyalur</small></div>
+          <div class="tl-map-tag hosp"><svg><use href="#i-hosp"/></svg>VG Hospital</div>
+          <div class="tl-map-tag food"><svg><use href="#i-cup"/></svg>Restaurants</div>
+          <div class="tl-map-tag shop"><svg><use href="#i-store"/></svg>Shops</div>
+        </div>
+        <div class="tl-process tl-in">
+          <div><span><svg><use href="#i-cal"/></svg></span><b>Book instantly</b><p>Pick your dates on Airbnb and you're confirmed.</p></div>
+          <div><span><svg><use href="#i-pin"/></svg></span><b>Find us on MTP Road</b><p>Open the map link and follow it to the door.</p></div>
+          <div><span><svg><use href="#i-car"/></svg></span><b>Park and settle in</b><p>Free parking, free Wi-Fi, towels and water ready.</p></div>
+          <div><span><svg><use href="#i-moon"/></svg></span><b>Rest easy</b><p>Quiet hours after 10 PM, so everyone sleeps well.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="tl-sec" id="faq">
+      <div class="tl-wrap tl-faq">
+        <div class="tl-faq-l">
+          <p class="tl-eyebrow tl-in">Good to know</p>
+          <h2 class="tl-h2 tl-in">Straight answers before you book.</h2>
+          <p class="tl-p tl-in">Still not sure? Send us a WhatsApp at +60 11-6116 5161 and ask away.</p>
+          <div class="tl-row tl-in">
+            <a class="tl-btn tl-btn-green" href="https://wa.me/601161165161" target="_blank" rel="noopener">WhatsApp us<span class="tl-ic"><svg><use href="#i-wa"/></svg></span></a>
+            <a class="tl-btn tl-btn-light" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+          </div>
+          <div class="tl-note tl-in"><span><svg><use href="#i-warn"/></svg></span><p><b>Please note:</b> unmarried couples are not allowed to stay.</p></div>
+        </div>
+        <div class="tl-qs tl-in" id="tl-qs">
+          <details open><summary>Where exactly is Thudinest?<span><svg><use href="#i-plus"/></svg></span></summary><p>On MTP Road in Poombuhar Nagar, Thudiyalur, Coimbatore. <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">Open it in Google Maps</a> for directions.</p></details>
+          <details><summary>How do I book?<span><svg><use href="#i-plus"/></svg></span></summary><p>Book instantly on Airbnb at <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">airbnb.com/h/thudinest</a>, or WhatsApp us if you have questions first.</p></details>
+          <details><summary>What's included in the stay?<span><svg><use href="#i-plus"/></svg></span></summary><p>A comfortable bedroom, attached bathroom, living area and basic kitchen amenities, plus free Wi-Fi, free parking, towels, soap and drinking water.</p></details>
+          <details><summary>Who is it best for?<span><svg><use href="#i-plus"/></svg></span></summary><p>Couples, solo travellers and remote workers looking for something a little different. It's a tiny home: compact, but thoughtfully designed for comfort.</p></details>
+          <details><summary>Are there any house rules?<span><svg><use href="#i-plus"/></svg></span></summary><p>Please respect quiet hours after 10 PM. Unmarried couples are not allowed to stay. The home is on the main road, so there may be some light traffic noise.</p></details>
+          <details><summary>What is Thudinest website hosting?<span><svg><use href="#i-plus"/></svg></span></summary><p>If you have an access code from us, you can create a free single-page website for your business in about two minutes, with no coding, and update it any time. <a href="/publish/">Get started</a>.</p></details>
+          <details><summary>Are the games really free?<span><svg><use href="#i-plus"/></svg></span></summary><p>Yes. All 19 games run in your browser with no download and no account, including 3D cricket (Floodlit Over) and Guest Rush.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="tl-cta tl-in" id="contact">
+      <span class="tl-cta-ring a" aria-hidden="true"></span><span class="tl-cta-ring b" aria-hidden="true"></span>
+      <p class="tl-eyebrow">Let's talk</p>
+      <h2 class="tl-h2">Planning a stay in Coimbatore?</h2>
+      <div class="tl-row">
+        <a class="tl-btn tl-btn-green" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+        <a class="tl-btn tl-btn-white" href="https://wa.me/601161165161" target="_blank" rel="noopener">WhatsApp now<span class="tl-ic"><svg><use href="#i-wa"/></svg></span></a>
+      </div>
+      <ul class="tl-cta-lines">
+        <li><a href="https://wa.me/601161165161" target="_blank" rel="noopener">+60 11-6116 5161</a></li>
+        <li><a href="https://wa.me/919698026106" target="_blank" rel="noopener">+91 96980 26106</a></li>
+        <li><a href="https://wa.me/917092713486" target="_blank" rel="noopener">+91 70927 13486</a></li>
+        <li><a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">airbnb.com/h/thudinest</a></li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="tl-foot">
+    <div class="tl-wrap">
+      <div class="tl-foot-grid">
+        <div class="tl-foot-brand">
+          <a class="tl-logo light" href="#top" data-jump="top"><span class="tl-logo-mark" aria-hidden="true"><i></i></span><span>thudi<b>nest</b></span></a>
+          <p>A cozy container homestay on MTP Road, Thudiyalur, Coimbatore. Plus free website hosting, live surveys and browser games.</p>
+        </div>
+        <div><h4>Explore</h4><a href="#stay" data-jump>Stay</a><a href="#space" data-jump>The space</a><a href="#find" data-jump>Find us</a><a href="#faq" data-jump>FAQ</a></div>
+        <div><h4>Extras</h4><a href="/publish/">Website hosting</a><a href="/survey/create/">Live surveys</a><a href="#games" data-jump>Featured games</a><a href="#" onclick="showScreen('home'); return false;">Game hub</a></div>
+        <div><h4>Contact</h4><a href="https://wa.me/601161165161" target="_blank" rel="noopener">+60 11-6116 5161</a><a href="https://wa.me/919698026106" target="_blank" rel="noopener">+91 96980 26106</a><a href="https://wa.me/917092713486" target="_blank" rel="noopener">+91 70927 13486</a><a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">Google Maps</a>
+          <div class="tl-socials"><a href="https://wa.me/601161165161" target="_blank" rel="noopener" aria-label="WhatsApp" class="wa"><svg><use href="#i-wa"/></svg></a><a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" aria-label="Airbnb" class="ab"><svg><use href="#i-home"/></svg></a></div>
+        </div>
+      </div>
+      <p class="tl-foot-area"><b>Thudinest No. 2:</b> Poombuhar Nagar, Thudiyalur, Coimbatore · MTP Road · Tamil Nadu, India</p>
+      <div class="tl-foot-bottom"><span>&copy; 2026 Thudinest. All rights reserved.</span><span class="tl-mono">Stay · Host · Survey · Play</span></div>
     </div>
+  </footer>
+
+  <!-- Floating buttons -->
+  <div class="tl-fab">
+    <button class="tl-top" id="tl-top" type="button" aria-label="Back to top"><svg><use href="#i-up"/></svg></button>
+    <a class="tl-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener" aria-label="WhatsApp us"><svg><use href="#i-wa"/></svg></a>
   </div>
 
-  <!-- Footer -->
-  <div class="tn-footer">
-    <strong>Thudinest No. 2</strong><br>
-    Poombuhar Nagar, Thudiyalur, Coimbatore &#183; MTP Road &#183; Tamil Nadu, India
-    <div class="tn-footer-links">
-      <a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">&#127968; Airbnb</a>
-      <a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">&#128205; Google Maps</a>
-      <a href="/publish/">&#127760; Hosting</a>
-      <a href="/survey/create/">&#128202; Survey</a>
-      <a href="https://wa.me/601161165161" target="_blank" rel="noopener">&#128172; +60 11-6116 5161</a>
-      <a href="https://wa.me/919698026106" target="_blank" rel="noopener">&#128172; +91 96980 26106</a>
-      <a href="https://wa.me/917092713486" target="_blank" rel="noopener">&#128172; +91 70927 13486</a>
-    </div>
-  </div>
-
-  <div class="tn-actionbar" id="tn-actionbar" aria-hidden="true">
-    <a class="tn-ab-book" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" tabindex="-1">&#127968; Book on Airbnb</a>
-    <a class="tn-ab-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener" tabindex="-1" aria-label="WhatsApp us">&#128172; WhatsApp</a>
+  <!-- Photo viewer -->
+  <div class="tl-lb" id="tl-lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img id="tl-lb-img" alt="">
+    <p class="tl-lb-cap" id="tl-lb-cap"></p>
+    <button type="button" class="tl-lb-btn x" id="tl-lb-x" aria-label="Close">&#10005;</button>
+    <button type="button" class="tl-lb-btn p" id="tl-lb-p" aria-label="Previous photo">&#8249;</button>
+    <button type="button" class="tl-lb-btn n" id="tl-lb-n" aria-label="Next photo">&#8250;</button>
   </div>
 </div>
 
@@ -6356,53 +6837,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =====================================================================
-// LANDING NAV: solid on scroll, section highlight, phone menu, action bar,
-// smooth in-page jumps, and labels for the phone version of the tables
-// =====================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  const nav = document.getElementById('tn-nav'), menu = document.getElementById('tn-nav-menu'), bar = document.getElementById('tn-actionbar');
-  if (!nav) return;
-  const hero = document.querySelector('.tn-hero'), book = document.getElementById('tn-book');
-  const setMenu = (open) => { nav.classList.toggle('open', open); menu.setAttribute('aria-expanded', String(open)); menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); };
-  menu.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-  document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !nav.contains(e.target)) setMenu(false); });
-  const jump = (sel) => { const el = document.querySelector(sel); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-  document.querySelectorAll('#screen-landing a[data-spy], #screen-landing a[data-jump]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); setMenu(false); jump(a.getAttribute('href')); }));
-  nav.querySelector('[data-top]').addEventListener('click', (e) => { e.preventDefault(); setMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  const onScroll = () => {
-    const y = window.scrollY, heroEnd = hero ? hero.offsetHeight - 80 : 400;
-    nav.classList.toggle('solid', y > 40);
-    if (bar) {
-      const r = book ? book.getBoundingClientRect() : null, nearBook = r && r.top < window.innerHeight && r.bottom > 0;
-      const show = y > heroEnd && !nearBook;
-      bar.classList.toggle('show', show); bar.setAttribute('aria-hidden', String(!show));
-      bar.querySelectorAll('a').forEach((a) => { a.tabIndex = show ? 0 : -1; });
-    }
-  };
-  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
-  const links = [...nav.querySelectorAll('a[data-spy]')], targets = links.map((a) => document.querySelector(a.getAttribute('href')));
-  const spy = new IntersectionObserver((entries) => {
-    entries.forEach((en) => { if (en.isIntersecting) { const i = targets.indexOf(en.target); links.forEach((l, j) => l.classList.toggle('active', j === i)); } });
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  targets.forEach((t) => t && spy.observe(t));
-  document.querySelectorAll('.tn-compare').forEach((tbl) => {
-    const heads = [...tbl.querySelectorAll('thead th')].map((th) => th.textContent.trim());
-    tbl.querySelectorAll('tbody tr').forEach((tr) => [...tr.children].forEach((td, i) => td.setAttribute('data-label', heads[i] || '')));
-  });
-});
-
-// =====================================================================
-// PEACOCK FEATHER: fade in once the image is ready, pause while the hero is off-screen
-// =====================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  const f = document.getElementById('tn-feather'); if (!f) return;
-  const img = f.querySelector('img'), ready = () => f.classList.add('ready');
-  if (img.complete && img.naturalWidth) ready(); else { img.addEventListener('load', ready); img.addEventListener('error', () => f.remove()); }
-  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => f.classList.toggle('paused', !e.isIntersecting)).observe(f);
-});
-
-// =====================================================================
 // LANDING SCROLL PROGRESS BAR
 // =====================================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -7943,53 +8377,171 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 </script>
-<div class="tn-lightbox" id="tn-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-  <img id="tn-lb-img" alt="">
-  <div class="tn-lb-cap" id="tn-lb-cap"></div>
-  <button type="button" class="tn-lb-btn tn-lb-close" id="tn-lb-close" aria-label="Close">&#10005;</button>
-  <button type="button" class="tn-lb-btn tn-lb-prev" id="tn-lb-prev" aria-label="Previous photo">&#8249;</button>
-  <button type="button" class="tn-lb-btn tn-lb-next" id="tn-lb-next" aria-label="Next photo">&#8250;</button>
-</div>
 <script>
-// Gallery viewer: tap a photo to open it full size; arrows, swipe or Esc to move around and close.
+// =====================================================================
+// THUDINEST LANDING: nav and phone menu, hero slideshow, the statement
+// that fills in as you scroll, rotating tabs, the accordion, the photo
+// viewer and scroll reveals. Everything is scoped to #screen-landing.
+// =====================================================================
 (function () {
-  var photos = Array.prototype.slice.call(document.querySelectorAll('.tn-gallery .tn-photo[data-full]'));
-  var box = document.getElementById('tn-lightbox'), img = document.getElementById('tn-lb-img'), cap = document.getElementById('tn-lb-cap');
-  var idx = 0, opener = null, touchX = null;
-  if (!photos.length || !box) return;
-  function show(i) {
-    idx = (i + photos.length) % photos.length;
-    var p = photos[idx], label = p.querySelector('.tn-photo-label').textContent;
-    img.src = p.getAttribute('data-full'); img.alt = label;
-    cap.textContent = label + '  \u00b7  ' + (idx + 1) + ' / ' + photos.length;
+  var root = document.getElementById('screen-landing');
+  if (!root || !document.getElementById('tl-nav')) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (s) { return root.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(root.querySelectorAll(s)); };
+  var landingOn = function () { return root.style.display !== 'none'; };
+
+  // ---- Nav: shadow on scroll, current-section highlight, phone menu, smooth jumps ----
+  var nav = $('#tl-nav'), burger = $('#tl-burger'), menu = $('#tl-menu'), topBtn = $('#tl-top');
+  function setMenu(open) {
+    burger.setAttribute('aria-expanded', String(open)); burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (open) { menu.hidden = false; requestAnimationFrame(function () { menu.classList.add('open'); }); document.body.style.overflow = 'hidden'; }
+    else { menu.classList.remove('open'); document.body.style.overflow = ''; setTimeout(function () { if (!menu.classList.contains('open')) menu.hidden = true; }, 300); }
   }
-  function open(i) {
-    opener = photos[i]; show(i); box.hidden = false;
-    requestAnimationFrame(function () { box.classList.add('open'); });
-    document.body.style.overflow = 'hidden';
-    document.getElementById('tn-lb-close').focus();
+  burger.addEventListener('click', function () { setMenu(burger.getAttribute('aria-expanded') !== 'true'); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
+  $$('[data-jump]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault(); setMenu(false);
+      var to = a.getAttribute('data-jump') === 'top' ? null : document.querySelector(a.getAttribute('href'));
+      if (!to) window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      else to.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+  topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
+  var spyLinks = $$('.tl-links a[data-spy]');
+  var spyTargets = spyLinks.map(function (a) { return a.getAttribute('data-spy') === 'top' ? $('.tl-hero') : document.getElementById(a.getAttribute('data-spy')); });
+  if ('IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) { if (en.isIntersecting) { var i = spyTargets.indexOf(en.target); spyLinks.forEach(function (l, j) { l.classList.toggle('on', i === j); }); } });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    spyTargets.forEach(function (t) { if (t) spy.observe(t); });
   }
-  function close() {
-    box.classList.remove('open'); box.hidden = true; document.body.style.overflow = '';
-    if (opener) opener.focus();
+
+  // ---- Statement: split into words, colour them in as the paragraph scrolls past ----
+  var fill = $('#tl-fill'), words = [];
+  if (fill) {
+    (function split(node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (n) {
+        if (n.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var s = document.createElement('span'); s.className = 'w'; s.textContent = part; frag.appendChild(s); words.push(s);
+          });
+          node.replaceChild(frag, n);
+        } else if (n.nodeType === 1) split(n);
+      });
+    })(fill);
   }
-  photos.forEach(function (p, i) { p.addEventListener('click', function () { open(i); }); });
-  document.getElementById('tn-lb-close').addEventListener('click', close);
-  document.getElementById('tn-lb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(idx - 1); });
-  document.getElementById('tn-lb-next').addEventListener('click', function (e) { e.stopPropagation(); show(idx + 1); });
-  box.addEventListener('click', function (e) { if (e.target === box) close(); });
+  function paintFill() {
+    if (!fill || !words.length) return;
+    var r = fill.getBoundingClientRect(), vh = window.innerHeight;
+    var p = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+    var n = Math.round(p * words.length);
+    for (var i = 0; i < words.length; i++) words[i].classList.toggle('on', i < n);
+  }
+
+  function onScroll() {
+    if (!landingOn()) return;
+    var y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 20);
+    topBtn.classList.toggle('show', y > 700);
+    paintFill();
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  // ---- Hero slideshow ----
+  var slides = $$('#tl-slides img'), dots = $$('#tl-slide-dots i'), sNo = $('#tl-slide-no'), sName = $('#tl-slide-name');
+  var names = ['Garden & peacock', 'Exterior', 'Bedroom', 'Living & desk'], si = 0;
+  function showSlide(i) {
+    si = (i + slides.length) % slides.length;
+    slides.forEach(function (im, j) { im.classList.toggle('on', j === si); });
+    dots.forEach(function (d, j) { d.classList.toggle('on', j === si); });
+    sNo.textContent = '0' + (si + 1); sName.textContent = names[si];
+  }
+  if (!reduce && slides.length > 1) setInterval(function () { if (landingOn() && !document.hidden) showSlide(si + 1); }, 4500);
+
+  // ---- Rotating tabs ----
+  var tabs = $$('.tl-tab'), panels = $$('.tl-panel'), tabWrap = $('.tl-tabs'), TAB_MS = 6500, tabTimer = null, ti = 0, paused = false;
+  root.style.setProperty('--tl-tab-ms', TAB_MS + 'ms');
+  function showTab(i, focus) {
+    ti = (i + tabs.length) % tabs.length;
+    tabs.forEach(function (t, j) {
+      var on = j === ti; t.classList.toggle('on', on); t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1;
+      var bar = t.querySelector('.tl-tab-bar i'); if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+    });
+    panels.forEach(function (p, j) { p.hidden = j !== ti; p.classList.toggle('on', j === ti); });
+    if (focus) tabs[ti].focus();
+    schedule();
+  }
+  function schedule() {
+    clearTimeout(tabTimer);
+    if (reduce || paused) return;
+    tabTimer = setTimeout(function () { if (landingOn() && !document.hidden) showTab(ti + 1); else schedule(); }, TAB_MS);
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { showTab(i); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); showTab(ti + 1, true); }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); showTab(ti - 1, true); }
+    });
+  });
+  var tabZone = $('#stay');
+  function pause(p) { paused = p; tabWrap.classList.toggle('paused', p); if (p) clearTimeout(tabTimer); else schedule(); }
+  tabZone.addEventListener('mouseenter', function () { pause(true); });
+  tabZone.addEventListener('mouseleave', function () { pause(false); });
+  tabZone.addEventListener('focusin', function () { pause(true); });
+  tabZone.addEventListener('focusout', function (e) { if (!tabZone.contains(e.relatedTarget)) pause(false); });
+  schedule();
+
+  // ---- Accordion ----
+  var accItems = $$('.tl-acc-item');
+  accItems.forEach(function (it) {
+    it.querySelector('.tl-acc-tab').addEventListener('click', function () {
+      var mobile = window.matchMedia('(max-width: 1023px)').matches, wasOn = it.classList.contains('on');
+      accItems.forEach(function (o) { o.classList.remove('on'); o.querySelector('.tl-acc-tab').setAttribute('aria-expanded', 'false'); });
+      if (!(mobile && wasOn)) { it.classList.add('on'); it.querySelector('.tl-acc-tab').setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  // ---- FAQ: one open at a time ----
+  var qs = $$('#tl-qs details');
+  qs.forEach(function (d) { d.addEventListener('toggle', function () { if (d.open) qs.forEach(function (o) { if (o !== d) o.open = false; }); }); });
+
+  // ---- Photo viewer ----
+  var photos = $$('.tl-ph[data-full]'), lb = $('#tl-lb'), lbImg = $('#tl-lb-img'), lbCap = $('#tl-lb-cap'), li = 0, opener = null, tx = null;
+  function lbShow(i) {
+    li = (i + photos.length) % photos.length;
+    var p = photos[li], label = p.querySelector('span').textContent;
+    lbImg.src = p.getAttribute('data-full'); lbImg.alt = p.querySelector('img').alt;
+    lbCap.textContent = label + '  ·  ' + (li + 1) + ' / ' + photos.length;
+  }
+  function lbOpen(i) { opener = photos[i]; lbShow(i); lb.hidden = false; document.body.style.overflow = 'hidden'; $('#tl-lb-x').focus(); }
+  function lbClose() { lb.hidden = true; document.body.style.overflow = ''; if (opener) opener.focus(); }
+  photos.forEach(function (p, i) { p.addEventListener('click', function () { lbOpen(i); }); });
+  $('#tl-lb-x').addEventListener('click', lbClose);
+  $('#tl-lb-p').addEventListener('click', function () { lbShow(li - 1); });
+  $('#tl-lb-n').addEventListener('click', function () { lbShow(li + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) lbClose(); });
   document.addEventListener('keydown', function (e) {
-    if (box.hidden) return;
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowLeft') show(idx - 1);
-    else if (e.key === 'ArrowRight') show(idx + 1);
+    if (lb.hidden) return;
+    if (e.key === 'Escape') lbClose(); else if (e.key === 'ArrowLeft') lbShow(li - 1); else if (e.key === 'ArrowRight') lbShow(li + 1);
   });
-  box.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
-  box.addEventListener('touchend', function (e) {
-    if (touchX === null) return;
-    var dx = e.changedTouches[0].clientX - touchX; touchX = null;
-    if (Math.abs(dx) > 45) show(idx + (dx < 0 ? 1 : -1));
-  });
+  lb.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', function (e) { if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 45) lbShow(li + (dx < 0 ? 1 : -1)); });
+
+  // ---- Reveal on scroll ----
+  var ins = $$('.tl-in');
+  if (reduce || !('IntersectionObserver' in window)) ins.forEach(function (el) { el.classList.add('seen'); });
+  else {
+    var io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('seen'); io.unobserve(en.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    ins.forEach(function (el, i) { if (el.closest('.tl-hero')) { el.style.transitionDelay = (i * 90) + 'ms'; } io.observe(el); });
+  }
 })();
 </script>
 </body>
