@@ -2339,7 +2339,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
   --radius: 26px;
   --f-head: 'Outfit', 'Figtree', system-ui, sans-serif; --f-body: 'Figtree', system-ui, sans-serif; --f-mono: 'JetBrains Mono', ui-monospace, monospace;
   display: block; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6;
-  -webkit-font-smoothing: antialiased; user-select: text; -webkit-user-select: text; overflow-x: clip;
+  -webkit-font-smoothing: antialiased; user-select: text; -webkit-user-select: text; overflow-x: clip; overflow-y: visible;
 }
 #screen-landing *, #screen-landing *::before, #screen-landing *::after { box-sizing: border-box; }
 :where(#screen-landing) a { color: inherit; }
@@ -2455,6 +2455,18 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 .tl-scroll { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; font: 500 11px/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
 .tl-scroll span { width: 18px; height: 28px; border-radius: 10px; border: 1.5px solid #b9c0cb; position: relative; }
 .tl-scroll span::after { content: ''; position: absolute; left: 50%; top: 6px; width: 2px; height: 6px; margin-left: -1px; border-radius: 2px; background: var(--muted); animation: tl-wheel 1.8s ease-in-out infinite; }
+
+/* ---------- Particle story (scroll-pinned canvas) ---------- */
+.tl-story { position: relative; height: 430svh; margin-top: clamp(20px, 4vw, 60px); }
+.tl-story-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.tl-story-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.tl-story-cap { position: absolute; left: 0; right: 0; top: calc(96px + env(safe-area-inset-top, 0px)); width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); pointer-events: none; }
+.tl-story-cap .tl-eyebrow { margin-bottom: 8px; transition: opacity 0.3s; }
+.tl-story-sub { margin: 0; font: 700 clamp(1.15rem, 2vw, 1.6rem)/1.25 var(--f-head); letter-spacing: -0.02em; color: var(--ink); max-width: 22em; transition: opacity 0.3s; }
+.tl-story-cap.fade .tl-eyebrow, .tl-story-cap.fade .tl-story-sub { opacity: 0; }
+.tl-story-chip { position: absolute; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 9px 16px 9px 9px; background: #fff; border-radius: 999px; box-shadow: var(--shadow-lg); white-space: nowrap; }
+@media (max-width: 700px) { .tl-story { height: 380svh; } .tl-story-cap { top: calc(84px + env(safe-area-inset-top, 0px)); } .tl-story-chip { left: 16px; transform: none; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .tl-story { height: 300svh; } }
 
 /* ---------- Statement ---------- */
 .tl-statement { padding: clamp(90px, 12vw, 170px) 0 0; }
@@ -2908,6 +2920,23 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
         </div>
       </div>
       <a class="tl-scroll" href="#intro" data-jump aria-label="Scroll down"><span></span>Scroll</a>
+    </section>
+
+
+    <!-- Particle story: ascii characters that form THUDINEST, then the home, hosting and games, as you scroll -->
+    <section class="tl-story" id="tl-story" aria-label="Thudinest: stay, host, survey and play">
+      <div class="tl-story-pin">
+        <canvas class="tl-story-cv" id="tl-story-cv" aria-hidden="true"></canvas>
+        <div class="tl-story-cap">
+          <p class="tl-eyebrow" id="tl-story-eyebrow">Keep scrolling</p>
+          <p class="tl-story-sub" id="tl-story-sub">Watch the letters find their place.</p>
+        </div>
+        <div class="tl-story-chip" aria-hidden="true">
+          <span class="tl-slide-no" id="tl-story-no">01</span>
+          <span class="tl-slide-name" id="tl-story-name">Thudinest</span>
+          <span class="tl-slide-dots" id="tl-story-dots"><i class="on"></i><i></i><i></i><i></i><i></i></span>
+        </div>
+      </div>
     </section>
 
     <!-- Statement that fills in as you scroll -->
@@ -8542,6 +8571,201 @@ document.addEventListener('DOMContentLoaded',()=>{
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     ins.forEach(function (el, i) { if (el.closest('.tl-hero')) { el.style.transitionDelay = (i * 90) + 'ms'; } io.observe(el); });
   }
+})();
+</script>
+<script>
+// =====================================================================
+// PARTICLE STORY: a few thousand small characters ("t h u d i n e s t")
+// that scroll-scrub between scenes: a loose cloud, the word THUDINEST,
+// the container home, a monitor with survey bars and a game controller.
+// Between scenes each particle bursts outward and springs to its next
+// spot, drawn as a streak while it moves and as a letter once it lands.
+// =====================================================================
+(function () {
+  var sec = document.getElementById('tl-story'), cv = document.getElementById('tl-story-cv');
+  if (!sec || !cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d'), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PAL = ['#0f3d33', '#1d5c46', '#2f8f5b', '#43b96a', '#9ed9b4', '#e6b48f'];
+  var CHARS = 'thudinest';
+  var SCENES = [
+    { no: '01', name: 'Keep scrolling', eyebrow: 'Keep scrolling', sub: 'Watch the letters find their place.' },
+    { no: '02', name: 'Thudinest', eyebrow: 'Thudinest', sub: 'Stay · Host · Survey · Play' },
+    { no: '03', name: 'The stay', eyebrow: 'The stay', sub: 'A cozy container home on MTP Road.' },
+    { no: '04', name: 'Hosting & surveys', eyebrow: 'Hosting & surveys', sub: 'Your own page and live results, free.' },
+    { no: '05', name: 'Free games', eyebrow: 'Free games', sub: '19 games in your browser, zero downloads.' }
+  ];
+  var W = 0, H = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 10, running = false, visible = false, last = 0, mx = -1e4, my = -1e4, sceneShown = -1;
+  var noEl = document.getElementById('tl-story-no'), nameEl = document.getElementById('tl-story-name'), dots = Array.prototype.slice.call(document.querySelectorAll('#tl-story-dots i'));
+  var capEl = sec.querySelector('.tl-story-cap'), eyeEl = document.getElementById('tl-story-eyebrow'), subEl = document.getElementById('tl-story-sub');
+
+  // ---- Scene drawings, rendered off-screen and sampled for particle targets ----
+  function frame(ox, oy, w, h, r, c, lw, x) { x.beginPath(); x.roundRect(ox, oy, w, h, r); x.lineWidth = lw; x.strokeStyle = c; x.stroke(); }
+  function drawWord(x, w, h) {
+    var lines = w / h < 0.95 ? ['THUDI', 'NEST'] : ['THUDINEST'];
+    var fs = 100; x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif';
+    var widest = Math.max.apply(null, lines.map(function (l) { return x.measureText(l).width; }));
+    fs = Math.min(fs * (w * 0.78) / widest, (h * (lines.length > 1 ? 0.62 : 0.4)) / lines.length * 1.25);
+    x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif'; x.textBaseline = 'middle'; x.lineJoin = 'round';
+    var cols = [1, 0, 2, 3, 5, 3, 2, 4, 1], k = 0, lh = fs * 0.98, y0 = h * 0.52 - (lines.length - 1) * lh / 2;
+    lines.forEach(function (line, li) {
+      var lw = x.measureText(line).width, cx = (w - lw) / 2, y = y0 + li * lh;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i], cw = x.measureText(ch).width;
+        x.lineWidth = Math.max(4, fs * 0.07); x.strokeStyle = PAL[0]; x.strokeText(ch, cx, y);
+        x.fillStyle = PAL[cols[k % cols.length]]; x.fillText(ch, cx, y);
+        cx += cw; k++;
+      }
+    });
+  }
+  function drawHouse(x, w, h) {
+    var S = Math.min(w * 0.8, h * 0.74), ox = (w - S) / 2, oy = h * 0.53 - S * 0.47, u = S / 100;
+    x.fillStyle = PAL[0]; x.fillRect(ox + 4 * u, oy + 6 * u, 92 * u, 6 * u);                    // roof slab
+    x.fillStyle = PAL[4]; x.fillRect(ox + 12 * u, oy + 12 * u, 76 * u, 28 * u);                 // glass storey
+    x.fillStyle = PAL[2]; for (var i = 0; i <= 4; i++) x.fillRect(ox + (12 + i * 18.6) * u, oy + 12 * u, 2.2 * u, 28 * u);
+    x.fillStyle = PAL[1]; x.fillRect(ox + 8 * u, oy + 38 * u, 84 * u, 4 * u);                   // balcony
+    x.fillStyle = PAL[0]; x.fillRect(ox + 16 * u, oy + 42 * u, 68 * u, 34 * u);                 // container
+    x.fillStyle = PAL[4]; x.fillRect(ox + 42 * u, oy + 48 * u, 14 * u, 22 * u);                 // door
+    x.fillStyle = PAL[5]; [[24, 48], [74, 48], [30, 60], [68, 60]].forEach(function (p) { x.beginPath(); x.arc(ox + p[0] * u, oy + p[1] * u, 1.8 * u, 0, 7); x.fill(); });
+    x.fillStyle = PAL[3]; x.beginPath(); x.ellipse(ox + 12 * u, oy + 74 * u, 12 * u, 10 * u, 0, 0, 7); x.ellipse(ox + 88 * u, oy + 72 * u, 13 * u, 12 * u, 0, 0, 7); x.fill();
+    x.fillStyle = PAL[2]; x.fillRect(ox + 2 * u, oy + 78 * u, 96 * u, 6 * u);                   // lawn
+  }
+  function drawMonitor(x, w, h) {
+    var S = Math.min(w * 0.72, h * 0.72), ox = (w - S) / 2, oy = h * 0.52 - S * 0.44, u = S / 100;
+    frame(ox + 4 * u, oy + 4 * u, 92 * u, 62 * u, 6 * u, PAL[0], 6 * u, x);
+    var bars = [[16, 26, 2], [32, 42, 3], [48, 34, 5], [64, 50, 3], [80, 20, 4]];
+    bars.forEach(function (b) { x.fillStyle = PAL[b[2]]; x.fillRect(ox + (b[0] - 5) * u, oy + (60 - b[1]) * u, 10 * u, b[1] * u); });
+    x.fillStyle = PAL[0]; x.fillRect(ox + 44 * u, oy + 69 * u, 12 * u, 12 * u); x.fillRect(ox + 30 * u, oy + 81 * u, 40 * u, 5 * u);
+  }
+  function drawController(x, w, h) {
+    var S = Math.min(w * 0.76, h * 0.8), ox = (w - S) / 2, oy = h * 0.53 - S * 0.33, u = S / 100;
+    x.beginPath(); x.moveTo(ox + 26 * u, oy + 6 * u); x.lineTo(ox + 74 * u, oy + 6 * u);
+    x.bezierCurveTo(ox + 96 * u, oy + 6 * u, ox + 102 * u, oy + 56 * u, ox + 92 * u, oy + 64 * u);
+    x.bezierCurveTo(ox + 84 * u, oy + 70 * u, ox + 74 * u, oy + 52 * u, ox + 66 * u, oy + 46 * u); x.lineTo(ox + 34 * u, oy + 46 * u);
+    x.bezierCurveTo(ox + 26 * u, oy + 52 * u, ox + 16 * u, oy + 70 * u, ox + 8 * u, oy + 64 * u);
+    x.bezierCurveTo(ox - 2 * u, oy + 56 * u, ox + 4 * u, oy + 6 * u, ox + 26 * u, oy + 6 * u); x.closePath();
+    x.fillStyle = PAL[2]; x.fill(); x.lineWidth = 4 * u; x.strokeStyle = PAL[0]; x.stroke();
+    x.fillStyle = PAL[4]; x.fillRect(ox + 18 * u, oy + 20 * u, 16 * u, 5 * u); x.fillRect(ox + 23.5 * u, oy + 14.5 * u, 5 * u, 16 * u);
+    [[72, 16, 5], [80, 23, 3], [64, 23, 4], [72, 30, 1]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.beginPath(); x.arc(ox + b[0] * u, oy + b[1] * u, 4 * u, 0, 7); x.fill(); });
+  }
+  function nearestPal(r, g, b) {
+    var best = 0, bd = 1e9;
+    for (var i = 0; i < PAL.length; i++) { var c = parseInt(PAL[i].slice(1), 16), d = Math.pow((c >> 16) - r, 2) + Math.pow(((c >> 8) & 255) - g, 2) + Math.pow((c & 255) - b, 2); if (d < bd) { bd = d; best = i; } }
+    return best;
+  }
+  function sample(draw) {
+    var sc = 0.5, sw = Math.max(1, Math.round(W * sc)), sh = Math.max(1, Math.round(H * sc));
+    var oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
+    var x = oc.getContext('2d', { willReadFrequently: true }); draw(x, sw, sh);
+    var d = x.getImageData(0, 0, sw, sh).data, pts = [], step = Math.max(1, Math.round(glyph * 0.62 * sc));
+    for (var yy = 0; yy < sh; yy += step) for (var xx = 0; xx < sw; xx += step) {
+      var i = (yy * sw + xx) * 4; if (d[i + 3] < 140) continue;
+      pts.push([xx / sc + (Math.random() - 0.5) * step, yy / sc + (Math.random() - 0.5) * step, nearestPal(d[i], d[i + 1], d[i + 2])]);
+    }
+    for (var k = pts.length - 1; k > 0; k--) { var j = (Math.random() * (k + 1)) | 0, t = pts[k]; pts[k] = pts[j]; pts[j] = t; }
+    var out = new Float32Array(N * 3);
+    for (var n = 0; n < N; n++) {
+      var p = pts.length ? pts[n % pts.length] : [W / 2, H / 2, 2], rep = n >= pts.length;
+      out[n * 3] = p[0] + (rep ? (Math.random() - 0.5) * 3 : 0); out[n * 3 + 1] = p[1] + (rep ? (Math.random() - 0.5) * 3 : 0); out[n * 3 + 2] = p[2];
+    }
+    return out;
+  }
+  function cloud() {
+    var out = new Float32Array(N * 3), R = Math.min(W, H) * 0.34, cx = W / 2, cy = H * 0.53;
+    for (var n = 0; n < N; n++) {
+      var a = Math.random() * Math.PI * 2, r = R * Math.sqrt(Math.random()) * (Math.random() < 0.3 ? 1.35 : 1);
+      out[n * 3] = cx + Math.cos(a) * r * 1.25; out[n * 3 + 1] = cy + Math.sin(a) * r * 0.9;
+      out[n * 3 + 2] = r > R * 0.9 ? (Math.random() < 0.7 ? 0 : 1) : [2, 3, 3, 4, 5][(Math.random() * 5) | 0];
+    }
+    return out;
+  }
+
+  // ---- Glyph sprites: one small canvas per (colour, character) ----
+  function buildSprites() {
+    sprites = PAL.map(function (col) {
+      return CHARS.split('').map(function (ch) {
+        var s = Math.ceil(glyph * 1.4 * DPR), c = document.createElement('canvas'); c.width = c.height = s;
+        var x = c.getContext('2d'); x.font = '700 ' + Math.round(glyph * DPR) + 'px "JetBrains Mono", ui-monospace, monospace';
+        x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(ch, s / 2, s / 2 + DPR * 0.5);
+        return c;
+      });
+    });
+  }
+
+  function layout() {
+    var r = cv.getBoundingClientRect(); if (!r.width) return;
+    W = r.width; H = r.height; DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    var small = W < 700;
+    glyph = small ? 7 : 10;
+    var want = Math.round(Math.min(small ? 1800 : 3200, (W * H) / (small ? 180 : 300)));
+    var fresh = !P || want !== N;
+    N = want;
+    if (fresh) {
+      P = new Float32Array(N * 7); // x, y, vx, vy, char, burst angle, burst radius
+      for (var i = 0; i < N; i++) { P[i * 7] = Math.random() * W; P[i * 7 + 1] = Math.random() * H; P[i * 7 + 4] = (Math.random() * CHARS.length) | 0; P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.35 + Math.random() * 0.65; }
+    }
+    buildSprites();
+    T = [cloud(), sample(drawWord), sample(drawHouse), sample(drawMonitor), sample(drawController)];
+  }
+
+  function progress() {
+    var r = sec.getBoundingClientRect(), span = r.height - window.innerHeight;
+    return span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+  }
+  var ease = function (t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
+
+  function showScene(i) {
+    if (i === sceneShown) return; sceneShown = i; var sc = SCENES[i];
+    noEl.textContent = sc.no; nameEl.textContent = sc.name; dots.forEach(function (d, j) { d.classList.toggle('on', j === i); });
+    capEl.classList.add('fade');
+    setTimeout(function () { eyeEl.textContent = sc.eyebrow; subEl.textContent = sc.sub; capEl.classList.remove('fade'); }, 220);
+  }
+
+  function tick(now) {
+    if (!running) return;
+    requestAnimationFrame(tick);
+    var dt = Math.min(2.5, (now - (last || now)) / 16.67); last = now;
+    var s = progress() * (T.length - 1), a = Math.min(T.length - 2, Math.floor(s)), lt = s - a;
+    var tt = ease((lt - 0.28) / 0.44), burst = Math.sin(Math.PI * tt), A = T[a], B = T[a + 1];
+    showScene(Math.round(s));
+    var R = Math.min(W, H) * 0.42, time = now * 0.001, k = 1 - Math.pow(1 - 0.085, dt), damp = Math.pow(0.8, dt);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round'; ctx.lineWidth = glyph * 0.55;
+    var gs = glyph * 1.4, half = gs / 2;
+    for (var i = 0; i < N; i++) {
+      var o = i * 7, j = i * 3;
+      var ang = P[o + 5] + time * 0.2, br = burst * R * P[o + 6];
+      var tx = A[j] + (B[j] - A[j]) * tt + Math.cos(ang) * br, ty = A[j + 1] + (B[j + 1] - A[j + 1]) * tt + Math.sin(ang) * br * 0.75;
+      tx += Math.sin(time * 1.3 + i) * 0.6; ty += Math.cos(time * 1.1 + i * 0.7) * 0.6;
+      var x = P[o], y = P[o + 1], vx = P[o + 2], vy = P[o + 3];
+      if (reduce) { x = tx; y = ty; vx = vy = 0; }
+      else {
+        var dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy;
+        if (d2 < 9000) { var f = (1 - d2 / 9000) * 2.2 * dt; vx += dx / Math.sqrt(d2 + 1) * f; vy += dy / Math.sqrt(d2 + 1) * f; }
+        vx = (vx + (tx - x) * k) * damp; vy = (vy + (ty - y) * k) * damp; x += vx * dt; y += vy * dt;
+      }
+      P[o] = x; P[o + 1] = y; P[o + 2] = vx; P[o + 3] = vy;
+      var c = (tt < 0.5 ? A[j + 2] : B[j + 2]) | 0, sp = vx * vx + vy * vy;
+      if (sp > 2.2) {
+        var len = Math.min(5, Math.sqrt(sp) * 0.9 + 1);
+        ctx.strokeStyle = PAL[c]; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * len, y - vy * len); ctx.stroke();
+      } else ctx.drawImage(sprites[c][P[o + 4]], x - half, y - half, gs, gs);
+    }
+  }
+  function setRunning(on) { if (on === running) return; running = on; if (on) { last = 0; requestAnimationFrame(tick); } }
+
+  var resizeT = 0;
+  window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(layout, 200); });
+  cv.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', function () { mx = my = -1e4; });
+  document.addEventListener('visibilitychange', function () { setRunning(visible && !document.hidden); });
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 100px Outfit'), document.fonts.load('700 10px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
+  Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 2500); })]).then(function () {
+    layout();
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }, { rootMargin: '100px 0px' }).observe(sec);
+    else { visible = true; setRunning(true); }
+  });
+  window.__tlStory = { progress: progress, get n() { return N; } };
 })();
 </script>
 </body>
