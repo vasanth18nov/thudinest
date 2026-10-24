@@ -262,8 +262,8 @@
 
   /* ---------- Kavin in letters (the particle ring from the thudinest.com hero) ---------- */
   .letters {
-    position: relative;
-    background: radial-gradient(60vmax 50vmax at 75% 50%, rgba(59, 130, 255, .22), transparent 65%), #0a1a44;
+    position: relative; margin-top: clamp(40px, 8vw, 100px);
+    background: radial-gradient(60vmax 50vmax at 75% 50%, rgba(59, 130, 255, .22), transparent 65%);
   }
   .letters-stage {
     min-height: 100vh; min-height: 100svh; width: min(1180px, 100% - 32px); margin-inline: auto;
@@ -502,6 +502,27 @@
       </p>
     </div>
 
+    <!-- Kavin in letters: the particle ring from the thudinest.com hero; a new picture every 3 seconds -->
+    <div class="letters" role="region" aria-label="Kavin, drawn in letters">
+      <div class="letters-stage">
+        <div class="letters-copy">
+          <p class="kicker">Interlude — Kavin, in letters</p>
+          <h2 class="h2" data-split>Made of<br>k·a·v·i·n.</h2>
+          <p>Every speck in this circle is a tiny letter from his name. Watch them burst apart and rebuild into the things he loves — tap the circle to skip ahead.</p>
+        </div>
+        <div class="letters-art">
+          <span class="lt-ring" aria-hidden="true"></span>
+          <span class="lt-orbit" aria-hidden="true"></span>
+          <canvas id="lt-cv" role="img" aria-label="Tiny letters of Kavin's name forming his name, a football, his number 25 shirt, a cat, a dog, a plane, a graduation cap, a game controller, the Roblox logo, a gaming PC and a heart that says DAD."></canvas>
+          <div class="lt-chip" aria-live="polite">
+            <span class="lt-no" id="lt-no">01</span>
+            <span id="lt-name">Kavin</span>
+            <span class="lt-bar" aria-hidden="true"><i id="lt-bar"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Memory lane: pinned; scrolling down slides this strip sideways -->
     <div class="lane">
       <div class="lane-track">
@@ -642,27 +663,6 @@
     <div class="sand-text">
       <p class="l1">Some names get written in the sand…</p>
       <p class="l2">…this one's going to be <span>heard on the pitch.</span></p>
-    </div>
-  </section>
-
-  <!-- Kavin in letters: the particle ring from the thudinest.com hero; a new picture every 3 seconds -->
-  <section class="letters" aria-label="Kavin, drawn in letters">
-    <div class="letters-stage">
-      <div class="letters-copy">
-        <p class="kicker">Interlude — Kavin, in letters</p>
-        <h2 class="h2" data-split>Made of<br>k·a·v·i·n.</h2>
-        <p>Every speck in this circle is a tiny letter from his name. Watch them burst apart and rebuild into the things he loves — tap the circle to skip ahead.</p>
-      </div>
-      <div class="letters-art">
-        <span class="lt-ring" aria-hidden="true"></span>
-        <span class="lt-orbit" aria-hidden="true"></span>
-        <canvas id="lt-cv" role="img" aria-label="Tiny letters of Kavin's name forming his name, a football, his number 25 shirt, a cat, a dog, a plane, a graduation cap, a game controller, the Roblox logo, a gaming PC and a heart that says DAD."></canvas>
-        <div class="lt-chip" aria-live="polite">
-          <span class="lt-no" id="lt-no">01</span>
-          <span id="lt-name">Kavin</span>
-          <span class="lt-bar" aria-hidden="true"><i id="lt-bar"></i></span>
-        </div>
-      </div>
     </div>
   </section>
 
