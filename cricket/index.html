@@ -626,6 +626,10 @@ body.is-touch .bottom { display: none; }
       <button type="button" data-fmt="t20" class="on" aria-pressed="true"><b>T20</b><small>Floodlights · colours · white ball</small></button>
       <button type="button" data-fmt="test" aria-pressed="false"><b>Test match</b><small>Daytime · whites · red ball</small></button>
     </div>
+    <div class="fmt" role="group" aria-label="Ground">
+      <button type="button" data-venue="stadium" class="on" aria-pressed="true"><b>Stadium</b><small>Stands · lights · cheerleaders</small></button>
+      <button type="button" data-venue="gully" aria-pressed="false"><b>Gully ground</b><small>The neighbourhood maidan</small></button>
+    </div>
     <div class="fmt team" role="group" aria-label="Your team">
       <button type="button" data-team="thudinest" class="on" aria-pressed="true"><b>Thudinest</b><small>Coimbatore · blue and gold</small></button>
       <button type="button" data-team="amh" aria-pressed="false"><b>Team AMH</b><small>Green and orange</small></button>
@@ -945,8 +949,8 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // the players' characters (Medea and Akai also dance on the stages), then the umpires'
   const NAMES = ['medea', 'ch01', 'demon', 'kaya', 'vanguard', 'pete', 'knight', 'josh', 'ely', 'akai', 'abe', 'copzombie', 'boss'];
-  // and the keeper's takes, Mixamo clips converted to bone rotations (see KeeperTake)
-  const clips = fetch('players/keeper.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  // and the Mixamo clips the models play (see Moves), converted to bone rotations
+  const clips = fetch('players/moves.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
   return Promise.all([Promise.all(NAMES.map((n) => optional(`${n}.glb`))), clips])
     .then(([got, clips]) => (got.some(Boolean) ? { models: Object.fromEntries(NAMES.map((n, i) => [n, got[i]])), clips } : null));
 })();
@@ -1106,6 +1110,8 @@ await Loader.step(0.32, 'Building the stadium');
 /* -------------------------------------------------------------- field & pitch */
 /* materials the match format retunes: night T20 under lights, or a Test in daylight */
 const stadium = {};
+// everything that belongs to the stadium and not the gully ground (see the gully ground below)
+const arena = new THREE.Group(); scene.add(arena);
 function drawGrass(g, w, h) {
   g.fillStyle = '#2b6a2c'; g.fillRect(0, 0, w, h);
   const bands = 30;
@@ -1158,16 +1164,16 @@ function drawPitch(g, w, h) {
   g.fillStyle = eg; g.fillRect(0, 0, w, h);
 }
 {
-  const grass = canvasTex(1024, 1024, drawGrass);
+  const grass = stadium.grassTex = canvasTex(1024, 1024, drawGrass);
   stadium.fieldMat = new THREE.MeshLambertMaterial({ map: grass, color: 0x9cb39a, emissiveMap: WHITE_TEX, side: THREE.DoubleSide });
-  const field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), stadium.fieldMat);
+  const field = stadium.field = new THREE.Mesh(new THREE.CircleGeometry(71, 120), stadium.fieldMat);
   field.rotation.x = -Math.PI / 2; field.position.copy(FIELD_C); field.receiveShadow = true;
   scene.add(field);
   const apron = new THREE.Mesh(new THREE.RingGeometry(70.8, 76, 120), std(0x163222, 0.95));
   apron.rotation.x = -Math.PI / 2; apron.position.set(FIELD_C.x, -0.02, FIELD_C.z);
-  scene.add(apron);
+  arena.add(apron);
 
-  const pitchTex = canvasTex(256, 2048, drawPitch);
+  const pitchTex = stadium.pitchTex = canvasTex(256, 2048, drawPitch);
   stadium.pitchMat = new THREE.MeshLambertMaterial({ map: pitchTex, color: 0xa39782, emissiveMap: WHITE_TEX, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
   const pitch = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 24.4), stadium.pitchMat);
   pitch.rotation.x = -Math.PI / 2; pitch.position.set(0, 0.006, FIELD_C.z); pitch.receiveShadow = true;
@@ -1212,11 +1218,11 @@ function drawPitch(g, w, h) {
   mGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); mGeo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); mGeo.setIndex(idx);
   const dm = new THREE.Mesh(mGeo, creaseMat);
   dm.receiveShadow = true;
-  scene.add(dm);
+  arena.add(dm);
 
   const rope = new THREE.Mesh(new THREE.TorusGeometry(BOUNDARY_R, 0.14, 8, 260), std(0xe9edf5, 0.55, { emissive: 0x222631 }));
   rope.rotation.x = -Math.PI / 2; rope.position.set(FIELD_C.x, 0.12, FIELD_C.z);
-  scene.add(rope);
+  arena.add(rope);
 }
 
 /* ------------------------------------------------------------------ stadium */
@@ -1250,7 +1256,7 @@ const led = {};
     const m = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), logoMat);
     m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI / 2, a + Math.PI, 0);
     m.position.set(FIELD_C.x + Math.sin(a) * 57, 0.02, FIELD_C.z + Math.cos(a) * 57);
-    m.receiveShadow = true; scene.add(m);
+    m.receiveShadow = true; arena.add(m);
   }
   led.redraw = () => {
     for (const k of ['idle', 'four', 'six', 'out']) {
@@ -1263,7 +1269,7 @@ const led = {};
   led.flash = 0;
   const boards = new THREE.Mesh(new THREE.CylinderGeometry(BOARD_R, BOARD_R, 0.95, 180, 1, true), led.mat);
   boards.position.set(FIELD_C.x, 0.48, FIELD_C.z);
-  scene.add(boards);
+  arena.add(boards);
 
   // stands: two lathed bowls with gaps behind each sightscreen
   const crowdTex = canvasTex(512, 256, (g, w, h) => {
@@ -1298,7 +1304,7 @@ const led = {};
     const pts = profile.map(([r, y]) => new THREE.Vector2(r, y));
     for (const start of [gap / 2, Math.PI + gap / 2]) {
       const m = new THREE.Mesh(new THREE.LatheGeometry(pts, 64, start, Math.PI - gap), mat);
-      m.position.copy(FIELD_C); scene.add(m);
+      m.position.copy(FIELD_C); arena.add(m);
     }
   };
   ring([[74, 0], [74, 1.4]], concrete);
@@ -1327,7 +1333,7 @@ const led = {};
   const waveGeo = new THREE.LatheGeometry(wavePts, 12, -0.26, 0.52);
   waveGeo.scale(-1, 1, 1); // face in toward the field
   const wave = new THREE.Mesh(waveGeo, waveMat);
-  wave.position.copy(FIELD_C); wave.visible = false; scene.add(wave);
+  wave.position.copy(FIELD_C); wave.visible = false; arena.add(wave);
   stadium.wave = { mesh: wave, mat: waveMat, t: -1, laps: 0 };
 
   // sightscreens (black for the white ball, white for the red) and the end blocks behind them
@@ -1335,9 +1341,9 @@ const led = {};
   for (const end of [-1, 1]) {
     const z = FIELD_C.z + end * 72.6;
     const ss = new THREE.Mesh(new THREE.BoxGeometry(21, 9, 0.6), black);
-    ss.position.set(0, 4.5, z); scene.add(ss);
+    ss.position.set(0, 4.5, z); arena.add(ss);
     const block = new THREE.Mesh(new THREE.BoxGeometry(34, 36, 12), concrete);
-    block.position.set(0, 18, FIELD_C.z + end * 100); scene.add(block);
+    block.position.set(0, 18, FIELD_C.z + end * 100); arena.add(block);
   }
 
   // floodlight towers
@@ -1364,14 +1370,14 @@ const led = {};
     const a = Math.PI / 4 + k * Math.PI / 2, r = 98;
     const x = FIELD_C.x + r * Math.sin(a), z = FIELD_C.z + r * Math.cos(a);
     const pylon = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 1.3, 50, 10), pylonMat);
-    pylon.position.set(x, 25, z); scene.add(pylon);
+    pylon.position.set(x, 25, z); arena.add(pylon);
     const head = new THREE.Group(); head.position.set(x, 52, z);
     head.lookAt(FIELD_C.x, 18, FIELD_C.z);
     const frame = new THREE.Mesh(new THREE.BoxGeometry(13, 7, 1), pylonMat); head.add(frame);
     const lamps = new THREE.Mesh(new THREE.PlaneGeometry(12, 6.2), lampMat); lamps.position.z = 0.55; head.add(lamps);
-    scene.add(head);
+    arena.add(head);
     const glow = new THREE.Mesh(glowGeo, glowMat);
-    glow.position.set(x - Math.sin(a) * 2, 52, z - Math.cos(a) * 2); scene.add(glow); stadium.glows.push(glow);
+    glow.position.set(x - Math.sin(a) * 2, 52, z - Math.cos(a) * 2); arena.add(glow); stadium.glows.push(glow);
   }
 }
 
@@ -1380,7 +1386,198 @@ const screenCanvas = document.createElement('canvas'); screenCanvas.width = 512;
 const screenTex = new THREE.CanvasTexture(screenCanvas); screenTex.encoding = THREE.sRGBEncoding;
 {
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(26, 13), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false, side: THREE.DoubleSide }));
-  scr.position.set(0, 26, FIELD_C.z - 93.9); scene.add(scr);
+  scr.position.set(0, 26, FIELD_C.z - 93.9); arena.add(scr);
+}
+/* ------------------------------------------------------------ the gully ground
+   The other ground, picked on the start card: a dusty neighbourhood maidan of the kind gully cricket is played on. The
+   field is the same size (so the game plays the same), with a mud pitch and a chalked boundary of painted stones, a
+   whitewashed compound wall with painted ads and kids sitting along it, colourful houses with water tanks on the
+   roofs, coconut palms, electric poles with sagging wires and a temple tower, under the afternoon sun. Its materials
+   share the stadium's shaders; the houses are merged into one mesh per colour. */
+const gully = new THREE.Group(); gully.visible = false; scene.add(gully);
+{
+  const lam = (color, map = WHITE_TEX, extra = {}) => new THREE.MeshLambertMaterial(Object.assign({ color, map, emissiveMap: WHITE_TEX, side: THREE.DoubleSide }, extra));
+  const rnd = (() => { let x = 20261026; return () => ((x = Math.imul(x ^ (x >>> 15), 2246822519) + 0x6d2b79f5 | 0) >>> 0) / 4294967296; })(); // the same town every visit
+  const pick = (a) => a[(rnd() * a.length) | 0];
+  // the ground: bare earth, worn smooth in the middle, tufts of dry grass toward the edges
+  stadium.dirtTex = canvasTex(1024, 1024, (g, w, h) => {
+    g.fillStyle = '#b48c5e'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) {
+      const x = rnd() * w, y = rnd() * h, r = rnd() * 6 + 1, d = Math.hypot(x - w / 2, y - h / 2) / (w / 2);
+      g.fillStyle = rnd() < 0.5 ? 'rgba(120,86,50,0.10)' : 'rgba(222,190,146,0.10)';
+      if (d > 0.55 && rnd() < 0.35) g.fillStyle = rnd() < 0.5 ? 'rgba(120,128,62,0.30)' : 'rgba(150,140,80,0.25)'; // dry grass
+      g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+    }
+    for (let i = 0; i < 60; i++) { // footpaths across the ground
+      g.strokeStyle = 'rgba(206,172,128,0.12)'; g.lineWidth = 6 + rnd() * 10;
+      g.beginPath(); g.moveTo(rnd() * w, rnd() * h); g.quadraticCurveTo(rnd() * w, rnd() * h, rnd() * w, rnd() * h); g.stroke();
+    }
+    const rg = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.3);
+    rg.addColorStop(0, 'rgba(214,180,136,0.35)'); rg.addColorStop(1, 'rgba(214,180,136,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, w, h);
+  });
+  // the mud pitch: rolled earth, cracked, scuffed at both ends
+  stadium.mudTex = canvasTex(256, 2048, (g, w, h) => {
+    g.fillStyle = '#a5754a'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2600; i++) { g.fillStyle = rnd() < 0.5 ? 'rgba(90,58,30,0.14)' : 'rgba(210,170,120,0.10)'; g.beginPath(); g.arc(rnd() * w, rnd() * h, rnd() * 5 + 1, 0, TAU); g.fill(); }
+    g.strokeStyle = 'rgba(70,44,22,0.4)'; g.lineWidth = 1;
+    for (let i = 0; i < 160; i++) { let x = rnd() * w, y = rnd() * h; g.beginPath(); g.moveTo(x, y); for (let k = 0; k < 4; k++) { x += (rnd() - 0.5) * 30; y += (rnd() - 0.5) * 30; g.lineTo(x, y); } g.stroke(); }
+    for (const y of [h * 0.06, h * 0.94]) { g.fillStyle = 'rgba(80,50,26,0.35)'; g.beginPath(); g.ellipse(w / 2, y, w * 0.32, h * 0.05, 0, 0, TAU); g.fill(); }
+    const eg = g.createLinearGradient(0, 0, w, 0);
+    eg.addColorStop(0, 'rgba(180,140,94,0.8)'); eg.addColorStop(0.12, 'rgba(180,140,94,0)'); eg.addColorStop(0.88, 'rgba(180,140,94,0)'); eg.addColorStop(1, 'rgba(180,140,94,0.8)');
+    g.fillStyle = eg; g.fillRect(0, 0, w, h);
+  });
+  // the land around the field, out to the houses
+  const outer = new THREE.Mesh(new THREE.RingGeometry(70.6, 170, 96, 1), lam(0xc4ad8a, stadium.dirtTex));
+  outer.rotation.x = -Math.PI / 2; outer.position.set(FIELD_C.x, -0.02, FIELD_C.z); outer.receiveShadow = true; gully.add(outer);
+  // the boundary: a chalk line and whitewashed stones
+  const chalk = lam(0xf1ece0, WHITE_TEX, { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  const line = new THREE.Mesh(new THREE.RingGeometry(BOUNDARY_R - 0.08, BOUNDARY_R + 0.08, 200, 1), chalk);
+  line.rotation.x = -Math.PI / 2; line.position.set(FIELD_C.x, 0.012, FIELD_C.z); gully.add(line);
+  const stones = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(0.17, 0), chalk, 110), dummy = new THREE.Object3D();
+  for (let i = 0; i < 110; i++) {
+    const a = i / 110 * TAU; dummy.position.set(FIELD_C.x + Math.sin(a) * (BOUNDARY_R + 0.35), 0.08, FIELD_C.z + Math.cos(a) * (BOUNDARY_R + 0.35));
+    dummy.rotation.set(rnd() * 3, rnd() * 3, 0); dummy.scale.set(1, 0.6, 1); dummy.updateMatrix(); stones.setMatrixAt(i, dummy.matrix);
+  }
+  gully.add(stones);
+
+  // the compound wall, whitewashed and painted with ads
+  const WALL_R = 75, WALL_H = 2.4;
+  const wallTex = canvasTex(2048, 128, (g, w, h) => {
+    g.fillStyle = '#e9e2d2'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 400; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? '120,100,70' : '160,150,130'},${0.04 + rnd() * 0.08})`; g.fillRect(rnd() * w, rnd() * h * 0.4 + h * 0.6, rnd() * 40, rnd() * 30); } // damp and dirt near the ground
+    const ads = [['THUDINEST', '#2350b8', '#ffc53d'], ['SRI MURUGAN STORES', '#c0392b', '#ffffff'], ['COIMBATORE CRICKET CLUB', '#1e7a46', '#fff4d6'], ['MOBILE RECHARGE', '#f39c12', '#1b1b1b'],
+      ['TUITION CENTRE', '#6c3483', '#ffffff'], ['ANNAPOORNA TIFFIN', '#d35400', '#fff4d6'], ['ICE CREAM', '#e84393', '#ffffff'], ['THUDINEST COIMBATORE', '#ffc53d', '#0f1f4d']];
+    let x = 30;
+    for (const [t, bg, fg] of ads) {
+      g.font = `900 52px ${DISPLAY}`; const tw = g.measureText(t).width + 50;
+      g.fillStyle = bg; g.fillRect(x, 18, tw, 78);
+      g.fillStyle = fg; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillText(t, x + 25, 60);
+      x += tw + 70; if (x > w - 100) break;
+    }
+    g.fillStyle = 'rgba(80,60,40,0.18)'; g.fillRect(0, h - 10, w, 10);
+  }, { repeat: [-6, 1] }); // read from inside the wall
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(WALL_R, WALL_R, WALL_H, 160, 1, true), lam(0xffffff, wallTex));
+  wall.position.set(FIELD_C.x, WALL_H / 2, FIELD_C.z); wall.receiveShadow = true; gully.add(wall);
+  const coping = new THREE.Mesh(new THREE.CylinderGeometry(WALL_R + 0.2, WALL_R + 0.2, 0.16, 160, 1, true), lam(0x8d8577));
+  coping.position.set(FIELD_C.x, WALL_H + 0.08, FIELD_C.z); gully.add(coping);
+  // kids up on the wall, watching
+  const kidsTex = canvasTex(1024, 64, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    const shirts = ['#e74c3c', '#f1c40f', '#3498db', '#ecf0f1', '#2ecc71', '#9b59b6', '#e67e22', '#1abc9c'], skins = ['#8d5a3b', '#6b4128', '#a86f4c', '#c68e6a'];
+    for (let x = 6; x < w - 12; x += 10 + rnd() * 26) {
+      if (rnd() < 0.3) continue;
+      const s = skins[(rnd() * skins.length) | 0], tall = 0.8 + rnd() * 0.3;
+      g.fillStyle = s; g.beginPath(); g.arc(x + 5, h - 40 * tall, 5, 0, TAU); g.fill(); // head
+      g.fillStyle = '#1b1410'; g.beginPath(); g.arc(x + 5, h - 42 * tall, 5, Math.PI, TAU); g.fill(); // hair
+      g.fillStyle = shirts[(rnd() * shirts.length) | 0]; g.fillRect(x, h - 35 * tall, 11, 20 * tall); // shirt
+      g.fillStyle = s; g.fillRect(x + 1, h - 15, 3, 15); g.fillRect(x + 7, h - 15, 3, 15); // legs hanging down
+    }
+  }, { repeat: [5, 1] });
+  for (const [a0, len] of [[0.35, 0.9], [2.0, 0.7], [3.6, 1.1], [5.0, 0.6]]) {
+    const kids = new THREE.Mesh(new THREE.CylinderGeometry(WALL_R - 0.25, WALL_R - 0.25, 1.3, 40, 1, true, a0, len), lam(0xffffff, kidsTex, { alphaTest: 0.5 }));
+    kids.position.set(FIELD_C.x, WALL_H + 0.2, FIELD_C.z); gully.add(kids);
+  }
+
+  // houses: plastered walls, a window with a grille and a sunshade on every bay of every floor
+  const facade = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 500; i++) { g.fillStyle = `rgba(0,0,0,${rnd() * 0.05})`; g.fillRect(rnd() * w, rnd() * h, rnd() * 20, rnd() * 20); }
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(0, h * 0.9, w, h * 0.1); // the floor band
+    g.fillStyle = '#4b3a2b'; g.fillRect(w * 0.28, h * 0.3, w * 0.44, h * 0.42); // window
+    g.fillStyle = '#9fb7c8'; g.fillRect(w * 0.31, h * 0.33, w * 0.38, h * 0.36);
+    g.strokeStyle = '#2c2c2c'; g.lineWidth = 3; for (let x = w * 0.34; x < w * 0.7; x += 14) { g.beginPath(); g.moveTo(x, h * 0.33); g.lineTo(x, h * 0.69); g.stroke(); } // grille
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(w * 0.22, h * 0.24, w * 0.56, h * 0.05); // sunshade
+  }, { repeat: [1, 1] });
+  facade.wrapS = facade.wrapT = THREE.RepeatWrapping;
+  const COLOURS = [0xf2c4ce, 0xf7e08a, 0x9fd3e6, 0xb8e0a8, 0xf4b183, 0xe8e2d6, 0xd7b9f0, 0x86d1c0];
+  const parts = COLOURS.map(() => []), tanks = [];
+  // one box, its sides tiled with bays 3.4 m wide and floors 3.2 m high
+  const box = (w, h, d, x, y, z, ry) => {
+    const geo = new THREE.BoxGeometry(w, h, d), uv = geo.attributes.uv;
+    const size = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]]; // +x -x +y -y +z -z
+    for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * Math.max(1, Math.round(size[f][0] / 3.4)), uv.getY(i) * (f === 2 || f === 3 ? 0.05 : Math.max(1, Math.round(size[f][1] / 3.2)))); }
+    geo.rotateY(ry); geo.translate(x, y, z);
+    return geo;
+  };
+  for (let i = 0; i < 74; i++) {
+    const a = i / 74 * TAU + (rnd() - 0.5) * 0.05, r = 84 + rnd() * 26 + (i % 3) * 8;
+    const floors = 1 + ((rnd() * 3) | 0), w = 6 + rnd() * 5, d = 7 + rnd() * 5, h = floors * 3.2;
+    const x = FIELD_C.x + Math.sin(a) * r, z = FIELD_C.z + Math.cos(a) * r, ry = a + (rnd() - 0.5) * 0.2;
+    const c = (rnd() * COLOURS.length) | 0;
+    parts[c].push(box(w, h, d, x, h / 2, z, ry));
+    parts[c].push(box(w + 0.3, 0.6, d + 0.3, x, h + 0.3, z, ry)); // the parapet
+    if (rnd() < 0.5) parts[c].push(box(2.6, 2.4, 2.6, x + Math.sin(a) * 1.5, h + 1.2, z + Math.cos(a) * 1.5, ry)); // the stair head
+    if (rnd() < 0.75) tanks.push([x - Math.sin(a + 1) * 1.6, h + 0.6, z - Math.cos(a + 1) * 1.6]);
+  }
+  const merge = (geos) => {
+    let nv = 0, ni = 0; for (const g of geos) { nv += g.attributes.position.count; ni += g.index.count; }
+    const pos = new Float32Array(nv * 3), nor = new Float32Array(nv * 3), uv = new Float32Array(nv * 2), idx = new Uint32Array(ni);
+    let v = 0, k = 0;
+    for (const g of geos) {
+      pos.set(g.attributes.position.array, v * 3); nor.set(g.attributes.normal.array, v * 3); uv.set(g.attributes.uv.array, v * 2);
+      for (const j of g.index.array) idx[k++] = j + v;
+      v += g.attributes.position.count; g.dispose();
+    }
+    const out = new THREE.BufferGeometry();
+    out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); out.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); out.setIndex(new THREE.BufferAttribute(idx, 1));
+    return out;
+  };
+  COLOURS.forEach((col, i) => { if (parts[i].length) gully.add(new THREE.Mesh(merge(parts[i]), lam(col, facade))); });
+  // black water tanks on the roofs
+  const tank = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.65, 0.65, 1.2, 14), lam(0x26272b), tanks.length);
+  tanks.forEach(([x, y, z], i) => { dummy.position.set(x, y, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); tank.setMatrixAt(i, dummy.matrix); });
+  gully.add(tank);
+
+  // the temple tower over the rooftops, beyond long-on
+  {
+    const tower = new THREE.Group(), ta = -2.5, tr = 128;
+    tower.position.set(FIELD_C.x + Math.sin(ta) * tr, 0, FIELD_C.z + Math.cos(ta) * tr); tower.rotation.y = ta;
+    const tiers = [0xd9a441, 0xe6b85c, 0xc98f3a, 0xe0b04e, 0xd59a3c, 0xebc56c, 0xcf9440];
+    let y = 0;
+    tiers.forEach((col, i) => { const w = 16 - i * 1.9, d = 9 - i * 0.9, hh = i ? 3.6 : 7; const m = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), lam(col)); m.position.y = y + hh / 2; tower.add(m); y += hh; });
+    const roof = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 2.6, 4, 12, 1, false, 0, Math.PI), lam(0xb5512a)); roof.rotation.z = HALF_PI; roof.position.y = y + 1.6; tower.add(roof);
+    for (const x of [-1.6, 0, 1.6]) { const k = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.6, 10), lam(0xf2c14e)); k.position.set(x, y + 4.2, 0); tower.add(k); }
+    gully.add(tower);
+  }
+
+  // coconut palms: a leaning trunk and a crown of arching fronds
+  const frondTex = canvasTex(64, 256, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.strokeStyle = '#3f6b2a'; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(w / 2, h); g.stroke();
+    for (let y = 8; y < h; y += 6) { const l = (w / 2) * (1 - y / h * 0.6); g.strokeStyle = y % 12 ? '#4f8a33' : '#5d9a3c'; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, y); g.lineTo(w / 2 - l, y + 10); g.moveTo(w / 2, y); g.lineTo(w / 2 + l, y + 10); g.stroke(); }
+  });
+  const frondGeo = new THREE.PlaneGeometry(1.4, 5, 1, 6);
+  { const p = frondGeo.attributes.position; for (let i = 0; i < p.count; i++) { const t = (p.getY(i) + 2.5) / 5; p.setY(i, t * 4.6); p.setZ(i, -t * t * 2.2); } frondGeo.rotateX(-0.5); frondGeo.computeVertexNormals(); }
+  const trunkGeo = new THREE.CylinderGeometry(0.17, 0.26, 1, 8); trunkGeo.translate(0, 0.5, 0);
+  const palms = [];
+  for (let i = 0; i < 46; i++) { const a = rnd() * TAU, r = 77 + rnd() * 50; palms.push([FIELD_C.x + Math.sin(a) * r, FIELD_C.z + Math.cos(a) * r, 9 + rnd() * 7, (rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.3]); }
+  const trunks = new THREE.InstancedMesh(trunkGeo, lam(0x7a6450), palms.length), fronds = new THREE.InstancedMesh(frondGeo, lam(0xffffff, frondTex, { alphaTest: 0.5 }), palms.length * 9);
+  palms.forEach(([x, z, h, lx, lz], i) => {
+    dummy.position.set(x, 0, z); dummy.rotation.set(lx, 0, lz); dummy.scale.set(1, h, 1); dummy.updateMatrix(); trunks.setMatrixAt(i, dummy.matrix);
+    const top = new V3(0, h, 0).applyEuler(new THREE.Euler(lx, 0, lz)).add(new V3(x, 0, z));
+    for (let k = 0; k < 9; k++) { dummy.position.copy(top); dummy.rotation.set(0, k / 9 * TAU + rnd() * 0.4, 0, 'YXZ'); dummy.scale.setScalar(0.85 + rnd() * 0.3); dummy.updateMatrix(); fronds.setMatrixAt(i * 9 + k, dummy.matrix); }
+  });
+  gully.add(trunks, fronds);
+
+  // electric poles round the wall, the wires sagging between them
+  const POLES = 22, poleGeo = new THREE.BoxGeometry(0.24, 9, 0.24), armGeo = new THREE.BoxGeometry(1.8, 0.12, 0.12), poleMat = lam(0xb9b4aa);
+  const tops = [];
+  for (let i = 0; i < POLES; i++) {
+    const a = (i + 0.5) / POLES * TAU, x = FIELD_C.x + Math.sin(a) * (WALL_R + 2.5), z = FIELD_C.z + Math.cos(a) * (WALL_R + 2.5);
+    const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(x, 4.5, z); gully.add(pole);
+    const arm = new THREE.Mesh(armGeo, poleMat); arm.position.set(x, 8.6, z); arm.rotation.y = a + HALF_PI; gully.add(arm);
+    tops.push([x, z, a]);
+  }
+  const wire = [];
+  for (let i = 0; i < POLES; i++) {
+    const [x0, z0, a0] = tops[i], [x1, z1, a1] = tops[(i + 1) % POLES];
+    for (const off of [-0.8, 0, 0.8]) {
+      const p0 = new V3(x0 + Math.cos(a0) * off, 8.6, z0 - Math.sin(a0) * off), p1 = new V3(x1 + Math.cos(a1) * off, 8.6, z1 - Math.sin(a1) * off);
+      for (let k = 0; k < 8; k++) { const u0 = k / 8, u1 = (k + 1) / 8; for (const u of [u0, u1]) { const q = p0.clone().lerp(p1, u); q.y -= Math.sin(u * Math.PI) * 1.1; wire.push(q.x, q.y, q.z); } }
+    }
+  }
+  const wireGeo = new THREE.BufferGeometry(); wireGeo.setAttribute('position', new THREE.Float32BufferAttribute(wire, 3));
+  gully.add(new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0x1d1d1d })));
 }
 await Loader.step(0.34, 'Dressing the players');
 /* ------------------------------------------------------------------- lights */
@@ -2253,7 +2450,7 @@ function buildBodies(models, clips) {
     }
   }
 
-  /* The keeper's takes (see KeeperTake): a clip frame sets every body bone's rotation, as the clip's change from the
+  /* Mixamo moves (see Moves): a clip frame sets every body bone's rotation, as the clip's change from the
      T-pose applied to this character's own T-pose (mirrored for a dive to the other side), blended with the rig's pose
      by A.w; the hips go where the take puts them; near the catch two-bone IK takes the wrists to the ball. */
   const CLIP_BI = clips ? Object.fromEntries(clips.bones.map((n, i) => [n, i])) : {};
@@ -2262,11 +2459,11 @@ function buildBodies(models, clips) {
   const TC = {}; for (const n of ORDER) TC[n] = new THREE.Quaternion();
   const AXIS_Y = new V3(0, 1, 0);
   function clipPoint(key, track, tau, out) {
-    const c = clips.clips[key], f = clamp((tau - c.from) * clips.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), u = f - i, a = c[track];
+    const c = clips.clips[key], f = clamp((tau - c.from) * c.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), u = f - i, a = c[track];
     return out.set(lerp(a[i * 3], a[i * 3 + 3], u), lerp(a[i * 3 + 1], a[i * 3 + 4], u), lerp(a[i * 3 + 2], a[i * 3 + 5], u));
   }
   function clipQ(c, n, tau, out) {
-    const f = clamp((tau - c.from) * clips.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), nb = clips.bones.length, b = CLIP_BI[n];
+    const f = clamp((tau - c.from) * c.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), nb = clips.bones.length, b = CLIP_BI[n];
     _qb2.fromArray(c.q, ((i + 1) * nb + b) * 4);
     return out.fromArray(c.q, (i * nb + b) * 4).slerp(_qb2, f - i);
   }
@@ -2315,9 +2512,17 @@ function buildBodies(models, clips) {
         twoBone(M[`${s}Arm`], M[`${s}ForeArm`], M[`${s}Hand`], _w.clone(), M[`${s}ForeArm`].getWorldPosition(_pole).add(_up.set(0, -0.2, 0)), v.len[`${s}ForeArm`], v.len[`${s}Hand`]);
       }
     }
-    // where a ball he holds sits: between the fists
+    // where a ball he holds sits: between the fists, or in the throwing hand
     const kn = (s) => M[`${s}HandMiddle1`] || M[`${s}HandIndex1`] || M[`${s}Hand`];
-    A.hold.copy(kn('Left').getWorldPosition(_w)).add(kn('Right').getWorldPosition(_C)).multiplyScalar(0.5);
+    if (A.hand) kn(A.hand).getWorldPosition(A.hold);
+    else A.hold.copy(kn('Left').getWorldPosition(_w)).add(kn('Right').getWorldPosition(_C)).multiplyScalar(0.5);
+    A.held = true;
+    // something in his right hand (the batter's bat) goes where the rig's wrist would be for this hand
+    if (A.carry) {
+      M.RightHand.getWorldQuaternion(_qa);
+      M.RightHand.getWorldPosition(_w).add(_T.copy(K.fist).applyQuaternion(_qa).multiplyScalar(K.S));
+      A.carry(_w, _qa.multiply(_qr.copy(K.rest.RightHand).invert()));
+    }
   }
 
   return {
@@ -2365,7 +2570,7 @@ const STAGES = [];
   for (const [sx, end] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
     const g = new THREE.Group();
     const x = sx * 16, z = FIELD_C.z + end * Math.sqrt(71.5 * 71.5 - x * x);
-    g.position.set(x, 0, z); g.lookAt(FIELD_C.x, 0, FIELD_C.z); scene.add(g);
+    g.position.set(x, 0, z); g.lookAt(FIELD_C.x, 0, FIELD_C.z); arena.add(g);
     const plat = new THREE.Mesh(new THREE.BoxGeometry(8.6, 1.0, 3.0), deck); plat.position.y = 0.5; g.add(plat);
     const lip = new THREE.Mesh(new THREE.BoxGeometry(8.7, 0.08, 3.05), trimM); lip.position.y = 1.0; g.add(lip);
     // the branding: a banner on the front of the deck and a big sign behind the dancers
@@ -2432,7 +2637,7 @@ function drawStages() {
 drawStages();
 /* the dance: a bounce on the beat, hips swaying, pom-poms up and down in turn, a spin now and then */
 const Dance = { t: -1, dur: 0 };
-function startDance(dur) { Dance.t = 0; Dance.dur = dur; for (const S of STAGES) for (const d of S.dancers) d.g.visible = true; }
+function startDance(dur) { if (game.venue === 'gully') return; Dance.t = 0; Dance.dur = dur; for (const S of STAGES) for (const d of S.dancers) d.g.visible = true; } // no stages at the gully ground
 function updateDance(dt) {
   if (Dance.t < 0) return;
   Dance.t += dt;
@@ -3200,7 +3405,7 @@ const dirVel = (speed, thDeg, beDeg) => new V3(Math.sin(thDeg * D2R) * Math.cos(
 
 /* ------------------------------------------------------------------- game */
 const game = {
-  state: 'menu', t: 0, clock: 0, overs: 5, total: 30, diff: 'normal', format: 't20', innings: 1, batTeam: 'home', target: 0, first: null,
+  state: 'menu', t: 0, clock: 0, overs: 5, total: 30, diff: 'normal', format: 't20', venue: 'stadium', innings: 1, batTeam: 'home', target: 0, first: null,
   runs: 0, wkts: 0, balls: 0, fours: 0, sixes: 0, dots: 0, log: [], fow: [],
   bats: [], bowl: [], nextIn: 2, bowler: 0, prevBowler: -1, overRuns: 0, lastOut: false, lastOverMark: 0,
   rigS: rigA, rigN: rigB,
@@ -3334,8 +3539,8 @@ function startInnings(resume) {
   const chase = game.innings === 2, bowlName = teamName(fieldTeam()), toss = !chase && !resume && game.tossNote ? `${game.tossNote} ` : '';
   showCommentary('', batTeamName(), isTest() ? (game.overs ? `Test match · ${game.overs} overs` : 'Test match') : `${game.overs} overs`,
     chase ? `${o1} and ${o2} walk out for ${batTeamName()}, needing ${game.target} to win. ${bw0.name} opens the bowling for ${bowlName}.`
-      : isTest() ? `${toss}${o1} and ${o2} walk out in the sunshine, in whites, to face the red ball. ${bw0.name} has the new ball.` : `${toss}${o1} and ${o2} walk out under the lights. ${bw0.name} has the ball.`,
-    resume ? 'Welcome back' : chase ? `Target ${game.target}` : isTest() ? 'Good morning, Coimbatore' : 'Good evening, Coimbatore', chase ? 'big' : '');
+      : game.venue === 'gully' ? `${toss}${o1} and ${o2} walk out on to the maidan, the whole street watching from the wall. ${bw0.name} has the ball.` : isTest() ? `${toss}${o1} and ${o2} walk out in the sunshine, in whites, to face the red ball. ${bw0.name} has the new ball.` : `${toss}${o1} and ${o2} walk out under the lights. ${bw0.name} has the ball.`,
+    resume ? 'Welcome back' : chase ? `Target ${game.target}` : game.venue === 'gully' ? 'Good afternoon, Coimbatore' : isTest() ? 'Good morning, Coimbatore' : 'Good evening, Coimbatore', chase ? 'big' : '');
   if (Caller.failed) Voice.say(resume ? `Welcome back. ${batTeamName()} are ${game.runs} for ${game.wkts}.` : chase ? `${batTeamName()} need ${game.target} to win.` : fill(pickOne(LINES.welcome), { o1, o2, bw: bw0.short, team: batTeamName() }), true);
   else if (chase && !resume) { if (game.batTeam === 'away') Comm.chase(); else Comm.newBatter(game.bats[game.rigS.batIdx]); }
   else Comm.welcome(game.bats[game.rigS.batIdx], resume);
@@ -3614,7 +3819,7 @@ function assignTasks() {
     const reachStop = ev.dive ? Math.max(0, dist - ev.f.reach - ev.f.dive * 0.7) : Math.max(0, dist - ev.f.reach * 0.6);
     const stopAt = dist > 0.01 ? c.pos.clone().lerp(to, reachStop / dist) : c.pos.clone();
     const arrive = Math.max(start + 0.05, ev.t - 0.02);
-    ev.f.tasks.push({ start, arrive, from: c.pos.clone(), to: stopAt, dive: ev.dive, face: to.clone(), kind: ev.kind, evT: ev.t });
+    ev.f.tasks.push({ start, arrive, from: c.pos.clone(), to: stopAt, dive: ev.dive, face: to.clone(), kind: ev.kind, evT: ev.t, y: ev.y || 0 });
     c.pos.copy(stopAt); c.t = ev.t + (ev.kind === 'drop' ? 0.15 : 0.7);
   }
   const last = P.events[P.events.length - 1];
@@ -4268,7 +4473,7 @@ function onEvent(ev) {
     showToast(`Misfield at ${ev.f.name}`);
   } else if (ev.kind === 'field') {
     P.holder = ev.f; Sound.glove();
-    if (!ev.f.isKeeper) P.throwAt = P.t + 0.45;
+    if (!ev.f.isKeeper) P.throwAt = P.t + (Bodies.clips ? (ev.dive ? 2.0 : 0.75) : 0.45); // the model winds up (and gets up off the ground first)
     const label = P.extra && ev.runs ? `${ev.runs} ${P.extra === 'wd' ? 'wide' : 'bye'}${ev.runs === 1 ? '' : 's'}` : ev.runs === 0 ? 'Dot ball' : ev.runs === 1 ? '1 run' : `${ev.runs} runs`;
     const where = ev.f.isKeeper ? 'gathered by the keeper' : ev.f.isBowler ? 'stopped by the bowler' : `fielded at ${ev.f.name}`;
     if (game.del && game.del.noBall && !P.extra) showCallout(ev.runs ? `${label} + no ball` : 'No ball', `${P.shot} · ${where}`, 'k-runs');
@@ -4815,8 +5020,9 @@ function updateStriker(b, dt) {
   if (tgt) b.look.lerp(tgt, 1 - Math.exp(-14 * dt));
   r.head.lookAt(b.look);
 }
-/* Milestones: once the runs are completed the batter turns to the dressing room and raises his bat, the crowd stands,
-   the cheerleaders dance, and the cameras cut to him and then to the stage before the next ball. */
+/* Milestones: once the runs are completed the batter turns to the dressing room and raises his bat, then breaks into a
+   silly dance (Mixamo's Silly Dancing, on his model), the crowd stands, the cheerleaders dance, and the cameras cut to
+   him and then to the stage before the next ball. */
 const danceLen = (m) => (m >= 100 ? 10 : 8); // seconds the cheerleaders dance for
 /* the team's total passing 25, 50, 75, 100...: the cheerleaders dance (once the runs are completed) */
 function teamMilestone(m) {
@@ -4829,7 +5035,7 @@ function startTeamDance() {
   game.danceAt = 0;
   startDance(len); Sound.cheerBeat(len - 0.4); Sound.applause(0.9, len);
   showToast(`${batTeamName()} reach ${m}`, 3);
-  cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; // straight to the stage
+  if (game.venue !== 'gully') { cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; } // straight to the stage
 }
 function celebrate(bat, m) {
   const b = [rigA, rigB].find((r) => game.bats[r.batIdx] === bat);
@@ -4864,6 +5070,11 @@ function updateCeleb(b, dt) {
   r.root.updateMatrixWorld(true);
   _v3.set(b.pos.x - 12, 3.2, b.pos.z + 8); r.head.lookAt(_v3); // up at the stands
   batInHand(b);
+  // then the silly dance, bat and all (the model's; the drawn batter keeps waving)
+  if (t > 1.6 && Bodies.clips && !b.anim) Moves.begin(b, 'dance', { carry: b.carry || (b.carry = (pos, q) => {
+    b.bat.quaternion.copy(q).multiply(_qHand); b.batAxis.copy(Y_AXIS).applyQuaternion(b.bat.quaternion);
+    b.bat.position.copy(pos).addScaledVector(b.batAxis, -0.56);
+  }) });
 }
 function startRun(b) {
   b.rig.pelvis.getWorldPosition(_v1);
@@ -4935,6 +5146,7 @@ function updateBatters(dt) {
     else if (b.mode === 'run') updateRunner(b, dt);
     else if (b.mode === 'ns') updateNonStrikerRig(b, dt);
     else if (b.mode === 'walkoff') updateWalkoff(b, dt);
+    if (b.anim) { if (b.mode !== 'celeb') Moves.stop(b); Moves.step(b, dt); }
   }
 }
 
@@ -5113,103 +5325,189 @@ function lookAtBall(r) {
   r.head.lookAt(ball.position);
   r.head.rotation.set(clamp(r.head.rotation.x, -0.7, 0.6), clamp(r.head.rotation.y, -1.25, 1.25), 0);
 }
-/* ------------------------------------------------------------ the keeper's takes
-   When a delivery goes through to the keeper, his model plays a Mixamo clip (players/keeper.json) instead of copying
-   the drawn keeper: Goalkeeper Catch for a take in front of him, Football Catch for a bouncer, Goalkeeper Diving Save
-   (either side) for one well wide, with Goalkeeper Sidestep first for one a little wide. Each clip is timed so its
-   catch comes as the ball arrives, and its footwork steered (a dive turned and stretched a little too) so his hands end
-   up at the ball; in the last moment IK puts them on it. The drawn keeper stays under his hips, so he carries on from
-   wherever the take leaves him. Without the models, the drawn keeper keeps as before. */
-const KeeperTake = (() => {
-  // clip seconds: where it starts, the catch, where the rig takes over again
-  const MOVES = { take: { from: 0.25, at: 0.68, end: 1.05 }, high: { from: 0.55, at: 1.46, end: 1.9 }, dive: { from: 0.45, at: 1.19, end: 3.3 }, shuffle: { from: 0, at: 0.53, end: 0.53 } };
-  const FADE_IN = 0.18, FADE_OUT = 0.3, BLEND = 0.15, Y = new V3(0, 1, 0);
+/* ------------------------------------------------------------ Mixamo moves
+   The player models play Mixamo clips (players/moves.json, converted from the downloads) instead of copying their
+   drawn rigs when there is one that fits:
+     the keeper    Goalkeeper Catch for a take, Football Catch for a bouncer, Goalkeeper Diving Save for one well wide,
+                   with Goalkeeper Sidestep first for one a little wide
+     fielders      Goalkeeper Catch to gather the ball or take a catch at chest height, Football Catch for a high catch,
+                   Receiver Catch for a skier, Goalkeeper Diving Save for a diving stop or catch, Goalkeeper Overhand
+                   Throw for the return, Running to chase, Breathing Idle standing about, Victory Idle after a catch
+     the batter    Silly Dancing for a milestone, bat in hand
+   A move either carries the player (timed so its catch comes as the ball arrives, its footwork steered so his hands
+   meet it, and his drawn rig following his hips) or plays on the spot while the rig moves him. Moves crossfade into
+   one another and ease in and out of the rig's pose. Without the models, everyone moves as drawn. */
+const Moves = (() => {
+  // clip seconds: where a move starts, its moment (the catch, the release) and where it hands back; a move that plays
+  // on the spot keeps `spot` of the clip's own footwork
+  const CLIP = {
+    take: { from: 0.25, at: 0.68, end: 1.05 }, high: { from: 0.55, at: 1.46, end: 1.9 }, leap: { from: 0.2, at: 0.6, end: 2.2 },
+    dive: { from: 0.45, at: 1.19, end: 3.3 }, shuffle: { from: 0, at: 0.53, end: 0.53 },
+    throw: { from: 1.0, at: 1.5, end: 2.3, spot: 0.25, hand: 'Right' },
+    run: { loop: true, spot: 0 }, idle: { loop: true, spot: 0 }, cheer: { loop: true, spot: 0 }, dance: { loop: true, spot: 0 },
+  };
+  const FADE_IN = 0.18, FADE_OUT = 0.3, BLEND = 0.2, Y = new V3(0, 1, 0);
+  const TAKES = new Set(['catch', 'drop', 'field', 'misfield']);
   const p = new V3(), q = new V3(), a = new V3(), b = new V3();
-  // a point of the clip (in leg lengths from where it starts) in the world
+  const range = (key) => { const c = Bodies.clips.clips[key], m = CLIP[key]; return [m.from !== undefined ? m.from : c.from, m.end !== undefined ? m.end : c.from + (c.n - 1) / c.fps]; };
+  // a point of the clip (in leg lengths) in the world
   function place(A, track, tau, out) {
     Bodies.clipPoint(A.key, track, tau, p);
-    out.set(A.mirror * p.x * A.sigma * A.L, 0, p.z * A.sigma * A.L).applyAxisAngle(Y, A.yaw).add(A.anchor);
-    if (A.warpTo > A.warpFrom) out.addScaledVector(A.warp, smooth(clamp((tau - A.warpFrom) / (A.warpTo - A.warpFrom), 0, 1)));
-    out.y = track === 'hips' ? (p.y - Bodies.clips.clips[A.key].rest) * A.L + A.hip : p.y * A.L;
+    const y = track === 'hips' ? (p.y - Bodies.clips.clips[A.key].rest) * A.L + A.hip : p.y * A.L;
+    if (A.spot !== null) {
+      const u = A.loop ? (tau - A.c0) / (A.c1 - A.c0) : 0; // less the travel round a loop
+      out.set(A.mirror * (p.x - A.p0.x - A.trav.x * u) * A.spot * A.L, 0, (p.z - A.p0.z - A.trav.z * u) * A.spot * A.L).applyAxisAngle(Y, A.yaw).add(A.actor.pos);
+    } else {
+      out.set(A.mirror * p.x * A.sigma * A.L, 0, p.z * A.sigma * A.L).applyAxisAngle(Y, A.yaw).add(A.anchor);
+      if (A.warpTo > A.warpFrom) out.addScaledVector(A.warp, smooth(clamp((tau - A.warpFrom) / (A.warpTo - A.warpFrom), 0, 1)));
+    }
+    out.y = y;
     return out;
   }
-  // the clip's start over the point
+  // a carrying move starts over the point
   function anchorAt(A, x, z) { A.anchor.set(0, 0, 0); const w = A.warpTo; A.warpTo = A.warpFrom; place(A, 'hips', A.tau, q); A.warpTo = w; A.anchor.set(x - q.x, 0, z - q.z); }
-  /* o: { yaw, mirror, catchAt (game clock, for a take), target (the ball at the catch), lateral and dur (a sidestep),
-     then (what follows a sidestep) } */
-  function begin(f, key, o) {
-    const m = MOVES[key], fit = Bodies.fit(f.rig), prev = f.anim;
-    const A = { key, mirror: o.mirror || 1, yaw: o.yaw, L: fit.L, hip: fit.hip, sigma: 1, anchor: new V3(), warp: new V3(), warpFrom: 0, warpTo: 0,
-      tau: m.from, speed: 1, w: prev ? prev.w : 0, state: prev ? 'on' : 'in', ik: 0, ikTarget: o.target || null, catchAt: o.catchAt === undefined ? null : o.catchAt,
-      then: o.then || null, hipsW: new V3(), hold: prev ? prev.hold : new V3(), prev: prev ? Object.assign({}, prev, { then: null, prev: null }) : null, mix: prev ? 0 : 1 };
-    if (A.catchAt !== null) { const left = Math.max(0.05, A.catchAt - game.clock); A.speed = clamp((m.at - m.from) / left, 0.6, 1.7); A.tau = Math.max(0, m.at - A.speed * left); }
-    else if (o.dur) A.speed = (m.end - m.from) / o.dur;
-    const sx = prev ? prev.hipsW.x : f.pos.x, sz = prev ? prev.hipsW.z : f.pos.z;
-    anchorAt(A, sx, sz);
-    if (key === 'shuffle') {
-      // stretch the sidestep to the distance
-      Bodies.clipPoint(key, 'hips', m.end, a); Bodies.clipPoint(key, 'hips', m.from, b);
-      A.sigma = clamp(Math.abs(o.lateral) / Math.max(0.05, Math.abs(a.x - b.x) * A.L), 0.3, 1.6); anchorAt(A, sx, sz);
-    }
-    if (A.ikTarget) {
-      if (key === 'dive') {
-        // turn the dive toward the ball, and stretch or shorten it to the distance
-        place(A, 'hands', m.at, a).sub(q.set(sx, 0, sz)).setY(0); b.copy(A.ikTarget).sub(q).setY(0);
-        A.yaw += clamp(Math.atan2(a.z * b.x - a.x * b.z, a.x * b.x + a.z * b.z), -0.8, 0.8);
-        A.sigma = clamp(b.length() / Math.max(0.1, a.length()), 0.55, 1.3);
-        anchorAt(A, sx, sz);
+  /* o: yaw, mirror, catchAt (game clock: when the moment comes), target (the ball then), lateral and dur (a sidestep),
+     then (a move to follow), speed, phase (where a loop starts), carry (something held in the right hand), onEnd */
+  function begin(actor, key, o = {}) {
+    const m = CLIP[key], fit = Bodies.fit(actor.rig), prev = actor.anim && actor.anim.w > 0 ? actor.anim : null;
+    if (!fit) return null;
+    const [c0, c1] = range(key);
+    const A = { actor, key, loop: !!m.loop, spot: m.spot !== undefined ? m.spot : null, hand: m.hand || null, c0, c1,
+      mirror: o.mirror || 1, yaw: o.yaw !== undefined ? o.yaw : actor.heading, L: fit.L, hip: fit.hip, sigma: 1,
+      anchor: new V3(), warp: new V3(), warpFrom: 0, warpTo: 0, p0: new V3(), trav: new V3(),
+      tau: c0, speed: o.speed || 1, w: prev ? prev.w : 0, state: prev && prev.w >= 1 && prev.state !== 'out' ? 'on' : 'in',
+      ik: 0, ikTarget: o.target || null, catchAt: o.catchAt === undefined ? null : o.catchAt, then: o.then || null,
+      hipsW: new V3(), hold: new V3(), held: false, carry: o.carry || null, onEnd: o.onEnd || null, fresh: true,
+      prev: prev ? Object.assign({}, prev, { then: null, prev: null }) : null, mix: prev ? 0 : 1, blend: o.blend || BLEND };
+    if (A.catchAt !== null) { const left = Math.max(0.05, A.catchAt - game.clock); A.speed = clamp((m.at - c0) / left, 0.6, 1.7); A.tau = Math.max(0, m.at - A.speed * left); }
+    else if (o.dur) A.speed = (c1 - c0) / o.dur;
+    if (o.phase) A.tau = c0 + o.phase * (c1 - c0);
+    if (A.spot !== null) {
+      Bodies.clipPoint(key, 'hips', c0, A.p0);
+      if (A.loop) A.trav.copy(Bodies.clipPoint(key, 'hips', c1, a)).sub(A.p0).setY(0);
+    } else {
+      const sx = prev ? prev.hipsW.x : actor.pos.x, sz = prev ? prev.hipsW.z : actor.pos.z;
+      anchorAt(A, sx, sz);
+      if (key === 'shuffle') {
+        // stretched to the distance
+        Bodies.clipPoint(key, 'hips', c1, a); Bodies.clipPoint(key, 'hips', c0, b);
+        A.sigma = clamp(Math.abs(o.lateral) / Math.max(0.05, Math.abs(a.x - b.x) * A.L), 0.3, 1.6); anchorAt(A, sx, sz);
       }
-      // what is left between the hands at the catch and the ball, made up along the way
-      place(A, 'hands', m.at, a); A.warp.set(A.ikTarget.x - a.x, 0, A.ikTarget.z - a.z); A.warpFrom = A.tau; A.warpTo = m.at;
+      if (A.ikTarget) {
+        if (key === 'dive') {
+          // turned toward the ball, and stretched or shortened to it
+          place(A, 'hands', m.at, a).sub(q.set(sx, 0, sz)).setY(0); b.copy(A.ikTarget).sub(q).setY(0);
+          A.yaw += clamp(Math.atan2(a.z * b.x - a.x * b.z, a.x * b.x + a.z * b.z), -0.8, 0.8);
+          A.sigma = clamp(b.length() / Math.max(0.1, a.length()), 0.55, 1.3);
+          anchorAt(A, sx, sz);
+        }
+        // whatever is left between his hands at the moment and the ball, made up along the way
+        place(A, 'hands', m.at, a); A.warp.set(A.ikTarget.x - a.x, 0, A.ikTarget.z - a.z); A.warpFrom = A.tau; A.warpTo = m.at;
+      }
     }
-    f.anim = f.rig.anim = A;
+    actor.anim = actor.rig.anim = A;
     return A;
   }
-  // the delivery's end, where it reaches him, and which take suits it
-  function plan(f, F) {
-    const S = F.sim, i = S.n - 1, target = new V3(S.pts[i * 3], S.pts[i * 3 + 1], S.pts[i * 3 + 2]);
-    const yaw = f.heading, d = a.subVectors(target, f.pos).applyAxisAngle(Y, -yaw), side = d.x >= 0 ? 1 : -1; // +x: his left
-    let key = 'take', lead = MOVES.take.at - MOVES.take.from, shuffle = 0;
-    if ((game.del.length === 'bouncer' && target.y > 1.2) || target.y > 1.75) { key = 'high'; lead = MOVES.high.at - MOVES.high.from; }
-    else if (Math.abs(d.x) > 1.45) { key = 'dive'; lead = MOVES.dive.at - MOVES.dive.from; }
-    else if (Math.abs(d.x) > 0.4) { shuffle = d.x; lead += 0.32; }
-    return { key, lead, shuffle, side, yaw, target, catchAt: null };
+  function stop(actor) { const A = actor.anim; if (A && A.state !== 'out') { A.state = 'out'; A.then = null; if (A.onEnd) { A.onEnd(); A.onEnd = null; } } }
+  function step(actor, dt) {
+    const A = actor.anim; if (!A) return;
+    const m = CLIP[A.key];
+    if (A.fresh) A.fresh = false; // begun this frame, already timed from now
+    else if (A.loop) { A.tau += dt * A.speed; if (A.tau > A.c1) A.tau = A.c0 + ((A.tau - A.c0) % (A.c1 - A.c0)); }
+    else A.tau += dt * (A.catchAt === null || A.tau < m.at ? A.speed : 1);
+    if (A.state === 'in') { A.w = Math.min(1, A.w + dt / FADE_IN); if (A.w >= 1) A.state = 'on'; }
+    A.mix = Math.min(1, A.mix + dt / A.blend);
+    if (!A.loop && A.tau >= A.c1 && A.state !== 'out') {
+      if (A.then) { place(A, 'hips', A.c1, A.hipsW); begin(actor, A.then.key, A.then); step(actor, 0); return; }
+      stop(actor);
+    }
+    if (A.state === 'out') { A.w -= dt / FADE_OUT; if (A.w <= 0) { actor.anim = actor.rig.anim = null; return; } }
+    if (!A.loop) A.tau = Math.min(A.tau, A.c1);
+    if (A.spot !== null) A.yaw = actor.heading;
+    place(A, 'hips', A.tau, A.hipsW);
+    if (A.prev) { const P = A.prev; if (P.spot !== null) P.yaw = actor.heading; place(P, 'hips', P.tau, P.hipsW); if (A.mix >= 1) A.prev = null; }
+    // the hands onto the ball over the last moment before it arrives, held as it does, then let go
+    if (A.catchAt !== null && A.ikTarget) { const t = game.clock - A.catchAt; A.ik = t < 0 ? smooth(clamp(1 + t / 0.3, 0, 1)) : clamp(1 - (t - 0.1) / 0.3, 0, 1); }
+    else A.ik = 0;
+    // a carrying move takes the drawn rig with it
+    if (A.spot === null) { actor.pos.set(A.hipsW.x, 0, A.hipsW.z); actor.heading = A.yaw; if (actor.tilt !== undefined) actor.tilt = 0; }
   }
+  // the speed the running clip covers ground at, for this player
+  const runSpeed = (actor) => { const f = Bodies.fit(actor.rig), [c0, c1] = range('run'); Bodies.clipPoint('run', 'hips', c1, a); Bodies.clipPoint('run', 'hips', c0, b); return f ? Math.hypot(a.x - b.x, a.z - b.z) * f.L / (c1 - c0) : 5; };
+
+  /* The keeper: which take suits the delivery, started so its catch comes as the ball arrives */
+  function keeper(f) {
+    const st = game.state, F = game.flight;
+    if (!(f.anim && !f.anim.loop) && st === 'flight' && F && !F.kept && F.sim.keeperT !== null) {
+      if (!F.keeperPlan) {
+        const S = F.sim, i = S.n - 1, target = new V3(S.pts[i * 3], S.pts[i * 3 + 1], S.pts[i * 3 + 2]);
+        const yaw = f.heading, d = a.subVectors(target, f.pos).applyAxisAngle(Y, -yaw), side = d.x >= 0 ? 1 : -1; // +x: his left
+        let key = 'take', lead = CLIP.take.at - CLIP.take.from, shuffle = 0;
+        if ((game.del.length === 'bouncer' && target.y > 1.2) || target.y > 1.75) { key = 'high'; lead = CLIP.high.at - CLIP.high.from; }
+        else if (Math.abs(d.x) > 1.45) { key = 'dive'; lead = CLIP.dive.at - CLIP.dive.from; }
+        else if (Math.abs(d.x) > 0.4) { shuffle = d.x; lead += 0.32; }
+        F.keeperPlan = { key, lead, shuffle, side, yaw, target };
+      }
+      const P = F.keeperPlan, left = F.sim.keeperT - F.t;
+      if (left <= P.lead && !P.begun) {
+        P.begun = true;
+        const catchAt = game.clock + left;
+        if (P.shuffle) begin(f, 'shuffle', { yaw: P.yaw, mirror: P.side, lateral: P.shuffle, dur: 0.32, then: { key: 'take', yaw: P.yaw, target: P.target, catchAt } });
+        else begin(f, P.key, { yaw: P.yaw, mirror: P.key === 'dive' ? P.side : 1, target: P.target, catchAt });
+      }
+    }
+    // hit, or off the gloves: the take gives way
+    if (st === 'inplay' && f.anim && !f.anim.loop && game.flight === null && f.anim.ikTarget && f.anim.catchAt !== null && !f.anim.fielding) { f.anim.ikTarget = null; stop(f); }
+  }
+
+  /* A fielder (the keeper too, once the ball is in play): the take, dive or catch as the ball reaches him, the throw
+     back, a cheer after a catch, or running and standing about */
+  function fielder(f, moveSpeed, task) {
+    const P = game.play, st = game.state, A = f.anim;
+    const busy = A && !A.loop && A.state !== 'out';
+    // his next take (looked for before his reaction time is up: a close catch can come sooner than the move needs)
+    task = P && !busy ? f.tasks.find((k) => k.evT !== undefined && !k.moved && TAKES.has(k.kind)) : null;
+    if (task) {
+      const key = task.dive ? 'dive' : task.kind === 'field' || task.kind === 'misfield' || task.y < 1.4 ? 'take' : task.y < 2.3 ? 'high' : 'leap';
+      const m = CLIP[key], left = task.evT - P.t;
+      if (left <= m.at - m.from) {
+        task.moved = true;
+        const target = new V3(task.face.x, Math.max(0.12, task.y), task.face.z);
+        const toBall = Math.hypot(target.x - f.pos.x, target.z - f.pos.z) > 0.3 ? Math.atan2(target.x - f.pos.x, target.z - f.pos.z) : f.heading;
+        const yaw = key === 'dive' ? f.heading : toBall;
+        a.subVectors(target, f.pos).applyAxisAngle(Y, -yaw);
+        const M = begin(f, key, { yaw, mirror: key === 'dive' && a.x < 0 ? -1 : 1, target, catchAt: game.clock + Math.max(0.05, left),
+          onEnd: () => { for (const k of f.tasks) if (P.t >= k.start - 1e-4) { k.from.copy(f.pos); k.to.copy(f.pos); } } });
+        if (M) M.fielding = true;
+        return;
+      }
+    }
+    // the return: the ball in his right hand, released as the throw starts
+    if (P && P.holder === f && P.throwAt && !P.throwing && !f.isKeeper && !(A && A.key === 'throw')) {
+      const left = P.throwAt - P.t;
+      if (left <= CLIP.throw.at - CLIP.throw.from && !(busy && A.tau < CLIP[A.key].at + 0.1)) {
+        begin(f, 'throw', { yaw: Math.atan2(KEEPER_TAKE.x - f.pos.x, KEEPER_TAKE.z - f.pos.z), catchAt: game.clock + Math.max(0.05, left) });
+        return;
+      }
+    }
+    if (busy) return;
+    if (f.pose === 'celebrate') { if (!(A && A.key === 'cheer' && A.state !== 'out')) begin(f, 'cheer', { phase: Math.random(), blend: A && A.key === 'leap' ? 0.6 : BLEND }); return; } // up off the ground first
+    // running, or standing about (not while crouched for the delivery, or the keeper while he works)
+    const cur = A && A.state !== 'out' ? A.key : null;
+    let want = null;
+    if (moveSpeed > (cur === 'run' ? 1.8 : 2.6)) want = 'run';
+    else if (moveSpeed < (cur === 'idle' ? 0.6 : 0.25) && st !== 'runup' && st !== 'flight' && !(f.isKeeper && st === 'inplay')) want = 'idle';
+    if (want === 'run') {
+      const sp = clamp(moveSpeed / runSpeed(f), 0.6, 1.5);
+      if (cur === 'run') A.speed = damp(A.speed, sp, 6, 1 / 60); else begin(f, 'run', { speed: sp, phase: Math.random() });
+    } else if (want === 'idle') { if (cur !== 'idle') begin(f, 'idle', { phase: Math.random() }); }
+    else if (A && A.loop) stop(f);
+  }
+
   return {
-    update(f, dt) {
-      const st = game.state, F = game.flight;
-      if (st === 'menu' || st === 'over') { if (f.anim) f.anim = f.rig.anim = null; return; }
-      if (!f.anim && st === 'flight' && F && !F.kept && F.sim.keeperT !== null && Bodies.clips && Bodies.fit(f.rig)) {
-        if (!F.keeperPlan) F.keeperPlan = plan(f, F);
-        const P = F.keeperPlan, left = F.sim.keeperT - F.t;
-        if (left <= P.lead && !P.begun) {
-          P.begun = true;
-          const catchAt = game.clock + left;
-          if (P.shuffle) begin(f, 'shuffle', { yaw: P.yaw, mirror: P.side, lateral: P.shuffle, dur: 0.32, then: { key: 'take', yaw: P.yaw, target: P.target, catchAt } });
-          else begin(f, P.key, { yaw: P.yaw, mirror: P.key === 'dive' ? P.side : 1, target: P.target, catchAt });
-        }
-      }
-      const A = f.anim; if (!A) return;
-      const m = MOVES[A.key];
-      if (st === 'inplay' && A.state !== 'out') { A.state = 'out'; A.then = null; } // hit, or off the gloves: the rig takes over
-      A.tau += dt * (A.catchAt === null || A.tau < m.at ? A.speed : 1);
-      if (A.state === 'in') { A.w = Math.min(1, A.w + dt / FADE_IN); if (A.w >= 1) A.state = 'on'; }
-      A.mix = Math.min(1, A.mix + dt / BLEND);
-      if (A.tau >= m.end && A.state !== 'out') {
-        if (A.then) { place(A, 'hips', m.end, A.hipsW); begin(f, A.then.key, A.then); this.update(f, 0); return; }
-        A.state = 'out';
-      }
-      if (A.state === 'out') { A.w -= dt / FADE_OUT; if (A.w <= 0) { f.anim = f.rig.anim = null; return; } }
-      A.tau = Math.min(A.tau, m.end);
-      place(A, 'hips', A.tau, A.hipsW);
-      if (A.prev) { const P = A.prev; place(P, 'hips', P.tau, P.hipsW); if (A.mix >= 1) A.prev = null; }
-      // the hands onto the ball over the last moment before it arrives, held as it does, then let go
-      if (A.catchAt !== null && A.ikTarget && st !== 'inplay') { const t = game.clock - A.catchAt; A.ik = t < 0 ? smooth(clamp(1 + t / 0.3, 0, 1)) : clamp(1 - (t - 0.1) / 0.3, 0, 1); }
-      else A.ik = 0;
-      // the drawn keeper stands under him, facing his way
-      f.pos.set(A.hipsW.x, 0, A.hipsW.z); f.heading = A.yaw; f.tilt = 0;
-    },
-    holding: (f) => !!(f.anim && f.anim.w > 0.5),
+    begin, stop, step, keeper, fielder,
+    // where a ball he holds is: between his fists (in his right hand for a throw)
+    hand(actor, out) { const A = actor.anim; if (A && A.w > 0.5 && A.held) { out.copy(A.hold); return true; } return false; },
   };
 })();
 function updateFielders(dt) {
@@ -5217,7 +5515,7 @@ function updateFielders(dt) {
   const playing = !!P && (st === 'inplay' || st === 'dead');
   const watching = st === 'flight' || playing;
   for (const f of fielders) {
-    if (f.isBowler && !(playing && f.tasks.length)) continue;
+    if (f.isBowler && !(playing && f.tasks.length)) { if (f.anim) { Moves.stop(f); Moves.step(f, dt); } continue; } // his run-up and action stay drawn
     const r = f.rig;
     let moveSpeed = 0, crouchT = 0, task = null;
     if (playing && f.tasks.length) {
@@ -5258,7 +5556,7 @@ function updateFielders(dt) {
     if (f.isKeeper && st === 'flight' && game.flight && !game.flight.keeperPlan && game.flight.sim.keeperT !== null && game.flight.t > game.flight.sim.keeperT - 0.4) {
       f.pos.x = damp(f.pos.x, ball.position.x + 0.15, 9, dt);
     }
-    if (f.isKeeper) KeeperTake.update(f, dt);
+    if (Bodies.clips) { if (f.isKeeper) Moves.keeper(f); Moves.fielder(f, moveSpeed, task); Moves.step(f, dt); }
     r.root.position.copy(f.pos); r.root.rotation.set(0, f.heading, f.tilt);
     const run = clamp(moveSpeed / 6.5, 0, 1);
     stepPhase(r, moveSpeed, run, dt);
@@ -5501,7 +5799,7 @@ const Toss = (() => {
     $('startPanel').hidden = true; $('tossPanel').hidden = false;
     $('tossEyebrow').textContent = `The toss · ${TEAMS.home.name} v World XI`;
     $('tossTitle').textContent = 'Call it';
-    $('tossText').textContent = `${isTest() ? 'A Test match in the sunshine' : `${game.overs} overs a side under the lights`}. The World XI captain spins the coin: heads or tails?`;
+    $('tossText').textContent = `${game.venue === 'gully' ? `${game.overs ? `${game.overs} overs a side` : 'A long one'} on the gully ground` : isTest() ? 'A Test match in the sunshine' : `${game.overs} overs a side under the lights`}. The World XI captain spins the coin: heads or tails?`;
     const coin = $('coin'); coin.style.transition = 'none'; coin.style.transform = 'none'; spins = 0;
     show('tossCall');
   }
@@ -5566,9 +5864,16 @@ const LOOKS = {
     sky: [0x040817, 0x18264e, 0xb86c5c, 1], crowd: 0.32, concrete: 0x1b2131, roof: 0x0e121c, sight: 0x07080c, lamps: 0xffffff, glow: 0.9, exposure: 1.05, grass: 0x9cb39a, pitch: 0xa39782 },
   day: { bg: 0x9cc1e8, fog: [0xc6d8ea, 260, 950], hemi: [0xd6e8ff, 0x3f5f36, 0.85], key: [0xfff3e0, 2.7], fill: [0xdfe9ff, 0.45], rim: [0xfff0dc, 0.35],
     sky: [0x2b66b8, 0x6fa4dc, 0xd8e6f0, 0], crowd: 0.07, concrete: 0x8a909c, roof: 0x5c6270, sight: 0xf3f3ef, lamps: 0x5a5d66, glow: 0, exposure: 1.0, grass: 0x8fa88d, pitch: 0x9c9080 },
+  // the gully ground: a hazy afternoon, the sun warm and the light off the dust
+  gully: { bg: 0xa9c7e2, fog: [0xd8dde0, 200, 720], hemi: [0xdfe9ff, 0x8a6a46, 0.85], key: [0xffe6c4, 2.5], fill: [0xe2e6f2, 0.4], rim: [0xffe2c4, 0.45],
+    sky: [0x3b78c4, 0x8ab8e2, 0xf0dcc4, 0], crowd: 0.07, concrete: 0x8a909c, roof: 0x5c6270, sight: 0xf3f3ef, lamps: 0x5a5d66, glow: 0, exposure: 1.0, grass: 0xd6c4aa, pitch: 0xe0cdb6 },
 };
 function applyLook(fmt) {
-  const L = LOOKS[fmt === 'test' ? 'day' : 'night'], KB = kitsOf(game.batTeam)[fmt], KF = kitsOf(fieldTeam())[fmt];
+  const lane = game.venue === 'gully';
+  const L = LOOKS[lane ? 'gully' : fmt === 'test' ? 'day' : 'night'], KB = kitsOf(game.batTeam)[fmt], KF = kitsOf(fieldTeam())[fmt];
+  // the ground: the stadium, or the gully ground with its earth and mud pitch
+  arena.visible = !lane; gully.visible = lane;
+  stadium.fieldMat.map = lane ? stadium.dirtTex : stadium.grassTex; stadium.pitchMat.map = lane ? stadium.mudTex : stadium.pitchTex;
   scene.background.setHex(L.bg); scene.fog.color.setHex(L.fog[0]); scene.fog.near = L.fog[1]; scene.fog.far = L.fog[2];
   LIGHTS.hemi.color.setHex(L.hemi[0]); LIGHTS.hemi.groundColor.setHex(L.hemi[1]); LIGHTS.hemi.intensity = L.hemi[2];
   for (const k of ['key', 'fill', 'rim']) { LIGHTS[k].color.setHex(L[k][0]); LIGHTS[k].intensity = L[k][1]; }
@@ -5614,7 +5919,8 @@ function formatUI(fmt) {
   });
   document.querySelectorAll('[data-fmt]').forEach((b) => { const on = b.dataset.fmt === fmt; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   const team = (t) => t.replace('{team}', TEAMS.home.name);
-  $('startEyebrow').textContent = team(T.eyebrow); $('ledeLead').textContent = team(T.lead); $('ledeTail').textContent = T.tail; $('bugTag').textContent = T.tag;
+  const lane = (t) => (game.venue === 'gully' ? t.replace('Day–night T20', 'T20').replace(' under the lights', ' on the gully ground').replace(' in the sunshine', ' on the gully ground') : t);
+  $('startEyebrow').textContent = lane(team(T.eyebrow)) + (game.venue === 'gully' ? ' · Gully ground' : ''); $('ledeLead').textContent = lane(team(T.lead)); $('ledeTail').textContent = T.tail; $('bugTag').textContent = T.tag;
 }
 function setFormat(fmt, quiet) {
   game.format = fmt;
@@ -5628,6 +5934,14 @@ function setFormat(fmt, quiet) {
   refreshStartPanel(); renderScore();
 }
 document.querySelectorAll('[data-fmt]').forEach((b) => b.addEventListener('click', () => { if (!game.active && b.dataset.fmt !== game.format) setFormat(b.dataset.fmt); }));
+/* the ground: the stadium, or the gully ground (see above) */
+function venueUI() { document.querySelectorAll('[data-venue]').forEach((b) => { const on = b.dataset.venue === game.venue; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }
+function setVenue(v) {
+  game.venue = v === 'gully' ? 'gully' : 'stadium';
+  storage.set('floodlit.venue', game.venue);
+  venueUI(); formatUI(game.format); applyLook(game.format);
+}
+document.querySelectorAll('[data-venue]').forEach((b) => b.addEventListener('click', () => { if (!game.active && b.dataset.venue !== game.venue) setVenue(b.dataset.venue); }));
 
 /* A free swing: on a no-ball (and the free hit after one in T20) the batter cannot be bowled or caught. */
 const noOut = () => !!((game.del && game.del.noBall) || game.freeHitNow);
@@ -5743,8 +6057,7 @@ function updateGame(dt) {
     if (st === 'dead') game.deadT += dt;
     if (st === 'dead' && game.deadFlight && game.flight) {
       const F = game.flight; F.t += dt;
-      if (F.kept && KeeperTake.holding(keeper)) ball.position.copy(keeper.anim.hold); // between the model's fists
-      else if (F.kept) { keeper.rig.root.updateMatrixWorld(true); keeper.handMarker.getWorldPosition(ball.position); }
+      if (F.kept) { if (!Moves.hand(keeper, ball.position)) { keeper.rig.root.updateMatrixWorld(true); keeper.handMarker.getWorldPosition(ball.position); } }
       else sampleAt(F.sim, Math.min(F.t, F.sim.dur), ball.position);
     } else if (game.play) {
       const P = game.play;
@@ -5752,7 +6065,7 @@ function updateGame(dt) {
       while (P.ei < P.events.length && P.t >= P.events[P.ei].t) { onEvent(P.events[P.ei]); P.ei++; }
       if (P.throwAt && P.holder && P.t >= P.throwAt && !P.throwing) startThrow(P);
       if (P.throwing && !P.throwing.done) flyThrow(P, dt);
-      else if (P.holder) { P.holder.rig.root.updateMatrixWorld(true); P.holder.handMarker.getWorldPosition(ball.position); }
+      else if (P.holder) { if (!Moves.hand(P.holder, ball.position)) { P.holder.rig.root.updateMatrixWorld(true); P.holder.handMarker.getWorldPosition(ball.position); } }
       else {
         sampleAt(P.sim, P.t, ball.position);
         if (ballPrev.y > 0.3 && ball.position.y < 0.08 && P.t > 0.15 && P.t < 5) Sound.bounce();
@@ -5780,7 +6093,7 @@ const KEEPER_TAKE = new V3(0.3, 0, 0.72);
 function startThrow(P) {
   const f = P.holder;
   f.rig.root.updateMatrixWorld(true);
-  const from = f.handMarker.getWorldPosition(new V3());
+  const from = new V3(); if (!Moves.hand(f, from)) f.handMarker.getWorldPosition(from);
   const to = new V3(KEEPER_TAKE.x - 0.05, 1.05, KEEPER_TAKE.z - 0.45);
   const d = Math.hypot(to.x - from.x, to.z - from.z);
   const segs = [];
@@ -5808,7 +6121,8 @@ function flyThrow(P, dt) {
   if (g.last) {
     // ease the end of the flight onto wherever the keeper's glove actually is
     keeper.rig.root.updateMatrixWorld(true);
-    keeper.handMarker.getWorldPosition(_v1).sub(g.p1);
+    if (!Moves.hand(keeper, _v1)) keeper.handMarker.getWorldPosition(_v1);
+    _v1.sub(g.p1);
     ball.position.addScaledVector(_v1, smooth(clamp((u - 0.55) / 0.45, 0, 1)));
   }
   if (g.last && T.t >= g.T) { T.done = true; P.holder = keeper; Sound.glove(); }
@@ -6359,9 +6673,9 @@ function updateCamera(rdt) {
     desired.fov = clamp(54 - d * 0.22, 30, 54) / Math.pow(clamp(aspect, 0.5, 1), 0.4);
     kp = 2.4; kl = 7;
   } else if (cam.mode === 'celeb' && cam.celeb) {
-    // first the batter with the bat raised, then across to the nearest dancers
+    // first the batter with the bat raised, then across to the nearest dancers (at the gully ground, his dance all the way)
     const b = cam.celeb, T = _v1.set(b.pos.x, 1.35, b.pos.z);
-    if (cam.modeT < 2.4) { const h = b.celebFace, fx = Math.sin(h), fz = Math.cos(h); desired.pos.set(T.x + fx * 4.8 + fz * 1.3, 1.75, T.z + fz * 4.8 - fx * 1.3); desired.look.set(T.x, 1.55, T.z); desired.fov = 32 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 3; kl = 6; } // in front of him, a little to one side
+    if (cam.modeT < 2.4 || game.venue === 'gully') { const h = b.celebFace, fx = Math.sin(h), fz = Math.cos(h); desired.pos.set(T.x + fx * 4.8 + fz * 1.3, 1.75, T.z + fz * 4.8 - fx * 1.3); desired.look.set(T.x, 1.55, T.z); desired.fov = 32 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 3; kl = 6; } // in front of him, a little to one side
     else {
       const S = STAGES.reduce((a, s) => (Math.abs(s.z - camera.position.z) < Math.abs(a.z - camera.position.z) ? s : a), STAGES[0]);
       desired.pos.set(S.x * 0.6, 3.4, S.z - Math.sign(S.z - FIELD_C.z) * 21); desired.look.set(S.x, 2.1, S.z); desired.fov = 19 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 2.4; kl = 4.5;
@@ -6525,6 +6839,8 @@ function boot(data) {
   {
     const fmt = data.format || storage.get('floodlit.format');
     game.format = FORMATS[fmt] ? fmt : 't20';
+    game.venue = (data.venue || storage.get('floodlit.venue')) === 'gully' ? 'gully' : 'stadium';
+    venueUI();
   }
   if (data.overs !== undefined && FORMATS[game.format].overs.includes(data.overs)) game.overs = data.overs;
   else if (!FORMATS[game.format].overs.includes(game.overs)) game.overs = FORMATS[game.format].def;
@@ -6636,11 +6952,11 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, KeeperTake, ball, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, Moves, ball, celebrate, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({
-    view: cam.view, muted: Sound.muted, voice: Voice.on, overs: game.overs, diff: game.diff, format: game.format,
+    view: cam.view, muted: Sound.muted, voice: Voice.on, overs: game.overs, diff: game.diff, format: game.format, venue: game.venue,
     innings: game.active ? {
       runs: game.runs, wkts: game.wkts, balls: game.balls, fours: game.fours, sixes: game.sixes, dots: game.dots,
       log: game.log, fow: game.fow, bats: game.bats, bowl: game.bowl, nextIn: game.nextIn, bowler: game.bowler,

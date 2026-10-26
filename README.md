@@ -196,13 +196,25 @@ GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat
 or ball and the feet on the ground, and on the bat the thumbs wrap the
 handle. The keeper is always someone bareheaded (Medea, Ch01, Josh, Ely or
-Abe), so no hat or hood hides where the ball pitches, and his takes are
-Mixamo clips (`cricket/players/keeper.json`, built from the downloads by
-`~/thudinest-assets/tools/build-clips.mjs`): Goalkeeper Catch for a normal
-take, Football Catch for a bouncer, Goalkeeper Diving Save for one well wide,
-and Goalkeeper Sidestep first for one a little wide. Each is timed so the
-catch comes as the ball arrives and steered so his hands meet it. Add
-`?classic` to the address to play with the drawn players only;
+Abe), so no hat or hood hides where the ball pitches. The models play
+Mixamo clips where one fits (`cricket/players/moves.json`, built from the
+downloads by `~/thudinest-assets/tools/build-clips.mjs`): the keeper's takes
+(Goalkeeper Catch, Football Catch for a bouncer, Goalkeeper Diving Save, a
+Goalkeeper Sidestep first for one a little wide); the fielders' stops, dives
+and catches (Goalkeeper Catch, Football Catch, Receiver Catch for a skier),
+the Goalkeeper Overhand Throw back, Running, Breathing Idle and a Victory
+Idle after a catch; and the batter's Silly Dancing, bat in hand, for a
+milestone. Takes and catches are timed so the catch comes as the ball
+arrives and steered so the hands meet it.
+
+**Grounds** — the start card picks the stadium (stands, floodlights,
+cheerleaders) or the gully ground: a dusty neighbourhood maidan with a mud
+pitch, a whitewashed compound wall with painted ads and kids sitting on it,
+houses with water tanks, coconut palms, electric poles and a temple tower,
+in afternoon light. The field is the same size, so the game plays the same.
+The choice is remembered (`floodlit.venue`).
+
+Add `?classic` to the address to play with the drawn players only;
 the game also falls back to them if the models fail to load. The Mixamo
 downloads and the build scripts live outside the repo, in
 `~/thudinest-assets/`.
