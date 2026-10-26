@@ -944,7 +944,7 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
   const optional = (file) => model(file).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // players drawn at random, then the umpires' character
-  const NAMES = ['james', 'remy', 'aj', 'vegas', 'footballer', 'timmy', 'boss'];
+  const NAMES = ['james', 'remy', 'aj', 'peasant', 'footballer', 'timmy', 'boss'];
   const load = Promise.all(NAMES.map((n) => optional(`${n}.glb`)));
   return Promise.race([load, late]).then((got) => (got.some(Boolean) ? Object.fromEntries(NAMES.map((n, i) => [n, got[i]])) : null))
     .catch((e) => { console.warn('Drawn players: the player models did not load', e); return null; });
@@ -1975,7 +1975,7 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
 
 /* ------------------------------------------------------------ realistic players
    Every player wears one of the downloaded Mixamo characters, exactly as downloaded (no kit, pads, helmet or gloves):
-   James, Remy, Aj, Big Vegas, the footballer or Timmy (players/*.glb), drawn at random for each player of every side
+   James, Remy, Aj, the peasant man, the footballer or Timmy (players/*.glb), drawn at random for each player of every side
    and kept for the match; both umpires are The Boss (players/boss.glb). The rigs still do all the work (stance, swings, run-ups, fielding, IK,
    replays): every frame each visible model's skeleton copies its rig's joint angles, then two-bone IK puts its fist on
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
@@ -2009,8 +2009,10 @@ function buildBodies(models) {
       setWorldQuat(bone, bone.getWorldQuaternion(new THREE.Quaternion()).premultiply(q));
       bone.updateMatrixWorld(true);
     };
+    // the knuckle the fist is measured to: middle finger, or the index for characters rigged with fewer fingers
+    const knuckle = (s) => CB[`${s}HandMiddle1`] || CB[`${s}HandIndex1`] || CB[`${s}Hand`].children.find((c) => c.isBone);
     for (const s of ['Left', 'Right']) {
-      aim(CB[`${s}Arm`], CB[`${s}ForeArm`], DOWN); aim(CB[`${s}ForeArm`], CB[`${s}Hand`], DOWN); aim(CB[`${s}Hand`], CB[`${s}HandMiddle1`], DOWN);
+      aim(CB[`${s}Arm`], CB[`${s}ForeArm`], DOWN); aim(CB[`${s}ForeArm`], CB[`${s}Hand`], DOWN); aim(CB[`${s}Hand`], knuckle(s), DOWN);
       aim(CB[`${s}UpLeg`], CB[`${s}Leg`], DOWN); aim(CB[`${s}Leg`], CB[`${s}Foot`], DOWN);
     }
     cal.updateMatrixWorld(true);
@@ -2053,7 +2055,7 @@ function buildBodies(models) {
     return {
       tpl, S, restLocal, rest, hipRatio, hipsFromLegs, footLift, curlAxis,
       hipsParentInv: hipsParent.matrixWorld.clone().invert(), hipsParentQ: hipsParent.getWorldQuaternion(new THREE.Quaternion()),
-      fist: CB.LeftHandMiddle1.position.clone(), // the rig holds the bat (and ball) at its wrist; the model's fist goes there
+      fist: knuckle('Left').position.clone(), // the rig holds the bat (and ball) at its wrist; the model's fist goes there
     };
   }
   const CHAR = {};

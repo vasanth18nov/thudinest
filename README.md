@@ -186,7 +186,7 @@ game card in the Play hub's `.game-cards` list in the root `index.html`.
 
 **Realistic players** — every player, on every side, is one of six Mixamo
 characters used exactly as downloaded (no kit, pads, helmet or gloves):
-James, Remy, Aj, Big Vegas, the footballer and Timmy, drawn at random per
+James, Remy, Aj, the peasant man, the footballer and Timmy, drawn at random per
 player (fixed by name, so a player keeps his look all match). Both umpires
 are The Boss. The models are `cricket/players/*.glb` (about 8 MB in all;
 `gltf.js` is three.js r149's GLTFLoader as a plain script). The drawn rigs
