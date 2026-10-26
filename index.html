@@ -2954,7 +2954,68 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
 .tl-logo-mark::after { display: none; }
 .tl-logo:hover .tl-logo-mark { transform: rotate(-10deg) scale(1.08); }
 .tl-logo { gap: 6px; }
+
+/* ---------- Guest reviews ---------- */
+a.tl-chip { text-decoration: none; }
+.tl-rev { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 20px; align-items: stretch; }
+.tl-fav { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: clamp(26px, 3.4vw, 40px); border-radius: var(--radius); text-align: center; background: radial-gradient(420px 260px at 50% 0%, rgba(230,180,90,0.16), transparent 70%), var(--card); box-shadow: var(--shadow); }
+.tl-fav-top { display: flex; align-items: center; gap: 12px; }
+.tl-laurel { width: 34px; height: 68px; flex: none; color: var(--peach); }
+.tl-laurel.r { transform: scaleX(-1); }
+.tl-fav-score b { display: block; font: 800 clamp(3.4rem, 6vw, 4.6rem)/0.95 var(--f-head); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.tl-fav-score small { display: block; margin-top: 8px; font: 600 12px/1.3 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--peach); }
+.tl-stars { color: var(--peach); font-size: 1.15rem; letter-spacing: 0.18em; }
+.tl-fav p { margin: 0; color: var(--muted); max-width: 24em; }
+.tl-fav-facts { list-style: none; margin: 4px 0 8px; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+.tl-fav-facts li { padding: 16px 6px 0; }
+.tl-fav-facts li + li { border-left: 1px solid var(--line); }
+.tl-fav-facts b { display: block; font: 800 1.5rem/1.1 var(--f-head); }
+.tl-fav-facts small { color: var(--muted); font-size: 0.82rem; }
+.tl-rev-r { display: grid; gap: 14px; align-content: start; }
+.tl-scores { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tl-score { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 10px; padding: 18px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); }
+.tl-score > span { grid-column: 1 / -1; width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; font-size: 18px; background: var(--green-t); color: var(--green-d); }
+.tl-score b { font: 700 0.98rem/1.2 var(--f-head); }
+.tl-score strong { font: 600 0.95rem/1 var(--f-mono); }
+.tl-score i { grid-column: 1 / -1; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.tl-score i::after { content: ''; display: block; height: 100%; background: linear-gradient(90deg, var(--green), var(--green-d)); transform: scaleX(var(--v, 1)); transform-origin: left; }
+.tl-mentions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 18px 20px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); }
+.tl-mentions .tl-mono { margin-right: 6px; }
+.tl-mentions span { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--green-t); font-size: 0.9rem; font-weight: 600; }
+.tl-mentions span b { font: 600 0.8rem/1 var(--f-mono); color: var(--green-d); }
+@media (max-width: 1023px) { .tl-rev { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .tl-scores { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tl-score { gap: 8px 6px; padding: 14px; }
+  .tl-score > span { width: 34px; height: 34px; font-size: 16px; }
+  .tl-score b { font-size: 0.84rem; }
+  .tl-mentions { padding: 16px; gap: 8px; }
+  .tl-mentions .tl-mono { flex-basis: 100%; }
+}
+
+/* ---------- Scroll-driven motion (GSAP + ScrollTrigger, 768px and up) ----------
+   The head script puts .tl-gs on <html> for wide screens without reduced motion.
+   It keeps .tl-in elements hidden until the motion script hands them to GSAP, so
+   nothing fades in twice; if GSAP doesn't load, the class comes off again and
+   the plain fade-ins take over. The peacock photo is made taller than its frame
+   so it can move in parallax (--py) without its edges showing. */
+@media (min-width: 768px) {
+  .tl-gs #screen-landing .tl-in, .tl-gs #screen-landing .tl-in.seen { opacity: 0; transform: translateY(26px); transition: none; }
+  .tl-gs .tl-banner-fig img { position: absolute; left: 0; top: -12%; height: 124%; translate: 0 var(--py, 0px); }
+}
 </style>
+<script>
+// Flag scroll-driven motion before first paint and start fetching GSAP early.
+// The motion script at the end of the page does the rest.
+(function () {
+  if (!window.matchMedia || !matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches) return;
+  document.documentElement.classList.add('tl-gs');
+  ['gsap.min.js', 'ScrollTrigger.min.js'].forEach(function (f) {
+    var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/' + f;
+    document.head.appendChild(l);
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -3011,6 +3072,9 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
     <symbol id="i-game" viewBox="0 0 24 24"><path d="M6 9h12a4 4 0 0 1 3.8 5.3l-.8 2.4a2.5 2.5 0 0 1-4.3.8L15 16H9l-1.7 1.5a2.5 2.5 0 0 1-4.3-.8l-.8-2.4A4 4 0 0 1 6 9ZM8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4zM10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-5 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-laurel" viewBox="0 0 24 48"><path d="M17 46C9 39 6 26 11 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><g fill="currentColor"><ellipse cx="8" cy="39" rx="2.4" ry="5.4" transform="rotate(-55 8 39)"/><ellipse cx="5" cy="30" rx="2.4" ry="5.4" transform="rotate(-28 5 30)"/><ellipse cx="4.8" cy="20.5" rx="2.3" ry="5" transform="rotate(-8 4.8 20.5)"/><ellipse cx="7.5" cy="11.5" rx="2.1" ry="4.6" transform="rotate(14 7.5 11.5)"/><ellipse cx="15.5" cy="36" rx="2" ry="4.6" transform="rotate(42 15.5 36)"/><ellipse cx="13.6" cy="26" rx="2" ry="4.4" transform="rotate(28 13.6 26)"/><ellipse cx="14" cy="16" rx="1.8" ry="4" transform="rotate(32 14 16)"/></g></symbol>
   </svg>
 
   <!-- Floating pill nav -->
@@ -3063,6 +3127,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
           <div class="tl-chips tl-in">
             <span class="tl-chip"><i></i>Instant booking</span>
             <span class="tl-chip"><i></i>Free parking &amp; Wi-Fi</span>
+            <a class="tl-chip" href="#reviews" data-jump><i></i>4.91 &#9733; Guest favourite</a>
           </div>
         </div>
         <div class="tl-hero-art tl-in">
@@ -3282,6 +3347,51 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
       </div>
     </section>
 
+    <!-- Guest reviews: the Airbnb rating, Guest favourite badge and category scores -->
+    <section class="tl-sec" id="reviews">
+      <div class="tl-wrap">
+        <div class="tl-head">
+          <div><p class="tl-eyebrow tl-in">Guest reviews</p><h2 class="tl-h2 tl-in">Rated <em>4.91</em> by our guests.</h2></div>
+          <p class="tl-p tl-in">From 57 reviews on Airbnb, where Thudinest is a Guest favourite. Guests talk most about the hospitality, how clean it is and how comfortable it feels.</p>
+        </div>
+        <div class="tl-rev tl-in">
+          <div class="tl-fav">
+            <div class="tl-fav-top">
+              <svg class="tl-laurel" aria-hidden="true"><use href="#i-laurel"/></svg>
+              <div class="tl-fav-score"><b id="tl-fav-num">4.91</b><small>Guest favourite</small></div>
+              <svg class="tl-laurel r" aria-hidden="true"><use href="#i-laurel"/></svg>
+            </div>
+            <div class="tl-stars" role="img" aria-label="4.91 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p>A Guest favourite on Airbnb, based on ratings, reviews and reliability.</p>
+            <ul class="tl-fav-facts">
+              <li><b>57</b><small>reviews</small></li>
+              <li><b>93%</b><small>five-star</small></li>
+              <li><b>100%</b><small>response rate</small></li>
+            </ul>
+            <a class="tl-btn tl-btn-green" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Read the reviews<span class="tl-ic"><svg><use href="#i-arrow"/></svg></span></a>
+          </div>
+          <div class="tl-rev-r">
+            <ul class="tl-scores" aria-label="Ratings out of 5">
+              <li class="tl-score"><span><svg><use href="#i-soap"/></svg></span><b>Cleanliness</b><strong>4.9</strong><i style="--v:.98"></i></li>
+              <li class="tl-score"><span><svg><use href="#i-check"/></svg></span><b>Accuracy</b><strong>5.0</strong><i style="--v:1"></i></li>
+              <li class="tl-score"><span><svg><use href="#i-key"/></svg></span><b>Check-in</b><strong>5.0</strong><i style="--v:1"></i></li>
+              <li class="tl-score"><span><svg><use href="#i-chat"/></svg></span><b>Communication</b><strong>5.0</strong><i style="--v:1"></i></li>
+              <li class="tl-score"><span><svg><use href="#i-pin"/></svg></span><b>Location</b><strong>4.9</strong><i style="--v:.98"></i></li>
+              <li class="tl-score"><span><svg><use href="#i-tag"/></svg></span><b>Value</b><strong>4.9</strong><i style="--v:.98"></i></li>
+            </ul>
+            <div class="tl-mentions">
+              <small class="tl-mono">Guests mention</small>
+              <span>Hospitality <b>32</b></span>
+              <span>Cleanliness <b>17</b></span>
+              <span>Comfort <b>14</b></span>
+              <span>Location <b>10</b></span>
+              <span>Indoor spaces <b>9</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Featured games -->
     <section class="tl-sec" id="games">
       <div class="tl-wrap">
@@ -3402,7 +3512,7 @@ a.tn-scroll-hint { text-decoration: none; color: rgba(255,255,255,0.5); }
           <a class="tl-logo light" href="#top" data-jump="top"><svg class="tl-logo-mark" viewBox="0 0 32 40" aria-hidden="true"><use href="#i-plume"/></svg><span>thudi<b>nest</b></span></a>
           <p>A cozy container homestay on MTP Road, Thudiyalur, Coimbatore. Plus free website hosting, live surveys and browser games.</p>
         </div>
-        <div><h4>Explore</h4><a href="#stay" data-jump>Stay</a><a href="#space" data-jump>The space</a><a href="#find" data-jump>Find us</a><a href="#faq" data-jump>FAQ</a></div>
+        <div><h4>Explore</h4><a href="#stay" data-jump>Stay</a><a href="#space" data-jump>The space</a><a href="#reviews" data-jump>Reviews</a><a href="#find" data-jump>Find us</a><a href="#faq" data-jump>FAQ</a></div>
         <div><h4>Extras</h4><a href="/publish/">Website hosting</a><a href="/survey/create/">Live surveys</a><a href="#games" data-jump>Featured games</a><a href="#" onclick="showScreen('home'); return false;">Game hub</a></div>
         <div><h4>Contact</h4><a href="https://wa.me/601161165161" target="_blank" rel="noopener">+60 11-6116 5161</a><a href="https://wa.me/919698026106" target="_blank" rel="noopener">+91 96980 26106</a><a href="https://wa.me/917092713486" target="_blank" rel="noopener">+91 70927 13486</a><a href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">Google Maps</a>
           <div class="tl-socials"><a href="https://wa.me/601161165161" target="_blank" rel="noopener" aria-label="WhatsApp" class="wa"><svg><use href="#i-wa"/></svg></a><a href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" aria-label="Airbnb" class="ab"><svg><use href="#i-home"/></svg></a></div>
@@ -8974,6 +9084,105 @@ document.addEventListener('DOMContentLoaded',()=>{
     else { visible = true; setRunning(true); }
   });
   window.__tlHero = { get scene() { return cur; }, get n() { return N; }, next: function () { advance(performance.now()); } };
+})();
+</script>
+<script>
+// =====================================================================
+// SCROLL-DRIVEN MOTION: GSAP + ScrollTrigger on screens 768px and wider.
+// The hero copy rises in on load and the hero drifts apart as you scroll
+// away, the peacock photo moves in parallax, photos and cards stagger in
+// with a slight scale-up, and the guest reviews spring in sideways.
+// Phones and reduced-motion visitors keep the plain fade-ins from the
+// landing script, and never download GSAP.
+// =====================================================================
+(function () {
+  var html = document.documentElement, root = document.getElementById('screen-landing');
+  if (!root || !html.classList.contains('tl-gs')) return;
+  var CDN = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/', failed = false;
+  // Content stays hidden until GSAP arrives, so don't wait on a slow CDN for long.
+  var giveUp = function () { failed = true; html.classList.remove('tl-gs'); };
+  var timer = setTimeout(giveUp, 3000);
+  function load(src, next) {
+    var s = document.createElement('script'); s.src = src;
+    s.onload = next; s.onerror = function () { clearTimeout(timer); giveUp(); };
+    document.head.appendChild(s);
+  }
+  load(CDN + 'gsap.min.js', function () {
+    load(CDN + 'ScrollTrigger.min.js', function () { clearTimeout(timer); if (!failed) start(); });
+  });
+
+  function start() {
+    var gsap = window.gsap, ST = window.ScrollTrigger;
+    gsap.registerPlugin(ST);
+    var $ = function (s, c) { return (c || root).querySelector(s); }, $$ = function (s, c) { return Array.prototype.slice.call((c || root).querySelectorAll(s)); };
+
+    // GSAP owns every reveal from here on: take them off the CSS fade-in.
+    var owned = $$('.tl-in');
+    owned.forEach(function (el) { el.classList.remove('tl-in'); el.style.transitionDelay = ''; });
+
+    // Cards with CSS hover transitions on transform: switch those off while
+    // GSAP animates them and hand them back to CSS when it's done.
+    var hold = function (els) { gsap.set(els, { transition: 'none' }); };
+    var release = function (els) { return function () { gsap.set(els, { clearProps: 'transition,transform,opacity' }); }; };
+
+    var mm = gsap.matchMedia();
+    mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', function () {
+      var hero = $('.tl-hero'), heroArt = $('.tl-hero-art'), fig = $('.tl-banner-fig'), revBox = $('.tl-rev');
+
+      // ---- Hero: copy rises in on load, then the layers drift apart on scroll ----
+      gsap.timeline({ defaults: { ease: 'expo.out', duration: 1.3 } })
+        .from($$('.tl-hero-copy > *'), { y: 60, opacity: 0, stagger: 0.11 })
+        .from(heroArt, { scale: 0.9, opacity: 0, duration: 1.6 }, 0.25);
+      var away = { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 };
+      gsap.to($('.tl-hero-copy'), { yPercent: -18, opacity: 0.2, ease: 'none', scrollTrigger: away });
+      gsap.to(heroArt, { yPercent: 14, ease: 'none', scrollTrigger: away });
+      gsap.to($('.tl-dot-bg'), { yPercent: 35, ease: 'none', scrollTrigger: away });
+
+      // ---- The peacock photo: parallax inside its frame, and the frame grows in ----
+      gsap.fromTo(fig, { '--py': '-9%' }, { '--py': '9%', ease: 'none', scrollTrigger: { trigger: fig, start: 'top bottom', end: 'bottom top', scrub: true } });
+      gsap.from(fig, { scale: 0.92, y: 60, opacity: 0, ease: 'none', scrollTrigger: { trigger: fig, start: 'top bottom', end: 'top 55%', scrub: 0.8 } });
+      var cap = $$('.tl-banner-tags, .tl-banner-title, figcaption > .tl-btn', fig);
+      hold(cap);
+      gsap.from(cap, { y: 40, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.12, onComplete: release(cap), scrollTrigger: { trigger: fig, start: 'top 55%', once: true } });
+
+      // ---- Photos and cards: staggered fade-in with a slight scale-up ----
+      var boxes = [['.tl-gallery', '.tl-ph'], ['.tl-amen', '.tl-am'], ['.tl-projects', '.tl-proj'], ['.tl-process', ':scope > div'], ['.tl-why', ':scope > div']].map(function (g) {
+        var box = $(g[0]), items = $$(g[1], box);
+        hold(items);
+        gsap.from(items, { y: 50, scale: 0.95, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.09, onComplete: release(items), scrollTrigger: { trigger: box, start: 'top 85%', once: true } });
+        return box;
+      });
+
+      // ---- Everything else (headings, copy, panels, the accordion): batched, staggered ----
+      var loose = owned.filter(function (el) { return !hero.contains(el) && el !== fig && el !== revBox && boxes.indexOf(el) < 0; });
+      hold(loose);
+      gsap.set(loose, { y: 40, scale: 0.97, opacity: 0 });
+      ST.batch(loose, {
+        start: 'top 88%', once: true,
+        onEnter: function (batch) {
+          // After a jump the batch also holds everything skipped over: show those at once so the stagger doesn't queue behind them.
+          var skipped = batch.filter(function (el) { return el.getBoundingClientRect().bottom < 0; }), shown = batch.filter(function (el) { return skipped.indexOf(el) < 0; });
+          release(skipped)();
+          gsap.to(shown, { y: 0, scale: 1, opacity: 1, duration: 1, ease: 'power3.out', stagger: 0.1, overwrite: true, onComplete: release(shown) });
+        }
+      });
+
+      // ---- Guest reviews: badge and score cards spring in from the sides ----
+      var spring = 'elastic.out(1, 0.75)', num = $('#tl-fav-num'), score = { v: 0 };
+      var bars = $$('.tl-score i', revBox), full = bars.map(function (b) { return parseFloat(b.style.getPropertyValue('--v')); });
+      gsap.timeline({ scrollTrigger: { trigger: revBox, start: 'top 80%', once: true } })
+        .from($('.tl-fav', revBox), { x: -140, rotation: -3, opacity: 0, duration: 1.6, ease: spring })
+        .from($$('.tl-score', revBox), { x: 160, opacity: 0, duration: 1.5, ease: spring, stagger: 0.08 }, 0.15)
+        .from($$('.tl-mentions > *', revBox), { x: 100, opacity: 0, duration: 1.3, ease: spring, stagger: 0.05 }, 0.45)
+        .fromTo(bars, { '--v': 0 }, { '--v': function (i) { return full[i]; }, duration: 1.4, ease: 'power3.out', stagger: 0.08 }, 0.5)
+        .to(score, { v: 4.91, duration: 1.6, ease: 'power3.out', onUpdate: function () { num.textContent = score.v.toFixed(2); } }, 0.2);
+    });
+
+    // The landing screen measures as zero while a game is open: re-measure when it comes back.
+    var show = window.showScreen;
+    if (typeof show === 'function') window.showScreen = function (name) { show.apply(this, arguments); if (name === 'landing') ST.refresh(); };
+    window.addEventListener('load', function () { ST.refresh(); });
+  }
 })();
 </script>
 
