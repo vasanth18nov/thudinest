@@ -2748,6 +2748,10 @@ const ball = new THREE.Group();
   const s = new THREE.Mesh(new THREE.SphereGeometry(BALL_VIS, 22, 16), ball.mat);
   s.castShadow = true; ball.add(s);
   ball.add(new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.006, 0.0035, 4, 28), ball.seamMat));
+  // the black insulating tape round a gully tape ball (shown at the gully ground)
+  ball.tape = new THREE.Group(); ball.add(ball.tape);
+  for (const a of [Math.PI / 3, -Math.PI / 3]) { const t = new THREE.Mesh(new THREE.TorusGeometry(BALL_VIS * 1.004, BALL_VIS * 0.16, 4, 28), ball.seamMat); t.rotation.y = a; ball.tape.add(t); }
+  ball.tape.visible = false;
   scene.add(ball);
 }
 const ballShadow = new THREE.Mesh(GEO.blob, blobMat); ballShadow.rotation.x = -HALF_PI; scene.add(ballShadow);
@@ -5035,7 +5039,7 @@ function startTeamDance() {
   game.danceAt = 0;
   startDance(len); Sound.cheerBeat(len - 0.4); Sound.applause(0.9, len);
   showToast(`${batTeamName()} reach ${m}`, 3);
-  if (game.venue !== 'gully') { cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; } // straight to the stage
+  if (game.venue !== 'gully') { cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; cam.solo = false; } // straight to the stage
 }
 function celebrate(bat, m) {
   const b = [rigA, rigB].find((r) => game.bats[r.batIdx] === bat);
@@ -5052,8 +5056,11 @@ function startCeleb(b) {
   const big = b.celebM >= 100;
   const len = danceLen(b.celebM);
   Sound.applause(1, len); Sound.cheerBeat(len - 0.4); if (big) Sound.six();
-  startDance(len); cam.danceLen = len; game.danceAt = 0; // the batter's moment includes the dance
-  cam.mode = 'celeb'; cam.modeT = 0; cam.celeb = b;
+  // from 50 the cheerleaders dance with him; a 25 is his dance alone
+  const solo = b.celebM < 50 || game.venue === 'gully';
+  if (!solo) startDance(len);
+  cam.danceLen = len; game.danceAt = 0; // the batter's moment includes the team's dance
+  cam.mode = 'celeb'; cam.modeT = 0; cam.celeb = b; cam.solo = solo;
 }
 function updateCeleb(b, dt) {
   const r = b.rig, t = game.clock - b.celebStart;
@@ -5897,6 +5904,9 @@ function applyLook(fmt) {
   }
   if (fmt === 'test') { ball.mat.color.setHex(0xa8141c); ball.mat.emissive.setHex(0x260306); ball.seamMat.color.setHex(0xf1ead6); trail.color.set(1.0, 0.86, 0.8); }
   else { ball.mat.color.setHex(0xffffff); ball.mat.emissive.setHex(0x6a6a66); ball.seamMat.color.setHex(0x9a9a92); trail.color.set(0.45, 0.84, 1.0); }
+  // at the gully ground a red tape ball, which shows against the dust and the pale sky where a white one is lost
+  if (lane) { ball.mat.color.setHex(0xff2a2a); ball.mat.emissive.setHex(0x7a0608); ball.seamMat.color.setHex(0x111111); trail.color.set(0.85, 0.05, 0.12); }
+  ball.tape.visible = lane; ball.scale.setScalar(lane ? 1.2 : 1);
   drawScreen(null);
 }
 const FORMAT_TEXT = {
@@ -6673,9 +6683,9 @@ function updateCamera(rdt) {
     desired.fov = clamp(54 - d * 0.22, 30, 54) / Math.pow(clamp(aspect, 0.5, 1), 0.4);
     kp = 2.4; kl = 7;
   } else if (cam.mode === 'celeb' && cam.celeb) {
-    // first the batter with the bat raised, then across to the nearest dancers (at the gully ground, his dance all the way)
+    // first the batter with the bat raised, then across to the nearest dancers (on him all the way when he dances alone)
     const b = cam.celeb, T = _v1.set(b.pos.x, 1.35, b.pos.z);
-    if (cam.modeT < 2.4 || game.venue === 'gully') { const h = b.celebFace, fx = Math.sin(h), fz = Math.cos(h); desired.pos.set(T.x + fx * 4.8 + fz * 1.3, 1.75, T.z + fz * 4.8 - fx * 1.3); desired.look.set(T.x, 1.55, T.z); desired.fov = 32 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 3; kl = 6; } // in front of him, a little to one side
+    if (cam.modeT < 2.4 || cam.solo) { const h = b.celebFace, fx = Math.sin(h), fz = Math.cos(h); desired.pos.set(T.x + fx * 4.8 + fz * 1.3, 1.75, T.z + fz * 4.8 - fx * 1.3); desired.look.set(T.x, 1.55, T.z); desired.fov = 32 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 3; kl = 6; } // in front of him, a little to one side
     else {
       const S = STAGES.reduce((a, s) => (Math.abs(s.z - camera.position.z) < Math.abs(a.z - camera.position.z) ? s : a), STAGES[0]);
       desired.pos.set(S.x * 0.6, 3.4, S.z - Math.sign(S.z - FIELD_C.z) * 21); desired.look.set(S.x, 2.1, S.z); desired.fov = 19 / Math.pow(clamp(aspect, 0.5, 1), 0.5); kp = 2.4; kl = 4.5;
@@ -6952,7 +6962,7 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, Moves, ball, celebrate, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, Moves, ball, celebrate, Dance, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({

@@ -204,14 +204,15 @@ Goalkeeper Sidestep first for one a little wide); the fielders' stops, dives
 and catches (Goalkeeper Catch, Football Catch, Receiver Catch for a skier),
 the Goalkeeper Overhand Throw back, Running, Breathing Idle and a Victory
 Idle after a catch; and the batter's Silly Dancing, bat in hand, for a
-milestone. Takes and catches are timed so the catch comes as the ball
+milestone (from 50 the cheerleaders dance too; a 25 is his dance alone). Takes and catches are timed so the catch comes as the ball
 arrives and steered so the hands meet it.
 
 **Grounds** — the start card picks the stadium (stands, floodlights,
 cheerleaders) or the gully ground: a dusty neighbourhood maidan with a mud
 pitch, a whitewashed compound wall with painted ads and kids sitting on it,
 houses with water tanks, coconut palms, electric poles and a temple tower,
-in afternoon light. The field is the same size, so the game plays the same.
+in afternoon light, played with a red tape ball that shows against the dust.
+The field is the same size, so the game plays the same.
 The choice is remembered (`floodlit.venue`).
 
 Add `?classic` to the address to play with the drawn players only;
