@@ -945,8 +945,10 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // the players' characters (Medea and Akai also dance on the stages), then the umpires'
   const NAMES = ['medea', 'ch01', 'demon', 'kaya', 'vanguard', 'pete', 'knight', 'josh', 'ely', 'akai', 'abe', 'copzombie', 'boss'];
-  return Promise.all(NAMES.map((n) => optional(`${n}.glb`)))
-    .then((got) => (got.some(Boolean) ? Object.fromEntries(NAMES.map((n, i) => [n, got[i]])) : null));
+  // and the keeper's takes, Mixamo clips converted to bone rotations (see KeeperTake)
+  const clips = fetch('players/keeper.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  return Promise.all([Promise.all(NAMES.map((n) => optional(`${n}.glb`))), clips])
+    .then(([got, clips]) => (got.some(Boolean) ? { models: Object.fromEntries(NAMES.map((n, i) => [n, got[i]])), clips } : null));
 })();
 
 /* ------------------------------------------------------------------ helpers */
@@ -1981,13 +1983,13 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
    while a model shows. Without the models, everyone stays as drawn. */
 const Bodies = await (async () => {
-  const none = { list: [], women: [], dress() { return false; }, sync() {} };
+  const none = { list: [], women: [], clips: null, dress() { return false; }, fit() { return null; }, sync() {} };
   await Loader.step(0.355, 'Dressing the players');
   const asset = await PlayerAsset;
   if (!asset) return none;
-  try { return buildBodies(asset); } catch (e) { console.warn('Drawn players: the player model could not be set up', e); return none; }
+  try { return buildBodies(asset.models, asset.clips); } catch (e) { console.warn('Drawn players: the player model could not be set up', e); return none; }
 })();
-function buildBodies(models) {
+function buildBodies(models, clips) {
   const STRIP = /^mixamorig\d*:?/;
   const bonesOf = (root) => { const m = {}; root.traverse((o) => { if (o.isBone) m[o.name.replace(STRIP, '')] = o; }); return m; };
   const SIDES = { 1: 'Left', [-1]: 'Right' }; // the rigs' side +1 is the player's left (+x when facing +z), as in Mixamo
@@ -2011,6 +2013,9 @@ function buildBodies(models) {
     };
     // the knuckle the fist is measured to: middle finger, or the index for characters rigged with fewer fingers
     const knuckle = (s) => CB[`${s}HandMiddle1`] || CB[`${s}HandIndex1`] || CB[`${s}Hand`].children.find((c) => c.isBone);
+    // the T-pose as downloaded, which the keeper's clips are measured from
+    const bind = {}; for (const [n, b] of Object.entries(CB)) bind[n] = b.getWorldQuaternion(new THREE.Quaternion());
+    const legLen = at(CB.LeftUpLeg).distanceTo(at(CB.LeftLeg)) + at(CB.LeftLeg).distanceTo(at(CB.LeftFoot));
     for (const s of ['Left', 'Right']) {
       aim(CB[`${s}Arm`], CB[`${s}ForeArm`], DOWN); aim(CB[`${s}ForeArm`], CB[`${s}Hand`], DOWN); aim(CB[`${s}Hand`], knuckle(s), DOWN);
       aim(CB[`${s}UpLeg`], CB[`${s}Leg`], DOWN); aim(CB[`${s}Leg`], CB[`${s}Foot`], DOWN);
@@ -2057,7 +2062,7 @@ function buildBodies(models) {
       }
     }
     return {
-      tpl, S, restLocal, rest, hipRatio, hipsFromLegs, footLift, curlAxis,
+      tpl, S, restLocal, rest, hipRatio, hipsFromLegs, footLift, curlAxis, bind, legLen, hipHeight: P('Hips').y - floor,
       hipsParentInv: hipsParent.matrixWorld.clone().invert(), hipsParentQ: hipsParent.getWorldQuaternion(new THREE.Quaternion()),
       fist: knuckle('Left').position.clone(), // the rig holds the bat (and ball) at its wrist; the model's fist goes there
     };
@@ -2136,7 +2141,15 @@ function buildBodies(models) {
   /* who wears what: each side shuffles the characters once per visit and hands them out down its XI, so no two
      players in a team look alike (the same character may turn out for both sides) */
   const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss');
-  const shuffled = () => { const a = PLAYERS.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // the keeper (sixth in each XI) is someone with nothing on his head: a hat, hood, helmet or horns behind the stumps
+  // hides where the ball pitches
+  const BARE = ['medea', 'ch01', 'josh', 'ely', 'abe'], KEEPS = 5;
+  const shuffled = () => {
+    const a = PLAYERS.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    const bare = a.map((k, i) => (BARE.includes(k) ? i : -1)).filter((i) => i >= 0);
+    if (bare.length && !BARE.includes(a[KEEPS])) { const j = bare[Math.floor(Math.random() * bare.length)]; [a[KEEPS], a[j]] = [a[j], a[KEEPS]]; }
+    return a;
+  };
   const DEAL = { home: shuffled(), away: shuffled() };
   const lookOf = (team, p, fallback) => {
     const at = p ? (team === 'home' ? xiList() : WORLD_XI).findIndex((q) => q.name === p.name) : -1;
@@ -2240,14 +2253,87 @@ function buildBodies(models) {
     }
   }
 
+  /* The keeper's takes (see KeeperTake): a clip frame sets every body bone's rotation, as the clip's change from the
+     T-pose applied to this character's own T-pose (mirrored for a dive to the other side), blended with the rig's pose
+     by A.w; the hips go where the take puts them; near the catch two-bone IK takes the wrists to the ball. */
+  const CLIP_BI = clips ? Object.fromEntries(clips.bones.map((n, i) => [n, i])) : {};
+  const swapSide = (n) => (n.startsWith('Left') ? `Right${n.slice(4)}` : n.startsWith('Right') ? `Left${n.slice(5)}` : n);
+  const _d = new THREE.Quaternion(), _qy = new THREE.Quaternion(), _rel = new THREE.Quaternion(), _inv = new THREE.Quaternion(), _qb2 = new THREE.Quaternion();
+  const TC = {}; for (const n of ORDER) TC[n] = new THREE.Quaternion();
+  const AXIS_Y = new V3(0, 1, 0);
+  function clipPoint(key, track, tau, out) {
+    const c = clips.clips[key], f = clamp((tau - c.from) * clips.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), u = f - i, a = c[track];
+    return out.set(lerp(a[i * 3], a[i * 3 + 3], u), lerp(a[i * 3 + 1], a[i * 3 + 4], u), lerp(a[i * 3 + 2], a[i * 3 + 5], u));
+  }
+  function clipQ(c, n, tau, out) {
+    const f = clamp((tau - c.from) * clips.fps, 0, c.n - 1), i = Math.min(c.n - 2, Math.floor(f)), nb = clips.bones.length, b = CLIP_BI[n];
+    _qb2.fromArray(c.q, ((i + 1) * nb + b) * 4);
+    return out.fromArray(c.q, (i * nb + b) * 4).slerp(_qb2, f - i);
+  }
+  // one clip frame: each bone's rotation relative to the model root
+  function clipPose(A, K, out) {
+    const c = clips.clips[A.key];
+    _rel.copy(_inv).multiply(_qy.setFromAxisAngle(AXIS_Y, A.yaw));
+    for (const n of ORDER) {
+      if (!K.bind[n]) continue;
+      clipQ(c, A.mirror < 0 ? swapSide(n) : n, A.tau, _d);
+      if (A.mirror < 0) _d.set(_d.x, -_d.y, -_d.z, _d.w);
+      out[n].copy(_rel).multiply(_d).multiply(K.bind[n]);
+    }
+  }
+  const TP = {}; for (const n of ORDER) TP[n] = new THREE.Quaternion();
+  const _hipsMix = new V3();
+  function applyClip(r, v, A) {
+    const M = v.B, K = v.K, w = clamp(A.w, 0, 1);
+    v.model.updateMatrixWorld(true);
+    r.root.getWorldQuaternion(_rootQ); _inv.copy(_rootQ).invert();
+    // the clip's pose (crossfading from the one before, after a sidestep), eased in from the rig's
+    clipPose(A, K, TC);
+    _hipsMix.copy(A.hipsW);
+    if (A.prev && A.mix < 1) {
+      clipPose(A.prev, K, TP);
+      for (const n of ORDER) if (K.bind[n]) TC[n].copy(TP[n].slerp(TC[n], A.mix));
+      _hipsMix.lerpVectors(A.prev.hipsW, A.hipsW, A.mix);
+    }
+    if (w < 1) for (const n of ORDER) if (M[n] && K.bind[n]) TC[n].copy(_qa.copy(_inv).multiply(M[n].getWorldQuaternion(_qr)).slerp(TC[n], w));
+    for (const n of ORDER) {
+      const b = M[n]; if (!b || !K.bind[n]) continue;
+      const pn = b.parent && b.parent.name.replace(STRIP, '');
+      b.quaternion.copy(_qr.copy(n === 'Hips' ? K.hipsParentQ : TC[pn]).invert()).multiply(TC[n]);
+    }
+    M.Hips.getWorldPosition(_hp).lerp(_hipsMix, w);
+    M.Hips.position.copy(M.Hips.parent.worldToLocal(_hp));
+    for (const s of ['Left', 'Right']) for (const n of ['ForeArm', 'Hand', 'Leg', 'Foot']) M[s + n].position.lerp(v.len[s + n], w);
+    v.model.updateMatrixWorld(true);
+    // the gloves to the ball
+    if (A.ik > 0 && A.ikTarget) {
+      _qy.setFromAxisAngle(AXIS_Y, A.yaw);
+      for (const s of ['Left', 'Right']) {
+        _T.set(s === 'Left' ? 0.075 : -0.075, 0, 0).applyQuaternion(_qy).add(A.ikTarget);
+        _E.subVectors(_hipsMix, A.ikTarget).setY(0).normalize().multiplyScalar(0.07); _T.add(_E); // the wrists just behind the ball
+        M[`${s}Hand`].getWorldPosition(_w).lerp(_T, clamp(A.ik, 0, 1));
+        twoBone(M[`${s}Arm`], M[`${s}ForeArm`], M[`${s}Hand`], _w.clone(), M[`${s}ForeArm`].getWorldPosition(_pole).add(_up.set(0, -0.2, 0)), v.len[`${s}ForeArm`], v.len[`${s}Hand`]);
+      }
+    }
+    // where a ball he holds sits: between the fists
+    const kn = (s) => M[`${s}HandMiddle1`] || M[`${s}HandIndex1`] || M[`${s}Hand`];
+    A.hold.copy(kn('Left').getWorldPosition(_w)).add(kn('Right').getWorldPosition(_C)).multiplyScalar(0.5);
+  }
+
   return {
     list, deal: DEAL,
+    clips, clipPoint,
+    // the keeper's measurements, in metres: one leg length, and his hip height standing
+    fit(rig) { const e = list.find((x) => x.rig === rig), K = e && e.active && CHAR[e.active]; return K ? { L: K.legLen * K.S, hip: K.hipHeight * K.S } : null; },
     women: ['medea', 'akai'].filter((k) => CHAR[k]), // they dance on the stages too
     dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (e) people.push([e, () => key]); return !!e; },
-    sync() {
+    sync(cam, live = true) {
       for (const [e, pick] of people) {
         show(e, pick());
-        if (e.active && e.rig.root.visible) syncOne(e.rig, e.models[e.active]);
+        if (!e.active || !e.rig.root.visible) continue;
+        syncOne(e.rig, e.models[e.active]);
+        const A = e.rig.anim;
+        if (A && live && clips && A.w > 0) applyClip(e.rig, e.models[e.active], A);
       }
     },
   };
@@ -5027,6 +5113,105 @@ function lookAtBall(r) {
   r.head.lookAt(ball.position);
   r.head.rotation.set(clamp(r.head.rotation.x, -0.7, 0.6), clamp(r.head.rotation.y, -1.25, 1.25), 0);
 }
+/* ------------------------------------------------------------ the keeper's takes
+   When a delivery goes through to the keeper, his model plays a Mixamo clip (players/keeper.json) instead of copying
+   the drawn keeper: Goalkeeper Catch for a take in front of him, Football Catch for a bouncer, Goalkeeper Diving Save
+   (either side) for one well wide, with Goalkeeper Sidestep first for one a little wide. Each clip is timed so its
+   catch comes as the ball arrives, and its footwork steered (a dive turned and stretched a little too) so his hands end
+   up at the ball; in the last moment IK puts them on it. The drawn keeper stays under his hips, so he carries on from
+   wherever the take leaves him. Without the models, the drawn keeper keeps as before. */
+const KeeperTake = (() => {
+  // clip seconds: where it starts, the catch, where the rig takes over again
+  const MOVES = { take: { from: 0.25, at: 0.68, end: 1.05 }, high: { from: 0.55, at: 1.46, end: 1.9 }, dive: { from: 0.45, at: 1.19, end: 3.3 }, shuffle: { from: 0, at: 0.53, end: 0.53 } };
+  const FADE_IN = 0.18, FADE_OUT = 0.3, BLEND = 0.15, Y = new V3(0, 1, 0);
+  const p = new V3(), q = new V3(), a = new V3(), b = new V3();
+  // a point of the clip (in leg lengths from where it starts) in the world
+  function place(A, track, tau, out) {
+    Bodies.clipPoint(A.key, track, tau, p);
+    out.set(A.mirror * p.x * A.sigma * A.L, 0, p.z * A.sigma * A.L).applyAxisAngle(Y, A.yaw).add(A.anchor);
+    if (A.warpTo > A.warpFrom) out.addScaledVector(A.warp, smooth(clamp((tau - A.warpFrom) / (A.warpTo - A.warpFrom), 0, 1)));
+    out.y = track === 'hips' ? (p.y - Bodies.clips.clips[A.key].rest) * A.L + A.hip : p.y * A.L;
+    return out;
+  }
+  // the clip's start over the point
+  function anchorAt(A, x, z) { A.anchor.set(0, 0, 0); const w = A.warpTo; A.warpTo = A.warpFrom; place(A, 'hips', A.tau, q); A.warpTo = w; A.anchor.set(x - q.x, 0, z - q.z); }
+  /* o: { yaw, mirror, catchAt (game clock, for a take), target (the ball at the catch), lateral and dur (a sidestep),
+     then (what follows a sidestep) } */
+  function begin(f, key, o) {
+    const m = MOVES[key], fit = Bodies.fit(f.rig), prev = f.anim;
+    const A = { key, mirror: o.mirror || 1, yaw: o.yaw, L: fit.L, hip: fit.hip, sigma: 1, anchor: new V3(), warp: new V3(), warpFrom: 0, warpTo: 0,
+      tau: m.from, speed: 1, w: prev ? prev.w : 0, state: prev ? 'on' : 'in', ik: 0, ikTarget: o.target || null, catchAt: o.catchAt === undefined ? null : o.catchAt,
+      then: o.then || null, hipsW: new V3(), hold: prev ? prev.hold : new V3(), prev: prev ? Object.assign({}, prev, { then: null, prev: null }) : null, mix: prev ? 0 : 1 };
+    if (A.catchAt !== null) { const left = Math.max(0.05, A.catchAt - game.clock); A.speed = clamp((m.at - m.from) / left, 0.6, 1.7); A.tau = Math.max(0, m.at - A.speed * left); }
+    else if (o.dur) A.speed = (m.end - m.from) / o.dur;
+    const sx = prev ? prev.hipsW.x : f.pos.x, sz = prev ? prev.hipsW.z : f.pos.z;
+    anchorAt(A, sx, sz);
+    if (key === 'shuffle') {
+      // stretch the sidestep to the distance
+      Bodies.clipPoint(key, 'hips', m.end, a); Bodies.clipPoint(key, 'hips', m.from, b);
+      A.sigma = clamp(Math.abs(o.lateral) / Math.max(0.05, Math.abs(a.x - b.x) * A.L), 0.3, 1.6); anchorAt(A, sx, sz);
+    }
+    if (A.ikTarget) {
+      if (key === 'dive') {
+        // turn the dive toward the ball, and stretch or shorten it to the distance
+        place(A, 'hands', m.at, a).sub(q.set(sx, 0, sz)).setY(0); b.copy(A.ikTarget).sub(q).setY(0);
+        A.yaw += clamp(Math.atan2(a.z * b.x - a.x * b.z, a.x * b.x + a.z * b.z), -0.8, 0.8);
+        A.sigma = clamp(b.length() / Math.max(0.1, a.length()), 0.55, 1.3);
+        anchorAt(A, sx, sz);
+      }
+      // what is left between the hands at the catch and the ball, made up along the way
+      place(A, 'hands', m.at, a); A.warp.set(A.ikTarget.x - a.x, 0, A.ikTarget.z - a.z); A.warpFrom = A.tau; A.warpTo = m.at;
+    }
+    f.anim = f.rig.anim = A;
+    return A;
+  }
+  // the delivery's end, where it reaches him, and which take suits it
+  function plan(f, F) {
+    const S = F.sim, i = S.n - 1, target = new V3(S.pts[i * 3], S.pts[i * 3 + 1], S.pts[i * 3 + 2]);
+    const yaw = f.heading, d = a.subVectors(target, f.pos).applyAxisAngle(Y, -yaw), side = d.x >= 0 ? 1 : -1; // +x: his left
+    let key = 'take', lead = MOVES.take.at - MOVES.take.from, shuffle = 0;
+    if ((game.del.length === 'bouncer' && target.y > 1.2) || target.y > 1.75) { key = 'high'; lead = MOVES.high.at - MOVES.high.from; }
+    else if (Math.abs(d.x) > 1.45) { key = 'dive'; lead = MOVES.dive.at - MOVES.dive.from; }
+    else if (Math.abs(d.x) > 0.4) { shuffle = d.x; lead += 0.32; }
+    return { key, lead, shuffle, side, yaw, target, catchAt: null };
+  }
+  return {
+    update(f, dt) {
+      const st = game.state, F = game.flight;
+      if (st === 'menu' || st === 'over') { if (f.anim) f.anim = f.rig.anim = null; return; }
+      if (!f.anim && st === 'flight' && F && !F.kept && F.sim.keeperT !== null && Bodies.clips && Bodies.fit(f.rig)) {
+        if (!F.keeperPlan) F.keeperPlan = plan(f, F);
+        const P = F.keeperPlan, left = F.sim.keeperT - F.t;
+        if (left <= P.lead && !P.begun) {
+          P.begun = true;
+          const catchAt = game.clock + left;
+          if (P.shuffle) begin(f, 'shuffle', { yaw: P.yaw, mirror: P.side, lateral: P.shuffle, dur: 0.32, then: { key: 'take', yaw: P.yaw, target: P.target, catchAt } });
+          else begin(f, P.key, { yaw: P.yaw, mirror: P.key === 'dive' ? P.side : 1, target: P.target, catchAt });
+        }
+      }
+      const A = f.anim; if (!A) return;
+      const m = MOVES[A.key];
+      if (st === 'inplay' && A.state !== 'out') { A.state = 'out'; A.then = null; } // hit, or off the gloves: the rig takes over
+      A.tau += dt * (A.catchAt === null || A.tau < m.at ? A.speed : 1);
+      if (A.state === 'in') { A.w = Math.min(1, A.w + dt / FADE_IN); if (A.w >= 1) A.state = 'on'; }
+      A.mix = Math.min(1, A.mix + dt / BLEND);
+      if (A.tau >= m.end && A.state !== 'out') {
+        if (A.then) { place(A, 'hips', m.end, A.hipsW); begin(f, A.then.key, A.then); this.update(f, 0); return; }
+        A.state = 'out';
+      }
+      if (A.state === 'out') { A.w -= dt / FADE_OUT; if (A.w <= 0) { f.anim = f.rig.anim = null; return; } }
+      A.tau = Math.min(A.tau, m.end);
+      place(A, 'hips', A.tau, A.hipsW);
+      if (A.prev) { const P = A.prev; place(P, 'hips', P.tau, P.hipsW); if (A.mix >= 1) A.prev = null; }
+      // the hands onto the ball over the last moment before it arrives, held as it does, then let go
+      if (A.catchAt !== null && A.ikTarget && st !== 'inplay') { const t = game.clock - A.catchAt; A.ik = t < 0 ? smooth(clamp(1 + t / 0.3, 0, 1)) : clamp(1 - (t - 0.1) / 0.3, 0, 1); }
+      else A.ik = 0;
+      // the drawn keeper stands under him, facing his way
+      f.pos.set(A.hipsW.x, 0, A.hipsW.z); f.heading = A.yaw; f.tilt = 0;
+    },
+    holding: (f) => !!(f.anim && f.anim.w > 0.5),
+  };
+})();
 function updateFielders(dt) {
   const st = game.state, P = game.play;
   const playing = !!P && (st === 'inplay' || st === 'dead');
@@ -5070,9 +5255,10 @@ function updateFielders(dt) {
       } else faceTo(f, 0, -1, dt, 3);
       f.tilt = damp(f.tilt, 0, 8, dt);
     }
-    if (f.isKeeper && st === 'flight' && game.flight && game.flight.sim.keeperT !== null && game.flight.t > game.flight.sim.keeperT - 0.4) {
+    if (f.isKeeper && st === 'flight' && game.flight && !game.flight.keeperPlan && game.flight.sim.keeperT !== null && game.flight.t > game.flight.sim.keeperT - 0.4) {
       f.pos.x = damp(f.pos.x, ball.position.x + 0.15, 9, dt);
     }
+    if (f.isKeeper) KeeperTake.update(f, dt);
     r.root.position.copy(f.pos); r.root.rotation.set(0, f.heading, f.tilt);
     const run = clamp(moveSpeed / 6.5, 0, 1);
     stepPhase(r, moveSpeed, run, dt);
@@ -5557,7 +5743,8 @@ function updateGame(dt) {
     if (st === 'dead') game.deadT += dt;
     if (st === 'dead' && game.deadFlight && game.flight) {
       const F = game.flight; F.t += dt;
-      if (F.kept) { keeper.rig.root.updateMatrixWorld(true); keeper.handMarker.getWorldPosition(ball.position); }
+      if (F.kept && KeeperTake.holding(keeper)) ball.position.copy(keeper.anim.hold); // between the model's fists
+      else if (F.kept) { keeper.rig.root.updateMatrixWorld(true); keeper.handMarker.getWorldPosition(ball.position); }
       else sampleAt(F.sim, Math.min(F.t, F.sim.dur), ball.position);
     } else if (game.play) {
       const P = game.play;
@@ -6224,7 +6411,7 @@ function mirrorBatters(on) {
     for (const t of [r.decalTex, r.frontTex]) if (t) { t.repeat.x *= -1; t.offset.x = t.repeat.x < 0 ? 1 : 0; }
   }
 }
-function draw() { Bodies.sync(camera); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
+function draw() { Bodies.sync(camera, !Replay.active); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
 /* The field map: fielders, batters and the ball from above, the batter's end at the bottom (turned round for the view
    from behind the bowler, so it matches the screen). Drawn a few times a second; a tap shrinks it to a dot. */
 const FieldMap = (() => {
@@ -6449,7 +6636,7 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, KeeperTake, ball, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({

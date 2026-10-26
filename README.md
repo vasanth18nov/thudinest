@@ -195,7 +195,14 @@ are `cricket/players/*.glb` (about 14 MB in all; `gltf.js` is three.js r149's
 GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat
 or ball and the feet on the ground, and on the bat the thumbs wrap the
-handle. Add `?classic` to the address to play with the drawn players only;
+handle. The keeper is always someone bareheaded (Medea, Ch01, Josh, Ely or
+Abe), so no hat or hood hides where the ball pitches, and his takes are
+Mixamo clips (`cricket/players/keeper.json`, built from the downloads by
+`~/thudinest-assets/tools/build-clips.mjs`): Goalkeeper Catch for a normal
+take, Football Catch for a bouncer, Goalkeeper Diving Save for one well wide,
+and Goalkeeper Sidestep first for one a little wide. Each is timed so the
+catch comes as the ball arrives and steered so his hands meet it. Add
+`?classic` to the address to play with the drawn players only;
 the game also falls back to them if the models fail to load. The Mixamo
 downloads and the build scripts live outside the repo, in
 `~/thudinest-assets/`.
