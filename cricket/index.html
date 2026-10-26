@@ -941,8 +941,12 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   });
   const image = (src) => new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = () => reject(new Error(`could not load ${src}`)); i.src = src; });
   const late = new Promise((_, reject) => setTimeout(() => reject(new Error('timed out')), 30000));
-  const load = Promise.all([script('players/gltf.js').then(() => new THREE.GLTFLoader().loadAsync('players/player.glb')), image('players/player-kit.png')]);
-  return Promise.race([load, late]).then(([gltf, mask]) => ({ gltf, mask })).catch((e) => { console.warn('Drawn players: the player model did not load', e); return null; });
+  const ready = script('players/gltf.js');
+  const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
+  const optional = (file) => model(file).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
+  // the kit player (James) is needed; the Thudinest characters (Remy, The Boss) are optional extras
+  const load = Promise.all([model('player.glb'), image('players/player-kit.png'), optional('remy.glb'), optional('boss.glb')]);
+  return Promise.race([load, late]).then(([gltf, mask, remy, boss]) => ({ gltf, mask, remy, boss })).catch((e) => { console.warn('Drawn players: the player model did not load', e); return null; });
 })();
 
 /* ------------------------------------------------------------------ helpers */
@@ -1969,12 +1973,17 @@ const legUmp = makeRig({ shirt: 0x2b8f8a, pants: 0x1d2128, skin: SKINS[5], head:
 legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.add(legUmp.root);
 
 /* ------------------------------------------------------------ realistic players
-   The batters, the bowler and the keeper wear a realistic player model (players/player.glb: a Mixamo character rebuilt
-   as a cricketer in whites, with a mask marking the shirt and trousers for the T20 colours). The rigs above still do all
-   the work (stance, swings, run-ups, IK, replays): every frame each model's skeleton copies its rig's joint angles,
-   then two-bone IK pins its wrists to the rig's wrists (the bat stays in the gloves, the ball in the bowler's hand) and
-   its ankles to the rig's ankles (planted feet don't slide). Helmet, pads, gloves and shirt lettering move from the rig
-   onto the matching bones; the rig's own body is hidden. Without the model, everyone stays as drawn. */
+   Realistic player models stand in for the drawn bodies:
+     - James (players/player.glb): a Mixamo character rebuilt as a cricketer in whites, with a mask marking the shirt
+       and trousers for the T20 colours. Batters, bowler and keeper of every side except Thudinest wear him, with the
+       helmet, pads, gloves and shirt lettering moved from the rig onto his bones.
+     - Remy and The Boss (players/remy.glb, boss.glb), exactly as downloaded: the Thudinest Coimbatore players (odd
+       squad places Remy, even places The Boss), batting and in the field, with no kit, pads or gloves; and both
+       umpires are The Boss.
+   The rigs still do all the work (stance, swings, run-ups, fielding, IK, replays): every frame each visible model's
+   skeleton copies its rig's joint angles, then two-bone IK puts its fist on the rig's grip point (the bat handle, the
+   ball) and its ankles on the rig's footholds. Each rig carries the models it may need and shows one at a time; a
+   fielder of any other side keeps the drawn body. Without the models, everyone stays as drawn. */
 const Bodies = await (async () => {
   const none = { list: [], sync() {}, paint() {} };
   await Loader.step(0.355, 'Dressing the players');
@@ -1982,89 +1991,99 @@ const Bodies = await (async () => {
   if (!asset) return none;
   try { return buildBodies(asset); } catch (e) { console.warn('Drawn players: the player model could not be set up', e); return none; }
 })();
-function buildBodies({ gltf, mask }) {
+function buildBodies({ gltf, mask, remy, boss }) {
   const STRIP = /^mixamorig\d*:?/;
   const bonesOf = (root) => { const m = {}; root.traverse((o) => { if (o.isBone) m[o.name.replace(STRIP, '')] = o; }); return m; };
-  const tpl = gltf.scene;
   const SIDES = { 1: 'Left', [-1]: 'Right' }; // the rigs' side +1 is the player's left (+x when facing +z), as in Mixamo
-
-  /* Calibration, on a spare copy: hang the arms and legs straight down so its rest pose is the rigs' rest pose */
-  const cal = THREE.SkeletonUtils.clone(tpl);
-  cal.updateMatrixWorld(true);
-  const CB = bonesOf(cal);
-  const at = (o) => o.getWorldPosition(new V3());
-  const DOWN = new V3(0, -1, 0);
-  const aim = (bone, child, dir) => {
-    const q = new THREE.Quaternion().setFromUnitVectors(at(child).sub(at(bone)).normalize(), dir);
-    setWorldQuat(bone, bone.getWorldQuaternion(new THREE.Quaternion()).premultiply(q));
-    bone.updateMatrixWorld(true);
-  };
-  for (const s of ['Left', 'Right']) {
-    aim(CB[`${s}Arm`], CB[`${s}ForeArm`], DOWN); aim(CB[`${s}ForeArm`], CB[`${s}Hand`], DOWN); aim(CB[`${s}Hand`], CB[`${s}HandMiddle1`], DOWN);
-    aim(CB[`${s}UpLeg`], CB[`${s}Leg`], DOWN); aim(CB[`${s}Leg`], CB[`${s}Foot`], DOWN);
-  }
-  cal.updateMatrixWorld(true);
-  const restLocal = {}, rest = {}; // bone rotations in the straightened pose: local, and relative to the model root
-  for (const [n, b] of Object.entries(CB)) { restLocal[n] = b.quaternion.clone(); rest[n] = b.getWorldQuaternion(new THREE.Quaternion()); }
-  const P = (n) => at(CB[n]);
-  let bodyMesh = null; cal.traverse((o) => { if (o.isSkinnedMesh && o.name !== 'cap' && !bodyMesh) bodyMesh = o; });
-  const floor = new THREE.Box3().setFromObject(cal).min.y;
-  // one pass over the skin (model units): the head's extent, and the chest's front and back along the centre line
-  const geo = bodyMesh.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
-  const boneIdx = (n) => bodyMesh.skeleton.bones.findIndex((b) => b.name.replace(STRIP, '') === n);
-  const comp = (attr, v, k) => (k === 0 ? attr.getX(v) : k === 1 ? attr.getY(v) : k === 2 ? attr.getZ(v) : attr.getW(v)); // r149 has no getComponent
-  const iHead = boneIdx('Head'), iChest = [boneIdx('Spine2'), boneIdx('Spine1'), boneIdx('Spine')];
-  const headLocal = new THREE.Box3(), headModel = new THREE.Box3(), invHead = CB.Head.matrixWorld.clone().invert(), vtx = new V3();
-  const chestPts = [];
-  for (let v = 0; v < pos.count; v++) {
-    let wHead = 0, wChest = 0;
-    for (let k = 0; k < 4; k++) { const j = comp(si, v, k), w = comp(sw, v, k); if (j === iHead) wHead += w; if (iChest.includes(j)) wChest += w; }
-    vtx.fromBufferAttribute(pos, v).applyMatrix4(bodyMesh.bindMatrix);
-    if (wHead > 0.9) { headModel.expandByPoint(vtx); headLocal.expandByPoint(vtx.clone().applyMatrix4(invHead)); }
-    if (wChest > 0.6) chestPts.push(vtx.x, vtx.y, vtx.z);
-  }
-  // as tall as the rigs (top of the head), so he stands right beside the stumps and the drawn fielders
-  const RIG_TOP = 1 + LIMB.spineY + LIMB.headY + 0.21;
-  const S = RIG_TOP / (headModel.max.y - floor);
-  // his legs are shorter than the rigs': the hips ride lower in proportion, and IK (with a little stretch) plants the feet
-  const upLegMid = P('LeftUpLeg').add(P('RightUpLeg')).multiplyScalar(0.5);
-  const hipRatio = ((upLegMid.y - floor) * S) / (1 + LIMB.hipY);
-  const hipsFromLegs = P('Hips').sub(upLegMid).multiplyScalar(S); // pelvis frame, metres
-  const hipsParent = CB.Hips.parent;
-  const hipsParentInv = hipsParent.matrixWorld.clone().invert(), hipsParentQ = hipsParent.getWorldQuaternion(new THREE.Quaternion());
-  const footLift = (P('LeftFoot').y - floor) * S - 0.08; // the rigs' ankles are 8 cm above the sole
-  // the rig holds the bat (and the ball) at its wrist joint; the model's fist (the middle knuckle) goes there instead
-  const fist = CB.LeftHandMiddle1.position.clone();
-  // shirt lettering: at the rig's heights between hips and shoulders, on the model's chest surface
-  const hipsY = P('Hips').y * S, shY = P('LeftArm').y * S; // the model stands on the rig's root, so these are heights there
-  const decalY = { back: hipsY + 0.7 * (shY - hipsY), front: hipsY + 0.736 * (shY - hipsY) }, chestZ = { back: 0, front: 0 };
-  for (let i = 0; i < chestPts.length; i += 3) {
-    if (Math.abs(chestPts[i] * S) > 0.05) continue;
-    const y = chestPts[i + 1] * S, z = chestPts[i + 2] * S;
-    if (Math.abs(y - decalY.back) < 0.05) chestZ.back = Math.min(chestZ.back, z);
-    if (Math.abs(y - decalY.front) < 0.05) chestZ.front = Math.max(chestZ.front, z);
-  }
-  const skull = headLocal.getCenter(new V3()), skullR = (headModel.max.x - headModel.min.x) / 2 * S; // width across the face
-  if (!chestZ.back) chestZ.back = -0.13; // no shirt found at that height: the rigs' own chest depth
-  if (!chestZ.front) chestZ.front = 0.14;
-
-  /* Finger curls: each finger joint turns toward the palm (which faces the thigh when the arm hangs) */
+  const RIG_TOP = 1 + LIMB.spineY + LIMB.headY + 0.21; // top of a rig's head: every model is scaled to this height
   const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
-  const curlAxis = {};
-  for (const s of ['Left', 'Right']) {
-    const palm = new V3(s === 'Left' ? -1 : 1, 0, 0);
-    for (const f of FINGERS) for (let k = 1; k <= 3; k++) {
-      const n = `${s}Hand${f}${k}`, child = CB[`${s}Hand${f}${k + 1}`] || CB[n].children[0];
-      if (!CB[n] || !child) continue;
-      const dir = at(child).sub(at(CB[n])).normalize();
-      curlAxis[n] = new V3().crossVectors(dir, palm).normalize().applyQuaternion(CB[n].getWorldQuaternion(new THREE.Quaternion()).invert());
-    }
-  }
   const GRIPS = { bat: [1.4, 1.5, 1.0, 0.7], keeper: [1.0, 1.1, 0.8, 0.55], relaxed: [0.22, 0.3, 0.2, 0.12] }; // knuckle, middle, tip, thumb
+  const comp = (attr, v, k) => (k === 0 ? attr.getX(v) : k === 1 ? attr.getY(v) : k === 2 ? attr.getZ(v) : attr.getW(v)); // r149 has no getComponent
+  const at = (o) => o.getWorldPosition(new V3());
 
-  /* Kits: the whites texture tinted per side, through the mask (red: shirt, green: trousers) */
+  /* Calibration, once per character, on a spare copy: hang the arms and legs straight down so its rest pose is the
+     rigs' rest pose, then measure what the per-frame copy needs */
+  function calibrate(tpl) {
+    const cal = THREE.SkeletonUtils.clone(tpl);
+    cal.updateMatrixWorld(true);
+    const CB = bonesOf(cal);
+    const DOWN = new V3(0, -1, 0);
+    const aim = (bone, child, dir) => {
+      const q = new THREE.Quaternion().setFromUnitVectors(at(child).sub(at(bone)).normalize(), dir);
+      setWorldQuat(bone, bone.getWorldQuaternion(new THREE.Quaternion()).premultiply(q));
+      bone.updateMatrixWorld(true);
+    };
+    for (const s of ['Left', 'Right']) {
+      aim(CB[`${s}Arm`], CB[`${s}ForeArm`], DOWN); aim(CB[`${s}ForeArm`], CB[`${s}Hand`], DOWN); aim(CB[`${s}Hand`], CB[`${s}HandMiddle1`], DOWN);
+      aim(CB[`${s}UpLeg`], CB[`${s}Leg`], DOWN); aim(CB[`${s}Leg`], CB[`${s}Foot`], DOWN);
+    }
+    cal.updateMatrixWorld(true);
+    const restLocal = {}, rest = {}; // bone rotations in the straightened pose: local, and relative to the model root
+    for (const [n, b] of Object.entries(CB)) { restLocal[n] = b.quaternion.clone(); rest[n] = b.getWorldQuaternion(new THREE.Quaternion()); }
+    const P = (n) => at(CB[n]);
+    const floor = new THREE.Box3().setFromObject(cal).min.y;
+    // one pass over the skin (model units): the head's extent, and the chest's front and back along the centre line
+    const headLocal = new THREE.Box3(), headModel = new THREE.Box3(), invHead = CB.Head.matrixWorld.clone().invert(), vtx = new V3();
+    const chestPts = [];
+    cal.traverse((mesh) => {
+      if (!mesh.isSkinnedMesh || mesh.name === 'cap') return; // James's cap comes off for a helmet: measure him bare-headed
+      const g = mesh.geometry, pos = g.attributes.position, si = g.attributes.skinIndex, sw = g.attributes.skinWeight;
+      const idx = (n) => mesh.skeleton.bones.findIndex((b) => b.name.replace(STRIP, '') === n);
+      const iHead = idx('Head'), iChest = [idx('Spine2'), idx('Spine1'), idx('Spine')];
+      for (let v = 0; v < pos.count; v++) {
+        let wHead = 0, wChest = 0;
+        for (let k = 0; k < 4; k++) { const j = comp(si, v, k), w = comp(sw, v, k); if (j === iHead) wHead += w; if (iChest.includes(j)) wChest += w; }
+        vtx.fromBufferAttribute(pos, v).applyMatrix4(mesh.bindMatrix);
+        if (wHead > 0.9) { headModel.expandByPoint(vtx); headLocal.expandByPoint(vtx.clone().applyMatrix4(invHead)); }
+        if (wChest > 0.6) chestPts.push(vtx.x, vtx.y, vtx.z);
+      }
+    });
+    // as tall as the rigs (top of the head), so he stands right beside the stumps and the drawn fielders
+    const S = RIG_TOP / (headModel.max.y - floor);
+    // the hips ride at the rigs' hip height in proportion to his own leg length; IK (with a little stretch) plants the feet
+    const upLegMid = P('LeftUpLeg').add(P('RightUpLeg')).multiplyScalar(0.5);
+    const hipRatio = ((upLegMid.y - floor) * S) / (1 + LIMB.hipY);
+    const hipsFromLegs = P('Hips').sub(upLegMid).multiplyScalar(S); // pelvis frame, metres
+    const hipsParent = CB.Hips.parent;
+    const footLift = (P('LeftFoot').y - floor) * S - 0.08; // the rigs' ankles are 8 cm above the sole
+    // shirt lettering (James): at the rig's heights between hips and shoulders, on his chest surface
+    const hipsY = P('Hips').y * S, shY = P('LeftArm').y * S; // the model stands on the rig's root, so these are heights there
+    const decalY = { back: hipsY + 0.7 * (shY - hipsY), front: hipsY + 0.736 * (shY - hipsY) }, chestZ = { back: 0, front: 0 };
+    for (let i = 0; i < chestPts.length; i += 3) {
+      if (Math.abs(chestPts[i] * S) > 0.05) continue;
+      const y = chestPts[i + 1] * S, z = chestPts[i + 2] * S;
+      if (Math.abs(y - decalY.back) < 0.05) chestZ.back = Math.min(chestZ.back, z);
+      if (Math.abs(y - decalY.front) < 0.05) chestZ.front = Math.max(chestZ.front, z);
+    }
+    if (!chestZ.back) chestZ.back = -0.13; // no shirt found at that height: the rigs' own chest depth
+    if (!chestZ.front) chestZ.front = 0.14;
+    // finger curls: each finger joint turns toward the palm (which faces the thigh when the arm hangs)
+    const curlAxis = {};
+    for (const s of ['Left', 'Right']) {
+      const palm = new V3(s === 'Left' ? -1 : 1, 0, 0);
+      for (const f of FINGERS) for (let k = 1; k <= 3; k++) {
+        const n = `${s}Hand${f}${k}`, child = CB[`${s}Hand${f}${k + 1}`] || (CB[n] && CB[n].children[0]);
+        if (!CB[n] || !child) continue;
+        const dir = at(child).sub(at(CB[n])).normalize();
+        curlAxis[n] = new V3().crossVectors(dir, palm).normalize().applyQuaternion(CB[n].getWorldQuaternion(new THREE.Quaternion()).invert());
+      }
+    }
+    return {
+      tpl, S, restLocal, rest, hipRatio, hipsFromLegs, footLift, curlAxis, decalY, chestZ,
+      hipsParentInv: hipsParent.matrixWorld.clone().invert(), hipsParentQ: hipsParent.getWorldQuaternion(new THREE.Quaternion()),
+      fist: CB.LeftHandMiddle1.position.clone(), // the rig holds the bat (and ball) at its wrist; the model's fist goes there
+      skull: headLocal.getCenter(new V3()), skullR: (headModel.max.x - headModel.min.x) / 2 * S, // width across the face
+    };
+  }
+  const CHAR = { james: calibrate(gltf.scene) };
+  for (const [k, g] of [['remy', remy], ['boss', boss]]) {
+    if (!g) continue;
+    try { CHAR[k] = calibrate(g.scene); } catch (e) { console.warn(`Player model ${k} could not be calibrated`, e); }
+  }
+
+  /* Kits (James): the whites texture tinted per side, through the mask (red: shirt, green: trousers) */
   let baseMat = null, capMat = null;
-  tpl.traverse((o) => { if (o.isMesh) for (const m of [].concat(o.material)) { if (m.name === 'body') baseMat = m; if (m.name === 'cap') capMat = m; } });
+  gltf.scene.traverse((o) => { if (o.isMesh) for (const m of [].concat(o.material)) { if (m.name === 'body') baseMat = m; if (m.name === 'cap') capMat = m; } });
   const TW = baseMat.map.image.width;
   const baseC = document.createElement('canvas'); baseC.width = baseC.height = TW;
   const bg = baseC.getContext('2d'); bg.drawImage(baseMat.map.image, 0, 0, TW, TW);
@@ -2099,51 +2118,54 @@ function buildBodies({ gltf, mask }) {
     return t;
   }
   const sideMats = {};
-  for (const s of ['bat', 'field']) {
-    sideMats[s] = { body: baseMat.clone(), cap: capMat.clone() };
+  for (const s of ['bat', 'field']) sideMats[s] = { body: baseMat.clone(), cap: capMat.clone() };
+
+  /* A model on a rig, straightened and scaled, fingers curled for the grip */
+  function addModel(rig, K, grip, cast) {
+    const model = THREE.SkeletonUtils.clone(K.tpl);
+    const MB = bonesOf(model);
+    for (const n in K.restLocal) if (MB[n]) MB[n].quaternion.copy(K.restLocal[n]);
+    const g = GRIPS[grip || 'relaxed'];
+    for (const s of ['Left', 'Right']) for (const f of FINGERS) for (let k = 1; k <= 3; k++) {
+      const n = `${s}Hand${f}${k}`; if (!MB[n] || !K.curlAxis[n]) continue;
+      MB[n].quaternion.copy(K.restLocal[n]).multiply(_q1.setFromAxisAngle(K.curlAxis[n], f === 'Thumb' ? g[3] : g[k - 1]));
+    }
+    model.scale.setScalar(K.S);
+    model.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = !!cast; } });
+    rig.root.add(model);
+    const len = {}; // rest offsets of the elbow, wrist, knee and ankle bones, for stretching
+    for (const s of ['Left', 'Right']) for (const n of ['ForeArm', 'Hand', 'Leg', 'Foot']) len[s + n] = MB[s + n].position.clone();
+    return { model, B: MB, K, len };
   }
 
-  /* Attaching a model to a rig */
-  const KEEP = new Set([GEOM.helmet, GEOM.grille, GEOM.helmetBand, GEOM.pad, GEOM.padStraps, GEOM.batGlove, GEOM.kGlove, GEOM.decal, GEOM.frontDecal, GEO.blob]);
+  /* James on a rig: team kit, and the rig's helmet, pads, gloves and lettering moved onto his bones, fitted to his head,
+     shins and hands */
+  const KEEP = new Set([GEOM.helmet, GEOM.grille, GEOM.helmetBand, GEOM.pad, GEOM.padStraps, GEOM.batGlove, GEOM.kGlove, GEOM.decal, GEOM.frontDecal]);
   const _m1 = new THREE.Matrix4(), _m2 = new THREE.Matrix4(), _m3 = new THREE.Matrix4();
-  function attach(rig, opts) {
-    const model = THREE.SkeletonUtils.clone(tpl);
-    const MB = bonesOf(model);
-    for (const n in restLocal) if (MB[n]) MB[n].quaternion.copy(restLocal[n]);
-    const grip = GRIPS[opts.grip || 'relaxed'];
-    for (const s of ['Left', 'Right']) for (const f of FINGERS) for (let k = 1; k <= 3; k++) {
-      const n = `${s}Hand${f}${k}`; if (!MB[n] || !curlAxis[n]) continue;
-      MB[n].quaternion.copy(restLocal[n]).multiply(_q1.setFromAxisAngle(curlAxis[n], f === 'Thumb' ? grip[3] : grip[k - 1]));
-    }
-    model.scale.setScalar(S);
-    rig.root.add(model);
+  function dressJames(rig, v, opts) {
+    const { model, B: MB, K } = v;
     let cap = null;
     model.traverse((o) => {
       if (!o.isMesh) return;
-      o.frustumCulled = false; o.castShadow = !!opts.cast;
       if (o.name === 'cap') { cap = o; o.material = sideMats[opts.side].cap; }
       else if (o.material.name === 'body') o.material = sideMats[opts.side].body;
     });
     if (opts.head !== 'cap') cap.visible = false;
-
-    /* the rig's accessories move to the model's bones, fitted to its head, shins and hands; everything else is hidden */
     const root = rig.root;
     root.updateMatrixWorld(true);
     const toRoot = _m1.copy(root.matrixWorld).invert();
     const inRoot = (o, local) => o.localToWorld(local).applyMatrix4(toRoot);
-    const owned = new Set(); model.traverse((o) => owned.add(o));
-    const parts = []; root.traverse((o) => { if (o.isMesh && !owned.has(o) && o.parent !== root) parts.push(o); });
-    for (const o of parts) {
-      if (!KEEP.has(o.geometry)) { o.visible = false; continue; }
+    for (const o of rig.drawn) {
+      if (!KEEP.has(o.geometry)) continue;
       const j = o.parent;
       let bone = null, from = null, to = null, k = 1;
       if (j === rig.head) {
-        bone = MB.Head; from = inRoot(j, new V3(0, 0.105, 0)); to = inRoot(MB.Head, skull.clone());
-        k = clamp(skullR / 0.088, 0.92, 1.18);
+        bone = MB.Head; from = inRoot(j, new V3(0, 0.105, 0)); to = inRoot(MB.Head, K.skull.clone());
+        k = clamp(K.skullR / 0.088, 0.92, 1.18);
       } else if (j === rig.spine) {
         bone = MB.Spine2; from = inRoot(o, new V3());
         const back = o.geometry === GEOM.decal;
-        to = new V3(from.x, back ? decalY.back : decalY.front, back ? chestZ.back - 0.006 : chestZ.front + 0.006);
+        to = new V3(from.x, back ? K.decalY.back : K.decalY.front, back ? K.chestZ.back - 0.006 : K.chestZ.front + 0.006);
       } else {
         const L = rig.legs.find((l) => l.knee === j), A = rig.arms.find((a) => a.wrist === j);
         if (L) {
@@ -2161,7 +2183,7 @@ function buildBodies({ gltf, mask }) {
           k = o.geometry === GEOM.kGlove ? 1.3 : 1.2;
         }
       }
-      if (!bone) { o.visible = false; continue; }
+      if (!bone) continue;
       // accessory in root space, moved by (from → to) and scaled about `to`, then expressed in the bone's frame
       _m2.copy(toRoot).multiply(o.matrixWorld);
       _m3.makeTranslation(-from.x, -from.y, -from.z).premultiply(new THREE.Matrix4().makeScale(k, k, k)).premultiply(new THREE.Matrix4().makeTranslation(to.x, to.y, to.z));
@@ -2169,13 +2191,60 @@ function buildBodies({ gltf, mask }) {
       const boneInRoot = new THREE.Matrix4().copy(toRoot).multiply(bone.matrixWorld);
       _m2.premultiply(boneInRoot.invert());
       _m2.decompose(o.position, o.quaternion, o.scale);
+      o.visible = true;
       bone.add(o);
     }
-    const len = {}; // rest offsets of the elbow, wrist, knee and ankle bones, for stretching
-    for (const s of ['Left', 'Right']) for (const n of ['ForeArm', 'Hand', 'Leg', 'Foot']) len[s + n] = MB[s + n].position.clone();
-    const body = { rig, model, B: MB, cap, side: opts.side, len };
-    list.push(body);
-    return body;
+    rig.drawn = rig.drawn.filter((o) => !KEEP.has(o.geometry));
+  }
+
+  /* Every rig that gets models: its drawn body parts (everything but the shadow blob), the models it may show, and
+     which one is showing (null: the drawn body) */
+  const list = [];
+  function equip(rig, opts) {
+    rig.drawn = []; rig.root.traverse((o) => { if (o.isMesh && o.parent !== rig.root) rig.drawn.push(o); });
+    const cast = rig.drawn.some((o) => o.castShadow);
+    const entry = { rig, models: {}, active: undefined, pick: opts.pick };
+    for (const key of opts.chars) {
+      if (!CHAR[key]) continue;
+      const v = addModel(rig, CHAR[key], key === 'james' ? opts.grip : opts.grip === 'keeper' ? 'relaxed' : opts.grip, cast);
+      if (key === 'james') dressJames(rig, v, opts);
+      v.model.visible = false;
+      entry.models[key] = v;
+    }
+    if (!Object.keys(entry.models).length) return null;
+    list.push(entry);
+    show(entry, opts.chars.find((k) => entry.models[k]) || null);
+    return entry;
+  }
+  function show(entry, key) {
+    if (entry.active === key) return;
+    entry.active = key;
+    for (const [k, v] of Object.entries(entry.models)) v.model.visible = k === key;
+    for (const o of entry.rig.drawn) o.visible = !key; // the drawn body only when no model is showing
+  }
+
+  /* who wears what: a Thudinest player is Remy (odd squad places) or The Boss (even); anyone else James if their rig
+     has him, otherwise the drawn body */
+  const isThudinest = (team) => team === 'home' && homeId === 'thudinest';
+  const lookOf = (p) => (SQUADS.thudinest.findIndex((s) => p && s.name === p.name) % 2 === 1 ? 'boss' : 'remy');
+  const choose = (entry, team, person, fallback) => {
+    const want = isThudinest(team) ? lookOf(person) : fallback;
+    return entry.models[want] ? want : entry.models[fallback] ? fallback : null;
+  };
+  const people = [];
+  for (const b of [rigA, rigB]) {
+    const e = equip(b.rig, { chars: ['james', 'remy', 'boss'], side: 'bat', head: 'helmet', grip: 'bat' });
+    if (e) people.push([e, () => choose(e, game.batTeam, game.bats && game.bats[b.batIdx], 'james')]);
+  }
+  for (const f of fielders) {
+    const james = f.isBowler || f.isKeeper;
+    const e = equip(f.rig, james ? { chars: ['james', 'remy', 'boss'], side: 'field', head: f.isKeeper ? 'cap' : 'bare', grip: f.isKeeper ? 'keeper' : 'relaxed' }
+      : { chars: ['remy', 'boss'], grip: 'relaxed' });
+    if (e) people.push([e, () => choose(e, fieldTeam(), f.person, james ? 'james' : null)]);
+  }
+  for (const u of [umpire, legUmp]) {
+    const e = equip(u, { chars: ['boss'], grip: 'relaxed' });
+    if (e) people.push([e, () => 'boss']);
   }
 
   /* Every frame: copy the rig's joints onto the model, then pin wrists and ankles with two-bone IK */
@@ -2211,13 +2280,12 @@ function buildBodies({ gltf, mask }) {
     setWorldQuat(b, b.getWorldQuaternion(_qr).premultiply(_qa)); b.updateMatrixWorld(true);
   }
   const _rootQ = new THREE.Quaternion(), _w = new V3(), _pole = new V3(), _up = new V3(), _hp = new V3();
-  function syncOne(body) {
-    const r = body.rig, M = body.B;
-    if (!r.root.visible) return;
+  function syncOne(r, v, ik) {
+    const M = v.B, K = v.K;
     r.root.updateMatrixWorld(true);
     // the rig's joint rotations relative to its root
     q.P.copy(r.pelvis.quaternion); q.S.copy(q.P).multiply(r.spine.quaternion); q.H.copy(q.S).multiply(r.head.quaternion);
-    const rel = (n, src) => T[n].copy(src).multiply(rest[n]);
+    const rel = (n, src) => T[n].copy(src).multiply(K.rest[n]);
     rel('Hips', q.P);
     rel('Spine', q.S1.slerpQuaternions(q.P, q.S, 1 / 3)); rel('Spine1', q.S2.slerpQuaternions(q.P, q.S, 2 / 3)); rel('Spine2', q.S);
     rel('Neck', q.N.slerpQuaternions(q.S, q.H, 0.5)); rel('Head', q.H);
@@ -2235,40 +2303,50 @@ function buildBodies({ gltf, mask }) {
     for (const n of ORDER) {
       const b = M[n]; if (!b) continue;
       const pn = b.parent && b.parent.name.replace(STRIP, '');
-      const parentRel = T[pn] && ORDER.indexOf(pn) >= 0 && ORDER.indexOf(pn) < ORDER.indexOf(n) ? T[pn] : n === 'Hips' ? hipsParentQ : rest[pn];
+      const parentRel = T[pn] && ORDER.indexOf(pn) >= 0 && ORDER.indexOf(pn) < ORDER.indexOf(n) ? T[pn] : n === 'Hips' ? K.hipsParentQ : K.rest[pn];
       b.quaternion.copy(_qr.copy(parentRel).invert()).multiply(T[n]);
     }
-    // hips: over the rig's hip joints, lower in proportion to his shorter legs
-    _hp.set(0, LIMB.hipY, 0).applyQuaternion(q.P).add(r.pelvis.position); _hp.y *= hipRatio;
-    _hp.add(_w.copy(hipsFromLegs).applyQuaternion(q.P)).multiplyScalar(1 / S).applyMatrix4(hipsParentInv);
+    // hips: over the rig's hip joints, at the model's own hip height in proportion
+    _hp.set(0, LIMB.hipY, 0).applyQuaternion(q.P).add(r.pelvis.position); _hp.y *= K.hipRatio;
+    _hp.add(_w.copy(K.hipsFromLegs).applyQuaternion(q.P)).multiplyScalar(1 / K.S).applyMatrix4(K.hipsParentInv);
     M.Hips.position.copy(_hp);
-    body.model.updateMatrixWorld(true);
+    v.model.updateMatrixWorld(true);
+    if (!ik) return; // far away: the copied joint angles are enough
     // the fist where the rig's wrist is (bat handle, ball, glove), the ankles where the rig's are; hands and feet keep
     // the rig's orientation
     r.root.getWorldQuaternion(_rootQ);
     for (const A of r.arms) {
       const s = SIDES[A.side];
       _qr.copy(_rootQ).multiply(T[`${s}Hand`]);
-      A.wrist.getWorldPosition(_w).sub(_T.copy(fist).applyQuaternion(_qr).multiplyScalar(S));
-      twoBone(M[`${s}Arm`], M[`${s}ForeArm`], M[`${s}Hand`], _w, A.el.getWorldPosition(_pole), body.len[`${s}ForeArm`], body.len[`${s}Hand`]);
+      A.wrist.getWorldPosition(_w).sub(_T.copy(K.fist).applyQuaternion(_qr).multiplyScalar(K.S));
+      twoBone(M[`${s}Arm`], M[`${s}ForeArm`], M[`${s}Hand`], _w, A.el.getWorldPosition(_pole), v.len[`${s}ForeArm`], v.len[`${s}Hand`]);
       setWorldQuat(M[`${s}Hand`], _qr.copy(_rootQ).multiply(T[`${s}Hand`])); M[`${s}Hand`].updateMatrixWorld(true);
     }
-    _up.set(0, footLift, 0).applyQuaternion(_rootQ);
+    _up.set(0, K.footLift, 0).applyQuaternion(_rootQ);
     for (const L of r.legs) {
       const s = SIDES[L.side];
-      twoBone(M[`${s}UpLeg`], M[`${s}Leg`], M[`${s}Foot`], L.ankle.getWorldPosition(_w).add(_up), L.knee.getWorldPosition(_pole), body.len[`${s}Leg`], body.len[`${s}Foot`]);
+      twoBone(M[`${s}UpLeg`], M[`${s}Leg`], M[`${s}Foot`], L.ankle.getWorldPosition(_w).add(_up), L.knee.getWorldPosition(_pole), v.len[`${s}Leg`], v.len[`${s}Foot`]);
       setWorldQuat(M[`${s}Foot`], _qr.copy(_rootQ).multiply(T[`${s}Foot`])); M[`${s}Foot`].updateMatrixWorld(true);
     }
   }
 
-  const list = [];
-  for (const b of [rigA, rigB]) b.body = attach(b.rig, { side: 'bat', head: 'helmet', grip: 'bat', cast: true });
-  bowler.body = attach(bowler.rig, { side: 'field', head: 'bare', grip: 'relaxed', cast: true });
-  keeper.body = attach(keeper.rig, { side: 'field', head: 'cap', grip: 'keeper', cast: true });
+  /* only models the camera can see are posed (one out of view keeps its last pose until it comes back), and the fine
+     IK is skipped for distant ones */
+  const _frustum = new THREE.Frustum(), _pm = new THREE.Matrix4(), _ball = new THREE.Sphere(new V3(), 2.5), _cam = new V3();
   return {
     list,
-    info: { S, hipRatio, upper: P('LeftArm').distanceTo(P('LeftForeArm')) * S, fore: P('LeftForeArm').distanceTo(P('LeftHand')) * S, shoulder: P('LeftArm').multiplyScalar(S).toArray(), footLift, skullR, chestZ },
-    sync() { for (const b of list) syncOne(b); },
+    sync(cam) {
+      if (cam) { cam.updateMatrixWorld(); _frustum.setFromProjectionMatrix(_pm.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse)); cam.getWorldPosition(_cam); }
+      for (const [e, pick] of people) {
+        show(e, pick());
+        if (!e.active || !e.rig.root.visible) continue;
+        if (cam) {
+          e.rig.root.updateMatrixWorld(true); e.rig.pelvis.getWorldPosition(_ball.center);
+          if (!_frustum.intersectsSphere(_ball)) continue;
+        }
+        syncOne(e.rig, e.models[e.active], !cam || _ball.center.distanceTo(_cam) < 35);
+      }
+    },
     /* team colours for the batting (KB) and fielding (KF) sides */
     paint(KB, KF) {
       for (const [s, K] of [['bat', KB], ['field', KF]]) { sideMats[s].body.map = kitTexture(K.shirt, K.pants); sideMats[s].cap.color.setHex(K.cap); }
@@ -6209,7 +6287,7 @@ function mirrorBatters(on) {
     for (const t of [r.decalTex, r.frontTex]) if (t) { t.repeat.x *= -1; t.offset.x = t.repeat.x < 0 ? 1 : 0; }
   }
 }
-function draw() { Bodies.sync(); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
+function draw() { Bodies.sync(camera); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
 /* The field map: fielders, batters and the ball from above, the batter's end at the bottom (turned round for the view
    from behind the bowler, so it matches the screen). Drawn a few times a second; a tap shrinks it to a dot. */
 const FieldMap = (() => {
@@ -6434,7 +6512,7 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, mirrorBatters, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({
