@@ -932,8 +932,8 @@ if (THREE.ColorManagement) {
   if ('legacyMode' in THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
   if ('enabled' in THREE.ColorManagement) THREE.ColorManagement.enabled = true;
 }
-/* The player models download while the stadium is built (see Bodies). A model that fails to load is left out; if
-   none load, a slow connection, or ?classic in the address, the drawn players are used instead. */
+/* The player models download while the stadium is built (see Bodies). A model that fails to load, or is still
+   loading after 30 seconds, is left out; if none load, or ?classic is in the address, the drawn players are used. */
 const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null) : (() => {
   const script = (src) => new Promise((resolve, reject) => {
     if (THREE.GLTFLoader) { resolve(); return; }
@@ -942,12 +942,11 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const late = new Promise((_, reject) => setTimeout(() => reject(new Error('timed out')), 30000));
   const ready = script('players/gltf.js');
   const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
-  const optional = (file) => model(file).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
-  // players drawn at random, then the umpires' character
-  const NAMES = ['james', 'remy', 'aj', 'peasant', 'footballer', 'timmy', 'boss'];
-  const load = Promise.all(NAMES.map((n) => optional(`${n}.glb`)));
-  return Promise.race([load, late]).then((got) => (got.some(Boolean) ? Object.fromEntries(NAMES.map((n, i) => [n, got[i]])) : null))
-    .catch((e) => { console.warn('Drawn players: the player models did not load', e); return null; });
+  const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
+  // the players' characters (Medea and Akai also dance on the stages), then the umpires'
+  const NAMES = ['medea', 'ch01', 'demon', 'kaya', 'vanguard', 'pete', 'knight', 'josh', 'ely', 'akai', 'abe', 'copzombie', 'boss'];
+  return Promise.all(NAMES.map((n) => optional(`${n}.glb`)))
+    .then((got) => (got.some(Boolean) ? Object.fromEntries(NAMES.map((n, i) => [n, got[i]])) : null));
 })();
 
 /* ------------------------------------------------------------------ helpers */
@@ -1975,13 +1974,14 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
 
 /* ------------------------------------------------------------ realistic players
    Every player wears one of the downloaded Mixamo characters, exactly as downloaded (no kit, pads, helmet or gloves):
-   James, Remy, Aj, the peasant man, the footballer or Timmy (players/*.glb), drawn at random for each player of every side
-   and kept for the match; both umpires are The Boss (players/boss.glb). The rigs still do all the work (stance, swings, run-ups, fielding, IK,
+   Medea, Akai, Kaya, Pete, Josh, Abe, Ely, the knight, the vanguard, the demon, the cop zombie or Ch01 (players/*.glb).
+   Each side deals them out at random, one per player, so no two in a team are alike; both umpires are The Boss
+   (players/boss.glb), and Medea and Akai also dance on the cheerleader stages. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
    replays): every frame each visible model's skeleton copies its rig's joint angles, then two-bone IK puts its fist on
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
    while a model shows. Without the models, everyone stays as drawn. */
 const Bodies = await (async () => {
-  const none = { list: [], sync() {} };
+  const none = { list: [], women: [], dress() { return false; }, sync() {} };
   await Loader.step(0.355, 'Dressing the players');
   const asset = await PlayerAsset;
   if (!asset) return none;
@@ -1993,7 +1993,7 @@ function buildBodies(models) {
   const SIDES = { 1: 'Left', [-1]: 'Right' }; // the rigs' side +1 is the player's left (+x when facing +z), as in Mixamo
   const RIG_TOP = 1 + LIMB.spineY + LIMB.headY + 0.21; // top of a rig's head: every model is scaled to this height
   const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
-  const GRIPS = { bat: [1.4, 1.5, 1.0, 0.7], relaxed: [0.22, 0.3, 0.2, 0.12] }; // knuckle, middle, tip, thumb
+  const GRIPS = { bat: [1.4, 1.5, 1.0, 0.25], relaxed: [0.22, 0.3, 0.2, 0.12] }; // knuckle, middle, tip, thumb
   const comp = (attr, v, k) => (k === 0 ? attr.getX(v) : k === 1 ? attr.getY(v) : k === 2 ? attr.getZ(v) : attr.getW(v)); // r149 has no getComponent
   const at = (o) => o.getWorldPosition(new V3());
 
@@ -2041,10 +2041,14 @@ function buildBodies(models) {
     const hipsFromLegs = P('Hips').sub(upLegMid).multiplyScalar(S); // pelvis frame, metres
     const hipsParent = CB.Hips.parent;
     const footLift = (P('LeftFoot').y - floor) * S - 0.08; // the rigs' ankles are 8 cm above the sole
-    // finger curls: each finger joint turns toward the palm (which faces the thigh when the arm hangs)
+    // finger curls: each finger joint turns toward the palm, measured from the knuckles (it faces the thigh when the
+    // arm hangs, for most rigs)
     const curlAxis = {};
     for (const s of ['Left', 'Right']) {
-      const palm = new V3(s === 'Left' ? -1 : 1, 0, 0);
+      const first = CB[`${s}HandIndex1`], last = CB[`${s}HandPinky1`] || CB[`${s}HandRing1`];
+      const palm = first && last
+        ? new V3().crossVectors(at(knuckle(s)).sub(at(CB[`${s}Hand`])), at(first).sub(at(last))).normalize().multiplyScalar(s === 'Left' ? 1 : -1)
+        : new V3(s === 'Left' ? -1 : 1, 0, 0);
       for (const f of FINGERS) for (let k = 1; k <= 3; k++) {
         const n = `${s}Hand${f}${k}`, child = CB[`${s}Hand${f}${k + 1}`] || (CB[n] && CB[n].children[0]);
         if (!CB[n] || !child) continue;
@@ -2063,6 +2067,9 @@ function buildBodies(models) {
     if (!g) continue;
     try { CHAR[k] = calibrate(g.scene); } catch (e) { console.warn(`Player model ${k} could not be calibrated`, e); }
   }
+  // the originals wait, hidden, in the scene, so the loading screen uploads their textures and builds their shaders
+  const wardrobe = new THREE.Group(); wardrobe.visible = false; scene.add(wardrobe);
+  for (const K of Object.values(CHAR)) wardrobe.add(K.tpl);
 
   /* A model on a rig, straightened and scaled, fingers curled for the grip */
   function addModel(rig, K, grip, cast) {
@@ -2074,6 +2081,27 @@ function buildBodies(models) {
       const n = `${s}Hand${f}${k}`; if (!MB[n] || !K.curlAxis[n]) continue;
       MB[n].quaternion.copy(K.restLocal[n]).multiply(_q1.setFromAxisAngle(K.curlAxis[n], f === 'Thumb' ? g[3] : g[k - 1]));
     }
+    // on the bat the thumb wraps the handle: it bends at its two outer joints, and turns at its root, until its tip
+    // lies over the curled index finger (a long thumb bends more)
+    if (grip === 'bat') for (const s of ['Left', 'Right']) {
+      const [t1, t2, t3] = [1, 2, 3].map((k) => MB[`${s}HandThumb${k}`]), i2 = MB[`${s}HandIndex2`], i3 = MB[`${s}HandIndex3`];
+      const tip = MB[`${s}HandThumb4`] || t3;
+      if (!t1 || !t2 || !t3 || !i2 || !i3 || !K.curlAxis[t2.name.replace(STRIP, '')]) continue;
+      const root = t1.quaternion.clone();
+      const pose = (bend) => {
+        t1.quaternion.copy(root);
+        for (const b of [t2, t3]) { const n = b.name.replace(STRIP, ''); b.quaternion.copy(K.restLocal[n]).multiply(_q1.setFromAxisAngle(K.curlAxis[n] || K.curlAxis[t2.name.replace(STRIP, '')], bend)); }
+        model.updateMatrixWorld(true);
+        const base = at(t1), target = at(i2).add(at(i3)).multiplyScalar(0.5);
+        _q1.setFromUnitVectors(at(tip).sub(base).normalize(), target.clone().sub(base).normalize());
+        setWorldQuat(t1, t1.getWorldQuaternion(new THREE.Quaternion()).premultiply(_q1));
+        model.updateMatrixWorld(true);
+        return at(tip).distanceTo(target);
+      };
+      let best = 0, miss = Infinity;
+      for (let bend = 0; bend <= 1.6; bend += 0.1) { const d = pose(bend); if (d < miss) { miss = d; best = bend; } }
+      pose(best);
+    }
     model.scale.setScalar(K.S);
     model.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = !!cast; } });
     rig.root.add(model);
@@ -2082,47 +2110,47 @@ function buildBodies(models) {
     return { model, B: MB, K, len };
   }
 
-  /* Every rig that gets models: its drawn body parts (everything but the shadow blob), the models it may show, and
-     which one is showing (null: the drawn body) */
+  /* Every rig that gets models: its drawn body parts (everything but the shadow blob), the characters it may show
+     (each built the first time it is needed), and which one is showing (null: the drawn body) */
   const list = [];
   function equip(rig, opts) {
+    const chars = opts.chars.filter((k) => CHAR[k]);
+    if (!chars.length) return null;
     rig.drawn = []; rig.root.traverse((o) => { if (o.isMesh && o.parent !== rig.root) rig.drawn.push(o); });
-    const cast = rig.drawn.some((o) => o.castShadow);
-    const entry = { rig, models: {}, active: undefined };
-    for (const key of opts.chars) {
-      if (!CHAR[key]) continue;
-      const v = addModel(rig, CHAR[key], opts.grip, cast);
-      v.model.visible = false;
-      entry.models[key] = v;
-    }
-    if (!Object.keys(entry.models).length) return null;
+    const entry = { rig, chars, grip: opts.grip, cast: rig.drawn.some((o) => o.castShadow), models: {}, active: undefined };
     list.push(entry);
-    show(entry, opts.chars.find((k) => entry.models[k]) || null);
+    show(entry, chars[0]);
     return entry;
   }
   function show(entry, key) {
     if (entry.active === key) return;
+    if (key && !entry.models[key]) {
+      if (!entry.chars.includes(key)) key = null;
+      else entry.models[key] = addModel(entry.rig, CHAR[key], entry.grip, entry.cast);
+    }
     entry.active = key;
     for (const [k, v] of Object.entries(entry.models)) v.model.visible = k === key;
     for (const o of entry.rig.drawn) o.visible = !key; // the drawn body only when no model is showing
   }
 
-  /* who wears what: each player draws a character at random, fixed by his name so he looks the same all match */
+  /* who wears what: each side shuffles the characters once per visit and hands them out down its XI, so no two
+     players in a team look alike (the same character may turn out for both sides) */
   const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss');
-  const lookOf = (p, fallback) => {
-    if (!p) return PLAYERS[fallback % PLAYERS.length];
-    let h = 2166136261; for (const ch of p.name) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); // FNV-1a
-    return PLAYERS[(h >>> 0) % PLAYERS.length];
+  const shuffled = () => { const a = PLAYERS.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const DEAL = { home: shuffled(), away: shuffled() };
+  const lookOf = (team, p, fallback) => {
+    const at = p ? (team === 'home' ? xiList() : WORLD_XI).findIndex((q) => q.name === p.name) : -1;
+    return DEAL[team][(at >= 0 ? at : fallback) % PLAYERS.length];
   };
   const people = [];
   if (PLAYERS.length) {
     for (const [i, b] of [rigA, rigB].entries()) {
       const e = equip(b.rig, { chars: PLAYERS, grip: 'bat' });
-      if (e) people.push([e, () => lookOf(game.bats && game.bats[b.batIdx], i)]);
+      if (e) people.push([e, () => lookOf(game.batTeam, game.bats && game.bats[b.batIdx], i)]);
     }
     for (const [i, f] of fielders.entries()) {
       const e = equip(f.rig, { chars: PLAYERS, grip: 'relaxed' });
-      if (e) people.push([e, () => lookOf(f.person, i)]);
+      if (e) people.push([e, () => lookOf(fieldTeam(), f.person, i)]);
     }
   }
   if (CHAR.boss) for (const u of [umpire, legUmp]) {
@@ -2213,7 +2241,9 @@ function buildBodies(models) {
   }
 
   return {
-    list,
+    list, deal: DEAL,
+    women: ['medea', 'akai'].filter((k) => CHAR[k]), // they dance on the stages too
+    dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (e) people.push([e, () => key]); return !!e; },
     sync() {
       for (const [e, pick] of people) {
         show(e, pick());
@@ -2224,7 +2254,8 @@ function buildBodies(models) {
 }
 
 /* Cheerleader stages beside the sightscreens at both ends, branded with the home side's name. The dancers come out
-   when a batter reaches 25, 50, 100, 150 or 200. They are simple shapes (a dozen meshes each) and are hidden until then. */
+   when a batter reaches 25, 50, 100, 150 or 200, and are hidden until then. They are the downloaded women, Medea and
+   Akai, with pom-poms, each on a bare rig (joints only) that the dance moves; without the models they are simple shapes. */
 const STAGES = [];
 {
   const deck = std(0x1b2131, 0.8), trimM = std(0xffc53d, 0.5);
@@ -2235,7 +2266,16 @@ const STAGES = [];
   const headGeo = new THREE.SphereGeometry(0.105, 16, 12), hairGeo = new THREE.SphereGeometry(0.115, 16, 10, 0, TAU, 0, Math.PI * 0.62), ponyGeo = new THREE.SphereGeometry(0.07, 10, 8);
   const armGeo = new THREE.CylinderGeometry(0.035, 0.03, 0.58, 8); armGeo.translate(0, -0.29, 0);
   const pomGeo = new THREE.IcosahedronGeometry(0.12, 1);
-  const hairM = std(0x15100c, 0.75), bootM = std(0xf3f3ef, 0.5);
+  const hairM = std(0x15100c, 0.75), bootM = std(0xf3f3ef, 0.5), pomM = std(0xffc53d, 0.45);
+  // the joints of a player rig (makeRig) and nothing else, for a dancer model to follow
+  const bareRig = () => {
+    const G = (parent, x, y, z) => { const o = new THREE.Group(); o.position.set(x, y, z); parent.add(o); return o; };
+    const root = new THREE.Group(); root.rotation.order = 'YXZ';
+    const pelvis = G(root, 0, 1.0, 0), spine = G(pelvis, 0, LIMB.spineY, 0), head = G(spine, 0, LIMB.headY, 0);
+    const legs = [1, -1].map((side) => { const hip = G(pelvis, LIMB.hipX * side, LIMB.hipY, 0), knee = G(hip, 0, -LIMB.thigh, 0); return { hip, knee, ankle: G(knee, 0, -LIMB.shin, 0), side }; });
+    const arms = [1, -1].map((side) => { const sh = G(spine, LIMB.shX * side, LIMB.shY, 0), el = G(sh, 0, -LIMB.upper, 0); return { sh, el, wrist: G(el, 0, -LIMB.fore, 0), side }; });
+    return { root, pelvis, spine, head, legs, arms };
+  };
   for (const [sx, end] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
     const g = new THREE.Group();
     const x = sx * 16, z = FIELD_C.z + end * Math.sqrt(71.5 * 71.5 - x * x);
@@ -2252,6 +2292,17 @@ const STAGES = [];
     for (const px of [-4.2, 4.2]) { const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.6, 0.12), deck); post.position.set(px, 2.8, -1.4); g.add(post); }
     const dancers = [];
     for (let i = 0; i < 3; i++) {
+      const phase = i * 0.7 + STAGES.length * 0.35;
+      if (Bodies.women.length) {
+        const rig = bareRig(), d = rig.root;
+        d.position.set(-2.6 + i * 2.6, 1.04, 0.2); d.visible = false; g.add(d);
+        if (Bodies.dress(rig, Bodies.women[(STAGES.length * 3 + i) % Bodies.women.length])) {
+          for (const A of rig.arms) { const pom = new THREE.Mesh(pomGeo, pomM); pom.position.y = -0.04; A.wrist.add(pom); }
+          dancers.push({ g: d, rig, phase });
+          continue;
+        }
+        g.remove(d);
+      }
       const d = new THREE.Group(); d.position.set(-2.6 + i * 2.6, 1.04, 0.2); d.visible = false; g.add(d);
       const skin = std(skinTones[(i + STAGES.length) % skinTones.length], 0.55), costume = std(0xffc53d, 0.45), top = std(0x2350b8, 0.5);
       const hips = new THREE.Group(); hips.position.y = 0.92; d.add(hips);
@@ -2273,7 +2324,7 @@ const STAGES = [];
         const pom = new THREE.Mesh(pomGeo, costume); pom.position.y = -0.62; A.add(pom);
         return A;
       });
-      dancers.push({ g: d, hips, chest, legs, arms, phase: i * 0.7 + STAGES.length * 0.35, side: 0 });
+      dancers.push({ g: d, hips, chest, legs, arms, phase });
     }
     STAGES.push({ g, fc, front, bc, back, dancers, end, x, z });
   }
@@ -2302,6 +2353,7 @@ function updateDance(dt) {
   if (Dance.t > Dance.dur) { Dance.t = -1; for (const S of STAGES) for (const d of S.dancers) d.g.visible = false; return; }
   const t = Dance.t, beat = t * 2 * Math.PI * 2.1; // about 126 beats a minute
   for (const S of STAGES) for (const d of S.dancers) {
+    if (d.rig) { danceRig(d, beat + d.phase, t); continue; }
     const p = beat + d.phase, b = Math.abs(Math.sin(p / 2));
     d.g.position.y = 1.04 + b * 0.12;
     d.hips.rotation.z = Math.sin(p / 2) * 0.12; d.chest.rotation.z = -Math.sin(p / 2) * 0.1;
@@ -2310,6 +2362,23 @@ function updateDance(dt) {
     d.arms[0].rotation.set(up(0), 0, -0.35 - 0.25 * Math.sin(p)); d.arms[1].rotation.set(up(Math.PI), 0, 0.35 + 0.25 * Math.sin(p));
     d.g.rotation.y = (Math.floor(t / 1.9 + d.phase) % 3 === 2) ? (t * 6) % TAU : Math.sin(p / 4) * 0.3; // every few bars, a twirl
   }
+}
+/* the same dance on a rig: a dip at the knees on every beat (feet on the deck), a knee lifted in turn, hips swaying,
+   pom-poms up and out, the head nodding, and the twirl */
+function danceRig(d, p, t) {
+  const { pelvis, spine, head, legs, arms } = d.rig, s2 = Math.sin(p / 2);
+  const dip = 0.07 * (1 - Math.abs(s2)), a = Math.acos(1 - dip / (LIMB.thigh + LIMB.shin));
+  pelvis.position.y = 1.0 - dip; pelvis.rotation.z = s2 * 0.1; spine.rotation.z = -s2 * 0.12;
+  for (const L of legs) {
+    const lift = 0.55 * Math.max(0, L.side * s2); // the left knee comes up on one beat, the right on the next
+    L.hip.rotation.set(-a - lift, 0, 0); L.knee.rotation.x = 2 * a + 1.6 * lift; L.ankle.rotation.x = -a - 0.6 * lift;
+  }
+  for (const A of arms) {
+    A.sh.rotation.set(-Math.PI * (0.55 + 0.4 * Math.max(0, Math.sin(p / 2 + (A.side > 0 ? 0 : Math.PI)))), 0, A.side * (0.35 + 0.25 * Math.sin(p)));
+    A.el.rotation.x = -0.35;
+  }
+  head.rotation.x = 0.1 * Math.sin(p);
+  d.g.rotation.y = (Math.floor(t / 1.9 + d.phase) % 3 === 2) ? (t * 6) % TAU : Math.sin(p / 4) * 0.3;
 }
 await Loader.step(0.36, 'Setting the field');
 
@@ -6380,7 +6449,7 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({
