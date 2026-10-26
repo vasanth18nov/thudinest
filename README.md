@@ -184,6 +184,17 @@ browser via `localStorage`; there is no server or database.
 `https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
 game card in the Play hub's `.game-cards` list in the root `index.html`.
 
+**Realistic players** — the batters, bowler and keeper wear a realistic
+player model (`cricket/players/player.glb`, a Mixamo character rebuilt as a
+cricketer, with `player-kit.png` marking the shirt and trousers for team
+colours, and `gltf.js`, three.js r149's GLTFLoader as a plain script). The
+drawn rigs still do all the posing; each frame the model copies its rig's
+joints, with IK pinning hands to the bat and feet to the ground. Fielders and
+umpires are still drawn. Add `?classic` to the address to play with the drawn
+players only; the game also falls back to them if the model fails to load.
+The source files and build script live outside the repo, in
+`~/thudinest-assets/`.
+
 **Changing a squad or adding a side** — edit `SQUADS` near the top of the
 script in `cricket/index.html` (name, shirt number, skin tone, look) and the
 side's entry in `HOME_TEAMS` (name, shirt text, kit colours, anthem file);
@@ -220,7 +231,7 @@ Web Audio synthesis. `?debug` exposes `window.__gr` for test bots.
 ```
 index.html      ← main site (landing page + game hub, all in one)
 bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
-cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks)
+cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks + players/ model)
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 images/         ← add your property photos here
 README.md       ← this file
