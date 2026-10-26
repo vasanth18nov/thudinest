@@ -184,20 +184,17 @@ browser via `localStorage`; there is no server or database.
 `https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
 game card in the Play hub's `.game-cards` list in the root `index.html`.
 
-**Realistic players** — Mixamo character models replace the drawn bodies.
-The Thudinest Coimbatore players are Remy (odd squad places) and The Boss
-(even places), exactly as downloaded, batting and in the field, with no
-kit, pads or gloves; both umpires are The Boss. Every other side's batters,
-bowler and keeper wear `player.glb` (a character rebuilt as a cricketer, with
-`player-kit.png` marking the shirt and trousers for team colours, plus the
-helmet, pads and gloves); their fielders stay drawn. The files live in
-`cricket/players/` (`gltf.js` is three.js r149's GLTFLoader as a plain
-script). The drawn rigs still do all the posing; each frame a model copies
-its rig's joints, with IK putting the hands on the bat or ball and the feet
-on the ground. Add `?classic` to the address to play with the drawn players
-only; the game also falls back to them if the models fail to load. The
-Mixamo downloads and the build scripts live outside the repo, in
-`~/thudinest-assets/`.
+**Realistic players** — every player, on every side, is one of six Mixamo
+characters used exactly as downloaded (no kit, pads, helmet or gloves):
+James, Remy, Aj, Big Vegas, the footballer and Timmy, drawn at random per
+player (fixed by name, so a player keeps his look all match). Both umpires
+are The Boss. The models are `cricket/players/*.glb` (about 8 MB in all;
+`gltf.js` is three.js r149's GLTFLoader as a plain script). The drawn rigs
+still do all the posing; each frame a model copies its rig's joints, with
+IK putting the hands on the bat or ball and the feet on the ground. Add
+`?classic` to the address to play with the drawn players only; the game
+also falls back to them if the models fail to load. The Mixamo downloads
+and the build scripts live outside the repo, in `~/thudinest-assets/`.
 
 **Changing a squad or adding a side** — edit `SQUADS` near the top of the
 script in `cricket/index.html` (name, shirt number, skin tone, look) and the
