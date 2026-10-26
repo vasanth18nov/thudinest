@@ -2432,8 +2432,12 @@ function buildBodies(models, clips) {
     _hp.add(_w.copy(K.hipsFromLegs).applyQuaternion(q.P)).multiplyScalar(1 / K.S).applyMatrix4(K.hipsParentInv);
     M.Hips.position.copy(_hp);
     v.model.updateMatrixWorld(true);
-    // the fist where the rig's wrist is (bat handle, ball, glove), the ankles where the rig's are; hands and feet keep
-    // the rig's orientation
+    limbIK(r, v);
+  }
+  // the fist where the rig's wrist is (bat handle, ball, glove), the ankles where the rig's are; hands and feet keep
+  // the rig's orientation (T holds this rig's targets from syncOne)
+  function limbIK(r, v) {
+    const M = v.B, K = v.K;
     r.root.getWorldQuaternion(_rootQ);
     for (const A of r.arms) {
       const s = SIDES[A.side];
@@ -2480,8 +2484,9 @@ function buildBodies(models, clips) {
   }
   const TP = {}; for (const n of ORDER) TP[n] = new THREE.Quaternion();
   const _hipsMix = new V3();
+  const TORSO = new Set(['Hips', 'Spine', 'Spine1', 'Spine2', 'Neck', 'Head']);
   function applyClip(r, v, A) {
-    const M = v.B, K = v.K, w = clamp(A.w, 0, 1);
+    const M = v.B, K = v.K, w = clamp(A.w, 0, 1), torso = A.mask === 'torso'; // torso: the clip turns the body, the rig keeps the limbs
     v.model.updateMatrixWorld(true);
     r.root.getWorldQuaternion(_rootQ); _inv.copy(_rootQ).invert();
     // the clip's pose (crossfading from the one before, after a sidestep), eased in from the rig's
@@ -2492,16 +2497,19 @@ function buildBodies(models, clips) {
       for (const n of ORDER) if (K.bind[n]) TC[n].copy(TP[n].slerp(TC[n], A.mix));
       _hipsMix.lerpVectors(A.prev.hipsW, A.hipsW, A.mix);
     }
-    if (w < 1) for (const n of ORDER) if (M[n] && K.bind[n]) TC[n].copy(_qa.copy(_inv).multiply(M[n].getWorldQuaternion(_qr)).slerp(TC[n], w));
+    if (w < 1) for (const n of ORDER) if (M[n] && K.bind[n] && (!torso || TORSO.has(n))) TC[n].copy(_qa.copy(_inv).multiply(M[n].getWorldQuaternion(_qr)).slerp(TC[n], w));
     for (const n of ORDER) {
-      const b = M[n]; if (!b || !K.bind[n]) continue;
+      const b = M[n]; if (!b || !K.bind[n] || (torso && !TORSO.has(n))) continue;
       const pn = b.parent && b.parent.name.replace(STRIP, '');
       b.quaternion.copy(_qr.copy(n === 'Hips' ? K.hipsParentQ : TC[pn]).invert()).multiply(TC[n]);
     }
-    M.Hips.getWorldPosition(_hp).lerp(_hipsMix, w);
-    M.Hips.position.copy(M.Hips.parent.worldToLocal(_hp));
-    for (const s of ['Left', 'Right']) for (const n of ['ForeArm', 'Hand', 'Leg', 'Foot']) M[s + n].position.lerp(v.len[s + n], w);
+    if (!torso) {
+      M.Hips.getWorldPosition(_hp).lerp(_hipsMix, w);
+      M.Hips.position.copy(M.Hips.parent.worldToLocal(_hp));
+      for (const s of ['Left', 'Right']) for (const n of ['ForeArm', 'Hand', 'Leg', 'Foot']) M[s + n].position.lerp(v.len[s + n], w);
+    }
     v.model.updateMatrixWorld(true);
+    if (torso) limbIK(r, v); // the hands back on the bat, the feet on the rig's footwork
     // the gloves to the ball
     if (A.ik > 0 && A.ikTarget) {
       _qy.setFromAxisAngle(AXIS_Y, A.yaw);
@@ -5078,10 +5086,33 @@ function updateCeleb(b, dt) {
   _v3.set(b.pos.x - 12, 3.2, b.pos.z + 8); r.head.lookAt(_v3); // up at the stands
   batInHand(b);
   // then the silly dance, bat and all (the model's; the drawn batter keeps waving)
-  if (t > 1.6 && Bodies.clips && !b.anim) Moves.begin(b, 'dance', { carry: b.carry || (b.carry = (pos, q) => {
-    b.bat.quaternion.copy(q).multiply(_qHand); b.batAxis.copy(Y_AXIS).applyQuaternion(b.bat.quaternion);
-    b.bat.position.copy(pos).addScaledVector(b.batAxis, -0.56);
-  }) });
+  if (t > 1.6 && Bodies.clips && !b.anim) Moves.begin(b, 'dance', { carry: batCarry(b) });
+}
+// the bat in a model's right hand while it plays a clip, held as batInHand holds it in the rig's
+const batCarry = (b) => b.carry || (b.carry = (pos, q) => {
+  b.bat.quaternion.copy(q).multiply(_qHand); b.batAxis.copy(Y_AXIS).applyQuaternion(b.bat.quaternion);
+  b.bat.position.copy(pos).addScaledVector(b.batAxis, -0.56);
+});
+/* The striker's Mixamo moves (see Moves): Golf Chip turns his body through a lofted drive, its impact kept on the
+   bat's contact while his arms stay on the bat; after a swing and a miss, Golf Putt Failure's frustrated straighten-up
+   and gesture, bat in hand. The clips face the off side, as he does (a left-hander is mirrored with his rig). */
+function strikerMoves(b, dt) {
+  if (!Bodies.clips) return;
+  const sa = b.swingActor || (b.swingActor = { rig: b.rig, pos: new V3(), heading: Math.PI, anim: null });
+  const sw = b === game.rigS && b.mode === 'bat' ? game.swing : null;
+  if (sw && !sw.moved && sw.loft && !sw.block && sw.foot === 'front' && Math.abs(sw.side) <= 1) {
+    sw.moved = true;
+    Moves.begin(sa, 'chip', { yaw: Math.PI, catchAt: sw.animStart + SWING_T, retime: true });
+  }
+  if (sw && sa.anim && sa.anim.key === 'chip') sa.anim.catchAt = sw.animStart + SWING_T; // contact moves to the ball when it is hit
+  if (sw && sw.resolved && sw.plan && !sw.plan.hit && !sw.block && !sw.missedShown && game.clock > sw.animStart + SWING_T + 0.35) {
+    sw.missedShown = true;
+    Moves.begin(sa, 'missed', { yaw: Math.PI, carry: batCarry(b) });
+  }
+  if (!sa.anim) return;
+  if (b.mode !== 'bat' || game.state === 'runup') Moves.stop(sa);
+  sa.pos.set(b.cur.pel.x, 0, b.cur.pel.z);
+  Moves.step(sa, dt);
 }
 function startRun(b) {
   b.rig.pelvis.getWorldPosition(_v1);
@@ -5154,6 +5185,7 @@ function updateBatters(dt) {
     else if (b.mode === 'ns') updateNonStrikerRig(b, dt);
     else if (b.mode === 'walkoff') updateWalkoff(b, dt);
     if (b.anim) { if (b.mode !== 'celeb') Moves.stop(b); Moves.step(b, dt); }
+    strikerMoves(b, dt);
   }
 }
 
@@ -5340,7 +5372,8 @@ function lookAtBall(r) {
      fielders      Goalkeeper Catch to gather the ball or take a catch at chest height, Football Catch for a high catch,
                    Receiver Catch for a skier, Goalkeeper Diving Save for a diving stop or catch, Goalkeeper Overhand
                    Throw for the return, Running to chase, Breathing Idle standing about, Victory Idle after a catch
-     the batter    Silly Dancing for a milestone, bat in hand
+     the batter    Golf Chip turning his body through a lofted drive (his arms stay on the bat), Golf Putt Failure
+                   after a swing and a miss, and Silly Dancing for a milestone, bat in hand
    A move either carries the player (timed so its catch comes as the ball arrives, its footwork steered so his hands
    meet it, and his drawn rig following his hips) or plays on the spot while the rig moves him. Moves crossfade into
    one another and ease in and out of the rig's pose. Without the models, everyone moves as drawn. */
@@ -5352,6 +5385,10 @@ const Moves = (() => {
     dive: { from: 0.45, at: 1.19, end: 3.3 }, shuffle: { from: 0, at: 0.53, end: 0.53 },
     throw: { from: 1.0, at: 1.5, end: 2.3, spot: 0.25, hand: 'Right' },
     run: { loop: true, spot: 0 }, idle: { loop: true, spot: 0 }, cheer: { loop: true, spot: 0 }, dance: { loop: true, spot: 0 },
+    // the batter: Golf Chip's body turn through a lofted drive (impact at `at`, kept on the bat's contact), and Golf
+    // Putt Failure's straighten-up and gesture after a swing and a miss
+    chip: { from: 0.75, at: 1.0, end: 1.75, spot: 0, mask: 'torso', fadeIn: 0.08 },
+    missed: { from: 2.9, at: 2.9, end: 7.4, spot: 0.3 },
   };
   const FADE_IN = 0.18, FADE_OUT = 0.3, BLEND = 0.2, Y = new V3(0, 1, 0);
   const TAKES = new Set(['catch', 'drop', 'field', 'misfield']);
@@ -5379,7 +5416,7 @@ const Moves = (() => {
     const m = CLIP[key], fit = Bodies.fit(actor.rig), prev = actor.anim && actor.anim.w > 0 ? actor.anim : null;
     if (!fit) return null;
     const [c0, c1] = range(key);
-    const A = { actor, key, loop: !!m.loop, spot: m.spot !== undefined ? m.spot : null, hand: m.hand || null, c0, c1,
+    const A = { actor, key, loop: !!m.loop, spot: m.spot !== undefined ? m.spot : null, hand: m.hand || null, c0, c1, mask: m.mask || null, lockYaw: o.yaw !== undefined && m.spot !== undefined, retime: !!o.retime,
       mirror: o.mirror || 1, yaw: o.yaw !== undefined ? o.yaw : actor.heading, L: fit.L, hip: fit.hip, sigma: 1,
       anchor: new V3(), warp: new V3(), warpFrom: 0, warpTo: 0, p0: new V3(), trav: new V3(),
       tau: c0, speed: o.speed || 1, w: prev ? prev.w : 0, state: prev && prev.w >= 1 && prev.state !== 'out' ? 'on' : 'in',
@@ -5422,17 +5459,19 @@ const Moves = (() => {
     if (A.fresh) A.fresh = false; // begun this frame, already timed from now
     else if (A.loop) { A.tau += dt * A.speed; if (A.tau > A.c1) A.tau = A.c0 + ((A.tau - A.c0) % (A.c1 - A.c0)); }
     else A.tau += dt * (A.catchAt === null || A.tau < m.at ? A.speed : 1);
-    if (A.state === 'in') { A.w = Math.min(1, A.w + dt / FADE_IN); if (A.w >= 1) A.state = 'on'; }
+    // kept on a moment that moves (the bat's contact): the clip runs at whatever speed meets it
+    if (A.retime && A.catchAt !== null && A.tau < m.at) { const left = A.catchAt - game.clock; A.speed = left > 0.02 ? clamp((m.at - A.tau) / left, 0.4, 3) : 3; }
+    if (A.state === 'in') { A.w = Math.min(1, A.w + dt / (m.fadeIn || FADE_IN)); if (A.w >= 1) A.state = 'on'; }
     A.mix = Math.min(1, A.mix + dt / A.blend);
     if (!A.loop && A.tau >= A.c1 && A.state !== 'out') {
       if (A.then) { place(A, 'hips', A.c1, A.hipsW); begin(actor, A.then.key, A.then); step(actor, 0); return; }
       stop(actor);
     }
-    if (A.state === 'out') { A.w -= dt / FADE_OUT; if (A.w <= 0) { actor.anim = actor.rig.anim = null; return; } }
+    if (A.state === 'out') { A.w -= dt / FADE_OUT; if (A.w <= 0) { if (actor.rig.anim === A) actor.rig.anim = null; actor.anim = null; return; } }
     if (!A.loop) A.tau = Math.min(A.tau, A.c1);
-    if (A.spot !== null) A.yaw = actor.heading;
+    if (A.spot !== null && !A.lockYaw) A.yaw = actor.heading;
     place(A, 'hips', A.tau, A.hipsW);
-    if (A.prev) { const P = A.prev; if (P.spot !== null) P.yaw = actor.heading; place(P, 'hips', P.tau, P.hipsW); if (A.mix >= 1) A.prev = null; }
+    if (A.prev) { const P = A.prev; if (P.spot !== null && !P.lockYaw) P.yaw = actor.heading; place(P, 'hips', P.tau, P.hipsW); if (A.mix >= 1) A.prev = null; }
     // the hands onto the ball over the last moment before it arrives, held as it does, then let go
     if (A.catchAt !== null && A.ikTarget) { const t = game.clock - A.catchAt; A.ik = t < 0 ? smooth(clamp(1 + t / 0.3, 0, 1)) : clamp(1 - (t - 0.1) / 0.3, 0, 1); }
     else A.ik = 0;

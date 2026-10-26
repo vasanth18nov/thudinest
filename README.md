@@ -203,8 +203,11 @@ downloads by `~/thudinest-assets/tools/build-clips.mjs`): the keeper's takes
 Goalkeeper Sidestep first for one a little wide); the fielders' stops, dives
 and catches (Goalkeeper Catch, Football Catch, Receiver Catch for a skier),
 the Goalkeeper Overhand Throw back, Running, Breathing Idle and a Victory
-Idle after a catch; and the batter's Silly Dancing, bat in hand, for a
-milestone (from 50 the cheerleaders dance too; a 25 is his dance alone). Takes and catches are timed so the catch comes as the ball
+Idle after a catch; and for the batter, Golf Chip turning his body through a
+lofted drive (his arms stay on the bat, the impact on the contact), Golf Putt
+Failure's frustrated straighten-up after a swing and a miss, and Silly
+Dancing, bat in hand, for a milestone (from 50 the cheerleaders dance too; a
+25 is his dance alone). Takes and catches are timed so the catch comes as the ball
 arrives and steered so the hands meet it.
 
 **Grounds** — the start card picks the stadium (stands, floodlights,
