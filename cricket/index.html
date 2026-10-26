@@ -948,7 +948,7 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
   const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // the players' characters (Medea and Akai also dance on the stages), then the umpires'
-  const NAMES = ['medea', 'ch01', 'demon', 'kaya', 'vanguard', 'pete', 'knight', 'josh', 'ely', 'akai', 'abe', 'copzombie', 'boss'];
+  const NAMES = ['medea', 'ch01', 'vanguard', 'pete', 'knight', 'josh', 'akai', 'abe', 'ninja', 'adam', 'steve', 'ch42', 'boss'];
   // and the Mixamo clips the models play (see Moves), converted to bone rotations
   const clips = fetch('players/moves.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
   return Promise.all([Promise.all(NAMES.map((n) => optional(`${n}.glb`))), clips])
@@ -1012,6 +1012,7 @@ try {
 /* phones and tablets get a lighter profile: standard (not physical) cloth, which compiles far faster on mobile GPUs.
    Resolution is set by Quality below, which keeps the picture as sharp as the device can hold at a smooth frame rate. */
 const LITE = !!((window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (navigator.deviceMemory && navigator.deviceMemory <= 4));
+const isPhone = () => Math.min(innerWidth, innerHeight) < 520; // a phone-sized screen: the cameras close in and the ball is drawn bigger
 /* Quality tiers: render resolution (as a multiple of CSS pixels) and shadow map size. A phone starts at 1.75x and moves
    with its frame rate, measured in play: up a tier after a few smooth seconds, down a tier when frames run long. A step
    down that does not speed anything up means the device caps the frame rate itself (low power mode), so it is undone.
@@ -2173,7 +2174,7 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
 
 /* ------------------------------------------------------------ realistic players
    Every player wears one of the downloaded Mixamo characters, exactly as downloaded (no kit, pads, helmet or gloves):
-   Medea, Akai, Kaya, Pete, Josh, Abe, Ely, the knight, the vanguard, the demon, the cop zombie or Ch01 (players/*.glb).
+   Medea, Akai, Pete, Josh, Abe, Adam, Steve, the ninja, the knight, the vanguard, Ch01 or Ch42 (players/*.glb).
    Each side deals them out at random, one per player, so no two in a team are alike; both umpires are The Boss
    (players/boss.glb), and Medea and Akai also dance on the cheerleader stages. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
    replays): every frame each visible model's skeleton copies its rig's joint angles, then two-bone IK puts its fist on
@@ -2340,7 +2341,7 @@ function buildBodies(models, clips) {
   const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss');
   // the keeper (sixth in each XI) is someone with nothing on his head: a hat, hood, helmet or horns behind the stumps
   // hides where the ball pitches
-  const BARE = ['medea', 'ch01', 'josh', 'ely', 'abe'], KEEPS = 5;
+  const BARE = ['medea', 'ch01', 'josh', 'abe', 'adam', 'ch42'], KEEPS = 5;
   const shuffled = () => {
     const a = PLAYERS.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     const bare = a.map((k, i) => (BARE.includes(k) ? i : -1)).filter((i) => i >= 0);
@@ -2520,7 +2521,7 @@ function buildBodies(models, clips) {
         twoBone(M[`${s}Arm`], M[`${s}ForeArm`], M[`${s}Hand`], _w.clone(), M[`${s}ForeArm`].getWorldPosition(_pole).add(_up.set(0, -0.2, 0)), v.len[`${s}ForeArm`], v.len[`${s}Hand`]);
       }
     }
-    // where a ball he holds sits: between the fists, or in the throwing hand
+    // where a ball he holds sits: between the fists, or in the one hand
     const kn = (s) => M[`${s}HandMiddle1`] || M[`${s}HandIndex1`] || M[`${s}Hand`];
     if (A.hand) kn(A.hand).getWorldPosition(A.hold);
     else A.hold.copy(kn('Left').getWorldPosition(_w)).add(kn('Right').getWorldPosition(_C)).multiplyScalar(0.5);
@@ -5416,7 +5417,7 @@ const Moves = (() => {
     const m = CLIP[key], fit = Bodies.fit(actor.rig), prev = actor.anim && actor.anim.w > 0 ? actor.anim : null;
     if (!fit) return null;
     const [c0, c1] = range(key);
-    const A = { actor, key, loop: !!m.loop, spot: m.spot !== undefined ? m.spot : null, hand: m.hand || null, c0, c1, mask: m.mask || null, lockYaw: o.yaw !== undefined && m.spot !== undefined, retime: !!o.retime,
+    const A = { actor, key, loop: !!m.loop, spot: m.spot !== undefined ? m.spot : null, hand: m.hand || (m.loop ? 'Right' : null), c0, c1, mask: m.mask || null, lockYaw: o.yaw !== undefined && m.spot !== undefined, retime: !!o.retime,
       mirror: o.mirror || 1, yaw: o.yaw !== undefined ? o.yaw : actor.heading, L: fit.L, hip: fit.hip, sigma: 1,
       anchor: new V3(), warp: new V3(), warpFrom: 0, warpTo: 0, p0: new V3(), trav: new V3(),
       tau: c0, speed: o.speed || 1, w: prev ? prev.w : 0, state: prev && prev.w >= 1 && prev.state !== 'out' ? 'on' : 'in',
@@ -5542,7 +5543,7 @@ const Moves = (() => {
     const cur = A && A.state !== 'out' ? A.key : null;
     let want = null;
     if (moveSpeed > (cur === 'run' ? 1.8 : 2.6)) want = 'run';
-    else if (moveSpeed < (cur === 'idle' ? 0.6 : 0.25) && st !== 'runup' && st !== 'flight' && !(f.isKeeper && st === 'inplay')) want = 'idle';
+    else if (moveSpeed < (cur === 'idle' ? 0.6 : 0.25) && st !== 'runup' && st !== 'flight' && !(f.isKeeper && (st === 'inplay' || (P && P.throwing && !P.throwing.done)))) want = 'idle';
     if (want === 'run') {
       const sp = clamp(moveSpeed / runSpeed(f), 0.6, 1.5);
       if (cur === 'run') A.speed = damp(A.speed, sp, 6, 1 / 60); else begin(f, 'run', { speed: sp, phase: Math.random() });
@@ -5552,7 +5553,7 @@ const Moves = (() => {
 
   return {
     begin, stop, step, keeper, fielder,
-    // where a ball he holds is: between his fists (in his right hand for a throw)
+    // where a ball he holds is: between his fists for a take or a catch, in his right hand otherwise
     hand(actor, out) { const A = actor.anim; if (A && A.w > 0.5 && A.held) { out.copy(A.hold); return true; } return false; },
   };
 })();
@@ -5945,7 +5946,7 @@ function applyLook(fmt) {
   else { ball.mat.color.setHex(0xffffff); ball.mat.emissive.setHex(0x6a6a66); ball.seamMat.color.setHex(0x9a9a92); trail.color.set(0.45, 0.84, 1.0); }
   // at the gully ground a red tape ball, which shows against the dust and the pale sky where a white one is lost
   if (lane) { ball.mat.color.setHex(0xff2a2a); ball.mat.emissive.setHex(0x7a0608); ball.seamMat.color.setHex(0x111111); trail.color.set(0.85, 0.05, 0.12); }
-  ball.tape.visible = lane; ball.scale.setScalar(lane ? 1.2 : 1);
+  ball.tape.visible = lane; ball.scale.setScalar((lane ? 1.2 : 1) * (isPhone() ? 1.25 : 1)); // drawn bigger on a phone (its flight is the same)
   drawScreen(null);
 }
 const FORMAT_TEXT = {
@@ -6224,7 +6225,10 @@ const Replay = (() => {
     get active() { return !!R; },
     mirrored(b) { return !!(R && R.m & (b === rigA ? 1 : 2)); },
     mark(k) { marks[k] = game.clock; },
-    reset() { for (const f of frames) pool.push(f.d); frames = []; lastRec = -1; for (const k in marks) delete marks[k]; },
+    reset() {
+      if (R) { R = null; ui(false); sparks.points.visible = dust.points.visible = true; } // a new ball or match cuts a replay short
+      for (const f of frames) pool.push(f.d); frames = []; lastRec = -1; for (const k in marks) delete marks[k];
+    },
     record() {
       if (R || game.clock - lastRec < 1 / HZ) return;
       lastRec = game.clock;
@@ -6698,9 +6702,17 @@ const VIEWS = {
   batsman: { pos: new V3(0.5, 3.0, 6.6), look: new V3(-0.12, 0.55, -10.5), fov: 44 },
   broadcast: { pos: new V3(0.6, 11.5, -58), look: new V3(-0.2, 0.3, -3.2), fov: 15 }, // high behind the bowler, a long lens down the pitch
 };
+/* On a phone the players are a few millimetres tall, so the cameras close in: a tighter lens, the batsman camera
+   nearer and a little lower, aimed a touch higher so the bowler's end stays clear of the scorecard */
+const PHONE_CAM = {
+  portrait: { zoom: 0.8, fwd: 1.4, down: 0.35, lookUp: 0.25 },
+  landscape: { zoom: 0.9, fwd: 0.8, down: -0.15, lookUp: 1.15 }, // the scorecard covers the top of a short screen: the far end sits lower
+};
+const phoneCam = () => PHONE_CAM[innerWidth > innerHeight ? 'landscape' : 'portrait'];
+const camZoom = () => (isPhone() ? phoneCam().zoom : 1);
 function viewFov(v, aspect) {
-  if (v === 'broadcast') { const hf = VIEWS.broadcast.fov * D2R; return clamp(2 * Math.atan(Math.tan(hf / 2) / aspect) / D2R, 8, 22); } // keep the width of the pitch end in frame
-  return VIEWS.batsman.fov / Math.pow(clamp(aspect, 0.45, 1), 0.55);
+  if (v === 'broadcast') { const hf = VIEWS.broadcast.fov * D2R; return clamp(2 * Math.atan(Math.tan(hf / 2) / aspect) / D2R * camZoom(), 7, 22); } // keep the width of the pitch end in frame
+  return VIEWS.batsman.fov / Math.pow(clamp(aspect, 0.45, 1), 0.55) * camZoom();
 }
 const desired = { pos: new V3(), look: new V3(), fov: 46 };
 const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -6719,7 +6731,7 @@ function updateCamera(rdt) {
     if (d > 4) cam.chaseDir.lerp(tmp.normalize(), 1 - Math.exp(-1.5 * rdt)).normalize();
     desired.pos.set(-cam.chaseDir.x * 10, 7.5 + Math.min(d, 90) * 0.15, -0.9 - cam.chaseDir.z * 10);
     desired.look.set(b.x, Math.max(0.4, b.y), b.z);
-    desired.fov = clamp(54 - d * 0.22, 30, 54) / Math.pow(clamp(aspect, 0.5, 1), 0.4);
+    desired.fov = clamp(54 - d * 0.22, 30, 54) / Math.pow(clamp(aspect, 0.5, 1), 0.4) * (isPhone() ? 0.9 : 1); // a little closer on a phone, the ball still in frame
     kp = 2.4; kl = 7;
   } else if (cam.mode === 'celeb' && cam.celeb) {
     // first the batter with the bat raised, then across to the nearest dancers (on him all the way when he dances alone)
@@ -6736,6 +6748,7 @@ function updateCamera(rdt) {
   } else {
     const V = VIEWS[cam.view];
     desired.pos.copy(V.pos); desired.look.copy(V.look); desired.fov = viewFov(cam.view, aspect);
+    if (cam.view === 'batsman' && isPhone()) { const P = phoneCam(); desired.pos.z -= P.fwd; desired.pos.y -= P.down; desired.look.y += P.lookUp; }
     if (cam.view === 'batsman') { desired.pos.x *= sideM(); desired.look.x *= sideM(); } // over a left-hander's shoulder
     kp = 3.2; kl = 4.5;
   }
@@ -6774,7 +6787,15 @@ function mirrorBatters(on) {
     for (const t of [r.decalTex, r.frontTex]) if (t) { t.repeat.x *= -1; t.offset.x = t.repeat.x < 0 ? 1 : 0; }
   }
 }
-function draw() { Bodies.sync(camera, !Replay.active); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
+/* a ball held by a model playing a clip sits in its hand as drawn this frame (the update placed it from the last) */
+function ballInHand() {
+  const F = game.flight, P = game.play;
+  if (game.state === 'dead' && game.deadFlight && F && F.kept) Moves.hand(keeper, ball.position);
+  else if (P && P.holder && !(P.throwing && !P.throwing.done)) Moves.hand(P.holder, ball.position);
+  else return;
+  ballShadow.position.set(ball.position.x, 0.018, ball.position.z);
+}
+function draw() { Bodies.sync(camera, !Replay.active); if (!Replay.active) ballInHand(); mirrorBatters(true); renderer.render(scene, camera); mirrorBatters(false); } // bodies follow their rigs before the mirror
 /* The field map: fielders, batters and the ball from above, the batter's end at the bottom (turned round for the view
    from behind the bowler, so it matches the screen). Drawn a few times a second; a tap shrinks it to a dot. */
 const FieldMap = (() => {
@@ -7001,7 +7022,7 @@ async function warmUp() {
   if (window.__dbgProgs) window.__dbgProgs(renderer, known);
   await Loader.step(1, 'Rolling the pitch');
 }
-if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, Moves, ball, celebrate, Dance, get cam() { return cam; } };
+if (/[?&]debug\b/.test(location.search)) window.__fo = { game, act, beginMatch, Toss, Bodies, rigA, rigB, bowler, keeper, scene, renderer, camera, mirrorBatters, STAGES, startDance, updateDance, fielders, xiList, WORLD_XI, Moves, ball, celebrate, Dance, PHONE_CAM, get cam() { return cam; } };
 const hot = window.claude && window.claude.hot;
 if (hot && hot.snapshot) {
   hot.snapshot(() => ({

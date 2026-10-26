@@ -186,17 +186,17 @@ game card in the Play hub's `.game-cards` list in the root `index.html`.
 
 **Realistic players** — every player, on every side, is one of twelve Mixamo
 characters used exactly as downloaded (no kit, pads, helmet or gloves):
-Medea, Akai, Kaya, Pete, Josh, Abe, Ely, the knight, the vanguard, the demon,
-the cop zombie and Ch01. Each side shuffles them once per page load and deals
+Medea, Akai, Pete, Josh, Abe, Adam, Steve, the ninja, the knight, the
+vanguard, Ch01 and Ch42. Each side shuffles them once per page load and deals
 one to each player of its XI, so no two players in a team look alike (the
 same character can turn out for both sides). Both umpires are The Boss, and
 Medea and Akai, with pom-poms, are the cheerleaders on the stages. The models
-are `cricket/players/*.glb` (about 14 MB in all; `gltf.js` is three.js r149's
+are `cricket/players/*.glb` (about 16 MB in all; `gltf.js` is three.js r149's
 GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat
 or ball and the feet on the ground, and on the bat the thumbs wrap the
-handle. The keeper is always someone bareheaded (Medea, Ch01, Josh, Ely or
-Abe), so no hat or hood hides where the ball pitches. The models play
+handle. The keeper is always someone bareheaded (Medea, Ch01, Josh, Abe, Adam
+or Ch42), so no hat or hood hides where the ball pitches. The models play
 Mixamo clips where one fits (`cricket/players/moves.json`, built from the
 downloads by `~/thudinest-assets/tools/build-clips.mjs`): the keeper's takes
 (Goalkeeper Catch, Football Catch for a bouncer, Goalkeeper Diving Save, a
@@ -217,6 +217,11 @@ houses with water tanks, coconut palms, electric poles and a temple tower,
 in afternoon light, played with a red tape ball that shows against the dust.
 The field is the same size, so the game plays the same.
 The choice is remembered (`floodlit.venue`).
+
+On a phone-sized screen the cameras close in (a tighter lens, the batsman
+camera nearer, aimed so the bowler's end clears the scorecard; `PHONE_CAM`,
+separate for portrait and landscape) and the ball is drawn a quarter bigger,
+so the players read at that size. Gameplay is unchanged.
 
 Add `?classic` to the address to play with the drawn players only;
 the game also falls back to them if the models fail to load. The Mixamo
