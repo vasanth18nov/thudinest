@@ -190,7 +190,8 @@ Medea, Akai, Pete, Josh, Abe, Adam, Steve, the ninja, the knight, the
 vanguard, Ch01 and Ch42. Each side shuffles them once per page load and deals
 one to each player of its XI, so no two players in a team look alike (the
 same character can turn out for both sides). Both umpires are The Boss, and
-Medea and Akai, with pom-poms, are the cheerleaders on the stages. The models
+Medea and Akai, with pom-poms, are the cheerleaders on the stages, dancing
+Mixamo's Salsa Dancing. The models
 are `cricket/players/*.glb` (about 16 MB in all; `gltf.js` is three.js r149's
 GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat

@@ -2181,7 +2181,7 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
    while a model shows. Without the models, everyone stays as drawn. */
 const Bodies = await (async () => {
-  const none = { list: [], women: [], clips: null, dress() { return false; }, fit() { return null; }, sync() {} };
+  const none = { list: [], women: [], clips: null, dress() { return null; }, fit() { return null; }, sync() {} };
   await Loader.step(0.355, 'Dressing the players');
   const asset = await PlayerAsset;
   if (!asset) return none;
@@ -2540,7 +2540,7 @@ function buildBodies(models, clips) {
     // the keeper's measurements, in metres: one leg length, and his hip height standing
     fit(rig) { const e = list.find((x) => x.rig === rig), K = e && e.active && CHAR[e.active]; return K ? { L: K.legLen * K.S, hip: K.hipHeight * K.S } : null; },
     women: ['medea', 'akai'].filter((k) => CHAR[k]), // they dance on the stages too
-    dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (e) people.push([e, () => key]); return !!e; },
+    dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (!e) return null; people.push([e, () => key]); return e.models[key]; }, // the model, for things held
     sync(cam, live = true) {
       for (const [e, pick] of people) {
         show(e, pick());
@@ -2554,8 +2554,9 @@ function buildBodies(models, clips) {
 }
 
 /* Cheerleader stages beside the sightscreens at both ends, branded with the home side's name. The dancers come out
-   when a batter reaches 25, 50, 100, 150 or 200, and are hidden until then. They are the downloaded women, Medea and
-   Akai, with pom-poms, each on a bare rig (joints only) that the dance moves; without the models they are simple shapes. */
+   when a batter reaches 50, 100, 150 or 200 (or the team's total passes 25s), and are hidden until then. They are the
+   downloaded women, Medea and Akai, with pom-poms, dancing Mixamo's Salsa Dancing (see Moves), each on a bare rig
+   (joints only); without the clips the rig dances a simple routine, and without the models they are simple shapes. */
 const STAGES = [];
 {
   const deck = std(0x1b2131, 0.8), trimM = std(0xffc53d, 0.5);
@@ -2596,9 +2597,15 @@ const STAGES = [];
       if (Bodies.women.length) {
         const rig = bareRig(), d = rig.root;
         d.position.set(-2.6 + i * 2.6, 1.04, 0.2); d.visible = false; g.add(d);
-        if (Bodies.dress(rig, Bodies.women[(STAGES.length * 3 + i) % Bodies.women.length])) {
-          for (const A of rig.arms) { const pom = new THREE.Mesh(pomGeo, pomM); pom.position.y = -0.04; A.wrist.add(pom); }
-          dancers.push({ g: d, rig, phase });
+        const model = Bodies.dress(rig, Bodies.women[(STAGES.length * 3 + i) % Bodies.women.length]);
+        if (model) {
+          // pom-poms in her hands (the model's, which the salsa moves), undoing the model's scale
+          model.model.updateMatrixWorld(true);
+          for (const side of ['Left', 'Right']) {
+            const hand = model.B[`${side}Hand`], k = 1 / hand.getWorldScale(new V3()).x, pom = new THREE.Mesh(pomGeo, pomM);
+            pom.scale.setScalar(k); pom.position.y = 0.09 * k; hand.add(pom);
+          }
+          dancers.push({ g: d, rig, phase, actor: { rig, pos: new V3(), heading: 0, anim: null } });
           continue;
         }
         g.remove(d);
@@ -2646,13 +2653,31 @@ function drawStages() {
 drawStages();
 /* the dance: a bounce on the beat, hips swaying, pom-poms up and down in turn, a spin now and then */
 const Dance = { t: -1, dur: 0 };
-function startDance(dur) { if (game.venue === 'gully') return; Dance.t = 0; Dance.dur = dur; for (const S of STAGES) for (const d of S.dancers) d.g.visible = true; } // no stages at the gully ground
+function startDance(dur) {
+  if (game.venue === 'gully') return; // no stages at the gully ground
+  Dance.t = 0; Dance.dur = dur;
+  for (const S of STAGES) for (const d of S.dancers) {
+    d.g.visible = true;
+    // the downloaded women dance Mixamo's Salsa Dancing, facing the field, each from a different point in it
+    if (d.actor && Bodies.clips) {
+      d.g.updateMatrixWorld(true); d.g.getWorldPosition(d.actor.pos);
+      const f = new V3(0, 0, 1).applyQuaternion(d.g.getWorldQuaternion(new THREE.Quaternion()));
+      d.actor.heading = Math.atan2(f.x, f.z);
+      Moves.begin(d.actor, 'salsa', { yaw: d.actor.heading, phase: (d.phase * 0.37) % 1 });
+    }
+  }
+}
 function updateDance(dt) {
   if (Dance.t < 0) return;
   Dance.t += dt;
-  if (Dance.t > Dance.dur) { Dance.t = -1; for (const S of STAGES) for (const d of S.dancers) d.g.visible = false; return; }
+  if (Dance.t > Dance.dur) {
+    Dance.t = -1;
+    for (const S of STAGES) for (const d of S.dancers) { d.g.visible = false; if (d.actor) d.actor.anim = d.rig.anim = null; }
+    return;
+  }
   const t = Dance.t, beat = t * 2 * Math.PI * 2.1; // about 126 beats a minute
   for (const S of STAGES) for (const d of S.dancers) {
+    if (d.actor && d.actor.anim) { Moves.step(d.actor, dt); continue; } // the salsa
     if (d.rig) { danceRig(d, beat + d.phase, t); continue; }
     const p = beat + d.phase, b = Math.abs(Math.sin(p / 2));
     d.g.position.y = 1.04 + b * 0.12;
@@ -5386,6 +5411,7 @@ const Moves = (() => {
     dive: { from: 0.45, at: 1.19, end: 3.3 }, shuffle: { from: 0, at: 0.53, end: 0.53 },
     throw: { from: 1.0, at: 1.5, end: 2.3, spot: 0.25, hand: 'Right' },
     run: { loop: true, spot: 0 }, idle: { loop: true, spot: 0 }, cheer: { loop: true, spot: 0 }, dance: { loop: true, spot: 0 },
+    salsa: { loop: true, spot: 0.35 }, // the cheerleaders, on their stages
     // the batter: Golf Chip's body turn through a lofted drive (impact at `at`, kept on the bat's contact), and Golf
     // Putt Failure's straighten-up and gesture after a swing and a miss
     chip: { from: 0.75, at: 1.0, end: 1.75, spot: 0, mask: 'torso', fadeIn: 0.08 },
@@ -5398,10 +5424,11 @@ const Moves = (() => {
   // a point of the clip (in leg lengths) in the world
   function place(A, track, tau, out) {
     Bodies.clipPoint(A.key, track, tau, p);
-    const y = track === 'hips' ? (p.y - Bodies.clips.clips[A.key].rest) * A.L + A.hip : p.y * A.L;
+    let y = track === 'hips' ? (p.y - Bodies.clips.clips[A.key].rest) * A.L + A.hip : p.y * A.L;
     if (A.spot !== null) {
       const u = A.loop ? (tau - A.c0) / (A.c1 - A.c0) : 0; // less the travel round a loop
       out.set(A.mirror * (p.x - A.p0.x - A.trav.x * u) * A.spot * A.L, 0, (p.z - A.p0.z - A.trav.z * u) * A.spot * A.L).applyAxisAngle(Y, A.yaw).add(A.actor.pos);
+      y += A.actor.pos.y; // standing on something (a stage deck)
     } else {
       out.set(A.mirror * p.x * A.sigma * A.L, 0, p.z * A.sigma * A.L).applyAxisAngle(Y, A.yaw).add(A.anchor);
       if (A.warpTo > A.warpFrom) out.addScaledVector(A.warp, smooth(clamp((tau - A.warpFrom) / (A.warpTo - A.warpFrom), 0, 1)));
