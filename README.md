@@ -184,20 +184,22 @@ browser via `localStorage`; there is no server or database.
 `https://thudinest.com/cricket/` once Pages redeploys. It's linked from a
 game card in the Play hub's `.game-cards` list in the root `index.html`.
 
-**Realistic players** — every player, on every side, is one of twelve Mixamo
-characters used exactly as downloaded (no kit, pads, helmet or gloves):
-Medea, Akai, Pete, Josh, Abe, Adam, Steve, the ninja, the knight, the
-vanguard, Ch01 and Ch42. Each side shuffles them once per page load and deals
-one to each player of its XI, so no two players in a team look alike (the
-same character can turn out for both sides). Both umpires are The Boss, and
-Medea and Akai, with pom-poms, are the cheerleaders on the stages, dancing
-Mixamo's Salsa Dancing. The models
-are `cricket/players/*.glb` (about 16 MB in all; `gltf.js` is three.js r149's
+**Realistic players** — every player, on every side, is one of eleven
+realistic Mixamo characters (no fantasy or cartoon ones), used exactly as
+downloaded (no kit, pads, helmet or gloves): Ch01, Pete, Josh, Adam, Steve,
+Ch42, James, Remy, the footballer, the SWAT officer and the racing driver.
+Each side shuffles them once per page load and deals one to each player of
+its XI, so no two players in a team look alike (the same character can turn
+out for both sides). Both umpires are The Boss. The cheerleader stages are
+ready for realistic women dancing Mixamo's Salsa Dancing (`women` in
+`buildBodies`); until some are downloaded the stages stand empty and a
+milestone's camera stays on the batter. The models
+are `cricket/players/*.glb` (about 20 MB in all; `gltf.js` is three.js r149's
 GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat
 or ball and the feet on the ground, and on the bat the thumbs wrap the
-handle. The keeper is always someone bareheaded (Medea, Ch01, Josh, Abe, Adam
-or Ch42), so no hat or hood hides where the ball pitches. The models play
+handle. The keeper is always someone bareheaded (Ch01, Josh, Adam, Ch42, Remy
+or the footballer), so no hat or hood hides where the ball pitches. The models play
 Mixamo clips where one fits (`cricket/players/moves.json`, built from the
 downloads by `~/thudinest-assets/tools/build-clips.mjs`): the keeper's takes
 (Goalkeeper Catch, Football Catch for a bouncer, Goalkeeper Diving Save, a

@@ -948,7 +948,7 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
   const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // the players' characters (Medea and Akai also dance on the stages), then the umpires'
-  const NAMES = ['medea', 'ch01', 'vanguard', 'pete', 'knight', 'josh', 'akai', 'abe', 'ninja', 'adam', 'steve', 'ch42', 'boss'];
+  const NAMES = ['ch01', 'pete', 'josh', 'adam', 'steve', 'ch42', 'james', 'remy', 'footballer', 'swat', 'racer', 'boss'];
   // and the Mixamo clips the models play (see Moves), converted to bone rotations
   const clips = fetch('players/moves.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
   return Promise.all([Promise.all(NAMES.map((n) => optional(`${n}.glb`))), clips])
@@ -2174,9 +2174,10 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
 
 /* ------------------------------------------------------------ realistic players
    Every player wears one of the downloaded Mixamo characters, exactly as downloaded (no kit, pads, helmet or gloves):
-   Medea, Akai, Pete, Josh, Abe, Adam, Steve, the ninja, the knight, the vanguard, Ch01 or Ch42 (players/*.glb).
+   Ch01, Pete, Josh, Adam, Steve, Ch42, James, Remy, the footballer, the SWAT officer or the racing driver (players/*.glb),
+   all of them realistic (no fantasy or cartoon characters).
    Each side deals them out at random, one per player, so no two in a team are alike; both umpires are The Boss
-   (players/boss.glb), and Medea and Akai also dance on the cheerleader stages. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
+   (players/boss.glb). The cheerleader stages take realistic women when there are some (`women` below); for now there are none. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
    replays): every frame each visible model's skeleton copies its rig's joint angles, then two-bone IK puts its fist on
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
    while a model shows. Without the models, everyone stays as drawn. */
@@ -2341,7 +2342,7 @@ function buildBodies(models, clips) {
   const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss');
   // the keeper (sixth in each XI) is someone with nothing on his head: a hat, hood, helmet or horns behind the stumps
   // hides where the ball pitches
-  const BARE = ['medea', 'ch01', 'josh', 'abe', 'adam', 'ch42'], KEEPS = 5;
+  const BARE = ['ch01', 'josh', 'adam', 'ch42', 'remy', 'footballer'], KEEPS = 5;
   const shuffled = () => {
     const a = PLAYERS.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     const bare = a.map((k, i) => (BARE.includes(k) ? i : -1)).filter((i) => i >= 0);
@@ -2539,7 +2540,7 @@ function buildBodies(models, clips) {
     clips, clipPoint,
     // the keeper's measurements, in metres: one leg length, and his hip height standing
     fit(rig) { const e = list.find((x) => x.rig === rig), K = e && e.active && CHAR[e.active]; return K ? { L: K.legLen * K.S, hip: K.hipHeight * K.S } : null; },
-    women: ['medea', 'akai'].filter((k) => CHAR[k]), // they dance on the stages too
+    women: [].filter((k) => CHAR[k]), // realistic women for the cheerleader stages, once downloaded (none yet)
     dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (!e) return null; people.push([e, () => key]); return e.models[key]; }, // the model, for things held
     sync(cam, live = true) {
       for (const [e, pick] of people) {
@@ -2554,9 +2555,9 @@ function buildBodies(models, clips) {
 }
 
 /* Cheerleader stages beside the sightscreens at both ends, branded with the home side's name. The dancers come out
-   when a batter reaches 50, 100, 150 or 200 (or the team's total passes 25s), and are hidden until then. They are the
-   downloaded women, Medea and Akai, with pom-poms, dancing Mixamo's Salsa Dancing (see Moves), each on a bare rig
-   (joints only); without the clips the rig dances a simple routine, and without the models they are simple shapes. */
+   when a batter reaches 50, 100, 150 or 200 (or the team's total passes 25s), and are hidden until then. They are
+   realistic downloaded women (Bodies.women; none yet, so the stages stand empty), with pom-poms, dancing Mixamo's Salsa
+   Dancing (see Moves), each on a bare rig (joints only). With ?classic (no models) they are simple drawn shapes. */
 const STAGES = [];
 {
   const deck = std(0x1b2131, 0.8), trimM = std(0xffc53d, 0.5);
@@ -2610,6 +2611,7 @@ const STAGES = [];
         }
         g.remove(d);
       }
+      if (Bodies.list.length) continue; // with the player models, no drawn stand-ins: the stage waits for real dancers
       const d = new THREE.Group(); d.position.set(-2.6 + i * 2.6, 1.04, 0.2); d.visible = false; g.add(d);
       const skin = std(skinTones[(i + STAGES.length) % skinTones.length], 0.55), costume = std(0xffc53d, 0.45), top = std(0x2350b8, 0.5);
       const hips = new THREE.Group(); hips.position.y = 0.92; d.add(hips);
@@ -2653,6 +2655,7 @@ function drawStages() {
 drawStages();
 /* the dance: a bounce on the beat, hips swaying, pom-poms up and down in turn, a spin now and then */
 const Dance = { t: -1, dur: 0 };
+const hasDancers = () => STAGES.some((S) => S.dancers.length); // none until there are realistic women to dance
 function startDance(dur) {
   if (game.venue === 'gully') return; // no stages at the gully ground
   Dance.t = 0; Dance.dur = dur;
@@ -5073,7 +5076,7 @@ function startTeamDance() {
   game.danceAt = 0;
   startDance(len); Sound.cheerBeat(len - 0.4); Sound.applause(0.9, len);
   showToast(`${batTeamName()} reach ${m}`, 3);
-  if (game.venue !== 'gully') { cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; cam.solo = false; } // straight to the stage
+  if (game.venue !== 'gully' && hasDancers()) { cam.mode = 'celeb'; cam.modeT = 2.4; cam.celeb = game.rigS; cam.danceLen = len + 2.4; cam.solo = false; } // straight to the stage
 }
 function celebrate(bat, m) {
   const b = [rigA, rigB].find((r) => game.bats[r.batIdx] === bat);
@@ -5091,7 +5094,7 @@ function startCeleb(b) {
   const len = danceLen(b.celebM);
   Sound.applause(1, len); Sound.cheerBeat(len - 0.4); if (big) Sound.six();
   // from 50 the cheerleaders dance with him; a 25 is his dance alone
-  const solo = b.celebM < 50 || game.venue === 'gully';
+  const solo = b.celebM < 50 || game.venue === 'gully' || !hasDancers();
   if (!solo) startDance(len);
   cam.danceLen = len; game.danceAt = 0; // the batter's moment includes the team's dance
   cam.mode = 'celeb'; cam.modeT = 0; cam.celeb = b; cam.solo = solo;
