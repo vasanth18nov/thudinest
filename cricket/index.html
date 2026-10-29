@@ -948,7 +948,7 @@ const PlayerAsset = /[?&]classic\b/.test(location.search) ? Promise.resolve(null
   const model = (file) => ready.then(() => new THREE.GLTFLoader().loadAsync(`players/${file}`));
   const optional = (file) => Promise.race([model(file), late]).catch((e) => { console.warn(`Player model ${file} did not load`, e); return null; });
   // the players' characters (Medea and Akai also dance on the stages), then the umpires'
-  const NAMES = ['ch01', 'pete', 'josh', 'adam', 'steve', 'ch42', 'james', 'remy', 'footballer', 'swat', 'racer', 'boss'];
+  const NAMES = ['ch01', 'pete', 'josh', 'adam', 'steve', 'ch42', 'james', 'remy', 'footballer', 'swat', 'racer', 'claire', 'boss'];
   // and the Mixamo clips the models play (see Moves), converted to bone rotations
   const clips = fetch('players/moves.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
   return Promise.all([Promise.all(NAMES.map((n) => optional(`${n}.glb`))), clips])
@@ -2177,7 +2177,7 @@ legUmp.root.position.set(-21, 0, -1.6); legUmp.root.rotation.y = HALF_PI; scene.
    Ch01, Pete, Josh, Adam, Steve, Ch42, James, Remy, the footballer, the SWAT officer or the racing driver (players/*.glb),
    all of them realistic (no fantasy or cartoon characters).
    Each side deals them out at random, one per player, so no two in a team are alike; both umpires are The Boss
-   (players/boss.glb). The cheerleader stages take realistic women when there are some (`women` below); for now there are none. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
+   (players/boss.glb). Claire (players/claire.glb) is the cheerleader on all four stages, dancing the salsa. The rigs still do all the work (stance, swings, run-ups, fielding, IK,
    replays): every frame each visible model's skeleton copies its rig's joint angles, then two-bone IK puts its fist on
    the rig's grip point (the bat handle, the ball) and its ankles on the rig's footholds. The rig's own body is hidden
    while a model shows. Without the models, everyone stays as drawn. */
@@ -2339,7 +2339,8 @@ function buildBodies(models, clips) {
 
   /* who wears what: each side shuffles the characters once per visit and hands them out down its XI, so no two
      players in a team look alike (the same character may turn out for both sides) */
-  const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss');
+  const DANCERS = ['claire']; // on the cheerleader stages only
+  const PLAYERS = Object.keys(CHAR).filter((k) => k !== 'boss' && !DANCERS.includes(k));
   // the keeper (sixth in each XI) is someone with nothing on his head: a hat, hood, helmet or horns behind the stumps
   // hides where the ball pitches
   const BARE = ['ch01', 'josh', 'adam', 'ch42', 'remy', 'footballer'], KEEPS = 5;
@@ -2540,7 +2541,7 @@ function buildBodies(models, clips) {
     clips, clipPoint,
     // the keeper's measurements, in metres: one leg length, and his hip height standing
     fit(rig) { const e = list.find((x) => x.rig === rig), K = e && e.active && CHAR[e.active]; return K ? { L: K.legLen * K.S, hip: K.hipHeight * K.S } : null; },
-    women: [].filter((k) => CHAR[k]), // realistic women for the cheerleader stages, once downloaded (none yet)
+    women: DANCERS.filter((k) => CHAR[k]), // Claire, on the cheerleader stages
     dress(rig, key) { const e = equip(rig, { chars: [key], grip: 'relaxed' }); if (!e) return null; people.push([e, () => key]); return e.models[key]; }, // the model, for things held
     sync(cam, live = true) {
       for (const [e, pick] of people) {
@@ -2556,8 +2557,8 @@ function buildBodies(models, clips) {
 
 /* Cheerleader stages beside the sightscreens at both ends, branded with the home side's name. The dancers come out
    when a batter reaches 50, 100, 150 or 200 (or the team's total passes 25s), and are hidden until then. They are
-   realistic downloaded women (Bodies.women; none yet, so the stages stand empty), with pom-poms, dancing Mixamo's Salsa
-   Dancing (see Moves), each on a bare rig (joints only). With ?classic (no models) they are simple drawn shapes. */
+   Claire (Bodies.women), with pom-poms, dancing Mixamo's Salsa Dancing (see Moves), each on a bare rig (joints only).
+   Without her the stages stand empty; with ?classic (no models) they are simple drawn shapes. */
 const STAGES = [];
 {
   const deck = std(0x1b2131, 0.8), trimM = std(0xffc53d, 0.5);

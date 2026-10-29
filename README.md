@@ -190,10 +190,9 @@ downloaded (no kit, pads, helmet or gloves): Ch01, Pete, Josh, Adam, Steve,
 Ch42, James, Remy, the footballer, the SWAT officer and the racing driver.
 Each side shuffles them once per page load and deals one to each player of
 its XI, so no two players in a team look alike (the same character can turn
-out for both sides). Both umpires are The Boss. The cheerleader stages are
-ready for realistic women dancing Mixamo's Salsa Dancing (`women` in
-`buildBodies`); until some are downloaded the stages stand empty and a
-milestone's camera stays on the batter. The models
+out for both sides). Both umpires are The Boss. Claire, with pom-poms, is the
+cheerleader on all four stages, dancing Mixamo's Salsa Dancing (she never
+plays; `DANCERS` in `buildBodies`). The models
 are `cricket/players/*.glb` (about 20 MB in all; `gltf.js` is three.js r149's
 GLTFLoader as a plain script). The drawn rigs still do all the posing; each
 frame a model copies its rig's joints, with IK putting the hands on the bat
