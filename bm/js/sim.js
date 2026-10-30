@@ -16,6 +16,7 @@ export const COURT = {
 export const G = 9.81, VT = 6.8, KD = G / (VT * VT), DT = 1 / 240, FLOOR = 0.0125;
 const D2R = Math.PI / 180;
 export const H_PREF = 2.62; // overhead contact: take the shuttle as it falls through this height
+export const H_JUMP = 2.95; // a jump smash takes it this high, at the top of the jump
 export const sideSign = (side) => (side === 0 ? 1 : -1); // which half (sign of z) a side plays
 export const netHeight = (x) => COURT.netH + (COURT.netHPost - COURT.netH) * Math.min(1, (x / COURT.postX) ** 2);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -29,7 +30,7 @@ export const SHOTS = {
   lift: { mode: 'angle', th: 52, fr: 0.028, depth: 6.05, dd: 0.4, err: 1.0, n: [1, 0.9, 1.2], label: 'Lift' },
   drop: { mode: 'clear', margin: 0.24, fr: 0.035, depth: 2.45, dd: 0.55, err: 1.1, n: [0.55, 0.7, 1], label: 'Drop' },
   smash: { mode: 'speed', v: 1, fr: 0.045, depth: 4.6, dd: 1.3, err: 1.05, n: [0.5, 1.2, 1.3], label: 'Smash' },
-  jump: { mode: 'speed', v: 1.1, fr: 0.055, depth: 4.2, dd: 1.3, err: 1.1, n: [0.5, 1.3, 1.35], label: 'Jump smash' },
+  jump: { mode: 'speed', v: 1.1, fr: 0.08, depth: 4.2, dd: 1.3, err: 1.3, n: [0.5, 1.45, 1.45], label: 'Jump smash' },
   kill: { mode: 'speed', v: 0.62, fr: 0.04, depth: 3.2, dd: 1.0, err: 1.0, n: [0.5, 1.2, 1.2], label: 'Net kill' },
   drive: { mode: 'speed', v: 40, fr: 0.04, depth: 5.2, dd: 0.9, err: 1.0, n: [0.8, 1, 1.15], label: 'Drive' },
   push: { mode: 'speed', v: 18, fr: 0.03, depth: 3.7, dd: 0.7, err: 1.0, n: [0.7, 0.9, 1], label: 'Push' },
@@ -151,10 +152,12 @@ export class Player {
     this.leave = false; this.moveAt = 0; this.noise = { x: 0, z: 0, t0: 0, t1: 1 };
     this.stats = { points: 0, winners: 0, errors: 0, smashes: 0, smashWinners: 0, maxSmash: 0, serves: 0, faults: 0, nets: 0, outs: 0, perfect: 0, shots: 0 };
   }
-  /* the shuttle at P relative to the body: dr to the right, df forward (toward the net), rho across the floor */
-  zone(P, x = this.x, z = this.z) {
-    const dx = P.x - x, dz = P.z - z, dr = dx * this.sg, df = -dz * this.sg, rho = Math.hypot(dr, df), R = reachOf(P.y);
-    return { dr, df, rho, R, in: rho <= R && df >= -0.45 && P.y >= 0.04 && P.y <= 2.85 && P.z * this.sg > -0.02 };
+  /* the shuttle at P relative to the body: dr to the right, df forward (toward the net), rho across the floor.
+     Off the floor in a jump, the racket reaches up to 3.2 m. */
+  zone(P, x = this.x, z = this.z, jump = false) {
+    const dx = P.x - x, dz = P.z - z, dr = dx * this.sg, df = -dz * this.sg, rho = Math.hypot(dr, df);
+    const R = jump && P.y >= 2.55 ? (P.y < 3.2 ? 0.75 : 0) : reachOf(P.y);
+    return { dr, df, rho, R, in: rho <= R && df >= -0.45 && P.y >= 0.04 && P.y <= (jump ? 3.2 : 2.85) && P.z * this.sg > -0.02 };
   }
   /* where the body should be to take the shuttle at P: overhead just right of the head, otherwise forehand or
      backhand side, lunging for low ones near the net */
@@ -345,10 +348,10 @@ export class Match {
   tryHit() {
     const sh = this.sh, pl = this.pl[1 - sh.by];
     if (!pl.press || sh.by < 0) return;
-    const z = pl.zone(sh.p); if (!z.in) return;
-    const comfy = z.rho <= 0.82 * z.R && sh.p.y <= H_PREF, low = sh.p.y < 0.28;
+    const jump = pl.press.jump, z = pl.zone(sh.p, pl.x, pl.z, jump); if (!z.in) return;
+    const comfy = z.rho <= 0.82 * z.R && sh.p.y <= (jump ? H_JUMP : H_PREF), low = sh.p.y < 0.28;
     const n = { x: sh.p.x + sh.v.x * DT, y: sh.p.y + sh.v.y * DT, z: sh.p.z + sh.v.z * DT };
-    if (comfy || low || !pl.zone(n).in) this.hit(pl, z);
+    if (comfy || low || !pl.zone(n, pl.x, pl.z, jump).in) this.hit(pl, z);
   }
   hit(pl, z) {
     const sh = this.sh, P = { x: sh.p.x, y: sh.p.y, z: sh.p.z }, opp = this.pl[1 - pl.side];
@@ -360,14 +363,14 @@ export class Match {
     const prev = this.pl[1 - pl.side].swing;
     if (prev && prev.kind === 'net' && P.y < 1.2) q *= 0.84; // a tight net shot, still tumbling
     if (sh.shots > 12) q *= Math.max(0.35, 1 - 0.025 * (sh.shots - 12)); // legs going in a long rally
-    const btn = pl.press.btn; pl.press = null;
+    const btn = pl.press.btn, jumped = pl.press.jump && P.y >= 2.5; pl.press = null;
     let kind, target;
-    if (pl.ai) ({ kind, target } = this.aiShot(pl, opp, P, q));
-    else ({ kind, target } = this.humanShot(pl, btn, P, q));
+    if (pl.ai) ({ kind, target } = this.aiShot(pl, opp, P, q, jumped));
+    else ({ kind, target } = this.humanShot(pl, btn, P, q, jumped));
     const v = this.solve(kind, P, target, q, pl.skill, pl);
     sh.v = v; sh.by = pl.side; sh.shots++; sh.t = 0; sh.cord = false; this.rally = sh.shots;
     const sp = Math.hypot(v.x, v.y, v.z);
-    const style = OVERHEAD.has(kind) && P.y >= 1.85 ? (kind === 'jump' ? 'jump' : 'over') : z.dr >= -0.05 ? 'fore' : 'back';
+    const style = jumped ? 'jump' : OVERHEAD.has(kind) && P.y >= 1.85 ? 'over' : z.dr >= -0.05 ? 'fore' : 'back';
     pl.swing = { kind, style, t: this.T, P, dir: { x: v.x / sp, y: v.y / sp, z: v.z / sp }, q, label, speed: sp, dr: z.dr, df: z.df };
     const st = pl.stats; st.shots++; if (q >= 1) st.perfect++;
     if (kind === 'smash' || kind === 'jump') { st.smashes++; st.maxSmash = Math.max(st.maxSmash, sp * 3.6); }
@@ -381,7 +384,7 @@ export class Match {
     // back toward the middle, leaning to the side the shuttle went
     const L = this.path.land;
     pl.tx = clamp((L ? L.x : 0) * 0.22, -0.8, 0.8); pl.tz = BASE_DEPTH * pl.sg; pl.walk = false;
-    pl.moveAt = this.T + (pl.ai ? 0.08 : 0);
+    pl.moveAt = this.T + (pl.ai ? 0.08 : 0) + (pl.swing.style === 'jump' ? 0.32 : 0); // a jump: back down first
     this.planFor(opp, false);
   }
 
@@ -402,29 +405,38 @@ export class Match {
     return out;
   }
   /* The receiver's plan: the first point of the flight it can get to with a moment to spare, preferring an overhead
-     as the shuttle falls past H_PREF; failing that, the one it gets closest to. */
-  planFor(pl, again) {
+     as the shuttle falls past H_PREF; failing that, the one it gets closest to. A jump smash (asked for, or the
+     computer's choice) takes the same flight higher, at H_JUMP, if there is time to take off. */
+  planFor(pl, again, jump = false) {
     const path = this.path; pl.plan = null;
     if (!path || path.end === 'net') return;
-    const react = pl.ai ? pl.ai.react * (again ? 0.5 : 1) : again ? 0.02 : HUMAN.react;
-    const ex = pl.x + pl.vx * 0.12, ez = pl.z + pl.vz * 0.12;
+    const react = pl.ai ? this.aiReact(pl) * (again ? 0.5 : 1) : again ? 0.02 : HUMAN.react;
+    let { i, ok } = this.pickOn(pl, react, H_PREF, 2.85), jumped = false;
+    if (i < 0) return;
+    const d = Math.abs(path.z[i]);
+    if (path.y[i] >= 2.0 && d <= 6.2 && (jump || (pl.ai && ok && this.rand() < pl.ai.jump * (d < 5 ? 1 : 0.5)))) {
+      const j = this.pickOn(pl, react, H_JUMP, 3.15);
+      if (j.ok && path.y[j.i] >= 2.6 && path.t[j.i] - this.T >= 0.12) { i = j.i; jumped = true; }
+    }
+    const P = { x: path.x[i], y: path.y[i], z: path.z[i] }, B = pl.bodyFor(P);
+    pl.plan = { t: path.t[i], P, B, ok, made: this.T, jump: jumped };
+    if (pl.ai) this.aiPlan(pl, again);
+  }
+  pickOn(pl, react, hPref, top) {
+    const path = this.path, ex = pl.x + pl.vx * 0.12, ez = pl.z + pl.vz * 0.12;
     let pick = -1, firstOk = -1, best = -1, bestShort = Infinity;
     for (let i = 0; i < path.t.length; i++) {
       const P = { x: path.x[i], y: path.y[i], z: path.z[i] };
-      if (P.z * pl.sg < 0.08 || P.y > 2.85 || P.y < 0.06) continue;
+      if (P.z * pl.sg < 0.08 || P.y > top || P.y < 0.06) continue;
       const B = pl.bodyFor(P), d = Math.hypot(B.x - ex, B.z - ez), avail = path.t[i] - this.T;
       const need = react + reachTime(d, pl.vmax, pl.accel), slack = avail - need;
       if (slack >= 0.1) {
         if (firstOk < 0) firstOk = i;
-        if (P.y <= H_PREF) { pick = i; break; }
+        if (P.y <= hPref) { pick = i; break; }
       }
       if (-slack < bestShort) { bestShort = -slack; best = i; }
     }
-    const i = pick >= 0 ? pick : firstOk >= 0 ? firstOk : best;
-    if (i < 0) return;
-    const P = { x: path.x[i], y: path.y[i], z: path.z[i] }, B = pl.bodyFor(P);
-    pl.plan = { t: path.t[i], P, B, ok: pick >= 0 || firstOk >= 0, made: this.T };
-    if (pl.ai) this.aiPlan(pl, again);
+    return { i: pick >= 0 ? pick : firstOk >= 0 ? firstOk : best, ok: pick >= 0 || firstOk >= 0 };
   }
 
   /* ---- legs */
@@ -438,9 +450,9 @@ export class Match {
           if (a) { const k = clamp((pl.plan.t - this.T) / Math.max(0.2, pl.noise.t1 - pl.noise.t0), 0, 1); x += pl.noise.x * k; z += pl.noise.z * k; }
           pl.tx = x; pl.tz = z;
         }
-        if (a && !pl.press && this.T >= pl.pressAt) pl.press = { btn: 'ai', t: pl.pressAt };
+        if (a && !pl.press && this.T >= pl.pressAt) pl.press = { btn: 'ai', t: pl.pressAt, jump: pl.plan.jump };
       }
-      if (!pl.ai && !pl.auto && sh.mode === 'flight' && (this.T - (pl.plan ? pl.plan.made : 0) > 0.06)) this.planFor(pl, true);
+      if (!pl.ai && !pl.auto && sh.mode === 'flight' && (this.T - (pl.plan ? pl.plan.made : 0) > 0.06)) this.planFor(pl, true, !!(pl.press && pl.press.jump));
     }
   }
   move(pl) {
@@ -469,14 +481,21 @@ export class Match {
   /* ---- the human's shots: A lob (clear, lift), B soft (drop, block, net), C attack (smash, drive, push) */
   press(side, btn) {
     const pl = this.pl[side]; if (!pl || pl.ai || this.over) return;
-    pl.press = { btn, t: this.T };
+    if (pl.press && pl.press.jump) return; // committed to the jump: another press changes nothing
+    pl.press = { btn, t: this.T, jump: false };
+    // smash on a high one with time to take off: a jump smash, taken higher at the top of the jump
+    if (btn === 'C' && this.phase === 'rally' && this.sh.by === 1 - side && pl.plan && pl.plan.P.y >= 2.0) {
+      const keep = pl.plan;
+      this.planFor(pl, true, true);
+      if (pl.plan && pl.plan.jump) pl.press.jump = true; else pl.plan = keep;
+    }
   }
-  humanShot(pl, btn, P, q) {
+  humanShot(pl, btn, P, q, jumped) {
     const h = P.y, d = Math.abs(P.z);
     let kind;
     if (btn === 'A') kind = h >= 1.9 ? 'clear' : 'lift';
     else if (btn === 'B') kind = h >= 1.9 ? 'drop' : h >= 1.0 || d >= 2.6 ? 'block' : 'net';
-    else kind = h >= 2.15 ? (q >= 1 && h >= 2.3 && d <= 5.4 ? 'jump' : 'smash') : h >= 1.7 && d < 2.6 ? 'kill' : h >= 0.95 ? 'drive' : 'push';
+    else kind = h >= 2.15 ? (jumped ? 'jump' : 'smash') : h >= 1.7 && d < 2.6 ? 'kill' : h >= 0.95 ? 'drive' : 'push';
     const ax = clamp(pl.input.ax, -1, 1), ad = clamp(pl.input.ad, -1, 1), aimed = Math.abs(ax) > 0.25;
     let x;
     // full aim is about 0.6 m inside the sideline, and deep shots stay short of the back line: a well-timed shot is in
@@ -498,9 +517,14 @@ export class Match {
   }
 
   /* ---- the computer */
+  // how long it takes to read the shot and move: quicker against a smash, which it is braced for
+  aiReact(pl) {
+    const sw = this.pl[1 - pl.side].swing, smash = sw && (sw.kind === 'smash' || sw.kind === 'jump');
+    return pl.ai.react * (smash ? 0.65 : 1);
+  }
   aiPlan(pl, again) {
     const a = pl.ai, path = this.path, plan = pl.plan;
-    pl.moveAt = this.T + (again ? a.react * 0.5 : a.react);
+    pl.moveAt = this.T + this.aiReact(pl) * (again ? 0.5 : 1);
     // the press it would have made: around its timing, early or late by its spread
     pl.pressAt = plan.t - Math.max(0.0, a.lead + this.randn() * a.leadSd);
     // misreads the flight at first, less and less as it comes
@@ -522,10 +546,10 @@ export class Match {
       if (out && (L.z > 0 ? 0 : 1) === pl.side) { pl.leave = true; pl.pressAt = Infinity; pl.tx = pl.x; pl.tz = pl.z; }
     }
   }
-  aiShot(pl, opp, P, q) {
+  aiShot(pl, opp, P, q, jumped) {
     const a = pl.ai, h = P.y, d = Math.abs(P.z), od = Math.abs(opp.z), w = {};
     const late = q < 0.7;
-    if (h >= 1.95) {
+    if (jumped) { w.jump = 0.72; w.drop = 0.18 * (od > 4.6 ? 1.6 : 1); w.aclear = 0.1 * (od < 3.6 ? 2 : 0.6); } else if (h >= 1.95) {
       const can = h >= 2.15 && d < 5.9;
       w.smash = can ? (0.2 + 0.4 * a.aggr) * (d < 4.6 ? 1.4 : 0.75) : 0;
       w.drop = 0.33 * (od > 4.6 ? 1.6 : 1);
@@ -543,10 +567,8 @@ export class Match {
     let kind = this.pick(w);
     const target = this.aiTarget(pl, opp, kind, P);
     if (kind === 'kill' && !this.smashOk(pl, P, target, 'kill')) kind = 'net';
-    if (kind === 'smash') {
-      if (!this.smashOk(pl, P, target)) kind = h >= 2.3 ? 'drop' : 'clear';
-      else if (a.jump && q >= 0.95 && h >= 2.3 && d <= 5.4 && this.rand() < a.jump) kind = 'jump';
-    }
+    if (kind === 'smash' && !this.smashOk(pl, P, target)) kind = h >= 2.3 ? 'drop' : 'clear';
+    if (kind === 'jump' && !this.smashOk(pl, P, target, 'jump')) kind = 'drop';
     return { kind, target: kind === 'smash' || kind === 'jump' || kind === 'kill' ? target : this.aiTarget(pl, opp, kind, P) };
   }
   aiTarget(pl, opp, kind, P) {

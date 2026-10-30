@@ -107,6 +107,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outl
 .ump { display: flex; align-items: center; gap: 10px; background: var(--panel-soft); border: 1px solid var(--rule); border-left: 3px solid var(--lime); border-radius: 4px; padding: 7px 12px 7px 10px; font: 600 14px/1.25 var(--ui); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .ump .lbl { flex: none; }
 .touch-ui .lower { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 168px); }
+@media (max-width: 640px) { .touch-ui .timing { bottom: calc(env(safe-area-inset-bottom, 0px) + 222px); padding: 6px 14px 5px; border-radius: 999px; background: rgba(9, 14, 30, 0.62); } } /* above the shot buttons */
 @media (max-height: 520px) { .touch-ui .lower { top: calc(env(safe-area-inset-top, 0px) + 116px); } }
 .rally { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 136px); left: max(16px, env(safe-area-inset-left, 0px)); background: var(--panel-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 5px 9px; font: 700 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: opacity 250ms ease; }
 .rally b { color: var(--chalk); font-size: 15px; }
@@ -278,7 +279,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outl
     <div class="ump" id="ump" hidden><span class="lbl">Umpire</span><span id="umpText"></span></div>
   </div>
   <div class="serve-hint" id="serveHint" hidden></div>
-  <div class="hint" id="keyHint" hidden><span><kbd>WASD</kbd>move / aim</span><span><kbd>J</kbd>clear · lift</span><span><kbd>K</kbd>drop · net</span><span><kbd>L</kbd>smash · drive</span><span><kbd>C</kbd>camera</span><span><kbd>P</kbd>pause</span></div>
+  <div class="hint" id="keyHint" hidden><span><kbd>WASD</kbd>move / aim</span><span><kbd>J</kbd>clear · lift</span><span><kbd>K</kbd>drop · net</span><span><kbd>L</kbd>smash · jump smash</span><span><kbd>C</kbd>camera</span><span><kbd>P</kbd>pause</span></div>
   <div class="replay-bug" id="replayBug" hidden><i></i>Replay</div>
   <div class="skip-hint" id="skipHint" hidden>Tap or press Space to skip</div>
 </div>
@@ -287,7 +288,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outl
   <div class="stick-zone" id="stickZone"></div>
   <div class="stick idle" id="stick"><span class="stick-tag" id="stickTag">Aim</span><div class="knob" id="knob"></div></div>
   <div class="shots">
-    <button class="shot c" data-btn="C" aria-label="Attack shot"><span><span id="lblC">Smash</span><small>attack</small></span></button>
+    <button class="shot c" data-btn="C" aria-label="Attack shot"><span><span id="lblC">Smash</span><small id="subC">attack</small></span></button>
     <button class="shot a" data-btn="A" aria-label="Lob shot"><span><span id="lblA">Clear</span><small>deep</small></span></button>
     <button class="shot b" data-btn="B" aria-label="Soft shot"><span><span id="lblB">Drop</span><small>short</small></span></button>
   </div>
@@ -306,7 +307,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outl
     <div class="brand"><span class="kicker">Thudinest Open · 3D badminton</span><h1>Rally <em>Point</em></h1><p>Singles under the arena lights. Watch it like TV, or from the side.</p></div>
     <div class="field"><span class="lbl">Your player</span><div class="chips" id="pickChips"></div>
       <div class="vs">vs <b id="oppName">—</b><button class="link-btn" id="oppShuffle" type="button">Change</button></div></div>
-    <div class="field"><label class="lbl" for="nameIn">Your name on the scoreboard</label><input class="name-in" id="nameIn" maxlength="14" placeholder="Optional" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><label class="lbl" for="nameIn">Your name on the scoreboard</label><input class="name-in" id="nameIn" maxlength="14" placeholder="Kavin" autocomplete="off" spellcheck="false"></div>
     <div class="field"><span class="lbl">Opponent</span><div class="seg" id="segDiff">
       <button data-v="easy">Club<small>Relaxed</small></button><button data-v="medium">National<small>A real game</small></button><button data-v="hard">World Tour<small>Bring it</small></button></div></div>
     <div class="field"><span class="lbl">Match</span><div class="seg" id="segLen">
@@ -323,6 +324,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outl
       <ul>
         <li>Three shots. <b>Clear</b> sends it high and deep (a lift from low down). <b>Drop</b> plays it short (a net shot near the net). <b>Smash</b> hits down hard from overhead (a drive or push from lower).</li>
         <li>Press the shot just before the shuttle reaches you; the racket swings when it arrives. The ring under your feet (and the buttons, on a phone) light up lime while a press would be <b>Perfect</b>.</li>
+        <li><b>Jump smash:</b> press Smash early, as the ring turns lime, on a high shuttle, and you leap to hit it at the top of the jump. It's the fastest shot in the game, but it's riskier and you land a moment later. Press too late and you smash from the ground.</li>
         <li>With auto-run on, your player runs to the shuttle and the stick (or <kbd>WASD</kbd>) aims: left and right across the court, up for deeper, down for shorter. With it off, the stick moves you and aims as you hit.</li>
         <li>Keys: <kbd>J</kbd> clear, <kbd>K</kbd> drop, <kbd>L</kbd> smash, <kbd>C</kbd> switches the camera, <kbd>P</kbd> or <kbd>Esc</kbd> pauses. A game controller works too: <kbd>A</kbd> clear, <kbd>B</kbd> drop, <kbd>X</kbd> or <kbd>RT</kbd> smash, <kbd>Y</kbd> camera.</li>
         <li>Rally scoring: every rally wins a point. Serve from the right when your score is even, the left when it's odd.</li>
