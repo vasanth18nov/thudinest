@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=2'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=3'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
@@ -598,6 +598,9 @@ const STROKES = {
 STROKES.jump = STROKES.over;
 const READY = STROKES.over.keys[0];
 const RELAXED = { g: [0.3, 0.92, 0.18], d: [0.1, -0.15, 0.98], pole: [0.6, -0.8, -0.3], lh: [-0.25, 0.92, 0.05] };
+const HIPS = { g: [0.25, 0.98, -0.03], d: [0.1, -0.85, -0.5], pole: [1, 0.1, -0.6], lh: [-0.25, 0.98, -0.03] }; // hands on hips, racket hanging
+const ARMS_UP = { g: [0.32, 1.98, 0.12], d: [0.15, 0.95, 0.15], pole: [1, -0.4, 0], lh: [-0.3, 1.98, 0.12] }; // a match won
+const FIST_UP = [-0.2, 1.45, 0.24], FIST_DOWN = [-0.17, 1.08, 0.2]; // the free hand's fist pump
 
 /* One player on the court: the model, its racket, and the pose it is in. The pose is built fresh every frame from
    the clips (legs and body), then the strokes (arms, turn, lunge, jump) and the head following the shuttle. */
@@ -777,9 +780,17 @@ class Body {
   lookAt(target, w) {
     if (w <= 0) return;
     const B = this.B;
+    // never more than about 23° down or 34° up: a low shuttle is watched with the eyes, not by dropping the head
+    B.Neck.updateMatrixWorld(true);
+    const p0 = B.Neck.getWorldPosition(_v1), lk = this.lk || (this.lk = new V3());
+    let dx = target.x - p0.x, dz = target.z - p0.z;
+    const dy = target.y - p0.y, hl = Math.hypot(dx, dz), dist = Math.hypot(hl, dy) || 1;
+    if (hl < 0.05) { this.dirWorld(0, 0, 1, _v2); dx = _v2.x; dz = _v2.z; } else { dx /= hl; dz /= hl; }
+    const el = clamp(Math.atan2(dy, hl), -0.4, 0.6);
+    lk.set(p0.x + dx * Math.cos(el) * dist, p0.y + Math.sin(el) * dist, p0.z + dz * Math.cos(el) * dist);
     for (const [n, k] of [['Neck', 0.4], ['Head', 0.6]]) {
       const b = B[n]; b.updateMatrixWorld(true);
-      const p = b.getWorldPosition(_v1), want = _v2.copy(target).sub(p).normalize();
+      const p = b.getWorldPosition(_v1), want = _v2.copy(lk).sub(p).normalize();
       // the face looks along +z in the T-pose, so now along (world rotation · T-pose rotation⁻¹) · +z
       b.getWorldQuaternion(_q1);
       const fwdNow = _v3.set(0, 0, 1).applyQuaternion(_q2.copy(_q1).multiply(_q3.copy(this.K.bind[n]).invert()));
@@ -817,7 +828,11 @@ class PlayerView {
   }
   setBody(b) { this.body = b; }
   react(key, o = {}) { if (!this.body || !CLIPS) return; this.body.react = { key, t: 0, from: o.from || 0, loop: !!o.loop, rate: o.rate || 1, mirror: o.mirror || 1, until: o.until || 9 }; }
-  stopReact() { if (this.body) this.body.react = null; }
+  stopReact() { if (this.body) this.body.react = null; this.deject = null; this.cheer = null; }
+  // the winner of a big point: a fist pump with the free hand; of the match, both arms up first
+  celebrate(T, secs, big) { this.cheer = { t0: T, until: T + secs, big }; }
+  // the loser of a point on an error, or of the match: hands to the hips, a shake of the head, a slight slump
+  dejected(T, secs) { this.deject = { t0: T, until: T + secs }; }
 
   /* which stroke is under way: the one just played (or the serve being made), else the one coming */
   stroke(pl, m) {
@@ -949,6 +964,24 @@ class PlayerView {
       this.setArm(P.g, P.d, P.pole, P.lh, 0, 0);
       arm.lw = rally ? 1 : 0.6;
     }
+    const D = this.deject;
+    if (D && T >= D.until) this.deject = null;
+    else if (D && !keyed && T >= D.t0) {
+      const u = smooth((T - D.t0) / 0.35) * (1 - smooth((T - D.until + 0.45) / 0.45)), mix = (a, b) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+      this.kg = mix(this.kg, HIPS.g); this.kd = mix(this.kd, HIPS.d); this.kp = mix(this.kp, HIPS.pole); this.klh = mix(this.klh, HIPS.lh);
+      arm.lw = lerp(arm.lw, 1, u); lean += 0.1 * u;
+    }
+    const C = this.cheer;
+    let fist = 0;
+    if (C && T >= C.until) this.cheer = null;
+    else if (C && !keyed && T >= C.t0) {
+      const t = T - C.t0, u = smooth(t / 0.25) * (1 - smooth((T - C.until + 0.4) / 0.4)), mix = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
+      const up = C.big ? 1 - smooth((t - 1.5) / 0.4) : 0, k = (Math.max(0, t - (C.big ? 1.7 : 0)) % 0.62) / 0.62;
+      const lh = up > 0.001 ? mix(FIST_DOWN, ARMS_UP.lh, up) : k < 0.6 ? mix(FIST_DOWN, FIST_UP, smooth(k / 0.6)) : mix(FIST_UP, FIST_DOWN, smooth((k - 0.6) / 0.22));
+      this.kg = mix(this.kg, ARMS_UP.g, u * up); this.kd = mix(this.kd, ARMS_UP.d, u * up); this.kp = mix(this.kp, ARMS_UP.pole, u * up);
+      this.klh = mix(this.klh, lh, u); arm.lw = lerp(arm.lw, 1, u); lean -= 0.05 * u; fist = u;
+    }
+    if (Math.abs(fist - (this.fist || 0)) > 0.02) { this.fist = fist; b.curl(1.25, lerp(0.3, 1.25, fist)); } // the free hand closes into a fist
     // the serve: the shuttle in the left hand until it is let go
     if (pl.swing && (pl.swing.style === 'serveFore' || pl.swing.style === 'serveBack') && T < pl.swing.t + 0.05) arm.lhTurn = 1.2; else arm.lhTurn = 0;
     // a reaction clip moves the whole body; arms follow it
@@ -964,7 +997,16 @@ class PlayerView {
     if (b.react) tall = 0;
     st.x = pl.x + (st.lungeX || 0) + this.reach.x; st.z = pl.z + (st.lungeZ || 0) + this.reach.z; st.yaw = this.yaw;
     st.crouch = Math.max(0, crouch + (mode === 'shuf' ? 0.03 * (1 - tall) : 0)); st.twist = twist; st.lean = lean; st.lift = lift; st.tall = tall;
-    st.look.copy(look); st.lookW = b.react ? 0.3 : 1;
+    // the head: on the shuttle in play; once the point is over, a moment on where it landed, then up at the other player
+    const o = m.pl[1 - pl.side], between = (m.phase === 'dead' && m.phaseT > 0.7) || m.phase === 'intro' || m.phase === 'over';
+    const lt = this.lookT || (this.lookT = new V3()), dj = this.deject && T >= this.deject.t0 && T < this.deject.t0 + 1.2;
+    if (dj) { const t = T - this.deject.t0; b.toWorld(0.8 * Math.sin(t * 9) * (1 - smooth((t - 0.5) / 0.6)), 0, 2.4, lt); } // down, shaking the head
+    else if (this.cheer && T >= this.cheer.t0) b.toWorld(0, 2.6, 4.5, lt); // up, to the crowd
+    else if (between) lt.set(o.x, 1.55, o.z);
+    else lt.copy(look);
+    if (!this.lookP) this.lookP = new V3().copy(lt);
+    this.lookP.lerp(lt, 1 - Math.exp(-dt * (between && !dj ? 4 : 16)));
+    st.look.copy(this.lookP); st.lookW = b.react ? 0.3 : 1;
     // arm targets to the world (in the body frame of this frame's yaw)
     this.keyed = keyed; this.sNow = s;
     this.armToWorld();
@@ -1533,8 +1575,8 @@ function onPoint(e, m) {
   // reactions
   const W = G.views[e.winner], Lv = G.views[1 - e.winner];
   const sw = m.pl[e.winner].swing, smashWin = sw && (sw.kind === 'smash' || sw.kind === 'jump') && (e.reason === 'in');
-  if (e.game || smashWin || e.rally >= 12) W.react('cheer', { until: 1.6 });
-  if ((e.reason === 'net' || e.reason === 'out') && Math.random() < 0.45) Lv.react('missed', { from: 2.95, until: 1.9, rate: 1.1 });
+  if (e.game || smashWin || e.rally >= 12) W.celebrate(m.T, 1.6, false);
+  if ((e.reason === 'net' || e.reason === 'out') && Math.random() < 0.45) Lv.dejected(m.T, 1.8);
   // a replay of something worth seeing
   const lastHitter = m.pl[m.sh.by] ? m.pl[m.sh.by].swing : null;
   const worth = (smashWin && sw.speed * 3.6 > 235) || (sw && sw.kind === 'jump' && e.reason === 'in') || e.rally >= 18 || (m.sh.cord && e.reason === 'in') || e.match;
@@ -1549,8 +1591,8 @@ function onPoint(e, m) {
 function onMatchEnd(e, m) {
   if (G.attract) { setTimeout(() => { if (G.attract) newMatch(true); }, 2500); return; }
   const you = e.winner === 0;
-  G.views[e.winner].react('cheer', { loop: true, until: 99 });
-  G.views[1 - e.winner].react('missed', { from: 2.95, until: 4.3 });
+  G.views[e.winner].celebrate(m.T, 8, true);
+  G.views[1 - e.winner].dejected(m.T, 4.3);
   Sound.applause(1.3, 5); crowd.cheer(1.2);
   led.flash(`${m.pl[e.winner].name.toUpperCase()} WINS`, '#d4ff3a', '#10170a', 8);
   setTimeout(() => { if (G.match === m) showEnd(e, m); }, 3600);
