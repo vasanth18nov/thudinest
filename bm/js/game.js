@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=3'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=4'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
@@ -786,8 +786,8 @@ class Body {
     let dx = target.x - p0.x, dz = target.z - p0.z;
     const dy = target.y - p0.y, hl = Math.hypot(dx, dz), dist = Math.hypot(hl, dy) || 1;
     if (hl < 0.05) { this.dirWorld(0, 0, 1, _v2); dx = _v2.x; dz = _v2.z; } else { dx /= hl; dz /= hl; }
-    const el = clamp(Math.atan2(dy, hl), -0.4, 0.6);
-    lk.set(p0.x + dx * Math.cos(el) * dist, p0.y + Math.sin(el) * dist, p0.z + dz * Math.cos(el) * dist);
+    const el = clamp(Math.atan2(dy, hl), -0.4, 0.6), far = Math.max(dist, 4); // far along it, so a close target can't tilt the head more
+    lk.set(p0.x + dx * Math.cos(el) * far, p0.y + Math.sin(el) * far, p0.z + dz * Math.cos(el) * far);
     for (const [n, k] of [['Neck', 0.4], ['Head', 0.6]]) {
       const b = B[n]; b.updateMatrixWorld(true);
       const p = b.getWorldPosition(_v1), want = _v2.copy(lk).sub(p).normalize();
@@ -1846,6 +1846,7 @@ $('nameIn').addEventListener('input', () => { G.s.name = $('nameIn').value.slice
 $('nameIn').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('nameIn').blur(); } e.stopPropagation(); });
 
 function showMenu() {
+  if (newerRelease) reloadForRelease();
   G.mode = 'menu'; G.paused = false;
   $('menu').hidden = false; $('hud').hidden = true; $('touch').hidden = true; $('pausePanel').hidden = true; $('endPanel').hidden = true;
   Sound.crowd(0.035);
@@ -1889,7 +1890,27 @@ $('menuBtn').addEventListener('click', () => { Sound.click(); showMenu(); });
 $('pauseBtn').addEventListener('click', () => { Sound.init(); pause(true); });
 $('viewBtn').addEventListener('click', () => { Sound.init(); Sound.click(); Input.onCam(); });
 canvas.addEventListener('pointerdown', () => { Sound.init(); Input.onSkip(); });
-document.addEventListener('visibilitychange', () => { if (document.hidden && G.mode === 'play') pause(true); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && G.mode === 'play') pause(true); else if (!document.hidden) checkRelease(); });
+
+/* a newer release on the site (a higher ?v= on game.js in index.html): reload into it, at once outside a match, else
+   on the way back to the menu. Once per release, so a stale copy somewhere can't loop. */
+const RELEASE = +(new URL(import.meta.url).searchParams.get('v') || 0);
+let newerRelease = 0;
+async function checkRelease() {
+  try {
+    const html = await (await fetch(`./?release=${Date.now()}`, { cache: 'no-store' })).text();
+    const v = +((html.match(/js\/game\.js\?v=(\d+)/) || [])[1] || 0);
+    if (v > RELEASE) { newerRelease = v; if (G.mode !== 'play' && G.mode !== 'paused') reloadForRelease(); }
+  } catch (e) { /* offline: carry on */ }
+}
+function reloadForRelease() {
+  const v = newerRelease;
+  try { if (sessionStorage.getItem('rp.reloadedFor') === String(v)) return; sessionStorage.setItem('rp.reloadedFor', String(v)); } catch (e) { return; }
+  const u = new URL(location.href); u.searchParams.set('v', v); location.replace(u.toString());
+}
+setInterval(() => { if (!document.hidden) checkRelease(); }, 5 * 60 * 1000);
+window.addEventListener('pageshow', (e) => { if (e.persisted) checkRelease(); }); // a tab restored from memory
+checkRelease();
 
 /* ------------------------------------------------------------------ resize & quality */
 function resize() {
