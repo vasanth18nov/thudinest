@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js';
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=2'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
