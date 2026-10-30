@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=4'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=5'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
@@ -915,7 +915,9 @@ class PlayerView {
         else { crouch += 0.15 * smooth((T - (t0 - 0.22)) / 0.22); tall = 0; }
       }
       if (s.lowLunge || s.style === 'netF' || s.style === 'netB') {
+        const was = this.lungeAmt;
         this.lungeAmt = Math.max(this.lungeAmt * Math.exp(-dt * 2), env);
+        if (was < 0.6 && this.lungeAmt >= 0.6 && dt > 0) Sound.squeak(clamp(pl.x / 4, -0.8, 0.8), farOf(pl.x, 0.1, pl.z)); // the lunging foot plants
         const P = s.P, dx = P.x - pl.x, dz = P.z - pl.z, dl = Math.hypot(dx, dz) || 1;
         const reach = clamp(dl - 0.85, 0, 0.6) * this.lungeAmt; // the shoulder stops an arm and a racket from the shuttle
         st.lungeX = (dx / dl) * reach; st.lungeZ = (dz / dl) * reach;
@@ -952,7 +954,7 @@ class PlayerView {
         st.air = 1; this.airFeet(a, up);
       } else {
         const u = (T - J.end) / 0.3;
-        if (!J.down) { J.down = true; this.feetT.Left.y = 0; this.feetT.Right.y = 0; }
+        if (!J.down) { J.down = true; this.feetT.Left.y = 0; this.feetT.Right.y = 0; const pn = clamp(pl.x / 4, -0.8, 0.8); Sound.step(pn); Sound.squeak(pn, farOf(pl.x, 0.1, pl.z)); } // shoes back on the mat
         crouch += 0.19 * Math.sin(Math.PI * clamp(u, 0, 1)); lean += 0.22 * (1 - smooth(u));
         st.feet = this.feetT; st.feetW = 1 - smooth((u - 0.35) / 0.65);
         if (u >= 1) this.jmp = null;
@@ -1225,35 +1227,66 @@ function playFrame(fa, fb, u, bodies) {
 /* All synthesised: the crack of the strings on the cork, shoes on the mat, the net, the hall and its crowd. The
    umpire's calls use the device's speech voices. */
 const Sound = (() => {
-  let ctx = null, master = null, crowdGain = null, noise = null, claps = null;
+  let ctx = null, out = null, master = null, verbSend = null, crowdGain = null, noise = null, hall = null;
   const A = { on: store.get('sound', true), voice: store.get('voice', true) };
+  /* The recordings (all CC0, from freesound.org: see sfx/CREDITS.txt): racket hits, shoe squeaks and swishes in one
+     sprite, crowd oohs, applause and cheers in another, and a seamless loop of a full hall. Fetched at once, decoded
+     when the first tap opens the audio. Until then the old synthesized sounds stand in. */
+  const S = { meta: null, fx: null, crowd: null, hall: null }, raw = {};
+  const fetched = fetch('sfx/sfx.json').then((r) => r.json()).then((m) => { S.meta = m; return Promise.all(['fx', 'crowd', 'hall'].map((k) => fetch(`sfx/${k}.mp3`).then((r) => r.arrayBuffer()).then((b) => { raw[k] = b; }))); }).catch(() => {});
+  function decodeAll() {
+    fetched.then(() => { for (const k of ['fx', 'crowd', 'hall']) if (raw[k]) { const b = raw[k]; raw[k] = null; ctx.decodeAudioData(b, (buf) => { S[k] = buf; if (k === 'hall') startHall(); }, () => {}); } });
+  }
   function init() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* older Safari */ }
     ctx = new AC();
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(ctx.destination);
-    master = ctx.createGain(); master.gain.value = A.on ? 0.9 : 0; master.connect(comp);
-    // a second of white noise for everything breathy
-    noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    // applause: thousands of single claps, each a tiny bright burst
-    claps = ctx.createBuffer(2, ctx.sampleRate * 3, ctx.sampleRate);
+    // glue (a gentle compressor), then a limiter so a smash under a cheer never distorts
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.001; lim.release.value = 0.1; lim.connect(ctx.destination);
+    out = lim;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 12; comp.ratio.value = 2.5; comp.attack.value = 0.006; comp.release.value = 0.3; comp.connect(lim);
+    master = ctx.createGain(); master.gain.value = A.on ? 0.8 : 0; master.connect(comp);
+    // the arena: a dark, wide reverb (decaying noise, a little later and duller in each ear) that every sound is sent to
+    const sr = ctx.sampleRate, n = Math.floor(sr * 2.2), ir = ctx.createBuffer(2, n, sr);
     for (let ch = 0; ch < 2; ch++) {
-      const c = claps.getChannelData(ch), sr = ctx.sampleRate;
-      for (let k = 0; k < 900; k++) {
-        const at = Math.floor(Math.random() * (c.length - sr * 0.03)), len = Math.floor(sr * (0.006 + Math.random() * 0.01)), amp = 0.25 + Math.random() * 0.5;
-        for (let i = 0; i < len; i++) c[at + i] += (Math.random() * 2 - 1) * amp * Math.exp(-i / (len * 0.25));
-      }
+      const d = ir.getChannelData(ch); let lp = 0;
+      for (let i = 0; i < n; i++) { const x = Math.random() * 2 - 1; lp += (x - lp) * (0.18 + 0.5 * (1 - i / n)); d[i] = i < sr * (0.014 + ch * 0.006) ? 0 : lp * Math.pow(1 - i / n, 3.2); }
     }
-    // the hall: a low murmur that never stops
-    const src = ctx.createBufferSource(); src.buffer = noise; src.loop = true;
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 420; bp.Q.value = 0.6;
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1400;
-    crowdGain = ctx.createGain(); crowdGain.gain.value = 0.05;
-    src.connect(bp).connect(lp).connect(crowdGain).connect(master); src.start();
+    const verb = ctx.createConvolver(); verb.buffer = ir; verbSend = ctx.createGain(); verbSend.gain.value = 0.55; verbSend.connect(verb).connect(master);
+    noise = ctx.createBuffer(1, sr * 2, sr);
+    const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    crowdGain = ctx.createGain(); crowdGain.gain.value = 0.05 * HALL; crowdGain.connect(master);
+    decodeAll();
+  }
+  const HALL = 3.4; // crowd(level) levels were set for the old murmur; the recorded hall sits this much higher
+  function startHall() {
+    if (hall || !S.hall) return;
+    hall = ctx.createBufferSource(); hall.buffer = S.hall; hall.loop = true;
+    hall.loopStart = S.meta.hall.loopStart; hall.loopEnd = S.meta.hall.loopEnd;
+    hall.connect(crowdGain); hall.start(0, S.meta.hall.loopStart);
   }
   const now = () => ctx.currentTime;
+  const pick = (list) => list[Math.floor(Math.random() * list.length)];
+  /* one slice of a sprite: gain, playback rate, pan, a low-pass for distance or softness, a send to the hall */
+  function play(buf, slice, o = {}) {
+    if (!buf || !slice) return null;
+    const t = now() + (o.delay || 0), src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = o.rate || 1;
+    let node = src;
+    if (o.lp) { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; f.Q.value = 0.5; node.connect(f); node = f; }
+    if (o.bp) { const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = o.bp; f.Q.value = o.q || 1; node.connect(f); node = f; }
+    const g = ctx.createGain(); g.gain.value = o.gain === undefined ? 1 : o.gain; node.connect(g); node = g;
+    if (o.fade) { g.gain.setValueAtTime(g.gain.value, t + o.fade[0]); g.gain.setTargetAtTime(0.0001, t + o.fade[0], o.fade[1]); }
+    if (ctx.createStereoPanner && o.pan) { const p = ctx.createStereoPanner(); p.pan.value = clamp(o.pan, -1, 1); node.connect(p); node = p; }
+    node.connect(master);
+    if (o.send) { const sg = ctx.createGain(); sg.gain.value = o.send; node.connect(sg).connect(verbSend); }
+    const off = slice[0] + (o.from || 0), dur = Math.max(0.01, slice[1] - (o.from || 0));
+    src.start(t, off, o.len ? Math.min(o.len, dur) : dur);
+    return g;
+  }
+  const fx = (name) => S.fx && S.meta && pick(S.meta.fx[name]);
+  // distance from the camera, 0 near to 1 far: quieter, duller and wetter
+  const away = (far = 0) => ({ k: 1 - 0.45 * far, lp: 16000 - 10000 * far, send: 0.12 + 0.25 * far });
   function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
   function burst(t, { f = 2000, q = 1, type = 'bandpass', peak = 0.5, dec = 0.05, a = 0.002, rate = 1, pan = 0 }) {
     const s = ctx.createBufferSource(); s.buffer = noise; s.playbackRate.value = rate;
@@ -1271,45 +1304,57 @@ const Sound = (() => {
     o.start(t); o.stop(t + a + dec + 0.05);
   }
   const ok = () => ctx && A.on;
+  const SOFT = new Set(['net', 'block', 'serveShort']), BIG = new Set(['smash', 'jump', 'kill']);
   return {
     A, init,
-    set(on) { A.on = on; store.set('sound', on); if (master) master.gain.setTargetAtTime(on ? 0.9 : 0, now(), 0.05); },
+    set(on) { A.on = on; store.set('sound', on); if (master) master.gain.setTargetAtTime(on ? 0.8 : 0, now(), 0.05); },
     setVoice(on) { A.voice = on; store.set('voice', on); if (!on && window.speechSynthesis) speechSynthesis.cancel(); },
-    // racket on shuttle: a crisp crack with a ring of the strings; heavier for a smash, a tick for a net shot
-    hit(kind, speed, pan) {
-      if (!ok()) return; const t = now() + 0.005, big = kind === 'smash' || kind === 'jump' || kind === 'kill', soft = kind === 'net' || kind === 'block' || kind === 'serveShort';
-      const v = clamp(speed / 70, 0.15, 1.2);
-      burst(t, { f: soft ? 3800 : 2600, q: 0.9, type: 'bandpass', peak: (soft ? 0.25 : 0.55) * (0.6 + v * 0.5), dec: soft ? 0.025 : 0.05, pan });
-      tone(t, { f: soft ? 2200 : 1500 + v * 300, f2: soft ? 1900 : 1200, peak: soft ? 0.05 : 0.12, dec: 0.07, pan });
-      if (big) { tone(t, { f: 210, f2: 70, type: 'triangle', peak: 0.35, dec: 0.09, pan }); burst(t, { f: 900, q: 0.6, type: 'lowpass', peak: 0.45, dec: 0.06, pan }); }
-    },
-    whoosh(pan) { if (!ok()) return; const t = now(); const s = ctx.createBufferSource(); s.buffer = noise; const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(700, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.14); const g = ctx.createGain(); env(g, t, 0.05, 0.12, 0.1); s.connect(f).connect(g).connect(master); s.start(t, Math.random()); s.stop(t + 0.25); },
-    squeak(pan) { if (!ok()) return; const t = now(), f0 = rand(2300, 3300); tone(t, { f: f0, f2: f0 * rand(1.15, 1.4), type: 'sawtooth', peak: 0.022, dec: rand(0.06, 0.12), a: 0.01, pan }); tone(t + 0.01, { f: f0 * 1.5, f2: f0 * 1.9, peak: 0.012, dec: 0.07, pan }); },
-    step(pan) { if (!ok()) return; burst(now(), { f: 160, q: 0.7, type: 'lowpass', peak: 0.08, dec: 0.04, pan }); },
-    net() { if (!ok()) return; const t = now(); burst(t, { f: 380, q: 0.8, type: 'lowpass', peak: 0.5, dec: 0.12 }); burst(t + 0.02, { f: 1500, q: 2, peak: 0.08, dec: 0.2 }); },
-    cord() { if (!ok()) return; const t = now(); burst(t, { f: 1200, q: 3, peak: 0.25, dec: 0.05 }); tone(t, { f: 420, f2: 300, peak: 0.08, dec: 0.12 }); },
-    land(pan) { if (!ok()) return; burst(now(), { f: 3000, q: 1.5, peak: 0.12, dec: 0.012, pan }); },
-    applause(k = 1, secs = 2.4) {
-      if (!ok()) return; const t = now(); const s = ctx.createBufferSource(); s.buffer = claps; s.playbackRate.value = rand(0.9, 1.1);
-      const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 500;
-      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5 * k, t + 0.12); g.gain.setTargetAtTime(0.0001, t + secs * 0.45, secs * 0.25);
-      s.connect(f).connect(g).connect(master); s.start(t, rand(0, 0.5)); s.stop(t + secs + 1);
-      // a cheer under the applause
-      const c = ctx.createBufferSource(); c.buffer = noise; c.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.8;
-      const cg = ctx.createGain(); cg.gain.setValueAtTime(0.0001, t); cg.gain.exponentialRampToValueAtTime(0.12 * k, t + 0.2); cg.gain.setTargetAtTime(0.0001, t + secs * 0.3, secs * 0.2);
-      c.connect(bp).connect(cg).connect(master); c.start(t); c.stop(t + secs + 1);
-    },
-    ooh(k = 1) {
-      if (!ok()) return; const t = now();
-      for (let i = 0; i < 6; i++) {
-        const o = ctx.createOscillator(); o.type = 'sawtooth'; const f0 = rand(170, 260); o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f0 * 0.82, t + 0.9);
-        const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 520; fl.Q.value = 3;
-        const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.02 * k, t + 0.18); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.0);
-        o.connect(fl).connect(g).connect(master); o.start(t + i * 0.012); o.stop(t + 1.1);
+    /* racket on shuttle, from real hits: a delicate tick for a net shot, a firm pock for a clear, and for a smash the
+       crack doubled with a heavier body under it */
+    hit(kind, speed, pan, far) {
+      if (!ok()) return;
+      const sl = fx('hit');
+      if (!sl) return this.synthHit(kind, speed, pan);
+      const d = away(far), v = clamp(speed / 65, 0.2, 1.15), r = 0.94 + Math.random() * 0.12;
+      if (SOFT.has(kind)) { play(S.fx, sl, { gain: 0.42 * d.k, rate: r * 1.08, lp: Math.min(d.lp, 3800), pan, send: d.send * 0.6 }); return; }
+      if (BIG.has(kind)) {
+        play(S.fx, sl, { gain: 1.3 * d.k, rate: r, lp: d.lp, pan, send: d.send + 0.08 });
+        play(S.fx, fx('hit'), { gain: 0.45 * d.k, rate: r * 1.12, lp: d.lp, pan, delay: 0.003 });
+        play(S.fx, sl, { gain: 0.65 * d.k, rate: 0.6, lp: 1100, pan }); // the body of the hit
+        return;
       }
+      play(S.fx, sl, { gain: (0.7 + 0.6 * v) * d.k, rate: r, lp: d.lp, pan, send: d.send });
     },
+    synthHit(kind, speed, pan) {
+      const t = now() + 0.005, big = BIG.has(kind), soft = SOFT.has(kind), v = clamp(speed / 70, 0.15, 1.2);
+      burst(t, { f: soft ? 3800 : 2600, q: 0.9, type: 'bandpass', peak: (soft ? 0.25 : 0.55) * (0.6 + v * 0.5), dec: soft ? 0.025 : 0.05, pan });
+      if (big) tone(t, { f: 210, f2: 70, type: 'triangle', peak: 0.35, dec: 0.09, pan });
+    },
+    // the racket through the air after a big hit (the slice is started at its loudest, so the swish trails the hit)
+    whoosh(pan, far) { if (!ok()) return; const sl = fx('whoosh'); if (sl) play(S.fx, sl, { gain: 0.36 * away(far).k, rate: 0.9 + Math.random() * 0.15, from: sl[1] * 0.35, pan, send: 0.1 }); },
+    squeak(pan, far) {
+      if (!ok()) return; const sl = fx('squeak'), d = away(far);
+      if (sl) play(S.fx, sl, { gain: (0.09 + Math.random() * 0.09) * d.k, rate: 0.9 + Math.random() * 0.22, lp: d.lp, pan, send: d.send * 0.8 });
+      else { const t = now(), f0 = rand(2300, 3300); tone(t, { f: f0, f2: f0 * rand(1.15, 1.4), type: 'sawtooth', peak: 0.022, dec: rand(0.06, 0.12), a: 0.01, pan }); }
+    },
+    step(pan) { if (!ok()) return; const sl = fx('hit'); if (sl) play(S.fx, sl, { gain: 0.22, rate: 0.4, lp: 320, pan, send: 0.1 }); }, // a landing: weight on the floor
+    // into the net: the cork's dull thump in the mesh; off the tape: a sharper tick
+    net() { if (!ok()) return; const sl = fx('hit'); if (!sl) { burst(now(), { f: 380, q: 0.8, type: 'lowpass', peak: 0.5, dec: 0.12 }); return; } play(S.fx, sl, { gain: 0.5, rate: 0.55, lp: 650, send: 0.2 }); play(S.fx, fx('whoosh'), { gain: 0.08, rate: 1.6, bp: 2200, q: 0.8, len: 0.12 }); },
+    cord() { if (!ok()) return; const sl = fx('hit'); if (!sl) { burst(now(), { f: 1200, q: 3, peak: 0.25, dec: 0.05 }); return; } play(S.fx, sl, { gain: 0.42, rate: 0.82, bp: 1700, q: 0.9, send: 0.2 }); },
+    // the shuttle on the mat: a light tap of its cork
+    land(pan, far) { if (!ok()) return; const sl = fx('hit'), d = away(far); if (!sl) { burst(now(), { f: 3000, q: 1.5, peak: 0.12, dec: 0.012, pan }); return; } play(S.fx, sl, { gain: 0.12 * d.k, rate: 1.35, lp: Math.min(2400, d.lp), pan, send: d.send }); },
+    /* the crowd: recorded applause, bigger with a cheer for a winner of a long rally, a game or the match, fading out
+       over `secs` */
+    applause(k = 1, secs = 2.4) {
+      if (!ok() || !S.crowd) return; const C = S.meta.crowd, r = 0.97 + Math.random() * 0.06, fade = [Math.max(0.6, secs * 0.45), secs * 0.3];
+      play(S.crowd, pick(k >= 0.85 ? C.clapBig : C.clap), { gain: (k >= 0.85 ? 1.15 : 1.35) * k, rate: r, fade, send: 0.15 });
+      if (k >= 0.95) play(S.crowd, pick(k >= 1.25 ? C.cheerBig : C.cheer), { gain: 0.6 * k, rate: r, fade, send: 0.15, delay: 0.05 });
+    },
+    ooh(k = 1) { if (!ok() || !S.crowd) return; play(S.crowd, pick(S.meta.crowd.ooh), { gain: 0.32 * k, rate: 0.95 + Math.random() * 0.1, send: 0.2 }); },
     click() { if (!ok()) return; tone(now(), { f: 1400, f2: 900, peak: 0.05, dec: 0.04 }); },
-    crowd(level) { if (crowdGain) crowdGain.gain.setTargetAtTime(A.on ? level : 0, now(), 0.4); },
+    crowd(level) { if (crowdGain) crowdGain.gain.setTargetAtTime(A.on ? level * HALL : 0, now(), 0.4); },
+    tap() { const d = ctx.createMediaStreamDestination(); out.connect(d); return d.stream; }, // the final mix, for tests
+    loaded: () => !!(S.fx && S.crowd && S.hall),
     // the umpire: a calm British voice if the device has one
     say(text) {
       if (!A.on || !A.voice || !window.speechSynthesis || !text) return;
@@ -1526,13 +1571,16 @@ function umpireCall(e, m) {
   if (e.interval) { text += ' · Interval'; say += '. Interval.'; }
   return { text, say };
 }
+// how far a sound is from the camera, 0 (close) to 1 (the far end of the hall)
+const _fv = new V3();
+const farOf = (x, y, z) => clamp((camera.position.distanceTo(_fv.set(x, y, z)) - 7) / 15, 0, 1);
 function handleEvents() {
   const m = G.match, live = !G.attract;
   for (const e of m.events) {
-    const pan = e.P ? clamp(e.P.x / 4, -0.8, 0.8) * (Cam.mode === 'side' ? 0.4 : 1) : 0;
+    const pan = e.P ? clamp(e.P.x / 4, -0.8, 0.8) * (Cam.mode === 'side' ? 0.4 : 1) : 0, far = e.P ? farOf(e.P.x, e.P.y, e.P.z) : 0;
     if (e.type === 'hit') {
-      Sound.hit(e.kind, e.speed, pan);
-      if (e.kind === 'smash' || e.kind === 'jump' || e.kind === 'kill') { Sound.whoosh(pan); if (e.kind === 'jump') { Cam.shake = 0.06; Sound.ooh(0.6); } }
+      Sound.hit(e.kind, e.speed, pan, far);
+      if (e.kind === 'smash' || e.kind === 'jump' || e.kind === 'kill') { Sound.whoosh(pan, far); if (e.kind === 'jump') { Cam.shake = 0.06; Sound.ooh(0.6); } }
       if (live && (e.kind === 'smash' || e.kind === 'jump') && e.speed * 3.6 >= 150) Hud.speed(SHOTS[e.kind].label, e.speed * 3.6);
       if (live && e.side === 0 && e.label) Hud.timing(e.label);
       if (live) Hud.rally(e.shots || 1);
@@ -1543,7 +1591,7 @@ function handleEvents() {
     } else if (e.type === 'netcord') {
       Sound.cord(); if (live) Hud.pill('Net cord', 1400);
     } else if (e.type === 'land') {
-      Sound.land(pan);
+      Sound.land(clamp(e.x / 4, -0.8, 0.8), farOf(e.x, 0, e.z));
       G.landT = m.T;
       if (live && e.inside !== undefined && e.near < 0.045 && !G.review) G.pendingReview = e;
       else if (live && e.inside === false) Hud.callout(e.serve ? 'Fault' : 'Out', null, 'out', 1200);
@@ -1967,7 +2015,7 @@ function tick(dt) {
     // shoes on the mat: a squeak on a hard change of direction
     for (const pl of m.pl) {
       const a = Math.hypot(pl.vx - (pl.pvx || 0), pl.vz - (pl.pvz || 0)) / Math.max(1e-3, simDt);
-      if (simDt > 0 && a > 11 && Math.hypot(pl.vx, pl.vz) > 1.6 && wall - (pl.squeakT || 0) > 0.35 && Math.random() < 0.5) { pl.squeakT = wall; Sound.squeak(clamp(pl.x / 4, -0.8, 0.8)); }
+      if (simDt > 0 && a > 15 && Math.hypot(pl.vx, pl.vz) > 2.2 && wall - (pl.squeakT || 0) > 0.8 && Math.random() < 0.45) { pl.squeakT = wall; Sound.squeak(clamp(pl.x / 4, -0.8, 0.8), farOf(pl.x, 0.1, pl.z)); }
       pl.pvx = pl.vx; pl.pvz = pl.vz;
     }
     net.update(m.T);

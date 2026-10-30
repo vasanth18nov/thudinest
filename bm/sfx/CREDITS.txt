@@ -1,0 +1,13 @@
+Rally Point sound effects: recordings from freesound.org, all released under CC0 1.0 (public domain).
+Cut, levelled and combined for the game (sprites fx.mp3 and crowd.mp3, the loop hall.mp3; offsets in sfx.json).
+
+Racket hits      497962 "01_Badminton-6.wav" (16HPanskaResatko_Matej), 418533 "Badminton hit.WAV" (14FPanskaBubik_Lukas),
+                 324244 "Badminton.wav" (PerMagnusLindborg)
+Shoe squeaks     68247 "sneaker_skid.wav", 88502 "sneaker squeak rubber.wav" (shakaharu)
+Racket swishes   235727 "Tennis racket_whoosh.wav" (speedygonzo), 662267 "Tennis Whooshes Swishes" (jamesdrake89)
+Crowd oohs       264499 "Crowd Ooohs and Ahhhs in Excitement" (noah0189)
+Applause, cheers 583130 "Medium Crowd Applause 01.wav" (AudioSea), 707871 "~100 People Crowd Applause" (SykerOfficial),
+                 139973 "Crowd.Yay.Applause.25ppl.Long.wav" (jessepash), 455659 "applause cheer ext medium crowd" (kyles)
+The hall         506454 "Sports Hall Ambience, Walla" (Kinoton), 360703 "Large_crowd_medium_distance_stereo.wav" (eguobyte)
+
+https://freesound.org/s/<number>/ for each. Rebuild with ~/thudinest-assets/bm/sfx/tools/build.py.
