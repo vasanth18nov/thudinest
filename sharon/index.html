@@ -159,9 +159,9 @@
   .hero-inner {
     position: relative; z-index: 2; width: min(1180px, 100% - 32px);
     display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: clamp(24px, 5vw, 80px);
-    padding-top: 70px; will-change: transform, opacity;
+    padding: 70px 0 64px; will-change: transform, opacity;
   }
-  .dp { position: relative; margin: 0; justify-self: center; width: min(100%, 340px); aspect-ratio: 1; cursor: pointer; }
+  .dp { position: relative; margin: 0; justify-self: center; width: min(100%, 340px, 40vh); width: min(100%, 340px, 40svh); aspect-ratio: 1; cursor: pointer; }
   .dp-halo {
     position: absolute; left: -45%; top: -45%; width: 190%; height: 190%; border-radius: 50%;
     background: radial-gradient(closest-side, rgba(255, 183, 3, .5), rgba(255, 138, 31, .2) 48%, transparent 74%);
@@ -197,7 +197,7 @@
     color: var(--gold); font: 700 13px/1 var(--body); letter-spacing: .22em; text-transform: uppercase;
   }
   .hero-text { order: -1; }
-  .hero-title { font-size: clamp(3.3rem, 8.4vw, 7.6rem); }
+  .hero-title { font-size: clamp(3.3rem, min(8.4vw, 13.5vh), 7.6rem); font-size: clamp(3.3rem, min(8.4vw, 13.5svh), 7.6rem); }
   .hero-title .line { display: block; overflow: hidden; padding: .02em .12em .1em 0; }
   .hero-title .accent {
     font-style: italic; font-weight: 700;
@@ -489,34 +489,51 @@
   /* ---------- Responsive ---------- */
   @media (max-width: 860px) {
     body { font-size: 17px; }
-    .hero-inner { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 52px; padding-top: 70px; }
-    .dp { width: min(50vw, 28svh, 250px); }
+    /* Phones: everything is sized from the visible height (svh: browser bars showing), so the photo,
+       title and chips always fit between the garland and the scroll cue; the gap leaves room for the mandala */
+    .hero { min-height: 460px; }
+    .hero-inner {
+      grid-template-columns: 1fr; justify-items: center; text-align: center;
+      gap: calc(min(50vw, 25vh, 250px) * .3); gap: calc(min(50vw, 25svh, 250px) * .3);
+      padding: 74px 0 66px;
+    }
+    .dp { width: min(50vw, 25vh, 250px); width: min(50vw, 25svh, 250px); }
     .sticker { width: 46px; height: 46px; font-size: 23px; }
     .sticker.s1 { left: -16px; } .sticker.s2 { right: -20px; } .sticker.s4 { bottom: -10px; }
     .hero-text { order: 0; display: flex; flex-direction: column; align-items: center; }
     .eyebrow { margin-bottom: 12px; padding: 7px 13px; font-size: 11px; }
-    .hero-title { font-size: clamp(3rem, 15vw, 4.6rem); }
-    .hero-lede { margin-top: 12px; }
-    .hero-chips { justify-content: center; margin-top: 16px; gap: 8px; }
-    .hero-chips li { padding: 9px 13px; font-size: 14px; }
-    .scroll-cue { bottom: 14px; }
+    .hero-title { font-size: clamp(2.5rem, min(15vw, 8.2vh), 4.6rem); font-size: clamp(2.5rem, min(15vw, 8.2svh), 4.6rem); }
+    .hero-lede { margin-top: 10px; font-size: 16px; }
+    .hero-chips { justify-content: center; margin-top: 14px; gap: 8px; }
+    .hero-chips li { padding: 8px 12px; font-size: 13.5px; }
+    .scroll-cue { bottom: 12px; gap: 6px; font-size: 13px; }
+    .scroll-cue i { height: 22px; }
+    /* Pinned scenes never taller than the visible screen, or their bottoms hide under the dock */
+    .lamps-stage, .date-stage, .where-stage { min-height: 460px; }
     .sparks-stage { grid-template-columns: 1fr; align-content: center; gap: 18px; padding-top: 70px; }
     .sparks-art { width: min(100%, 50svh); }
     .sparks-copy p:not(.kicker) { margin-top: 12px; font-size: 16px; }
     .sp-chip { font-size: 13px; }
     .lamps-stage { padding-bottom: 92px; }
-    .date-stage { grid-template-columns: 1fr; grid-template-rows: 1fr auto; justify-items: center; text-align: center; gap: 6px; padding: 104px 0 96px; }
+    /* The 8 takes whatever height is left above the date, so short screens never overlap */
+    .date-stage { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; text-align: center; gap: 6px; padding: 100px 0 92px; }
     .date-kicker { left: 50%; translate: -50% 0; top: 64px; }
-    .eight { height: min(46svh, 420px); align-self: end; }
-    .date-copy .d-time { margin-top: 16px; }
+    .eight { height: 100%; max-height: 420px; align-self: end; }
+    .date-copy .d-month { margin-top: 4px; }
+    .date-copy .d-year { margin-top: 6px; }
+    .date-copy .d-time { margin-top: 14px; }
     .cards3 { grid-template-columns: 1fr; }
     .fun-card { width: 78vw; height: min(64svh, 540px); }
     .fun-intro { width: 74vw; }
-    .where-stage { padding-bottom: max(96px, 13vh); }
+    .where-stage { padding-bottom: 88px; gap: 14px; }
+    .where-actions { flex-wrap: nowrap; gap: 8px; }
+    .where-actions .btn { padding: 13px 18px; font-size: 15px; }
     .map-hint { font-size: 11px; }
   }
-  @media (max-width: 860px) and (max-height: 700px) {
+  /* Very short screens (small phones with browser bars): drop the scroll cue and its reserved space */
+  @media (max-width: 860px) and (max-height: 600px) {
     .scroll-cue { display: none; }
+    .hero-inner { padding-bottom: 14px; }
     .hero-lede { font-size: 15px; }
   }
   @media (max-width: 380px) {
@@ -934,7 +951,7 @@
         <span class="map-attr">© OpenStreetMap contributors</span>
       </a>
       <div class="where-actions">
-        <a class="btn waze" href="https://waze.com/ul?ll=3.09199%2C101.69871&amp;navigate=yes&amp;zoom=17" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-nav"/></svg>Navigate with Waze</a>
+        <a class="btn waze" href="https://waze.com/ul?ll=3.09199%2C101.69871&amp;navigate=yes&amp;zoom=17" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-nav"/></svg>Open in Waze</a>
         <button class="btn ghost" type="button" id="copy-addr"><svg aria-hidden="true"><use href="#i-copy"/></svg><span>Copy address</span></button>
       </div>
     </div>
