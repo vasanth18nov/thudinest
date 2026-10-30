@@ -12,8 +12,8 @@ Deployed via Netlify → add your Netlify URL here.
 - **Game Hub** — Indian Rummy, Chess (Hard AI), Ping Pong with power-ups, and
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
-  batting game, and **Guest Rush** (`/guest-rush/`), a 3D homestay game —
-  see below.
+  batting game, **Guest Rush** (`/guest-rush/`), a 3D homestay game, and
+  **Rally Point** (`/bm/`), a 3D badminton game — see below.
 
 ## Adding Property Photos
 
@@ -261,6 +261,47 @@ painted procedurally except the hardwood, water normals and the sunset HDR
 environment, which come from the three.js examples on jsDelivr. Sound is all
 Web Audio synthesis. `?debug` exposes `window.__gr` for test bots.
 
+## Rally Point (`/bm/`)
+
+3D singles badminton at the "Thudinest Open": you against the computer at
+three levels (Club, National, World Tour), a quick game to 11, one game to
+21 or best of three, with rally scoring, service courts, intervals, game and
+match point, and the chair umpire's calls. Watch it in the **broadcast** view
+(high behind your baseline, as on television) or the **side** view
+(courtside at the net), and switch at any time.
+
+Controls: three shots, each meaning what fits the shuttle's height. **Clear**
+(J) goes high and deep, or lifts from low down. **Drop** (K) plays short, or
+a net shot near the net. **Smash** (L) hits down from overhead, or drives,
+pushes or kills lower down. Press just before the shuttle arrives; the ring
+under your feet (and the buttons on a phone) light up for a Perfect. With
+auto-run on, your player runs to the shuttle and the stick or WASD aims;
+with it off, the stick moves you. C switches the camera, P pauses. Touch
+screens get a floating stick and three buttons. A gamepad works too.
+
+How it works:
+
+- `bm/js/sim.js` is the game with no graphics: the shuttle flies with real
+  quadratic drag (terminal speed 6.8 m/s, so clears hang and smashes die), a
+  solver aims every shot to land where it was meant to, players plan where
+  to meet the shuttle, the computer picks shots and makes mistakes by level,
+  and BWF rules keep the score. It runs in Node for test matches.
+- `bm/js/game.js` draws and films it with three.js r170 (bundled into
+  `bm/vendor/three.js`, served from the site, no CDN). The players are the
+  sporty Mixamo characters from the cricket game (`bm/players/*.glb`, copies,
+  so the two games don't depend on each other) and Josh umpires in his
+  blazer. Footwork comes from the cricket game's motion-capture clips
+  (`bm/players/moves.json`: idle, run, sidestep, cheer, miss, dive); the
+  strokes are drawn on top with two-bone IK so the racket's strings meet the
+  shuttle at the contact. Smash winners and long rallies get slow-motion
+  replays, and close line calls get a shuttle review. Sound is synthesised
+  with Web Audio; the umpire speaks through the device's speech voices.
+- `bm/players/faces/*.jpg` are the menu portraits (`?faces` renders them
+  again from the models). `?debug` exposes `window.__bm` for test bots.
+
+Build tools and the headless tests (Playwright on the Mac's GPU, and Node
+match simulations) are in `~/thudinest-assets/bm/`.
+
 ## Files
 
 ```
@@ -268,6 +309,7 @@ index.html      ← main site (landing page + game hub, all in one)
 bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
 cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks + players/ model)
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
+bm/             ← Rally Point 3D badminton (page, js/sim.js + js/game.js, vendor/three.js, players/)
 images/         ← add your property photos here
 README.md       ← this file
 ```

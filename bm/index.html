@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#070b16">
+<title>Rally Point | Thudinest Games</title>
+<meta name="description" content="Rally Point: a free 3D badminton game. Singles at the Thudinest Open, in the broadcast view or from the side, against a computer opponent at three levels. No download, no account.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800;1,900&family=Barlow:wght@500;600;700&display=swap">
+<link rel="modulepreload" href="vendor/three.js">
+<link rel="modulepreload" href="js/sim.js">
+<style>
+[hidden] { display: none !important; }
+/* Layout: the full-bleed WebGL arena under a broadcast-style HUD pinned to the safe-area corners (score bug top left,
+   view and pause top right, callouts centred); on touch screens a floating stick on the left and three shot buttons on
+   the right. Menus are cards over the live arena. */
+:root {
+  --ink: #070b16;
+  --panel: rgba(9, 14, 30, 0.84);
+  --panel-soft: rgba(9, 14, 30, 0.62);
+  --panel-solid: #0c1328;
+  --rule: rgba(226, 232, 255, 0.12);
+  --rule-strong: rgba(226, 232, 255, 0.26);
+  --chalk: #f2f4fb;
+  --muted: #98a2bf;
+  --lime: #d4ff3a;
+  --lime-ink: #10170a;
+  --you: #39a3ff;
+  --cpu: #ff5b4f;
+  --mint: #3fe0a2;
+  --coral: #ff5b4f;
+  --scrim: rgba(4, 7, 15, 0.55);
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --ui: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); }
+body {
+  color: var(--chalk); font: 500 15px/1.4 var(--ui);
+  -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
+  touch-action: none; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+.safe {
+  position: fixed; inset: 0; pointer-events: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 14px) max(16px, env(safe-area-inset-left, 0px));
+}
+.lbl { font: 700 11px/1 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- score bug ---------- */
+.bug { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(16px, env(safe-area-inset-left, 0px)); width: 300px; max-width: calc(100vw - 120px); border-radius: 6px; overflow: hidden; background: var(--panel); border: 1px solid var(--rule); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.bug-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 10px 4px; background: var(--lime); color: var(--lime-ink); font: 800 italic 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+.bug-head span:last-child { opacity: 0.75; }
+.row { display: grid; grid-template-columns: 4px minmax(0, 1fr) 18px 26px 46px; align-items: center; height: 38px; }
+.row + .row { border-top: 1px solid var(--rule); }
+.row .bar { height: 100%; }
+.row.p0 .bar { background: var(--you); } .row.p1 .bar { background: var(--cpu); }
+.row .nm { padding: 0 8px 0 10px; font: 700 18px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .srv { width: 14px; height: 14px; opacity: 0; transition: opacity 200ms ease; }
+.row.serving .srv { opacity: 1; }
+.row .gm { justify-self: center; min-width: 20px; height: 22px; border-radius: 3px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.08); font: 700 15px/1 var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.row .pt { justify-self: stretch; height: 100%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.06); font: 800 26px/1 var(--display); font-variant-numeric: tabular-nums; }
+.row .pt.bump { animation: bump 420ms ease; }
+@keyframes bump { 0% { background: var(--lime); color: var(--lime-ink); } 100% { background: rgba(255, 255, 255, 0.06); } }
+.bug-foot { display: flex; justify-content: space-between; gap: 8px; padding: 5px 10px 6px; border-top: 1px solid var(--rule); font: 700 12px/1 var(--ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.bug-foot b { color: var(--chalk); font-weight: 700; }
+.bug-foot .tag { color: var(--lime); }
+
+/* ---------- top right ---------- */
+.tr { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 8px; pointer-events: auto; }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--rule); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 150ms ease, transform 120ms ease; }
+.icon-btn:hover { background: rgba(30, 40, 70, 0.9); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width: 22px; height: 22px; }
+.view-btn { width: auto; padding: 0 14px 0 10px; border-radius: 22px; gap: 8px; display: flex; align-items: center; font: 700 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ---------- callouts ---------- */
+.callout { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; text-align: center; }
+.call-main { font: 900 italic clamp(40px, 9vw, 86px)/0.9 var(--display); letter-spacing: 0.02em; text-transform: uppercase; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5); }
+.call-main.t-in { color: var(--mint); } .call-main.t-out { color: var(--coral); } .call-main.t-lime { color: var(--lime); } .call-main.t-white { color: var(--chalk); }
+.call-sub { font: 700 15px/1.2 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--chalk); background: var(--panel); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 14px; }
+.callout.show { animation: callIn 380ms cubic-bezier(.2, .9, .3, 1.2) both; }
+.callout.hide { animation: callOut 300ms ease both; }
+@keyframes callIn { from { opacity: 0; transform: translateX(-50%) scale(0.8); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@keyframes callOut { to { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
+.pill { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 16px); transform: translateX(-50%); background: var(--lime); color: var(--lime-ink); font: 800 italic 18px/1 var(--display); letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 16px 7px; border-radius: 4px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); white-space: nowrap; }
+.pill.red { background: var(--coral); color: #fff; }
+.timing { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); transform: translateX(-50%); font: 800 italic 22px/1 var(--display); letter-spacing: 0.14em; text-transform: uppercase; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); pointer-events: none; opacity: 0; }
+.timing.on { animation: tIn 900ms ease both; }
+.timing[data-q="Perfect"] { color: var(--lime); } .timing[data-q="Good"] { color: var(--chalk); } .timing[data-q="Late"], .timing[data-q="Early"] { color: #ffb347; }
+@keyframes tIn { 0% { opacity: 0; transform: translate(-50%, 8px); } 15% { opacity: 1; transform: translate(-50%, 0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+
+/* lower third: the speed gun, and the umpire's call */
+.lower { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; max-width: min(380px, 60vw); }
+.speed { display: flex; align-items: stretch; border-radius: 4px; overflow: hidden; background: var(--panel); border: 1px solid var(--rule); transform-origin: left center; }
+.speed .k { background: var(--lime); color: var(--lime-ink); font: 800 italic 14px/1 var(--display); letter-spacing: 0.14em; padding: 9px 10px 8px; text-transform: uppercase; display: grid; place-items: center; }
+.speed .v { padding: 4px 12px 3px; font: 800 30px/1 var(--display); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 4px; }
+.speed .v small { font: 700 13px/1 var(--display); letter-spacing: 0.1em; color: var(--muted); }
+.speed.show, .ump.show { animation: slideIn 420ms cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+.ump { display: flex; align-items: center; gap: 10px; background: var(--panel-soft); border: 1px solid var(--rule); border-left: 3px solid var(--lime); border-radius: 4px; padding: 7px 12px 7px 10px; font: 600 14px/1.25 var(--ui); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.ump .lbl { flex: none; }
+.touch-ui .lower { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 168px); }
+@media (max-height: 520px) { .touch-ui .lower { top: calc(env(safe-area-inset-top, 0px) + 116px); } }
+.rally { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 136px); left: max(16px, env(safe-area-inset-left, 0px)); background: var(--panel-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 5px 9px; font: 700 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: opacity 250ms ease; }
+.rally b { color: var(--chalk); font-size: 15px; }
+.replay-bug { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: var(--coral); color: #fff; font: 800 italic 16px/1 var(--display); letter-spacing: 0.16em; padding: 8px 12px 7px; border-radius: 4px; }
+.replay-bug i { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+.skip-hint { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); left: 50%; transform: translateX(-50%); font: 600 13px/1 var(--ui); color: var(--muted); background: var(--panel-soft); padding: 7px 12px; border-radius: 999px; }
+.hint { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; max-width: min(760px, 92vw); padding: 8px 14px; background: var(--panel-soft); border: 1px solid var(--rule); border-radius: 8px; font: 600 13px/1.3 var(--ui); color: var(--muted); transition: opacity 600ms ease; }
+.hint kbd { font: 700 12px/1 var(--ui); color: var(--chalk); background: rgba(255, 255, 255, 0.1); border: 1px solid var(--rule-strong); border-bottom-width: 2px; border-radius: 4px; padding: 3px 6px; margin-right: 4px; }
+.serve-hint { position: absolute; left: 50%; bottom: 26%; transform: translateX(-50%); text-align: center; font: 700 15px/1.3 var(--ui); background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 9px 14px; white-space: nowrap; }
+.serve-hint b { color: var(--lime); }
+
+/* ---------- touch controls ---------- */
+.touch { position: fixed; inset: 0; pointer-events: none; }
+.stick-zone { position: absolute; left: 0; bottom: 0; width: 50%; height: 62%; pointer-events: auto; }
+.stick { position: absolute; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; background: rgba(9, 14, 30, 0.35); border: 2px solid rgba(226, 232, 255, 0.22); transition: opacity 200ms ease; }
+.stick .knob { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%; background: rgba(226, 232, 255, 0.85); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); }
+.stick.idle { opacity: 0.45; }
+.stick-tag { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); font: 700 10px/1 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.shots { position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); width: 230px; height: 190px; pointer-events: none; }
+.shot { position: absolute; width: 84px; height: 84px; border-radius: 50%; pointer-events: auto; display: grid; place-items: center; text-align: center; font: 800 italic 16px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--chalk); background: rgba(9, 14, 30, 0.72); border: 2px solid var(--rule-strong); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform 90ms ease, background 120ms ease; }
+.shot small { display: block; font: 700 10px/1 var(--ui); letter-spacing: 0.1em; color: var(--muted); margin-top: 4px; font-style: normal; }
+.shot.down { transform: scale(0.92); background: rgba(212, 255, 58, 0.25); }
+/* the perfect window: press now */
+.ready .shot { border-color: var(--lime); box-shadow: 0 0 0 3px rgba(212, 255, 58, 0.35), 0 6px 18px rgba(0, 0, 0, 0.35); }
+.shot.c { right: 70px; top: 0; border-color: var(--lime); }
+.shot.c span { color: var(--lime); }
+.shot.a { right: 140px; bottom: 0; }
+.shot.b { right: 0; bottom: 0; }
+
+/* ---------- cards ---------- */
+.overlay { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px); pointer-events: auto; overflow-y: auto; box-sizing: border-box; }
+.overlay > .card { margin: auto 0; }
+.overlay.dim { background: var(--scrim); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.card { width: min(440px, 100%); background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 22px 22px 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.menu { position: fixed; inset: 0; display: flex; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px) max(16px, calc(env(safe-area-inset-left, 0px) + 4vw)); pointer-events: auto; overflow-y: auto; box-sizing: border-box; }
+.menu .card { width: 460px; max-width: 100%; margin: auto 0; box-sizing: border-box; padding-bottom: 16px; }
+/* Play stays in reach while the card scrolls on a short screen */
+.menu .primary { position: sticky; bottom: 0; z-index: 2; box-shadow: 0 -10px 24px rgba(9, 14, 30, 0.9), 0 8px 24px rgba(212, 255, 58, 0.22); }
+.brand { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; }
+.brand .kicker { font: 800 italic 13px/1 var(--display); letter-spacing: 0.24em; text-transform: uppercase; color: var(--lime); }
+.brand h1 { margin: 0; font: 900 italic 64px/0.86 var(--display); letter-spacing: 0.01em; text-transform: uppercase; }
+.brand h1 em { font-style: italic; color: var(--lime); }
+.brand p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.field { margin-top: 14px; }
+.field > .lbl { display: block; margin-bottom: 7px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--rule); border-radius: 10px; }
+.seg button { padding: 9px 6px 8px; border-radius: 7px; font: 700 15px/1.05 var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); transition: background 120ms ease, color 120ms ease; }
+.seg button small { display: block; font: 600 11px/1.2 var(--ui); letter-spacing: 0.02em; text-transform: none; margin-top: 3px; opacity: 0.85; }
+.seg button:hover { color: var(--chalk); }
+.seg button[aria-pressed="true"] { background: var(--chalk); color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: flex; align-items: center; gap: 8px; padding: 5px 11px 5px 5px; border-radius: 999px; border: 1px solid var(--rule-strong); font: 700 14px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); transition: background 120ms ease, color 120ms ease, border-color 120ms ease; }
+.chip .face { width: 26px; height: 26px; border-radius: 50%; background: #1b2440 center/cover no-repeat; flex: none; }
+.chip[aria-pressed="true"] { color: var(--ink); background: var(--chalk); border-color: var(--chalk); }
+.vs { margin-top: 8px; font: 600 13px/1.3 var(--ui); color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.vs b { color: var(--chalk); }
+.link-btn { color: var(--lime); font: 700 13px/1 var(--ui); padding: 4px 2px; text-decoration: underline; text-underline-offset: 3px; }
+.name-in { width: 100%; box-sizing: border-box; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--rule-strong); border-radius: 8px; color: var(--chalk); font: 700 16px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 12px; user-select: text; -webkit-user-select: text; }
+.name-in::placeholder { color: var(--muted); }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; }
+.tog { display: flex; align-items: center; gap: 8px; font: 600 13px/1 var(--ui); color: var(--muted); padding: 4px 0; }
+.tog i { position: relative; width: 34px; height: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.14); transition: background 150ms ease; flex: none; }
+.tog i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--chalk); transition: transform 150ms ease; }
+.tog[aria-pressed="true"] { color: var(--chalk); }
+.tog[aria-pressed="true"] i { background: var(--you); }
+.tog[aria-pressed="true"] i::after { transform: translateX(14px); }
+.primary { width: 100%; margin-top: 18px; padding: 15px 16px 13px; border-radius: 10px; background: var(--lime); color: var(--lime-ink); font: 900 italic 24px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 8px 24px rgba(212, 255, 58, 0.22); transition: transform 120ms ease, box-shadow 120ms ease; position: relative; overflow: hidden; }
+.primary:hover { box-shadow: 0 10px 30px rgba(212, 255, 58, 0.35); }
+.primary:active { transform: scale(0.98); }
+.primary[disabled] { cursor: progress; background: rgba(212, 255, 58, 0.35); box-shadow: none; }
+.secondary { width: 100%; margin-top: 8px; padding: 12px 16px 11px; border-radius: 10px; border: 1px solid var(--rule-strong); font: 800 italic 18px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; }
+.secondary:hover { background: rgba(255, 255, 255, 0.06); }
+.how { margin-top: 14px; font: 500 13px/1.45 var(--ui); color: var(--muted); }
+.how summary { cursor: pointer; font-weight: 700; color: var(--chalk); list-style: none; display: flex; align-items: center; gap: 6px; }
+.how summary::-webkit-details-marker { display: none; }
+.how summary::before { content: "+"; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--rule-strong); font-size: 13px; }
+.how[open] summary::before { content: "–"; }
+.how ul { margin: 8px 0 0; padding-left: 18px; }
+.how li { margin: 3px 0; }
+.how kbd { font: 700 11px/1 var(--ui); color: var(--chalk); background: rgba(255, 255, 255, 0.1); border: 1px solid var(--rule-strong); border-radius: 4px; padding: 2px 5px; }
+.home { display: inline-block; margin-top: 14px; color: var(--muted); font: 600 13px/1 var(--ui); text-decoration: none; }
+.home:hover { color: var(--chalk); text-decoration: underline; }
+.card h2 { margin: 0 0 4px; font: 900 italic 40px/0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+.card h2.win { color: var(--lime); }
+.card .sub { color: var(--muted); margin: 0 0 14px; }
+.games { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.games span { padding: 6px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); font: 800 20px/1 var(--display); font-variant-numeric: tabular-nums; }
+.games span.w { background: rgba(212, 255, 58, 0.16); color: var(--lime); }
+.stats { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.stats th, .stats td { padding: 7px 4px; border-top: 1px solid var(--rule); text-align: center; font: 700 16px/1 var(--display); }
+.stats th { font: 700 11px/1 var(--ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.stats td:first-child, .stats th:first-child { text-align: left; font: 600 13px/1.2 var(--ui); color: var(--muted); }
+.stats tr:first-child th { border-top: 0; }
+.stats .c0 { color: var(--you); } .stats .c1 { color: var(--cpu); }
+
+/* loading */
+.load { text-align: center; }
+.load .brand { align-items: center; margin-bottom: 18px; }
+.bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 100%; background: var(--lime); transform-origin: left; transform: scaleX(0.04); transition: transform 200ms ease; }
+.load-step { margin-top: 10px; color: var(--muted); font-size: 13px; }
+.fatal-msg { color: var(--chalk); }
+
+@media (max-width: 560px) {
+  .bug { width: 232px; }
+  .row { height: 32px; grid-template-columns: 4px minmax(0, 1fr) 16px 22px 38px; }
+  .row .nm { font-size: 16px; }
+  .row .pt { font-size: 22px; }
+  .bug-head { font-size: 11px; }
+  .bug-foot { font-size: 11px; }
+  .rally { top: calc(env(safe-area-inset-top, 0px) + 118px); }
+  .brand h1 { font-size: 52px; }
+  .view-btn span { display: none; }
+  .view-btn { width: 44px; padding: 0; justify-content: center; }
+  .replay-bug { top: calc(env(safe-area-inset-top, 0px) + 200px); }
+  .menu { padding-left: 16px; }
+  .brand p { font-size: 13px; }
+  .speed .v { font-size: 24px; }
+}
+@media (max-height: 820px) {
+  .brand { margin-bottom: 10px; }
+  .brand h1 { font-size: 54px; }
+  .field { margin-top: 10px; }
+  .field > .lbl { margin-bottom: 5px; }
+  .seg button { padding: 7px 6px 6px; }
+  .name-in { padding: 8px 12px; }
+  .primary { margin-top: 12px; padding: 13px 16px 11px; }
+  .card { padding: 18px 20px 16px; }
+}
+@media (max-height: 520px) {
+  .brand h1 { font-size: 40px; }
+  .brand p { display: none; }
+  .bug { width: 236px; }
+  .row { height: 28px; grid-template-columns: 4px minmax(0, 1fr) 16px 22px 38px; }
+  .row .nm { font-size: 15px; }
+  .row .pt { font-size: 20px; }
+  .bug-head { font-size: 11px; padding: 4px 9px 3px; }
+  .bug-foot { display: none; }
+  .rally { top: calc(env(safe-area-inset-top, 0px) + 86px); }
+  .serve-hint { bottom: 22%; }
+  .shots { transform: scale(0.85); transform-origin: right bottom; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .callout.show, .callout.hide, .speed.show, .ump.show, .timing.on { animation-duration: 1ms; }
+}
+</style>
+</head>
+<body>
+<canvas id="scene" tabindex="0" aria-label="Rally Point, a 3D badminton court"></canvas>
+
+<div class="safe" id="hud" hidden>
+  <div class="bug" aria-live="polite">
+    <div class="bug-head"><span>Thudinest Open</span><span id="bugGame">Game 1</span></div>
+    <div class="row p0" id="row0"><i class="bar"></i><span class="nm" id="nm0">You</span><svg class="srv" viewBox="0 0 16 16" aria-label="serving"><path d="M8 1.5c-1.1 0-2 .9-2 2 0 .5.2 1 .5 1.3L3.6 13.6a1 1 0 0 0 1 1.4h6.8a1 1 0 0 0 1-1.4L9.5 4.8c.3-.3.5-.8.5-1.3 0-1.1-.9-2-2-2Z" fill="#d4ff3a"/></svg><span class="gm" id="gm0">0</span><span class="pt" id="pt0">0</span></div>
+    <div class="row p1" id="row1"><i class="bar"></i><span class="nm" id="nm1">CPU</span><svg class="srv" viewBox="0 0 16 16" aria-label="serving"><path d="M8 1.5c-1.1 0-2 .9-2 2 0 .5.2 1 .5 1.3L3.6 13.6a1 1 0 0 0 1 1.4h6.8a1 1 0 0 0 1-1.4L9.5 4.8c.3-.3.5-.8.5-1.3 0-1.1-.9-2-2-2Z" fill="#d4ff3a"/></svg><span class="gm" id="gm1">0</span><span class="pt" id="pt1">0</span></div>
+    <div class="bug-foot"><span>Men's singles</span><span id="bugTag" class="tag"></span></div>
+  </div>
+  <div class="rally" id="rally" style="opacity:0">Rally <b id="rallyN">0</b></div>
+  <div class="tr">
+    <button class="icon-btn view-btn" id="viewBtn" aria-label="Switch camera view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3l2-3h8l2 3h3v12H3z"/><circle cx="12" cy="13" r="4"/></svg><span id="viewName">Broadcast</span></button>
+    <button class="icon-btn" id="pauseBtn" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  </div>
+  <div class="pill" id="pill" hidden></div>
+  <div class="callout" id="callout" hidden><div class="call-main" id="callMain"></div><div class="call-sub" id="callSub" hidden></div></div>
+  <div class="timing" id="timing" data-q=""></div>
+  <div class="lower">
+    <div class="speed" id="speed" hidden><span class="k" id="speedK">Smash</span><span class="v"><span id="speedV">0</span><small>km/h</small></span></div>
+    <div class="ump" id="ump" hidden><span class="lbl">Umpire</span><span id="umpText"></span></div>
+  </div>
+  <div class="serve-hint" id="serveHint" hidden></div>
+  <div class="hint" id="keyHint" hidden><span><kbd>WASD</kbd>move / aim</span><span><kbd>J</kbd>clear · lift</span><span><kbd>K</kbd>drop · net</span><span><kbd>L</kbd>smash · drive</span><span><kbd>C</kbd>camera</span><span><kbd>P</kbd>pause</span></div>
+  <div class="replay-bug" id="replayBug" hidden><i></i>Replay</div>
+  <div class="skip-hint" id="skipHint" hidden>Tap or press Space to skip</div>
+</div>
+
+<div class="touch" id="touch" hidden>
+  <div class="stick-zone" id="stickZone"></div>
+  <div class="stick idle" id="stick"><span class="stick-tag" id="stickTag">Aim</span><div class="knob" id="knob"></div></div>
+  <div class="shots">
+    <button class="shot c" data-btn="C" aria-label="Attack shot"><span><span id="lblC">Smash</span><small>attack</small></span></button>
+    <button class="shot a" data-btn="A" aria-label="Lob shot"><span><span id="lblA">Clear</span><small>deep</small></span></button>
+    <button class="shot b" data-btn="B" aria-label="Soft shot"><span><span id="lblB">Drop</span><small>short</small></span></button>
+  </div>
+</div>
+
+<div class="overlay" id="loadPanel">
+  <div class="card load">
+    <div class="brand"><span class="kicker">Thudinest Open · 3D badminton</span><h1>Rally <em>Point</em></h1></div>
+    <div class="bar"><i id="loadBar"></i></div>
+    <div class="load-step" id="loadStep">Loading the arena…</div>
+  </div>
+</div>
+
+<div class="menu" id="menu" hidden>
+  <div class="card">
+    <div class="brand"><span class="kicker">Thudinest Open · 3D badminton</span><h1>Rally <em>Point</em></h1><p>Singles under the arena lights. Watch it like TV, or from the side.</p></div>
+    <div class="field"><span class="lbl">Your player</span><div class="chips" id="pickChips"></div>
+      <div class="vs">vs <b id="oppName">—</b><button class="link-btn" id="oppShuffle" type="button">Change</button></div></div>
+    <div class="field"><label class="lbl" for="nameIn">Your name on the scoreboard</label><input class="name-in" id="nameIn" maxlength="14" placeholder="Optional" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><span class="lbl">Opponent</span><div class="seg" id="segDiff">
+      <button data-v="easy">Club<small>Relaxed</small></button><button data-v="medium">National<small>A real game</small></button><button data-v="hard">World Tour<small>Bring it</small></button></div></div>
+    <div class="field"><span class="lbl">Match</span><div class="seg" id="segLen">
+      <button data-v="quick">Quick<small>1 game to 11</small></button><button data-v="single">Game<small>1 game to 21</small></button><button data-v="full">Match<small>Best of 3</small></button></div></div>
+    <div class="field"><span class="lbl">Camera</span><div class="seg" id="segView">
+      <button data-v="broadcast">Broadcast<small>TV, end on</small></button><button data-v="side">Side<small>Courtside</small></button></div></div>
+    <div class="toggles">
+      <button class="tog" id="togAuto" aria-pressed="true"><i></i>Auto-run to the shuttle</button>
+      <button class="tog" id="togMark" aria-pressed="true"><i></i>Landing marker</button>
+      <button class="tog" id="togSound" aria-pressed="true"><i></i>Sound</button>
+    </div>
+    <button class="primary" id="playBtn" disabled>Loading…</button>
+    <details class="how" id="howTo"><summary>How to play</summary>
+      <ul>
+        <li>Three shots. <b>Clear</b> sends it high and deep (a lift from low down). <b>Drop</b> plays it short (a net shot near the net). <b>Smash</b> hits down hard from overhead (a drive or push from lower).</li>
+        <li>Press the shot just before the shuttle reaches you; the racket swings when it arrives. The ring under your feet (and the buttons, on a phone) light up lime while a press would be <b>Perfect</b>.</li>
+        <li>With auto-run on, your player runs to the shuttle and the stick (or <kbd>WASD</kbd>) aims: left and right across the court, up for deeper, down for shorter. With it off, the stick moves you and aims as you hit.</li>
+        <li>Keys: <kbd>J</kbd> clear, <kbd>K</kbd> drop, <kbd>L</kbd> smash, <kbd>C</kbd> switches the camera, <kbd>P</kbd> or <kbd>Esc</kbd> pauses. A game controller works too: <kbd>A</kbd> clear, <kbd>B</kbd> drop, <kbd>X</kbd> or <kbd>RT</kbd> smash, <kbd>Y</kbd> camera.</li>
+        <li>Rally scoring: every rally wins a point. Serve from the right when your score is even, the left when it's odd.</li>
+      </ul>
+    </details>
+    <a class="home" href="/">← Back to thudinest.com</a>
+  </div>
+</div>
+
+<div class="overlay dim" id="pausePanel" hidden>
+  <div class="card">
+    <h2>Paused</h2>
+    <p class="sub" id="pauseSub"></p>
+    <div class="field"><span class="lbl">Camera</span><div class="seg" id="segViewP">
+      <button data-v="broadcast">Broadcast</button><button data-v="side">Side</button></div></div>
+    <div class="toggles">
+      <button class="tog" id="togAutoP"><i></i>Auto-run</button>
+      <button class="tog" id="togMarkP"><i></i>Landing marker</button>
+      <button class="tog" id="togSoundP"><i></i>Sound</button>
+      <button class="tog" id="togVoiceP"><i></i>Umpire voice</button>
+      <button class="tog" id="togReplayP"><i></i>Replays</button>
+    </div>
+    <button class="primary" id="resumeBtn">Resume</button>
+    <button class="secondary" id="restartBtn">Restart match</button>
+    <button class="secondary" id="quitBtn">Main menu</button>
+  </div>
+</div>
+
+<div class="overlay dim" id="endPanel" hidden>
+  <div class="card">
+    <h2 id="endTitle">Match won</h2>
+    <p class="sub" id="endSub"></p>
+    <div class="games" id="endGames"></div>
+    <table class="stats" id="endStats"></table>
+    <button class="primary" id="againBtn">Rematch</button>
+    <button class="secondary" id="menuBtn">Change settings</button>
+  </div>
+</div>
+
+<div class="overlay dim" id="fatal" hidden>
+  <div class="card"><h2>Out of play</h2><p class="fatal-msg" id="fatalMsg">The 3D arena could not start on this device.</p><p class="sub" id="fatalWhy"></p><button class="primary" onclick="location.reload()">Reload</button><a class="home" href="/">← Back to thudinest.com</a></div>
+</div>
+
+<script>
+/* Errors before the game module runs (an old browser without modules, a blocked download) still get a message */
+window.__fatal = (msg, why) => {
+  document.getElementById('loadPanel').hidden = true; document.getElementById('menu').hidden = true;
+  document.getElementById('fatal').hidden = false;
+  if (msg) document.getElementById('fatalMsg').textContent = msg;
+  document.getElementById('fatalWhy').textContent = why ? 'Details: ' + String(why).slice(0, 180) : '';
+};
+window.addEventListener('error', (e) => { if (!window.__booted) window.__fatal(null, e.message); });
+setTimeout(() => { if (!window.__booted) window.__fatal('The arena is taking too long to load. Check the connection and reload.'); }, 45000);
+</script>
+<script type="module" src="js/game.js"></script>
+<script nomodule>window.__fatal('This browser is too old for the 3D arena. Try a current Chrome, Safari, Edge or Firefox.');</script>
+</body>
+</html>
