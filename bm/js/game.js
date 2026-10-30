@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=5'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=6'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
@@ -859,20 +859,27 @@ class PlayerView {
     const vx = pl.vx, vz = pl.vz, v = Math.hypot(vx, vz);
     const L = b.loco;
     // ---- footwork, all of it from facing the net: a run forward faces the way it goes, sideways is a chassé square
-    // to the net, and going back turns side-on and chassés, left shoulder to the net (or the right one, on the way to
-    // the backhand corner). Never the back to the net.
+    // to the net, going back for a shot in the rear court turns side-on and chassés, left shoulder to the net (or the
+    // right one, on the way to the backhand corner), and any other step back (the server back from the service line,
+    // the way back to the middle after a net shot, the walk to the next serve) is a backpedal still facing the net.
+    // Never the back to the net.
     let wantRel = 0, mode = 'idle', mirror = L.mirror;
     const rel = v > 0.5 ? angDiff(this.netYaw, Math.atan2(vx, vz)) : 0, ar = Math.abs(rel); // the way it moves, from facing the net (+ to its left)
+    const plan = pl.plan, deep = !!plan && m.phase === 'rally' && m.sh.by !== pl.side && Math.abs(plan.P.z) - Math.abs(pl.z) > 0.7;
     if (v > 0.5 && ar < 1.05) {
       // forward: a run facing the way it goes, or small steps still facing the net
       mode = v > 1.0 ? 'run' : 'idle'; wantRel = rel * lerp(0.3, 1, smooth((v - 0.6) / 0.6)); this.chasse = null;
-    } else if (v > 0.5 && (ar < 2.1 || v > 1.0 || (this.chasse && v > 0.6))) {
+    } else if (v > 0.5 && (ar < 2.0 || (deep && (v > 1.0 || this.chasse)))) {
       // a chassé: a step to its right faces 90° left of the way it moves, a step to its left 90° right. Whichever is
       // squarer to the net, keeping the one in use (the forehand side to start with) unless the other is clearly squarer
       mode = 'shuf';
       const r = angDiff(0, rel + Math.PI / 2), l = angDiff(0, rel - Math.PI / 2), keepL = this.chasse === 'L';
       const useR = Math.abs(r) - (keepL ? 0 : 0.45) <= Math.abs(l) - (keepL ? 0.45 : 0);
-      this.chasse = useR ? 'R' : 'L'; wantRel = useR ? r : l; mirror = useR ? -1 : 1;
+      this.chasse = useR ? 'R' : 'L'; wantRel = clamp(useR ? r : l, -1.35, 1.35); mirror = useR ? -1 : 1;
+    } else if (v > 0.6) {
+      // a step back with no shot behind: backpedal, the run played backwards, the chest still to the net
+      mode = 'back'; this.chasse = null;
+      wantRel = angDiff(0, rel - Math.PI) * 0.4;
     } else {
       // standing, or a small step back: square to the other player
       if (v < 0.6) this.chasse = null;
@@ -880,12 +887,13 @@ class PlayerView {
       wantRel = clamp(angDiff(this.netYaw, Math.atan2(o.x - pl.x, o.z - pl.z)), -0.45, 0.45) * 0.7;
     }
     const runRate = v / Math.max(0.5, 7.06 * b.K.legLen), shufRate = v / Math.max(0.5, 2.74 * b.K.legLen);
-    L.tRun += dt * clamp(runRate, 0.35, 1.3);
+    L.tRun += dt * clamp(runRate, 0.35, 1.3) * (mode === 'back' ? -1.35 : 1); // shorter, quicker steps backwards
     L.tShuf += dt * clamp(shufRate, 0.5, 1.9);
     L.tIdle += dt;
     L.mirror = mirror;
     const k = 1 - Math.exp(-dt * 9);
-    L.run = lerp(L.run, mode === 'run' ? 1 : 0, k); L.shuf = lerp(L.shuf, mode === 'shuf' ? 1 : 0, k); L.idle = lerp(L.idle, mode === 'idle' ? 1 : 0, k);
+    // a backpedal is the run backwards at part weight over the ready stance: smaller steps, the body upright
+    L.run = lerp(L.run, mode === 'run' ? 1 : mode === 'back' ? 0.6 : 0, k); L.shuf = lerp(L.shuf, mode === 'shuf' ? 1 : 0, k); L.idle = lerp(L.idle, mode === 'idle' ? 1 : mode === 'back' ? 0.4 : 0, k);
     // ---- the stroke
     const s = live ? this.stroke(pl, m) : null;
     let yawOff = 0, twist = 0, lean = 0.06, crouch = live ? 0.07 : 0.0, lift = 0, tall = 0;
@@ -992,8 +1000,9 @@ class PlayerView {
       if (!st.air) lift = 0;
       if (b.react.t > b.react.until) b.react = null;
     }
-    // ---- body yaw, from facing the net: never more than 2.1 rad round either way, so never round through the back
-    const want = clamp(wantRel + yawOff, -2.1, 2.1);
+    // ---- body yaw, from facing the net: at most side-on (a stroke's turn on top of a side-on chassé doesn't add up
+    // past it), so never round through the back
+    const want = clamp(wantRel + yawOff, -1.6, 1.6);
     this.rel += (want - this.rel) * (1 - Math.exp(-dt * (keyed ? 14 : 9)));
     this.yaw = this.netYaw + this.rel;
     if (b.react) tall = 0;
@@ -1392,7 +1401,8 @@ const Input = (() => {
   // the floating stick: wherever the left thumb lands
   const zone = $('stickZone'), stick = $('stick'), knob = $('knob');
   const R = 52;
-  const restStick = () => { const r = zone.getBoundingClientRect(); stick.style.left = `${r.left + Math.min(110, r.width * 0.35)}px`; stick.style.top = `${r.bottom - 110}px`; knob.style.transform = ''; stick.classList.add('idle'); };
+  // at rest, low on the left (the zone is the left half, bottom up; from the window, as the zone has no size while hidden)
+  const restStick = () => { stick.style.left = `${Math.min(110, innerWidth * 0.175) + 8}px`; stick.style.top = `${innerHeight - 118}px`; knob.style.transform = ''; stick.classList.add('idle'); };
   zone.addEventListener('pointerdown', (e) => {
     I.onAny && I.onAny(); if (I.touch.id !== null) return;
     I.touch.id = e.pointerId; I.touch.x0 = I.touch.x = e.clientX; I.touch.y0 = I.touch.y = e.clientY;
@@ -1476,7 +1486,7 @@ const Hud = (() => {
     el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
     later('ump', 2800, () => { el.hidden = true; });
   };
-  H.rally = (n) => { $('rallyN').textContent = n; $('rally').style.opacity = n >= 6 ? 1 : 0; };
+  H.rally = (n) => { $('rallyN').textContent = n; $('bug').classList.toggle('long', n >= 6); };
   H.timing = (label) => { const el = $('timing'); el.dataset.q = label; el.textContent = label; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); };
   H.serveHint = (show) => {
     const el = $('serveHint');
@@ -1495,7 +1505,7 @@ const Hud = (() => {
     if ($('lblC').textContent !== c) $('lblC').textContent = c;
     if ($('subC').textContent !== cs) $('subC').textContent = cs;
   };
-  H.clear = () => { for (const id of ['callout', 'pill', 'speed', 'ump', 'serveHint', 'replayBug', 'skipHint']) $(id).hidden = true; $('rally').style.opacity = 0; };
+  H.clear = () => { for (const id of ['callout', 'pill', 'speed', 'ump', 'serveHint', 'replayBug', 'skipHint']) $(id).hidden = true; $('bug').classList.remove('long'); };
   return H;
 })();
 
