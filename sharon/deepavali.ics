@@ -1,0 +1,23 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//thudinest//sharon//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:sharon-deepavali-2026@thudinest.com
+DTSTAMP:20261030T000000Z
+DTSTART:20261108T100000Z
+DTEND:20261108T140000Z
+SUMMARY:Deepavali at Sharon's 🪔
+LOCATION:The Vyne Residence\, Taman Sungai Besi\, 57100 Kuala Lumpur
+GEO:3.09199;101.69871
+DESCRIPTION:Food\, drinks\, karaoke and music. 6 PM onwards.\nRSVP on What
+ sApp: +60 17-605 7231\nhttps://thudinest.com/sharon/
+URL:https://thudinest.com/sharon/
+BEGIN:VALARM
+TRIGGER:-PT3H
+ACTION:DISPLAY
+DESCRIPTION:Deepavali at Sharon's tonight
+END:VALARM
+END:VEVENT
+END:VCALENDAR
