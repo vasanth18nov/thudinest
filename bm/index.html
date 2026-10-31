@@ -387,7 +387,7 @@ window.__fatal = (msg, why) => {
 window.addEventListener('error', (e) => { if (!window.__booted) window.__fatal(null, e.message); });
 setTimeout(() => { if (!window.__booted) window.__fatal('The arena is taking too long to load. Check the connection and reload.'); }, 45000);
 </script>
-<script type="module" src="js/game.js?v=6"></script>
+<script type="module" src="js/game.js?v=7"></script>
 <script nomodule>window.__fatal('This browser is too old for the 3D arena. Try a current Chrome, Safari, Edge or Firefox.');</script>
 </body>
 </html>

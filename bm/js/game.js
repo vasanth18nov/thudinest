@@ -2,7 +2,7 @@
    choices) is in sim.js; this file draws it, animates the players from it, films it and takes the controls.
    Axes as in sim.js: x across the court, y up, z along it, the net at z = 0; you play the half z > 0. */
 import * as THREE from '../vendor/three.js';
-import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=6'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
+import { Match, COURT, DIFFS, SHOTS, sideSign, netHeight, H_PREF, DT } from './sim.js?v=7'; // bump ?v= here and in index.html with each release: browsers keep JS for 4 hours
 
 window.__booted = true;
 const $ = (id) => document.getElementById(id);
@@ -431,7 +431,7 @@ const bonesOf = (root) => { const m = {}; root.traverse((o) => { if (o.isBone) {
 const ORDER = ['Hips', 'Spine', 'Spine1', 'Spine2', 'Neck', 'Head', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'];
 const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
 const swapSide = (n) => (n.startsWith('Left') ? `Right${n.slice(4)}` : n.startsWith('Right') ? `Left${n.slice(5)}` : n);
-const _q1 = new Q(), _q2 = new Q(), _q3 = new Q(), _v1 = new V3(), _v2 = new V3(), _v3 = new V3(), _v4 = new V3(), _m1 = new THREE.Matrix4();
+const _q1 = new Q(), _q2 = new Q(), _q3 = new Q(), _qs = new Q(), _v1 = new V3(), _v2 = new V3(), _v3 = new V3(), _v4 = new V3(), _v5 = new V3(), _m1 = new THREE.Matrix4();
 const Y_UP = new V3(0, 1, 0);
 const _qw = new Q(); // setWorldQuat's own: callers pass the shared temporaries
 function setWorldQuat(obj, qW) { obj.parent.getWorldQuaternion(_qw); obj.quaternion.copy(_qw.invert()).multiply(qW); }
@@ -594,8 +594,29 @@ const STROKES = {
     { t: 0.4, g: [-0.04, 1.08, 0.42], d: [-0.55, -0.25, 0.8], pole: [-0.1, 0.1, 1], lh: [-0.35, 1.05, 0.2], yaw: 0.1, tw: 0 },
     { t: 0.8, g: [0.3, 1.18, 0.32], d: [0.15, 0.8, 0.58], pole: [0.8, -0.6, -0.2], lh: [-0.28, 1.12, 0.3], yaw: 0, tw: 0 },
   ] },
+  // the stylish ones (see PlayerView.flairFor): round the head, a high one on the backhand side taken above the left
+  // shoulder with the body square and bent to the left, the racket dropping behind the head first
+  rth: { bias: [-0.2, 0.42, 0.05], pole: [0.5, 0.9, 0.1], side: 0.55, keys: [
+    { t: -0.5, g: [0.3, 1.18, 0.32], d: [0.15, 0.8, 0.58], pole: [0.8, -0.6, -0.2], lh: [-0.28, 1.12, 0.3], yaw: 0, tw: 0 },
+    { t: -0.3, g: [0.24, 1.66, -0.06], d: [0.02, 0.9, -0.42], pole: [0.8, 0.4, -0.4], lh: [-0.42, 1.72, 0.32], yaw: -0.2, tw: -0.15 },
+    { t: -0.07, g: [0.06, 1.8, -0.16], d: [-0.22, -0.75, -0.6], pole: [0.6, 0.9, -0.1], lh: [-0.45, 1.42, 0.18], yaw: -0.1, tw: -0.1 },
+    { t: 0.12, g: [-0.1, 1.36, 0.5], d: [-0.35, -0.55, 0.75], pole: [0.7, 0.3, 0.2], lh: [-0.4, 1.1, -0.05], yaw: 0.1, tw: 0.2 },
+    { t: 0.34, g: [-0.28, 1.0, 0.28], d: [-0.5, -0.8, 0.3], pole: [0.7, -0.4, 0.3], lh: [-0.32, 1.0, -0.05], yaw: 0.15, tw: 0.25 },
+    { t: 0.72, g: [0.3, 1.18, 0.32], d: [0.15, 0.8, 0.58], pole: [0.8, -0.6, -0.2], lh: [-0.28, 1.12, 0.3], yaw: 0, tw: 0 },
+  ], whip: { t: -0.035, g: [0.08, 1.9, -0.05], d: [-0.15, 0.1, -1], pole: [0.6, 0.9, -0.1], lh: [-0.45, 1.38, 0.15], yaw: -0.1, tw: -0.12 } },
+  // behind the back: a mid-height one gone past the backhand side, the body turned away from it and the racket arm
+  // wrapped round the back, the wrist flicking it from behind the left hip (the contact key: PlayerView.keys)
+  btb: { bias: [0, 0, 0], pole: [0.85, -0.25, -0.55], behind: [0.04, 1.03, -0.18], keys: [
+    { t: -0.45, g: [0.3, 1.18, 0.32], d: [0.15, 0.8, 0.58], pole: [0.8, -0.6, -0.2], lh: [-0.28, 1.12, 0.3], yaw: 0, tw: 0 },
+    { t: -0.26, g: [0.42, 1.08, -0.02], d: [0.45, 0.2, -0.87], pole: [0.8, -0.5, -0.4], lh: [-0.32, 1.22, 0.32], yaw: 0, tw: 0.12 },
+    { t: -0.1, g: [0.22, 1.0, -0.2], d: [-0.25, 0.05, -0.97], pole: [0.85, -0.25, -0.55], lh: [-0.36, 1.24, 0.34], yaw: 0, tw: -0.08 },
+    { t: 0.14, g: [-0.1, 1.04, -0.2], d: [-0.82, 0.3, 0.48], pole: [0.85, -0.25, -0.55], lh: [-0.36, 1.2, 0.3], yaw: 0, tw: -0.18 },
+    { t: 0.4, g: [0.12, 1.06, -0.1], d: [-0.2, 0.75, 0.6], pole: [0.8, -0.45, -0.3], lh: [-0.3, 1.15, 0.3], yaw: 0, tw: 0 },
+    { t: 0.7, g: [0.3, 1.18, 0.32], d: [0.15, 0.8, 0.58], pole: [0.8, -0.6, -0.2], lh: [-0.28, 1.12, 0.3], yaw: 0, tw: 0 },
+  ] },
 };
 STROKES.jump = STROKES.over;
+STROKES.over.whip = { t: -0.035, g: [0.27, 1.8, -0.02], d: [0.1, 0.05, -1], pole: [0.8, 0.5, -0.1], lh: [-0.22, 1.5, 0.35], yaw: -0.3, tw: -0.15 }; // racket back, on its way up
 const READY = STROKES.over.keys[0];
 const RELAXED = { g: [0.3, 0.92, 0.18], d: [0.1, -0.15, 0.98], pole: [0.6, -0.8, -0.3], lh: [-0.25, 0.92, 0.05] };
 const HIPS = { g: [0.25, 0.98, -0.03], d: [0.1, -0.85, -0.5], pole: [1, 0.1, -0.6], lh: [-0.25, 0.98, -0.03] }; // hands on hips, racket hanging
@@ -688,7 +709,9 @@ class Body {
   pose(st, dt) {
     const K = this.K, B = this.B;
     this.root.position.set(st.x, st.lift || 0, st.z);
-    this.yaw = st.yaw; this.root.rotation.y = st.yaw;
+    // the whole rotation, not just its y: a replay writes the root's quaternion, and three.js reads a turn past 90°
+    // back as x = z = 180°, which would stay and mirror every yaw after it (the player facing away from the net)
+    this.yaw = st.yaw; this.root.rotation.set(0, st.yaw, 0);
     this.clipPose(dt);
     // the clip's legs first, to find where its feet are
     this.applyT(0, this.hipsY, 0);
@@ -700,11 +723,11 @@ class Body {
     const hy = this.hipsY + (st.tall || 0) * (this.K.hipH * 0.985 - this.hipsY);
     this.applyT(0, hy - (st.crouch || 0) * this.hs, 0);
     this.root.updateMatrixWorld(true);
-    // the chest: twist about the vertical and lean forward
-    if (st.twist || st.lean) {
-      const right = this.dirWorld(1, 0, 0, _v4);
+    // the chest: twist about the vertical, lean forward, bend to the side (+ to the left)
+    if (st.twist || st.lean || st.side) {
+      const right = this.dirWorld(1, 0, 0, _v4), fwd = this.dirWorld(0, 0, 1, _v5);
       for (const n of ['Spine', 'Spine1', 'Spine2']) {
-        _q2.setFromAxisAngle(Y_UP, (st.twist || 0) / 3).multiply(_q3.setFromAxisAngle(right, (st.lean || 0) / 3));
+        _q2.setFromAxisAngle(Y_UP, (st.twist || 0) / 3).multiply(_q3.setFromAxisAngle(right, (st.lean || 0) / 3)).multiply(_qs.setFromAxisAngle(fwd, -(st.side || 0) / 3));
         setWorldQuat(B[n], B[n].getWorldQuaternion(_q1).premultiply(_q2)); B[n].updateMatrixWorld(true);
       }
     }
@@ -809,7 +832,7 @@ class Body {
 /* Reads a sim player (position, speed, the plan for the shuttle on its way, the stroke just played) and poses its
    Body: footwork from the clips, the stroke around its contact, a lunge to a low shuttle near the net, a jump for
    the jump smash, the head on the shuttle. */
-const STYLE_AXIS = { over: [1, 0, 0, 1], jump: [1, 0, 0, 1], fore: [0, 1, 0, -1], back: [0, 1, 0, -1], netF: [1, 0, 0, 1], netB: [0, 1, 0, -1], serveFore: [1, 0, 0, 1], serveBack: [0, 1, 0, -1] };
+const STYLE_AXIS = { over: [1, 0, 0, 1], jump: [1, 0, 0, 1], fore: [0, 1, 0, -1], back: [0, 1, 0, -1], netF: [1, 0, 0, 1], netB: [0, 1, 0, -1], serveFore: [1, 0, 0, 1], serveBack: [0, 1, 0, -1], rth: [1, 0, 0, 1], btb: [0, 1, 0, -1] };
 const SOFT = new Set(['net', 'block']);
 const _sv = { a: new V3(), b: new V3(), c: new V3(), d: new V3(), e: new V3() };
 class PlayerView {
@@ -825,6 +848,8 @@ class PlayerView {
     this.rel = 0; // the body's turn from facing the net
     this.chasse = null; // which way a chassé steps: 'R' (left shoulder to the net) or 'L'
     this.jmp = null; // a jump in the air: { t0, v0, tc, end }
+    this.reach = { x: 0, z: 0 }; // a step toward a contact out of reach
+    this.flair = null; // the stylish way chosen for the shuttle coming, if any (flairFor)
   }
   setBody(b) { this.body = b; }
   react(key, o = {}) { if (!this.body || !CLIPS) return; this.body.react = { key, t: 0, from: o.from || 0, loop: !!o.loop, rate: o.rate || 1, mirror: o.mirror || 1, until: o.until || 9 }; }
@@ -841,6 +866,7 @@ class PlayerView {
       const P = sw.P, z = pl.zone ? pl.zone(P) : null;
       let style = sw.style;
       if ((style === 'fore' || style === 'back') && (SOFT.has(sw.kind) || (P.y < 1.1 && Math.abs(P.z) < 2.6))) style = style === 'fore' ? 'netF' : 'netB';
+      if (!style.startsWith('serve')) style = this.flairFor(pl, m, style, sw.t, P, pl.x, pl.z, sw);
       return { style, tc: sw.t, P, hit: true, dir: sw.dir, kind: sw.kind, lowLunge: P.y < 0.9 || (P.y < 1.0 && z && z.df > 0.55) };
     }
     const plan = pl.plan;
@@ -848,9 +874,34 @@ class PlayerView {
       const P = plan.P, z = pl.zone(P, plan.B.x, plan.B.z), jump = plan.jump && (pl.ai || (pl.press && pl.press.jump));
       let style = jump ? 'jump' : P.y >= 1.85 ? 'over' : z.dr >= -0.05 ? 'fore' : 'back';
       if (style === 'fore' || style === 'back') if (P.y < 1.1 && Math.abs(P.z) < 2.6) style = style === 'fore' ? 'netF' : 'netB';
+      style = this.flairFor(pl, m, style, plan.t, P, plan.B.x, plan.B.z, null);
       return { style, tc: plan.t, P, hit: false, committed: !!pl.press, from: pl.press ? pl.press.t : -9, dir: null, kind: null, lowLunge: P.y < 0.9 || (P.y < 1.0 && z.df > 0.55) };
     }
     return null;
+  }
+  /* a stylish way to play it, decided once for each shuttle coming (the other player's shot) and kept to the end of
+     the stroke, whatever the plan does: round the head for a high one to the backhand rear corner (as the top players
+     take most of them), and now and then behind the back for a mid-height one gone past the backhand side. Only the
+     look of the stroke: where the shuttle goes is the sim's. (bx, bz): where the body will be at the contact */
+  flairFor(pl, m, style, tc, P, bx, bz, sw) {
+    let F = this.flair;
+    const key = m.pl[1 - pl.side].swing;
+    if (!F || F.key !== key) {
+      let pick = null;
+      // (decided while it is coming, never at the hit itself: no stroke changes style with no backswing)
+      if (sw) pick = null;
+      else if (style === 'over' && Math.abs(P.z) > 4.3 && P.x * pl.sg < -0.85 && Math.random() < 0.65) pick = 'rth';
+      else if (style === 'back' && P.y >= 0.8 && P.y <= 1.6 && Math.abs(P.z) > 2.2 && Math.abs(m.T - (this.btbT ?? -99)) > 8) {
+        // the shuttle's bearing from the net-facing (+ to the left) and distance from the body
+        const a = angDiff(this.netYaw, Math.atan2(P.x - bx, P.z - bz)), rho = Math.hypot(P.x - bx, P.z - bz);
+        const chance = pl.ai ? (pl.ai.skill > 0.8 ? 0.45 : pl.ai.skill > 0.6 ? 0.35 : 0.15) : 0.4;
+        if (a > 0.5 && a < 2.2 && rho > 0.45 && rho < 1.05 && Math.random() < chance) { pick = 'btb'; this.btbT = m.T; }
+      }
+      F = this.flair = { key, style: pick, base: pick === 'rth' ? 'over' : pick === 'btb' ? 'back' : null };
+    }
+    if (!F.style || F.base !== style) return style;
+    if (sw && !sw.flair) sw.flair = F.style;
+    return F.style;
   }
 
   update(dt, pl, m, look, live) {
@@ -886,6 +937,8 @@ class PlayerView {
       const o = m.pl[1 - pl.side];
       wantRel = clamp(angDiff(this.netYaw, Math.atan2(o.x - pl.x, o.z - pl.z)), -0.45, 0.45) * 0.7;
     }
+    // in the air the feet can't turn the body: the turn it took off with, plus only the stroke's own
+    if (this.jmp) { if (this.jmp.rel0 === undefined) this.jmp.rel0 = this.rel - (this.kYaw || 0); wantRel = this.jmp.rel0; }
     const runRate = v / Math.max(0.5, 7.06 * b.K.legLen), shufRate = v / Math.max(0.5, 2.74 * b.K.legLen);
     L.tRun += dt * clamp(runRate, 0.35, 1.3) * (mode === 'back' ? -1.35 : 1); // shorter, quicker steps backwards
     L.tShuf += dt * clamp(shufRate, 0.5, 1.9);
@@ -896,7 +949,7 @@ class PlayerView {
     L.run = lerp(L.run, mode === 'run' ? 1 : mode === 'back' ? 0.6 : 0, k); L.shuf = lerp(L.shuf, mode === 'shuf' ? 1 : 0, k); L.idle = lerp(L.idle, mode === 'idle' ? 1 : mode === 'back' ? 0.4 : 0, k);
     // ---- the stroke
     const s = live ? this.stroke(pl, m) : null;
-    let yawOff = 0, twist = 0, lean = 0.06, crouch = live ? 0.07 : 0.0, lift = 0, tall = 0;
+    let yawOff = 0, twist = 0, lean = 0.06, crouch = live ? 0.07 : 0.0, lift = 0, tall = 0, side = 0, flairX = 0, flairYaw = null;
     const rally = m.phase === 'rally' || (m.phase === 'serve' && live);
     let keyed = false;
     st.feet = null; st.feetW = 0; st.air = 0;
@@ -906,11 +959,11 @@ class PlayerView {
       let tau = T - s.tc;
       // not played (yet): hold the racket back until the press, and drop the stroke once the shuttle has gone by
       if (!s.hit) { if (!s.committed) tau = Math.min(tau, -0.07); }
-      keyed = this.keys(S, s, tau);
+      keyed = this.keys(S, s, tau); this.kArgs = [S, s, tau];
       yawOff = this.kYaw; twist = this.kTw;
       // reach: rise for a high one, lunge for a low one in front
       const env = tau < 0 ? smooth((tau + 0.32) / 0.3) : 1 - smooth((tau - 0.08) / 0.4);
-      if (s.style === 'over') {
+      if (s.style === 'over' || s.style === 'rth') {
         // up on the toes as far as the contact needs: arm and racket reach about 1.07 m above the shoulder
         const P = s.P, need = P.y - (1.5 * b.hs + 1.04);
         lift = clamp(need, 0, 0.4) * env;
@@ -922,13 +975,28 @@ class PlayerView {
         if (T >= t0) this.jmp = { t0: T, v0, tc: s.tc, end: T + (2 * v0) / 9.81 };
         else { crouch += 0.15 * smooth((T - (t0 - 0.22)) / 0.22); tall = 0; }
       }
+      if (s.style === 'rth') {
+        // round the head: the body a step to the right of a shuttle above its left shoulder, bending to the left
+        flairX = clamp((s.P.x + 0.3 * pl.sg - pl.x) * pl.sg, -0.6, 0.7) * pl.sg * env; // (or to the left, if it stands too far right)
+        side = S.side * env;
+      } else if (s.style === 'btb') {
+        // behind the back: turned away from it, so that it is behind the left hip at the contact; the turn is held
+        // from the contact on and quickly given back as the racket comes through, never further round
+        if (tau <= 0 || this.btbRel === undefined) {
+          const bx = pl.x + (st.lungeX || 0) + this.reach.x, bz = pl.z + (st.lungeZ || 0) + this.reach.z;
+          this.btbRel = clamp(angDiff(this.netYaw, Math.atan2(s.P.x - bx, s.P.z - bz)) - 2.0, -1.1, 0.3);
+        }
+        flairYaw = { rel: this.btbRel, w: tau < 0 ? env : 1 - smooth(tau / 0.3) };
+      }
       if (s.lowLunge || s.style === 'netF' || s.style === 'netB') {
         const was = this.lungeAmt;
         this.lungeAmt = Math.max(this.lungeAmt * Math.exp(-dt * 2), env);
         if (was < 0.6 && this.lungeAmt >= 0.6 && dt > 0) Sound.squeak(clamp(pl.x / 4, -0.8, 0.8), farOf(pl.x, 0.1, pl.z)); // the lunging foot plants
         const P = s.P, dx = P.x - pl.x, dz = P.z - pl.z, dl = Math.hypot(dx, dz) || 1;
         const reach = clamp(dl - 0.85, 0, 0.6) * this.lungeAmt; // the shoulder stops an arm and a racket from the shuttle
-        st.lungeX = (dx / dl) * reach; st.lungeZ = (dz / dl) * reach;
+        // eased in: a contact that moves (struck early, or a new plan) slides the lunge over a few frames, no jump
+        const kl = 1 - Math.exp(-dt * 22);
+        st.lungeX = (st.lungeX || 0) + ((dx / dl) * reach - (st.lungeX || 0)) * kl; st.lungeZ = (st.lungeZ || 0) + ((dz / dl) * reach - (st.lungeZ || 0)) * kl;
         crouch += (0.12 + 0.2 * clamp((1.0 - P.y) / 0.8, 0, 1)) * this.lungeAmt;
         lean += 0.25 * this.lungeAmt;
         // the racket foot steps out toward the shuttle, the other stays behind
@@ -940,9 +1008,11 @@ class PlayerView {
     // reaching: if the racket shoulder was out of reach of the contact last frame, the body steps toward it
     if (!this.reach) this.reach = { x: 0, z: 0 };
     if (s && b.shB && T - s.tc > -0.35 && T - s.tc < 0.1) {
-      const shW = b.toWorld(b.shB.x, b.shB.y, b.shB.z, _sv.e), P = s.P;
+      // (behind the back: from the hand behind the back, which has the racket's length and a little more)
+      const bh = STROKES[s.style] && STROKES[s.style].behind;
+      const shW = bh ? b.toWorld(bh[0], bh[1], bh[2], _sv.e) : b.toWorld(b.shB.x, b.shB.y, b.shB.z, _sv.e), P = s.P;
       const dx = P.x - shW.x, dy = P.y - shW.y, dz = P.z - shW.z, dist = Math.hypot(dx, dy, dz), hz = Math.hypot(dx, dz) || 1;
-      const over = dist - (0.56 + RACKET_L) * b.hs * 0.95;
+      const over = dist - (bh ? RACKET_L + 0.1 * b.hs : (0.56 + RACKET_L) * b.hs * 0.95);
       if (over > 0) { const k2 = Math.min(1, dt * 14) * Math.min(over, 0.3); this.reach.x += (dx / hz) * k2; this.reach.z += (dz / hz) * k2; }
       const rl = Math.hypot(this.reach.x, this.reach.z); if (rl > 0.6) { this.reach.x *= 0.6 / rl; this.reach.z *= 0.6 / rl; }
     } else { const k2 = Math.exp(-dt * 3); this.reach.x *= k2; this.reach.z *= k2; }
@@ -1002,12 +1072,15 @@ class PlayerView {
     }
     // ---- body yaw, from facing the net: at most side-on (a stroke's turn on top of a side-on chassé doesn't add up
     // past it), so never round through the back
-    const want = clamp(wantRel + yawOff, -1.6, 1.6);
-    this.rel += (want - this.rel) * (1 - Math.exp(-dt * (keyed ? 14 : 9)));
+    let want = clamp(wantRel + yawOff, -1.6, 1.6);
+    if (flairYaw) want = lerp(want, flairYaw.rel, flairYaw.w);
+    this.flairX = (this.flairX || 0) + (flairX - (this.flairX || 0)) * (1 - Math.exp(-dt * 12));
+    // and no faster than a quick pivot (10 rad/s), so a change of side or a long frame never snaps it round
+    this.rel += clamp((want - this.rel) * (1 - Math.exp(-dt * (keyed ? 14 : 9))), -10 * dt, 10 * dt);
     this.yaw = this.netYaw + this.rel;
     if (b.react) tall = 0;
-    st.x = pl.x + (st.lungeX || 0) + this.reach.x; st.z = pl.z + (st.lungeZ || 0) + this.reach.z; st.yaw = this.yaw;
-    st.crouch = Math.max(0, crouch + (mode === 'shuf' ? 0.03 * (1 - tall) : 0)); st.twist = twist; st.lean = lean; st.lift = lift; st.tall = tall;
+    st.x = pl.x + (st.lungeX || 0) + this.reach.x + this.flairX; st.z = pl.z + (st.lungeZ || 0) + this.reach.z; st.yaw = this.yaw;
+    st.crouch = Math.max(0, crouch + (mode === 'shuf' ? 0.03 * (1 - tall) : 0)); st.twist = twist; st.lean = lean; st.side = side; st.lift = lift; st.tall = tall;
     // the head: on the shuttle in play; once the point is over, a moment on where it landed, then up at the other player
     const o = m.pl[1 - pl.side], between = (m.phase === 'dead' && m.phaseT > 0.7) || m.phase === 'intro' || m.phase === 'over';
     const lt = this.lookT || (this.lookT = new V3()), dj = this.deject && T >= this.deject.t0 && T < this.deject.t0 + 1.2;
@@ -1018,6 +1091,9 @@ class PlayerView {
     if (!this.lookP) this.lookP = new V3().copy(lt);
     this.lookP.lerp(lt, 1 - Math.exp(-dt * (between && !dj ? 4 : 16)));
     st.look.copy(this.lookP); st.lookW = b.react ? 0.3 : 1;
+    // the stroke's keys again, now in the body frame this frame is posed in (where it stands, how it is turned): the
+    // racket's head meets the shuttle even while the body is still turning or lunging into the contact
+    if (keyed) { b.root.position.set(st.x, st.lift, st.z); b.yaw = st.yaw; this.keys(...this.kArgs); }
     // arm targets to the world (in the body frame of this frame's yaw)
     this.keyed = keyed; this.sNow = s;
     this.armToWorld();
@@ -1046,16 +1122,24 @@ class PlayerView {
     const Pb = b.toBody(_sv.a.set(s.P.x, s.P.y, s.P.z), _sv.b);
     const sh = b.shB ? [b.shB.x, b.shB.y, b.shB.z] : [0.19, 1.43, 0.0], bs = S.bias;
     const RL = RACKET_L / b.hs;
-    const d = _sv.c.set(Pb.x - sh[0], Pb.y - sh[1], Pb.z - sh[2]);
-    const room = clamp((0.56 + RL - d.length()) / 0.35, 0, 1);
-    d.normalize().add(_v3.set(bs[0], bs[1], bs[2]).multiplyScalar(room)).normalize();
-    const contact = { t: 0, g: [Pb.x - d.x * RL, Pb.y - d.y * RL, Pb.z - d.z * RL], d: [d.x, d.y, d.z], pole: S.pole, lh: null, yaw: 0.0, tw: 0.08 };
+    const d = _sv.c;
+    if (S.behind) {
+      // behind the back: the racket from the hand behind the back out to the shuttle, the hand sliding along that
+      // line until the racket's head is on it
+      const H0 = S.behind;
+      d.set(Pb.x - H0[0], Pb.y - H0[1], Pb.z - H0[2]).normalize();
+    } else {
+      d.set(Pb.x - sh[0], Pb.y - sh[1], Pb.z - sh[2]);
+      const room = clamp((0.56 + RL - d.length()) / 0.35, 0, 1);
+      d.normalize().add(_v3.set(bs[0], bs[1], bs[2]).multiplyScalar(room)).normalize();
+    }
+    const contact = { t: 0, g: [Pb.x - d.x * RL, Pb.y - d.y * RL, Pb.z - d.z * RL], d: [d.x, d.y, d.z], pole: S.pole, lh: null, yaw: 0.0, tw: S.behind ? -0.15 : 0.08 };
     let k0 = null, k1 = null;
     const all = this.allKeys || (this.allKeys = []);
     all.length = 0;
     for (const k of keys) { if (k.t < 0) all.push(k); }
-    // the overhead whips through a racket-back position on its way up
-    if (S === STROKES.over) all.push({ t: -0.035, g: [0.27, 1.8, -0.02], d: [0.1, 0.05, -1], pole: [0.8, 0.5, -0.1], lh: [-0.22, 1.5, 0.35], yaw: -0.3, tw: -0.15 });
+    // an overhead whips through a racket-back position on its way up
+    if (S.whip) all.push(S.whip);
     all.push(contact);
     for (const k of keys) if (k.t > 0) all.push(k);
     for (let i = 0; i < all.length - 1; i++) if (tau >= all[i].t && tau <= all[i + 1].t) { k0 = all[i]; k1 = all[i + 1]; break; }
@@ -1098,7 +1182,7 @@ class PlayerView {
 /* Josh in his blazer, seated high at the net, head following the shuttle */
 function poseUmpire(b, look) {
   const K = b.K, B = b.B, T = b.T;
-  b.root.position.set(chair.position.x - 0.1, 0, 0); b.yaw = Math.PI / 2; b.root.rotation.y = b.yaw;
+  b.root.position.set(chair.position.x - 0.1, 0, 0); b.yaw = Math.PI / 2; b.root.rotation.set(0, b.yaw, 0);
   for (const n of ORDER) T[n].copy(K.bind[n]);
   const thigh = _q1.setFromAxisAngle(_v1.set(1, 0, 0), -Math.PI / 2 + 0.08);
   for (const s of ['Left', 'Right']) T[`${s}UpLeg`].premultiply(thigh);
@@ -1594,6 +1678,16 @@ function handleEvents() {
       if (live && (e.kind === 'smash' || e.kind === 'jump') && e.speed * 3.6 >= 150) Hud.speed(SHOTS[e.kind].label, e.speed * 3.6);
       if (live && e.side === 0 && e.label) Hud.timing(e.label);
       if (live) Hud.rally(e.shots || 1);
+      // a stylish one: its name up (see PlayerView.flairFor), and a tight net shot spinning over the net
+      if (!e.serve && G.views[e.side]) {
+        const pl = m.pl[e.side], st = G.views[e.side].stroke(pl, m), fl = st && pl.swing && pl.swing.flair;
+        if (fl === 'btb') { if (live) Hud.pill('Behind the back', 1700); Sound.ooh(0.75); }
+        else if (fl === 'rth' && live && (e.kind === 'smash' || e.kind === 'jump')) Hud.pill('Round-the-head smash', 1500);
+        if (e.kind === 'net' && e.q >= 0.72 && Math.random() < 0.6) {
+          sh.tumble = { t0: m.T, dur: 0.62, n: e.q >= 0.95 ? 3 : 2 };
+          if (live && (e.side === 0 || e.q >= 0.95)) Hud.pill('Spinning net shot', 1400); // yours, or the very best
+        } else sh.tumble = null;
+      }
       if (e.side === 0) Hud.serveHint(false);
       fx.trail.boost = clamp((e.speed - 15) / 50, 0, 1);
     } else if (e.type === 'net') {
@@ -1606,11 +1700,12 @@ function handleEvents() {
       if (live && e.inside !== undefined && e.near < 0.045 && !G.review) G.pendingReview = e;
       else if (live && e.inside === false) Hud.callout(e.serve ? 'Fault' : 'Out', null, 'out', 1200);
     } else if (e.type === 'point') onPoint(e, m);
-    else if (e.type === 'game' || e.type === 'gameStart') Hud.score(m);
-    else if (e.type === 'serveReady') { if (live && e.side === 0) Hud.serveHint(true); }
-    else if (e.type === 'gameStart' && e.game > 1 && live) {
-      setTimeout(() => { const n = ['', 'First', 'Second', 'Third'][e.game] || ''; Sound.say(`${n} game. Love all. Play.`); Hud.ump(`${n} game · Love all, play`); }, 900);
-    } else if (e.type === 'match') onMatchEnd(e, m);
+    else if (e.type === 'game') Hud.score(m);
+    else if (e.type === 'gameStart') {
+      Hud.score(m);
+      if (e.game > 1 && live) setTimeout(() => { if (G.match !== m) return; const n = ['', 'First', 'Second', 'Third'][e.game] || ''; Sound.say(`${n} game. Love all. Play.`); Hud.ump(`${n} game · Love all, play`); }, 900);
+    } else if (e.type === 'serveReady') { if (live && e.side === 0) Hud.serveHint(true); }
+    else if (e.type === 'match') onMatchEnd(e, m);
   }
   m.events.length = 0;
 }
@@ -1626,9 +1721,10 @@ function onPoint(e, m) {
   if (!live) return;
   const call = umpireCall(e, m);
   setTimeout(() => { if (G.match !== m) return; Hud.ump(call.text); Sound.say(call.say); }, e.game ? 900 : 650);
-  if (e.interval) setTimeout(() => Hud.pill('Interval', 2400), 1200);
-  else if (e.gp && !e.game) setTimeout(() => Hud.pill(`${e.gp === 'match' ? 'Match' : 'Game'} point`, 2200), 1100);
-  if (e.game && !e.match) setTimeout(() => Hud.callout('Game', `${wname} ${Math.max(...e.score)}–${Math.min(...e.score)}`, 'lime', 2200), 500);
+  const still = (fn) => () => { if (G.match === m && G.mode === 'play') fn(); }; // not over a new match or the menu
+  if (e.interval) setTimeout(still(() => Hud.pill('Interval', 2400)), 1200);
+  else if (e.gp && !e.game) setTimeout(still(() => Hud.pill(`${e.gp === 'match' ? 'Match' : 'Game'} point`, 2200)), 1100);
+  if (e.game && !e.match) setTimeout(still(() => Hud.callout('Game', `${wname} ${Math.max(...e.score)}–${Math.min(...e.score)}`, 'lime', 2200)), 500);
   led.flash(e.game ? `GAME ${wname.toUpperCase()}` : `POINT ${wname.toUpperCase()}`, you ? '#39a3ff' : '#ff5b4f', '#ffffff', 2.6);
   // reactions
   const W = G.views[e.winner], Lv = G.views[1 - e.winner];
@@ -1637,8 +1733,9 @@ function onPoint(e, m) {
   if ((e.reason === 'net' || e.reason === 'out') && Math.random() < 0.45) Lv.dejected(m.T, 1.8);
   // a replay of something worth seeing
   const lastHitter = m.pl[m.sh.by] ? m.pl[m.sh.by].swing : null;
-  const worth = (smashWin && sw.speed * 3.6 > 235) || (sw && sw.kind === 'jump' && e.reason === 'in') || e.rally >= 18 || (m.sh.cord && e.reason === 'in') || e.match;
-  if (G.s.replays && worth && (G.ptCount - G.lastReplayPt >= 3 || e.match) && lastHitter) {
+  const flair = lastHitter && lastHitter.flair === 'btb'; // a behind-the-back shot to end it, whoever won
+  const worth = (smashWin && sw.speed * 3.6 > 235) || (sw && sw.kind === 'jump' && e.reason === 'in') || e.rally >= 18 || (m.sh.cord && e.reason === 'in') || e.match || flair;
+  if (G.s.replays && worth && (G.ptCount - G.lastReplayPt >= 3 || e.match || flair) && lastHitter) {
     G.lastReplayPt = G.ptCount;
     m.hold = true;
     G.pendingReplay = { at: performance.now() + 900, t1: lastHitter.t, kind: lastHitter.kind, side: m.sh.by };
@@ -1747,6 +1844,17 @@ function updateShuttle(dt, simDt) {
   shuttle.position.copy(p);
   sh.q.setFromUnitVectors(Y_UP, sh.dir);
   shuttle.quaternion.copy(sh.q).multiply(_q1.setFromAxisAngle(Y_UP, sh.spin));
+  // a spinning net shot: the shuttle flips over and over across the net, then rights itself, cork first, to fall
+  const tb = sh.tumble;
+  if (tb) {
+    const age = m.T - tb.t0;
+    if (age < 0 || age > tb.dur || S.mode !== 'flight') sh.tumble = null;
+    else {
+      const u = age / tb.dur, ang = TAU * tb.n * (1 - (1 - u) * (1 - u)); // fast off the strings, slowing to a stop
+      _s2.crossVectors(sh.dir, Y_UP); if (_s2.lengthSq() < 1e-4) _s2.set(1, 0, 0);
+      shuttle.quaternion.premultiply(_q1.setFromAxisAngle(_s2.normalize(), ang));
+    }
+  }
   // drawn bigger the further it is from the camera, so it is never lost
   const dist = camera.position.distanceTo(p), px = innerHeight;
   const want = clamp((8.5 * dist * 2 * Math.tan((camera.fov * Math.PI) / 360)) / (0.08 * px), 1, 3.6);
@@ -2012,7 +2120,8 @@ function tick(dt) {
     applyInput();
     let simDt = 0;
     if (G.replay) { if (!G.paused) updateReplay(dt); }
-    else {
+    // (not else: a replay that ended this frame hands straight back to the live pose, with no frame of its last one)
+    if (!G.replay) {
       if (!G.paused) { simDt = dt * G.pace; m.step(simDt); handleEvents(); }
       if (G.match === m) {
         updateShuttle(dt, simDt);
