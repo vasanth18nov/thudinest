@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mr Dude Car Wash · Taman Sungai Besi, Kuala Lumpur</title>
+<meta name="description" content="Car washing and detailing in Taman Sungai Besi, Kuala Lumpur. Wash from RM10, 2-step polish, truck wash and a loyalty card. Open every day, 10 AM to 10 PM.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#08090b">
+<meta property="og:title" content="Mr Dude Car Wash">
+<meta property="og:description" content="Your car needs a bath too. Wash from RM10 in Taman Sungai Besi, KL.">
+<meta property="og:image" content="https://thudinest.com/mrdude/img/logo.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%BF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
+<style>
+  :root {
+    --ink: #08090b;
+    --ink-2: #14161a;
+    --line: rgba(255,255,255,.14);
+    --gold: #f2a93b;
+    --gold-deep: #c67c14;
+    --soap: #f5f3ee;
+    --soap-2: #e6e3da;
+    --blue: #0a2a66;
+    --blue-2: #123a8a;
+    --cyan: #6fd3ff;
+    --muted: #a3a7ae;
+    --lean: -8deg;
+    --gutter: clamp(16px, 4vw, 56px);
+    --display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+    --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { -webkit-text-size-adjust: 100%; background: var(--ink); overflow-x: clip; }
+  body { font-family: var(--body); color: var(--soap); background: var(--ink); overflow-x: clip; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  img, video, canvas, svg { display: block; }
+  video, img { max-width: 100%; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+  .disp { font-family: var(--display); font-weight: 400; text-transform: uppercase; line-height: .98; letter-spacing: .005em; }
+  .lean { display: inline-block; transform: skewX(var(--lean)); }
+  .eyebrow { font-weight: 800; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+  .pin { position: relative; height: 100vh; height: 100svh; overflow: hidden; }
+
+  /* Header, always on a dark pill so the logo reads over every section */
+  .bar { position: fixed; z-index: 50; top: 12px; left: var(--gutter); right: var(--gutter); display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+  .bar > * { pointer-events: auto; }
+  .brand { display: block; width: 92px; height: 50px; border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 6px 22px rgba(0,0,0,.4); }
+  .brand img { width: 100%; height: 100%; object-fit: cover; }
+  .nav { display: flex; align-items: center; gap: 2px; padding: 5px; background: rgba(8,9,11,.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 99px; font-size: 13px; font-weight: 700; color: var(--soap); }
+  .nav a { text-decoration: none; padding: 8px 13px; border-radius: 99px; transition: background .2s, color .2s; }
+  .nav a:hover { background: rgba(255,255,255,.12); }
+  .nav a.wa { background: var(--gold); color: var(--ink); }
+  .nav a.wa:hover { background: #ffc266; }
+  .progress { position: fixed; z-index: 60; left: 0; right: 0; top: 0; height: 3px; pointer-events: none; }
+  .progress i { position: absolute; inset: 0; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); transform: scaleX(0); transform-origin: left; }
+  @media (max-width: 760px) { .nav a:not(.wa) { display: none; } .brand { width: 76px; height: 42px; } }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 22px; border-radius: 99px; font-weight: 800; font-size: 15px; text-decoration: none; transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s, color .2s; }
+  .btn:hover { transform: translateY(-2px) scale(1.02); }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: #ffc266; }
+  .btn-ghost { border: 1.5px solid currentColor; }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+
+  /* Lazy clips */
+  .clip { width: 100%; height: 100%; object-fit: cover; background: var(--ink-2); }
+
+  /* 1. Hero */
+  .hero { background: var(--gold); }
+  .wall { position: absolute; left: 50%; top: 50%; width: 118vw; height: 170vh; display: flex; gap: 6px; transform: translate(-50%, -50%) rotate(-7deg); }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; margin-top: var(--o, 0); }
+  .tile { flex: none; aspect-ratio: 9 / 13; overflow: hidden; background: var(--ink-2); }
+  .tile img, .tile video { width: 100%; height: 100%; object-fit: cover; }
+  .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,9,11,.55), rgba(8,9,11,.3) 40%, rgba(8,9,11,.92)); }
+  .hero-head { position: absolute; inset: auto var(--gutter) clamp(28px, 7vh, 72px); z-index: 2; }
+  .hero-head h1 { font-size: clamp(58px, 11.5vw, 190px); margin-top: 14px; }
+  .hero-head h1 .ln { display: block; overflow: hidden; padding-bottom: .05em; }
+  .hero-head h1 .ln > span { display: block; transform-origin: left bottom; }
+  .hero-head h1 em { color: var(--gold); font-style: normal; }
+  .hero-sub { max-width: 560px; margin-top: 16px; font-size: clamp(16px, 1.5vw, 19px); font-weight: 500; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  #cut { display: none; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; }
+  .hero-top { display: none; position: absolute; z-index: 4; left: var(--gutter); right: var(--gutter); bottom: clamp(20px, 5vh, 44px); justify-content: space-between; align-items: flex-end; gap: 20px; font-size: 13px; font-weight: 700; color: var(--soap); }
+  .hero-top .cue { display: inline-flex; align-items: center; gap: 10px; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; font-size: 12px; font-weight: 800; }
+  .hero-top .cue i { display: block; width: 2px; height: 28px; background: var(--gold); transform-origin: top; animation: cue 1.8s ease-in-out infinite; }
+  @keyframes cue { 0% { transform: scaleY(0); } 55% { transform: scaleY(1); transform-origin: top; } 56% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+  .motion #cut { display: block; }
+  .motion .hero-top { display: flex; }
+  @media (max-width: 760px) {
+    .col:nth-child(n+3) { display: none; }
+    .wall { width: 130vw; }
+    .hero-top span.loc { display: none; }
+  }
+
+  /* 2. Story */
+  .story { padding: clamp(90px, 16vh, 180px) var(--gutter) clamp(60px, 10vh, 120px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: clamp(32px, 6vw, 96px); align-items: center; max-width: 1560px; margin: 0 auto; }
+  .story p.big { font-size: clamp(27px, 3.6vw, 56px); font-weight: 700; line-height: 1.16; letter-spacing: -.02em; margin-top: 22px; }
+  .story p.big em { font-style: normal; color: var(--gold); }
+  .story-pics { position: relative; aspect-ratio: 4 / 5; }
+  .story-pics figure { position: absolute; overflow: hidden; background: var(--ink-2); }
+  .story-pics .a { inset: 0 22% 26% 0; clip-path: polygon(13% 0, 100% 0, 87% 100%, 0 100%); }
+  .story-pics .b { inset: 40% 0 0 34%; clip-path: polygon(13% 0, 100% 0, 87% 100%, 0 100%); }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 var(--gutter); }
+  .stats > div { padding: clamp(18px, 3vw, 36px) clamp(8px, 2vw, 28px); border-left: 1px solid var(--line); }
+  .stats > div:first-child { border-left: 0; padding-left: 0; }
+  .stats b { display: block; font-family: var(--display); font-weight: 400; font-size: clamp(36px, 6.4vw, 104px); line-height: 1; color: var(--gold); transform: skewX(var(--lean)); transform-origin: left bottom; }
+  .stats span { display: block; margin-top: 8px; color: var(--muted); font-size: clamp(12px, 1.2vw, 15px); font-weight: 500; }
+  .marquee { overflow: hidden; padding: clamp(28px, 6vh, 64px) 0; white-space: nowrap; }
+  .marquee .track { display: inline-block; font-family: var(--display); font-size: clamp(64px, 13vw, 210px); line-height: 1; text-transform: uppercase; color: transparent; -webkit-text-stroke: 1.5px rgba(245,243,238,.42); }
+  .marquee .track b { font-weight: 400; color: var(--gold); -webkit-text-stroke: 0; }
+  @media (max-width: 760px) {
+    .story { grid-template-columns: 1fr; }
+    .story-pics { aspect-ratio: 1 / 1.06; }
+  }
+
+  /* 3. Gloss: frames scrubbed by scroll */
+  .gloss { background: #000; }
+  #amb { position: absolute; inset: -8%; width: 116%; height: 116%; filter: blur(70px) saturate(1.5); opacity: .58; }
+  .gloss-word { display: none; position: absolute; top: 50%; left: 0; white-space: nowrap; font-family: var(--display); font-size: 62vh; line-height: 1; text-transform: uppercase; color: rgba(245,243,238,.09); transform: translateY(-50%); pointer-events: none; }
+  .frame { position: absolute; top: 50%; left: 50%; height: min(90vh, 150vw); aspect-ratio: 9 / 16; transform: translate(-50%, -50%); overflow: hidden; background: var(--ink-2); box-shadow: 0 40px 120px rgba(0,0,0,.65); }
+  #seq { width: 100%; height: 100%; }
+  .beats { position: absolute; left: var(--gutter); top: 50%; width: calc(50% - 26vh - var(--gutter) - 24px); transform: translateY(-50%); }
+  .beat h2 { font-size: clamp(38px, 5.2vw, 88px); margin-top: 12px; }
+  .beat p { margin-top: 12px; color: #d2d4d8; font-size: clamp(15px, 1.2vw, 18px); max-width: 34ch; }
+  .motion .beat { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); opacity: 0; }
+  .ticks { position: absolute; right: var(--gutter); top: 50%; width: calc(50% - 26vh - var(--gutter) - 24px); transform: translateY(-50%); list-style: none; padding: 0; font-weight: 700; font-size: clamp(14px, 1.1vw, 16px); }
+  .ticks li { padding: 13px 0; border-top: 1px solid var(--line); color: rgba(245,243,238,.42); display: flex; justify-content: space-between; transition: color .25s; }
+  .ticks li.on { color: var(--gold); }
+  .motion .gloss-word { display: block; }
+  @media (min-aspect-ratio: 0.9) { .gloss { --fw: 25.3vh; } }
+  @media (max-aspect-ratio: 0.9) {
+    .frame { inset: 0; height: 100%; width: 100%; transform: none; aspect-ratio: auto; }
+    .gloss::after { content: ''; position: absolute; inset: 42% 0 0; background: linear-gradient(transparent, rgba(0,0,0,.88)); }
+    .beats { z-index: 2; top: auto; bottom: clamp(26px, 6vh, 56px); right: var(--gutter); width: auto; height: 170px; transform: none; }
+    .ticks, .gloss-word, .motion .gloss-word { display: none; }
+    .motion .beat { top: auto; bottom: 0; transform: none; }
+  }
+
+  /* 4. Services lane */
+  .lane { background: var(--ink); }
+  .motion .lane { height: 100vh; height: 100svh; overflow: hidden; }
+  .lane-track { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); padding: 72px var(--gutter) 28px; overflow-x: auto; }
+  .motion .lane-track { position: absolute; left: 0; top: 0; height: 100%; width: max-content; overflow: visible; will-change: transform; }
+  .lane-intro { flex: none; width: min(78vw, 560px); padding-right: 24px; }
+  .lane-intro h2 { font-size: clamp(52px, 8vw, 128px); margin-top: 14px; }
+  .lane-intro p { margin-top: 16px; color: var(--muted); max-width: 36ch; }
+  .svc { flex: none; position: relative; width: min(74vw, calc((100vh - 130px) * .72)); height: min(calc(74vw / .72), calc(100vh - 130px)); overflow: hidden; background: var(--ink-2); text-decoration: none; display: block; }
+  .svc-media { position: absolute; inset: -4% -12%; }
+  .svc-media.zoom video { transform: scale(1.38); }
+  .svc::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, rgba(0,0,0,.9)); pointer-events: none; }
+  .svc-text { position: absolute; z-index: 1; left: 18px; right: 18px; bottom: 18px; }
+  .svc-text h3 { font-size: clamp(30px, 3.2vw, 50px); }
+  .svc-text p { margin-top: 6px; font-size: 14px; color: #d8dade; }
+  .svc-price { position: absolute; z-index: 1; left: 18px; top: 18px; padding: 6px 12px; background: var(--gold); color: var(--ink); font-weight: 800; font-size: 14px; transform: skewX(var(--lean)); }
+  .svc.plain { background: var(--gold); color: var(--ink); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; }
+  .svc.plain::after { display: none; }
+  .svc.plain h3 { font-size: clamp(38px, 4.6vw, 72px); }
+  .svc.plain ul { list-style: none; padding: 0; font-weight: 800; }
+  .svc.plain li { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1.5px solid rgba(8,9,11,.3); font-size: clamp(14px, 1.2vw, 17px); }
+
+  /* 5. Foam wipe into the menu */
+  .foam { background: var(--ink); color: var(--ink); display: grid; place-items: center; text-align: center; padding: 0 var(--gutter); }
+  .foam-text { position: relative; z-index: 1; }
+  .foam h2 { font-size: clamp(64px, 13vw, 220px); }
+  .foam .eyebrow { color: var(--gold-deep); }
+  #bubbles { display: none; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+  .motion #bubbles { display: block; }
+  html:not(.motion) .foam { background: var(--soap); padding-block: 90px 30px; height: auto; }
+
+  /* 6. Prices */
+  .prices { background: var(--soap); color: var(--ink); padding: clamp(30px, 6vh, 70px) var(--gutter) clamp(70px, 12vh, 140px); }
+  .price-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 80px); max-width: 1440px; margin: 0 auto; align-items: start; }
+  .picker { background: var(--ink); color: var(--soap); padding: clamp(20px, 3vw, 40px); }
+  .picker h3 { font-family: var(--body); font-size: 15px; font-weight: 800; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .chip { min-height: 42px; padding: 8px 15px; border: 1.5px solid var(--line); border-radius: 99px; font-weight: 700; font-size: 14px; transition: background .2s, color .2s, border-color .2s, opacity .2s; }
+  .chip:hover:not(:disabled) { border-color: var(--gold); }
+  .chip[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+  .chip:disabled { opacity: .26; cursor: not-allowed; }
+  .picker .gap { margin-top: 24px; }
+  .readout { display: flex; align-items: baseline; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .readout small { font-family: var(--display); font-size: clamp(30px, 3.6vw, 54px); color: var(--gold); transform: skewX(var(--lean)); }
+  #rm { font-family: var(--display); font-size: clamp(96px, 13vw, 200px); line-height: 1; color: var(--gold); transform: skewX(var(--lean)); font-variant-numeric: tabular-nums; }
+  .readout-note { margin-top: 12px; color: var(--muted); font-size: 14px; }
+  .extras h3 { font-size: clamp(36px, 4.4vw, 68px); }
+  table { border-collapse: collapse; width: 100%; }
+  .extras table { margin-top: 18px; font-size: clamp(14px, 1.15vw, 16px); }
+  .extras th, .extras td { padding: 12px 8px; text-align: right; border-top: 1px solid rgba(8,9,11,.16); font-variant-numeric: tabular-nums; white-space: nowrap; transition: background .25s; }
+  .extras th:first-child, .extras td:first-child { text-align: left; white-space: normal; font-weight: 700; padding-left: 0; }
+  .extras thead th { font-weight: 800; font-size: 13px; }
+  .extras .hot { background: var(--gold); font-weight: 800; }
+  .fine { margin-top: 14px; color: #55585e; font-size: 13px; }
+  @media (max-width: 860px) { .price-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .extras th:not(:first-child):not(.hot), .extras td:not(:first-child):not(.hot) { display: none; }
+  }
+
+  /* 7. Polish */
+  .polish { background: var(--ink); }
+  .panes { position: absolute; inset: 0 47% 0 0; }
+  .pane { position: absolute; top: 0; bottom: 0; width: 44%; overflow: hidden; clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%); }
+  .pane:nth-child(1) { left: -6%; }
+  .pane:nth-child(2) { left: 26%; }
+  .pane:nth-child(3) { left: 58%; }
+  .polish-copy { position: absolute; top: 0; bottom: 0; right: var(--gutter); width: min(42%, 640px); display: flex; flex-direction: column; justify-content: center; }
+  .polish-copy h2 { font-size: clamp(52px, 7.4vw, 124px); margin-top: 10px; }
+  .polish-copy > p { margin-top: 12px; color: #c9ccd1; font-size: clamp(14px, 1.15vw, 17px); max-width: 48ch; }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 18px; list-style: none; padding: 0; font-size: 12.5px; font-weight: 700; }
+  .steps li { border-top: 2px solid var(--gold); padding-top: 8px; }
+  .steps b { display: block; color: var(--gold); font-size: 11px; }
+  .tiers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 22px; border-top: 1px solid var(--line); }
+  .tiers > div { padding: 12px 8px 4px 0; }
+  .tiers > div > span { color: var(--muted); font-size: 13px; font-weight: 700; }
+  .tiers b { display: block; font-family: var(--display); font-weight: 400; font-size: clamp(28px, 3.2vw, 54px); line-height: 1.04; color: var(--gold); }
+  .tiers b i { font-style: normal; font-size: .46em; margin-right: 3px; }
+  .polish-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .polish-note a { color: var(--gold); font-weight: 800; }
+  @media (max-width: 860px) {
+    .polish.pin { height: auto; min-height: 100svh; overflow: visible; }
+    .panes { position: relative; inset: auto; height: 34vh; overflow: hidden; }
+    .polish-copy { position: relative; right: auto; width: auto; padding: 24px var(--gutter) 36px; }
+    .polish-copy h2 { font-size: clamp(48px, 14vw, 84px); }
+    .tiers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* 8. Trucks */
+  .trucks { background: var(--blue); }
+  .truck-stage { background: radial-gradient(ellipse at 70% 80%, var(--blue-2), var(--blue) 66%); }
+  .truck-head { position: absolute; z-index: 2; left: var(--gutter); top: clamp(76px, 12vh, 120px); max-width: 52%; }
+  .truck-head h2 { font-size: clamp(46px, 7vw, 116px); margin-top: 10px; }
+  .eyebrow.c { color: var(--cyan); }
+  .ton { position: absolute; z-index: 1; right: var(--gutter); top: clamp(60px, 9vh, 96px); font-family: var(--display); font-size: clamp(110px, 23vw, 380px); line-height: 1; text-transform: uppercase; color: rgba(255,255,255,.13); transform: skewX(var(--lean)); overflow: hidden; }
+  .ton span { display: inline-block; }
+  .road { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(#06193f, #030c21); border-top: 2px solid rgba(111,211,255,.35); }
+  .road .dash { position: absolute; left: -10%; right: -10%; top: 19%; height: 5px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.5) 0 70px, transparent 70px 150px); }
+  .road-note { position: absolute; left: var(--gutter); bottom: 26px; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+  #truck { position: absolute; z-index: 2; left: 2vw; bottom: calc(40% - 9.5vh); width: min(62vw, 880px); height: auto; max-height: 48vh; overflow: visible; }
+  .truck-table { position: absolute; z-index: 3; right: var(--gutter); bottom: 22px; width: min(46vw, 620px); background: rgba(3,12,33,.86); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(111,211,255,.25); }
+  .truck-table th, .truck-table td { padding: 8px 8px; text-align: right; font-size: clamp(12px, 1.02vw, 15px); border-top: 1px solid rgba(255,255,255,.1); font-variant-numeric: tabular-nums; transition: background .25s, color .25s; }
+  .truck-table thead th { border-top: 0; font-weight: 800; }
+  .truck-table th:first-child { text-align: left; font-weight: 700; }
+  .truck-table .hot { background: var(--gold); color: var(--ink); font-weight: 800; }
+  @media (max-width: 860px) {
+    .truck-head { max-width: none; right: var(--gutter); top: 72px; }
+    .ton { top: auto; bottom: calc(68vh - 60px); display: none; }
+    #truck { width: 96vw; bottom: 46vh; }
+    .road { height: 46vh; }
+    .road .dash { top: 6%; }
+    .road-note { display: none; }
+    .truck-table { left: var(--gutter); right: var(--gutter); width: auto; bottom: 14px; }
+    .truck-table th:first-child { white-space: normal; }
+  }
+  .heavy { background: var(--blue); padding: clamp(50px, 9vh, 100px) var(--gutter); }
+  .heavy-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: clamp(28px, 5vw, 80px); max-width: 1440px; margin: 0 auto; align-items: center; }
+  .heavy h3 { font-size: clamp(38px, 5vw, 80px); }
+  .heavy ul { list-style: none; padding: 0; margin-top: 16px; font-weight: 700; }
+  .heavy li { display: flex; justify-content: space-between; gap: 14px; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.2); }
+  .heavy li b { color: var(--gold); font-weight: 800; white-space: nowrap; }
+  .board { display: block; transform-origin: center; box-shadow: 0 30px 90px rgba(0,0,0,.5); }
+  .board img { width: 100%; height: auto; }
+  .strips { display: flex; margin-top: 20px; height: clamp(180px, 22vw, 300px); }
+  .strip { flex: 1; min-width: 0; clip-path: polygon(39% 1%, 99% 1%, 61% 99%, 1% 99%); margin-right: -5%; }
+  .strip:last-child { margin-right: 0; }
+  .strip figcaption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  @media (max-width: 860px) { .heavy-grid { grid-template-columns: 1fr; } }
+
+  /* 9. Loyalty */
+  .loyalty { background: var(--gold); color: var(--ink); perspective: 1400px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 70px); padding: 76px var(--gutter) 28px; }
+  .loyalty .eyebrow { color: var(--ink); }
+  .loyalty h2 { font-size: clamp(44px, 5.5vw, 104px); margin-top: 10px; }
+  #count { margin-top: 12px; font-weight: 800; font-size: clamp(16px, 1.5vw, 21px); }
+  .terms { margin-top: 14px; padding-left: 18px; font-size: 13.5px; font-weight: 500; }
+  .card-wrap { perspective: 1400px; display: grid; gap: 14px; justify-items: center; }
+  .lcard { width: 100%; max-width: 660px; padding: clamp(16px, 2.6vw, 34px); background: linear-gradient(120deg, #17438f, #2b6ac7 62%, #6fa9ea); color: #fff; border-radius: 14px; box-shadow: 0 34px 70px rgba(70,38,0,.45); transform-style: preserve-3d; }
+  .lcard-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+  .lcard-top b { font-family: var(--display); font-weight: 400; font-size: clamp(21px, 3vw, 40px); line-height: 1.02; text-transform: uppercase; color: var(--gold); }
+  .lcard-top span { display: block; margin-top: 4px; font-size: clamp(12px, 1.2vw, 15px); font-weight: 700; }
+  .lcard-top img { width: clamp(68px, 9vw, 112px); border-radius: 50%; flex: none; }
+  .cells { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(5px, .9vw, 11px); margin-top: clamp(12px, 2vw, 22px); }
+  .cell { position: relative; aspect-ratio: 1.12; border-radius: 7px; background: rgba(255,255,255,.82); display: grid; place-items: center; color: var(--blue); font-weight: 800; font-size: clamp(10px, 1.1vw, 15px); }
+  .cell.free { font-family: var(--display); font-weight: 400; background: #fff; color: #cf1f2e; font-size: clamp(12px, 1.5vw, 21px); transform: rotate(-4deg); }
+  .stamp { position: absolute; inset: 9%; display: grid; place-items: center; border-radius: 50%; border: 2.5px solid #cf1f2e; color: #cf1f2e; font-family: var(--display); font-size: clamp(8px, 1.05vw, 14px); line-height: 1; text-align: center; transform: rotate(-14deg); }
+  .cell:nth-child(2n) .stamp { transform: rotate(11deg); }
+  .lcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: clamp(10px, 1.8vw, 20px); font-size: clamp(12px, 1.2vw, 15px); font-weight: 700; }
+  .veh { flex: 1; max-width: 60%; padding: 7px 12px; background: rgba(8,9,11,.34); border-radius: 6px; }
+  .lcard-foot i { font-family: var(--display); font-style: normal; font-size: clamp(18px, 2.2vw, 30px); text-transform: uppercase; line-height: 1; }
+  .burst { position: absolute; left: 50%; top: 50%; width: 210%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; z-index: 2; opacity: 0; }
+  .realcard { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; max-width: 660px; width: 100%; }
+  .realcard img { width: clamp(70px, 8vw, 92px); aspect-ratio: 1; object-fit: cover; border: 3px solid var(--ink); }
+  @media (max-width: 860px) {
+    .loyalty { grid-template-columns: 1fr; align-content: center; padding-top: 66px; gap: 12px; }
+    .loyalty h2 { font-size: clamp(42px, 12vw, 70px); }
+    .terms { font-size: 12px; margin-top: 8px; }
+    #count { margin-top: 6px; }
+    .realcard img { width: 56px; }
+  }
+
+  /* 10. Reviews */
+  .reviews { background: var(--ink-2); display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(20px, 5vw, 80px); align-items: center; padding: 72px var(--gutter) 24px; }
+  html:not(.motion) .reviews { height: auto; overflow: visible; }
+  .reviews h2 { font-size: clamp(46px, 6.6vw, 110px); margin-top: 10px; }
+  .reviews h2 em { font-style: normal; color: var(--gold); }
+  .reviews-lede { margin-top: 14px; color: var(--muted); max-width: 44ch; font-size: clamp(14px, 1.2vw, 17px); }
+  .deck { position: relative; display: grid; gap: 14px; }
+  .motion .deck { height: min(66vh, 520px); }
+  .rev { background: var(--soap); color: var(--ink); padding: clamp(18px, 2.4vw, 32px); box-shadow: 0 24px 60px rgba(0,0,0,.42); transform-origin: 50% 100%; }
+  .motion .rev { position: absolute; left: 0; right: 0; top: 50%; }
+  .rev blockquote { font-size: clamp(15.5px, 1.6vw, 23px); font-weight: 700; line-height: 1.32; letter-spacing: -.01em; margin-top: 10px; }
+  .rev footer { margin-top: 14px; font-size: 13px; color: #4c4f55; font-weight: 700; }
+  .stars { color: var(--gold-deep); letter-spacing: .1em; font-size: 15px; }
+  @media (max-width: 860px) {
+    .reviews { grid-template-columns: 1fr; gap: 10px; align-content: start; }
+    .reviews h2 { font-size: clamp(40px, 11vw, 62px); }
+    .reviews-lede { margin-top: 8px; font-size: 13.5px; }
+    .motion .deck { height: 56vh; }
+  }
+
+  /* 11. Visit */
+  .visit { background: var(--ink); padding: clamp(80px, 14vh, 150px) var(--gutter) 40px; overflow: hidden; }
+  .dirty { font-size: clamp(76px, 18.6vw, 340px); line-height: .94; }
+  .dirty .ch { display: inline-block; }
+  .dirty em { font-style: normal; color: var(--gold); }
+  .visit-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); max-width: 1560px; margin: clamp(30px, 6vh, 64px) auto 0; align-items: center; }
+  .info dl { display: grid; grid-template-columns: auto 1fr; gap: 0 22px; margin-top: 8px; }
+  .info dt, .info dd { padding: 15px 0; border-top: 1px solid var(--line); margin: 0; }
+  .info dt { color: var(--muted); font-size: 14px; font-weight: 700; }
+  .info dd { font-weight: 700; font-size: clamp(15px, 1.5vw, 20px); }
+  .info dd small { display: block; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .info dd a { text-underline-offset: 3px; }
+  .visit-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .visit-pics { display: flex; height: clamp(320px, 42vw, 620px); }
+  .visit-pics figure { flex: 1; min-width: 0; clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%); margin-right: -6%; background: var(--ink-2); }
+  .visit-pics figure:last-child { margin-right: 0; }
+  .colophon { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: clamp(40px, 8vh, 80px); padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  .colophon img { width: 150px; border-radius: 50%; }
+  @media (max-width: 860px) { .visit-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i></i></div>
+
+<header class="bar">
+  <a class="brand" href="#hero" data-scroll aria-label="Mr Dude Car Wash, back to top"><img src="img/logo.jpg" alt="Mr Dude Car Washing and Detailing logo"></a>
+  <nav class="nav" aria-label="Sections">
+    <a href="#services" data-scroll>Services</a>
+    <a href="#menu" data-scroll>Prices</a>
+    <a href="#polish" data-scroll>Polish</a>
+    <a href="#trucks" data-scroll>Trucks</a>
+    <a href="#loyalty" data-scroll>Loyalty</a>
+    <a href="#visit" data-scroll>Find us</a>
+    <a class="wa" href="https://wa.me/601116406114" target="_blank" rel="noopener">WhatsApp us</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero pin" id="hero">
+    <div class="wall" aria-hidden="true">
+      <div class="col" style="--o:-6vh">
+        <div class="tile"><video class="clip" data-src="media/red-roof.mp4" poster="img/red-roof.jpg" muted loop playsinline></video></div>
+        <div class="tile"><img src="img/banner.jpg" alt=""></div>
+        <div class="tile"><img src="img/red-bonnet.jpg" alt=""></div>
+      </div>
+      <div class="col" style="--o:-34vh">
+        <div class="tile"><img src="img/engine.jpg" alt=""></div>
+        <div class="tile"><video class="clip" data-src="media/wheel.mp4" poster="img/wheel.jpg" muted loop playsinline></video></div>
+        <div class="tile"><img src="img/sign.jpg" alt=""></div>
+      </div>
+      <div class="col" style="--o:-14vh">
+        <div class="tile"><video class="clip" data-src="media/civic-bumper.mp4" poster="img/civic-bumper.jpg" muted loop playsinline></video></div>
+        <div class="tile"><img src="img/mazda.jpg" alt=""></div>
+        <div class="tile"><img src="img/red-door.jpg" alt=""></div>
+      </div>
+      <div class="col" style="--o:-40vh">
+        <div class="tile"><img src="img/blockwall.jpg" alt=""></div>
+        <div class="tile"><video class="clip" data-src="media/vacuum.mp4" poster="img/vacuum.jpg" muted loop playsinline></video></div>
+        <div class="tile"><img src="img/interior.jpg" alt=""></div>
+      </div>
+    </div>
+    <div class="hero-shade"></div>
+    <div class="hero-head">
+      <p class="eyebrow">Mr Dude Car Wash · Since 2022</p>
+      <h1 class="disp">
+        <span class="ln"><span class="lean">Your car</span></span>
+        <span class="ln"><span class="lean">needs a <em>bath</em> too.</span></span>
+      </h1>
+      <p class="hero-sub">Car washing and detailing in Taman Sungai Besi, Kuala Lumpur. Wash from RM10, open every day until 10 PM.</p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" href="#menu" data-scroll>Find your price</a>
+        <a class="btn btn-ghost" href="#visit" data-scroll>How to get here</a>
+      </div>
+    </div>
+    <canvas id="cut" aria-hidden="true"></canvas>
+    <div class="hero-top" aria-hidden="true">
+      <span class="cue"><i></i>Scroll to wash</span>
+      <span class="loc">Car washing &amp; detailing · Taman Sungai Besi, KL</span>
+    </div>
+  </section>
+
+  <section class="story">
+    <div>
+      <p class="eyebrow">The yard</p>
+      <p class="big" data-words>A tin roof in Taman Sungai Besi. Blue walls, towels drying on the line, hoses across the floor. Since 2022, dusty cars have rolled in here and gone home <em>looking new.</em></p>
+    </div>
+    <div class="story-pics">
+      <figure class="a"><video class="clip" data-src="media/dusk.mp4" poster="img/dusk.jpg" muted loop playsinline aria-label="A detailer polishing a black car under the lit roof after dark"></video></figure>
+      <figure class="b"><video class="clip" data-src="media/timelapse.mp4" poster="img/timelapse.jpg" muted loop playsinline aria-label="Time-lapse of a car having its interior cleaned under the roof"></video></figure>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div><b>RM10</b><span>where a wash starts</span></div>
+    <div><b>10 PM</b><span>open every day, from 10 AM</span></div>
+    <div><b>5 + 1</b><span>buy five washes, the next is free</span></div>
+  </div>
+  <div class="marquee" aria-hidden="true"><div class="track">Clean <b>✦</b> Shine <b>✦</b> Protect <b>✦</b> Clean <b>✦</b> Shine <b>✦</b> Protect <b>✦</b> Clean <b>✦</b> Shine <b>✦</b></div></div>
+
+  <section class="gloss pin" id="gloss">
+    <canvas id="amb" width="18" height="32" aria-hidden="true"></canvas>
+    <div class="gloss-word" aria-hidden="true">Shine shine shine</div>
+    <div class="frame"><canvas id="seq" role="img" aria-label="The camera walks along a freshly polished black Honda Civic, from bonnet to spoiler, with the yard reflected in the paint"></canvas></div>
+    <div class="beats">
+      <div class="beat"><p class="eyebrow">Keep scrolling</p><h2 class="disp"><span class="lean">Walk round it.</span></h2><p>One black Civic, mid-polish, under the tin roof.</p></div>
+      <div class="beat"><p class="eyebrow">The door</p><h2 class="disp"><span class="lean">See the roof in it?</span></h2><p>Black paint hides nothing. That is the yard, reflected in the door.</p></div>
+      <div class="beat"><p class="eyebrow">The back</p><h2 class="disp"><span class="lean">Right to the spoiler.</span></h2><p>The pad goes everywhere the light does.</p></div>
+    </div>
+    <ol class="ticks" aria-hidden="true">
+      <li class="on"><span>Bonnet</span><span>01</span></li>
+      <li><span>Door</span><span>02</span></li>
+      <li><span>Spoiler</span><span>03</span></li>
+    </ol>
+  </section>
+
+  <section class="lane" id="services" aria-label="Services">
+    <div class="lane-track">
+      <div class="lane-intro">
+        <p class="eyebrow">What we do</p>
+        <h2 class="disp"><span class="lean">Pick your<br>kind of clean.</span></h2>
+        <p>A quick rinse or the full polish. Prices run from small car to large.</p>
+      </div>
+      <article class="svc"><div class="svc-media"><video class="clip" data-src="media/wheel.mp4" poster="img/wheel.jpg" muted loop playsinline></video></div><span class="svc-price">RM10–15</span><div class="svc-text"><h3 class="disp">Wash</h3><p>Pressure hose, wheels and all.</p></div></article>
+      <article class="svc"><div class="svc-media zoom"><video class="clip" data-src="media/s-foam.mp4" poster="img/s-foam.jpg" muted loop playsinline></video></div><span class="svc-price">RM12–15</span><div class="svc-text"><h3 class="disp">Chemical wash</h3><p>For the grime water alone won't shift.</p></div></article>
+      <article class="svc"><div class="svc-media"><video class="clip" data-src="media/mazda.mp4" poster="img/mazda.jpg" muted loop playsinline></video></div><span class="svc-price">RM10–12</span><div class="svc-text"><h3 class="disp">Water wax</h3><p>A quick extra layer of gloss.</p></div></article>
+      <article class="svc"><div class="svc-media"><video class="clip" data-src="media/vacuum.mp4" poster="img/vacuum.jpg" muted loop playsinline></video></div><span class="svc-price">RM5–10</span><div class="svc-text"><h3 class="disp">Vacuum</h3><p>Seats, floors, the bits under the pedals.</p></div></article>
+      <article class="svc"><div class="svc-media"><video class="clip" data-src="media/interior.mp4" poster="img/interior.jpg" muted loop playsinline></video></div><span class="svc-price">RM12–15</span><div class="svc-text"><h3 class="disp">Dashboard &amp; 4 doors</h3><p>Everything your hands touch, wiped down.</p></div></article>
+      <article class="svc plain"><h3 class="disp"><span class="lean">Seats, mats, even your home carpet.</span></h3><ul><li><span>Car seat wash</span><span>RM50–80</span></li><li><span>Car mat wash</span><span>RM5–7</span></li><li><span>Home carpet wash</span><span>RM20–45</span></li></ul></article>
+      <a class="svc" href="#polish" data-scroll><div class="svc-media"><video class="clip" data-src="media/red-roof.mp4" poster="img/red-roof.jpg" muted loop playsinline></video></div><span class="svc-price">From RM180</span><div class="svc-text"><h3 class="disp">2-step polish</h3><p>Compound, then finish. See below.</p></div></a>
+      <article class="svc"><div class="svc-media zoom"><video class="clip" data-src="media/s-bike.mp4" poster="img/s-bike.jpg" muted loop playsinline></video></div><span class="svc-price">Ask us</span><div class="svc-text"><h3 class="disp">Motorbikes too</h3><p>Message us for the price.</p></div></article>
+    </div>
+  </section>
+
+  <section class="foam pin" id="menu">
+    <div class="foam-text">
+      <p class="eyebrow">The menu</p>
+      <h2 class="disp"><span class="lean">No surprises.</span></h2>
+    </div>
+    <canvas id="bubbles" aria-hidden="true"></canvas>
+  </section>
+
+  <section class="prices" aria-label="Car wash prices">
+    <div class="price-grid">
+      <div class="picker">
+        <h3 id="lbl-type">What are you driving?</h3>
+        <div class="chips" id="types" role="group" aria-labelledby="lbl-type"></div>
+        <h3 id="lbl-size" class="gap">What size?</h3>
+        <div class="chips" id="sizes" role="group" aria-labelledby="lbl-size"></div>
+        <div class="readout" aria-live="polite"><small>RM</small><span id="rm">15</span></div>
+        <p class="readout-note">Not sure which size you are? <a href="https://wa.me/601116406114" target="_blank" rel="noopener">Ask on WhatsApp.</a></p>
+      </div>
+      <div class="extras">
+        <h3 class="disp"><span class="lean">Everything else</span></h3>
+        <table id="extras">
+          <thead><tr><th scope="col"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">Service</span></th><th scope="col">XS</th><th scope="col">S</th><th scope="col">M</th><th scope="col">L</th><th scope="col">XL</th></tr></thead>
+          <tbody>
+            <tr><td>Wash only</td><td>RM10</td><td>RM11–12</td><td>RM12</td><td>RM15</td><td>RM15</td></tr>
+            <tr><td>Water wax</td><td>RM10</td><td>RM11</td><td>RM12</td><td>RM12</td><td>RM12</td></tr>
+            <tr><td>Chemical wash</td><td>RM12</td><td>RM13</td><td>RM14</td><td>RM15</td><td>RM15</td></tr>
+            <tr><td>Car seat wash</td><td>RM50</td><td>RM60</td><td>RM70</td><td>RM80</td><td>RM80</td></tr>
+            <tr><td>Dashboard / 4 doors clean</td><td>RM12</td><td>RM12</td><td>RM12</td><td>RM15</td><td>RM15</td></tr>
+            <tr><td>Vacuum only</td><td>RM5</td><td>RM5</td><td>RM7</td><td>RM10</td><td>RM10</td></tr>
+            <tr><td>Car mat wash</td><td>RM5</td><td>RM5</td><td>RM5</td><td>RM7</td><td>RM7</td></tr>
+            <tr><td>Home carpet wash</td><td>–</td><td>RM20</td><td>RM30</td><td>RM45</td><td>–</td></tr>
+          </tbody>
+        </table>
+        <p class="fine">From the Mr Dude price list. Prices can change, so please confirm at the counter.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="polish pin" id="polish">
+    <div class="panes" aria-hidden="true">
+      <div class="pane"><video class="clip" data-src="media/red-door.mp4" poster="img/red-door.jpg" muted loop playsinline></video></div>
+      <div class="pane"><video class="clip" data-src="media/red-roof.mp4" poster="img/red-roof.jpg" muted loop playsinline></video></div>
+      <div class="pane"><video class="clip" data-src="media/red-bonnet.mp4" poster="img/red-bonnet.jpg" muted loop playsinline></video></div>
+    </div>
+    <div class="polish-copy">
+      <p class="eyebrow">Detailing</p>
+      <h2 class="disp"><span class="lean">From dull<br>to dazzling.</span></h2>
+      <p>The 2-step polish brings back deep gloss and removes swirls, scratches and haze. Restore, correct, perfect.</p>
+      <ol class="steps">
+        <li><b>1</b>Paint correction</li>
+        <li><b>2</b>Compound polish</li>
+        <li><b>3</b>Finishing polish</li>
+        <li><b>4</b>Protection boost</li>
+      </ol>
+      <div class="tiers">
+        <div><span>Compact</span><b><i>RM</i><span class="n" data-to="180">180</span></b></div>
+        <div><span>Sedan</span><b><i>RM</i><span class="n" data-to="230">230</span></b></div>
+        <div><span>SUV</span><b><i>RM</i><span class="n" data-to="280">280</span></b></div>
+        <div><span>MPV</span><b><i>RM</i><span class="n" data-to="350">350</span></b></div>
+      </div>
+      <p class="polish-note">3rd anniversary price, limited to the first 5 slots. <a href="https://wa.me/601116406114" target="_blank" rel="noopener">Ask if there's one left.</a></p>
+    </div>
+  </section>
+
+  <section class="trucks pin truck-stage" id="trucks">
+    <div class="truck-head">
+      <p class="eyebrow c">Truck wash</p>
+      <h2 class="disp"><span class="lean">Bring the<br>big one.</span></h2>
+    </div>
+    <div class="ton" aria-hidden="true"><span id="tonN">1</span> ton</div>
+    <div class="road" aria-hidden="true"><div class="dash"></div><p class="road-note">Keep scrolling to add tonnes</p></div>
+    <svg id="truck" viewBox="0 0 900 330" aria-hidden="true">
+      <ellipse cx="460" cy="300" rx="430" ry="16" fill="#000" opacity=".35"/>
+      <rect id="tBox" x="340" y="110" width="240" height="140" rx="5" fill="#f5f3ee"/>
+      <rect id="tStripe" x="340" y="218" width="240" height="10" fill="#f2a93b"/>
+      <text id="tName" x="460" y="190" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="46" fill="#08090b" transform="skewX(0)">MR DUDE</text>
+      <rect id="tChassis" x="340" y="250" width="440" height="16" fill="#16181d"/>
+      <g id="tCab">
+        <path d="M590 120 h92 q14 0 21 12 l42 72 q7 12 7 24 v38 h-162 z" fill="#f2a93b"/>
+        <path d="M640 138 h40 q8 0 12 7 l28 50 h-80 z" fill="#0d2a5e"/>
+        <path d="M650 146 l8 0 l-6 40 l-8 0 z" fill="#6fd3ff" opacity=".5"/>
+        <rect x="600" y="205" width="150" height="5" fill="#c67c14"/>
+        <rect x="740" y="232" width="20" height="10" rx="2" fill="#fff"/>
+        <rect x="628" y="214" width="26" height="5" rx="2" fill="#16181d"/>
+      </g>
+      <g id="tFront" class="wheel" transform="translate(690 272)"><circle r="30" fill="#0b0c0f"/><circle r="16" fill="#c9ccd1"/><g class="spin"><rect x="-2.5" y="-14" width="5" height="28" fill="#4c4f55"/><rect x="-14" y="-2.5" width="28" height="5" fill="#4c4f55"/></g></g>
+      <g id="tRear" class="wheel" transform="translate(420 272)"><circle r="30" fill="#0b0c0f"/><circle r="16" fill="#c9ccd1"/><g class="spin"><rect x="-2.5" y="-14" width="5" height="28" fill="#4c4f55"/><rect x="-14" y="-2.5" width="28" height="5" fill="#4c4f55"/></g></g>
+      <g id="tRear2" class="wheel" transform="translate(350 272)" opacity="0"><circle r="30" fill="#0b0c0f"/><circle r="16" fill="#c9ccd1"/><g class="spin"><rect x="-2.5" y="-14" width="5" height="28" fill="#4c4f55"/><rect x="-14" y="-2.5" width="28" height="5" fill="#4c4f55"/></g></g>
+    </svg>
+    <table class="truck-table" id="truckTable">
+      <thead><tr><th scope="col">Lorry size</th><th scope="col">1 ton</th><th scope="col">3 ton</th><th scope="col">5 ton</th><th scope="col">10 ton</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Wash &amp; vacuum</th><td>RM35</td><td>RM55</td><td>RM65</td><td>RM95</td></tr>
+        <tr><th scope="row">Chemical wash + vacuum</th><td>RM50</td><td>RM70</td><td>RM90</td><td>RM120–150</td></tr>
+        <tr><th scope="row">Chemical + wash + vacuum + diesel</th><td>RM55</td><td>RM75</td><td>RM95</td><td>–</td></tr>
+        <tr><th scope="row">Head wash</th><td>RM20</td><td>RM30</td><td>RM30</td><td>RM50</td></tr>
+        <tr><th scope="row">Box wash</th><td>RM25</td><td>RM35</td><td>–</td><td>–</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="heavy" aria-label="Heavy vehicles">
+    <div class="heavy-grid">
+      <div>
+        <p class="eyebrow c">Heavy vehicles</p>
+        <h3 class="disp" style="margin-top:10px"><span class="lean">Yes, even the JCB.</span></h3>
+        <ul>
+          <li><span>JCB</span><b>RM90</b></li>
+          <li><span>Concrete truck</span><b>RM150</b></li>
+          <li><span>Tipper truck</span><b>RM150–200</b></li>
+          <li><span>Tanker truck</span><b><a href="https://wa.me/601116406114" target="_blank" rel="noopener">Ask us</a></b></li>
+        </ul>
+        <p class="fine" style="color:#b6c4e3">The truck board lists 9 AM to 9 PM. Call ahead if you're bringing something big.</p>
+        <div class="strips">
+          <figure class="strip"><video class="clip" data-src="media/s-truck.mp4" poster="img/s-truck.jpg" muted loop playsinline aria-label="A yellow lorry in the yard"></video></figure>
+          <figure class="strip"><video class="clip" data-src="media/s-foam.mp4" poster="img/s-foam.jpg" muted loop playsinline aria-label="A foam-covered wheel being scrubbed by hand"></video></figure>
+          <figure class="strip"><video class="clip" data-src="media/s-bike.mp4" poster="img/s-bike.jpg" muted loop playsinline aria-label="A blue motorbike being rinsed"></video></figure>
+        </div>
+      </div>
+      <a class="board" href="img/truck-board.webp" target="_blank" rel="noopener"><img src="img/truck-board.webp" width="1400" height="933" loading="lazy" alt="Mr Dude Carwash truck wash price board. Phone 011-1640 6114, Taman Sungai Besi."></a>
+    </div>
+  </section>
+
+  <section class="loyalty pin" id="loyalty">
+    <div>
+      <p class="eyebrow">Loyalty card</p>
+      <h2 class="disp"><span class="lean">Five washes.<br>Sixth one's on us.</span></h2>
+      <p id="count" aria-hidden="true">Your first wash</p>
+      <ol class="terms">
+        <li>Every wash gets 1 stamp.</li>
+        <li>One card per vehicle number.</li>
+        <li>Free wash is a normal wash.</li>
+      </ol>
+    </div>
+    <div class="card-wrap">
+      <div class="lcard" id="lcard">
+        <div class="lcard-top">
+          <div><b>Redeem your free<br>Mr Dude car wash</b><span>Buy 5 washes, get 1 free!</span></div>
+          <img src="img/logo.jpg" alt="">
+        </div>
+        <div class="cells" id="cells"></div>
+        <div class="lcard-foot"><span class="veh">Vehicle no: <span id="plate">YOU 2022</span></span><i>Loyalty<br>card</i></div>
+      </div>
+      <div class="realcard"><img src="img/card-hand.jpg" alt="A customer holding the real blue Mr Dude loyalty card at the yard" loading="lazy"><span>The real card, photographed by a customer. Ask at the counter on your first visit.</span></div>
+    </div>
+  </section>
+
+  <section class="reviews pin" id="reviews">
+    <div>
+      <p class="eyebrow">Google reviews</p>
+      <h2 class="disp"><span class="lean">Ask for <em>Uncle</em><br><em>Anthony.</em></span></h2>
+      <p class="reviews-lede">Six of these eight customers mention him by name. The rest of the team gets some love too.</p>
+    </div>
+    <div class="deck" id="deck">
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>Had an awesome experience here! My car was pretty dusty when I dropped it off, but they made it look brand new. Super friendly staff and amazing attention to detail — even the rims and interior were spotless.</blockquote><footer>William FoOng</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>The staff are polite, respectful, and always address customers properly — they even call us “Puan” instead of using casual terms like “kak”, which makes me feel appreciated and respected.</blockquote><footer>Nor Sarah Abdul Jalil</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>Honestly, the cleaning is on par with other premium car wash, the price is well justified, it only cost me RM 16 for wash and vacuum for my vios.</blockquote><footer>Nurmas Aizil Hambali Bin Aizaz</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>Found this place through Google because my car condition is horrible and in need of a wash. So glad i came, its now clean and shiny! Super convenient that they're open till 10pm.</blockquote><footer>Afiqah Farhana</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>I had a fantastic experience at Mr. Dude Car Wash, and a big part of that was thanks to Mr. Anthony, the manager. He's incredibly kind, empathetic, and down-to-earth… the workmanship was clean, detailed, and impressive.</blockquote><footer>Vasanthakrishnan Govindaraj</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>I've been sending my car &amp; motorbike here for more than a year… If there's ever any issue or if I'm not satisfied, the team is quick to improve for the next visit.</blockquote><footer>Mohd Nazrin Zainuri</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>Mr. Anthony was friendly and got started right away. They paid close attention to detail — my car looked spotless inside and out! Prices were reasonable, and the whole process was quick.</blockquote><footer>king kong</footer></article>
+      <article class="rev"><div class="stars" aria-label="5 stars">★★★★★</div><blockquote>First time to sent my car to wash here, place clean and the friendly supervisor Anthony, and the wash guys very responsible and faster to wash my car to clean, I very satisfied and will come again. Good Job</blockquote><footer>leon lim</footer></article>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <h2 class="disp dirty" aria-label="Bring it dirty."><span class="lean" data-chars>Bring it</span><br><span class="lean" data-chars><em>dirty.</em></span></h2>
+    <div class="visit-grid">
+      <div class="info">
+        <dl>
+          <dt>Where</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=Mr+Dude+Car+Wash+Jalan+2%2F108c+Taman+Sungai+Besi+57100+Kuala+Lumpur" target="_blank" rel="noopener">Jalan 2/108c, Taman Sungai Besi,<br>57100 Kuala Lumpur</a></dd>
+          <dt>When</dt><dd>Every day, 10 AM to 10 PM<small>Hours can change on public holidays</small></dd>
+          <dt>Call</dt><dd><a href="tel:+601116406114">011-1640 6114</a></dd>
+          <dt>Follow</dt><dd><a href="https://www.instagram.com/mrdudecarwash/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@mrdudecarwash" target="_blank" rel="noopener">TikTok</a></dd>
+        </dl>
+        <div class="visit-cta">
+          <a class="btn btn-gold" href="https://wa.me/601116406114" target="_blank" rel="noopener">WhatsApp us</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Mr+Dude+Car+Wash+Jalan+2%2F108c+Taman+Sungai+Besi+57100+Kuala+Lumpur" target="_blank" rel="noopener">Get directions</a>
+        </div>
+      </div>
+      <div class="visit-pics">
+        <figure><video class="clip" data-src="media/sign.mp4" poster="img/sign.jpg" muted loop playsinline aria-label="The yellow Mr Dude sign above the car wash, under big trees"></video></figure>
+        <figure><video class="clip" data-src="media/yard.mp4" poster="img/yard.jpg" muted loop playsinline aria-label="The yard seen from the road"></video></figure>
+        <figure><video class="clip" data-src="media/civic-bumper.mp4" poster="img/civic-bumper.jpg" muted loop playsinline aria-label="A detailer polishing the bumper of a black Civic"></video></figure>
+      </div>
+    </div>
+    <div class="colophon">
+      <img src="img/logo.jpg" alt="" loading="lazy">
+      <span>Clips and photos from Mr Dude Car Wash. Page on <a href="https://thudinest.com/">thudinest.com</a>.</span>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const clamp = (a, b, v) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const seeded = n => { let s = n; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
+
+  // Taller screens need longer columns: repeat each one as stills so the wall never runs out
+  $$('.col').forEach(col => [...col.children].forEach(t => {
+    const c = t.cloneNode(true), v = $('video', c);
+    if (v) { const im = new Image(); im.src = v.poster; im.alt = ''; v.replaceWith(im); }
+    col.append(c);
+  }));
+
+  // Clips load and play only while near the screen
+  const clipIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const v = e.target;
+      if (e.isIntersecting) {
+        if (!v.src) v.src = v.dataset.src;
+        v.play().catch(() => {});
+      } else if (v.src) v.pause();
+    });
+  }, { rootMargin: '10% 0px' });
+  $$('video[data-src]').forEach(v => clipIO.observe(v));
+
+  // Price finder (works with or without motion)
+  const CARS = {
+    'Compact / hatchback': { XS: '12–13', L: '15' },
+    'Sedan': { S: '14', M: '15', L: '16' },
+    'SUV / jeep': { S: '15', M: '16', L: '17' },
+    'MPV': { M: '16', L: '20', XL: '25', XXL: '30' },
+    '4x4': { M: '20', L: '25' },
+    'Passenger van': { M: '35', L: '40' },
+    'Cargo van': { M: '25', L: '30' }
+  };
+  const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  let car = 'Sedan', size = 'M';
+  const rm = $('#rm'), typesEl = $('#types'), sizesEl = $('#sizes'), extras = $('#extras');
+  let rollTween = null;
+  function setPrice(text) {
+    if (!window.gsap || !document.documentElement.classList.contains('motion') || !/^\d+$/.test(text) || !/^\d+$/.test(rm.textContent)) { rm.textContent = text; return; }
+    const o = { v: +rm.textContent };
+    if (rollTween) rollTween.kill();
+    rollTween = gsap.to(o, { v: +text, duration: .55, ease: 'power3.out', onUpdate: () => rm.textContent = Math.round(o.v) });
+    gsap.fromTo(rm, { y: -8 }, { y: 0, duration: .5, ease: 'back.out(3)' });
+  }
+  function renderPicker() {
+    const row = CARS[car];
+    if (!row[size]) size = row.M ? 'M' : Object.keys(row)[0];
+    typesEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.car === car)));
+    sizesEl.querySelectorAll('button').forEach(b => {
+      b.disabled = !row[b.dataset.size];
+      b.setAttribute('aria-pressed', String(b.dataset.size === size));
+    });
+    setPrice(row[size]);
+    // The extras table has no XXL column, so XXL shows XL
+    const idx = Math.min(SIZES.indexOf(size), 4) + 1;
+    extras.querySelectorAll('tr').forEach(tr => [...tr.children].forEach((c, i) => c.classList.toggle('hot', i === idx)));
+  }
+  Object.keys(CARS).forEach(name => {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = name; b.dataset.car = name;
+    b.onclick = () => { car = name; renderPicker(); };
+    typesEl.append(b);
+  });
+  SIZES.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = s; b.dataset.size = s;
+    b.onclick = () => { size = s; renderPicker(); };
+    sizesEl.append(b);
+  });
+  rm.textContent = CARS[car][size];
+
+  // Loyalty card cells: five stamps then FREE, twice over, like the real card
+  const cells = $('#cells');
+  for (let row = 0; row < 2; row++) {
+    for (let i = 1; i <= 5; i++) {
+      const c = document.createElement('div');
+      c.className = 'cell';
+      if (row === 0) c.innerHTML = `<span class="stamp">MR<br>DUDE</span>`;
+      cells.append(c);
+    }
+    const f = document.createElement('div');
+    f.className = 'cell free'; f.textContent = 'FREE';
+    cells.append(f);
+  }
+
+  const motion = document.documentElement.classList.contains('motion');
+  if (!window.gsap || !window.ScrollTrigger) {
+    document.documentElement.classList.remove('motion');
+    renderPicker();
+    return;
+  }
+  renderPicker();
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  if (!motion) { drawSeqStatic(); return; }
+
+  // Smooth scrolling, kept in lock-step with ScrollTrigger
+  const lenis = window.Lenis ? new Lenis({ lerp: 0.1 }) : null;
+  if (lenis) {
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  }
+  // Pinned sections sit deeper than their DOM position, so jump to the trigger's own start
+  $$('[data-scroll]').forEach(a => a.addEventListener('click', e => {
+    const target = $(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    // Some scenes open empty, so land where each one has something to show
+    const st = ScrollTrigger.getAll().find(t => t.pin === target);
+    const into = { menu: 1, polish: .62, trucks: .3 }[target.id] || 0;
+    const y = st ? st.start + (st.end - st.start) * into : target.getBoundingClientRect().top + scrollY;
+    lenis ? lenis.scrollTo(y) : scrollTo(0, y);
+  }));
+
+  gsap.to('.progress i', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
+
+  /* ---------- 1. Hero: the name is a window, then you fly through it ---------- */
+  const cut = $('#cut'), cc = cut.getContext('2d');
+  const state = { p: 0, r: 0 };
+  let W = 0, H = 0, layout = null;
+  function fit() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = cut.parentElement.offsetHeight;
+    cut.width = W * dpr; cut.height = H * dpr;
+    cc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const lines = W / H > .95 ? ['MR DUDE'] : ['MR', 'DUDE'];
+    cc.font = '400 100px Anton';
+    const widest = Math.max(...lines.map(l => cc.measureText(l).width));
+    const lh = 1.12;
+    const fs = Math.min((W * .9) / widest * 100, (H * .7) / (lines.length * lh));
+    const skew = Math.tan(-8 * Math.PI / 180) * -1;
+    const y0 = H * (lines.length > 1 ? .47 : .5) - (lines.length - 1) * fs * lh / 2;
+    layout = { lines, fs, lh, skew, y0 };
+    // Find the fattest stroke near the middle: that is where the camera flies in
+    const res = 2, off = document.createElement('canvas');
+    off.width = W / res; off.height = H / res;
+    const o = off.getContext('2d', { willReadFrequently: true });
+    o.scale(1 / res, 1 / res);
+    paintText(o);
+    const d = o.getImageData(0, 0, off.width, off.height), w = off.width, h = off.height;
+    const on = (x, y) => x >= 0 && y >= 0 && x < w && y < h && d.data[(y * w + x) * 4 + 3] > 128;
+    const walk = (x, y, dx, dy) => { let n = 0; while (on(x + dx * n, y + dy * n)) n++; return n; };
+    let best = { s: -1, x: W / 2, y: H / 2 };
+    for (let y = 0; y < h; y += 3) for (let x = 0; x < w; x += 3) {
+      if (!on(x, y)) continue;
+      const score = Math.min(walk(x, y, 1, 0), walk(x, y, -1, 0), walk(x, y, 0, 1), walk(x, y, 0, -1));
+      const adj = score - Math.abs(x - w / 2) * .012;
+      if (adj > best.s) best = { s: adj, x: x * res, y: y * res, r: score * res };
+    }
+    layout.ax = best.x; layout.ay = best.y;
+    layout.max = Math.hypot(W, H) * .62 / Math.max(best.r || 10, 4);
+    drawCut();
+  }
+  function paintText(c, stroke) {
+    const { lines, fs, lh, skew, y0 } = layout;
+    c.font = `400 ${fs}px Anton`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillStyle = '#000';
+    lines.forEach((l, i) => {
+      const y = y0 + i * fs * lh;
+      c.save();
+      c.transform(1, 0, skew, 1, -skew * y + W / 2, 0);
+      stroke ? c.strokeText(l, 0, y) : c.fillText(l, 0, y);
+      c.restore();
+    });
+  }
+  function drawCut() {
+    if (!layout) return;
+    const p = state.p;
+    const hidden = p >= .995;
+    if (hidden !== cut.hidden) cut.hidden = hidden;
+    if (hidden) { cut.style.display = 'none'; return; }
+    cut.style.display = '';
+    cc.save();
+    cc.globalCompositeOperation = 'source-over';
+    cc.clearRect(0, 0, W, H);
+    cc.fillStyle = '#08090b';
+    cc.fillRect(0, 0, W, H);
+    cc.globalCompositeOperation = 'destination-out';
+    if (state.r < 1) {
+      cc.beginPath();
+      cc.rect(0, H * (1 - state.r) * 1, W, H * state.r);
+      cc.clip();
+    }
+    const e = Math.pow(p, 1.7);
+    const s = Math.exp(Math.log(layout.max) * e);
+    const sx = lerp(layout.ax, W / 2, Math.min(1, e * 1.4)), sy = lerp(layout.ay, H / 2, Math.min(1, e * 1.4));
+    cc.translate(sx, sy); cc.scale(s, s); cc.translate(-layout.ax, -layout.ay);
+    paintText(cc);
+    // A thin gold edge keeps the name readable whatever footage is behind it
+    const edge = clamp(0, 1, 1 - p * 5);
+    if (edge > 0) {
+      cc.globalCompositeOperation = 'source-over';
+      cc.strokeStyle = `rgba(242,169,59,${edge})`;
+      cc.lineWidth = 2 / s;
+      paintText(cc, true);
+    }
+    cc.restore();
+  }
+  (document.fonts ? document.fonts.load('100px Anton') : Promise.resolve()).catch(() => {}).then(() => {
+    fit();
+    gsap.to(state, { r: 1, duration: 1.3, ease: 'expo.out', delay: .1, onUpdate: drawCut });
+    ScrollTrigger.refresh();
+  });
+  ScrollTrigger.addEventListener('refreshInit', () => { if (W !== innerWidth || H !== cut.parentElement.offsetHeight) fit(); });
+
+  gsap.set('.hero-head .eyebrow, .hero-sub, .hero-cta', { autoAlpha: 0, y: 26 });
+  gsap.set('.hero-head h1 .ln > span', { yPercent: 112 });
+  gsap.set('.hero-shade', { opacity: 0 });
+  const heroTl = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: '+=340%', pin: true, scrub: true }
+  });
+  heroTl
+    .to(state, { p: 1, duration: 6, onUpdate: drawCut }, 0)
+    .to('.hero-top', { autoAlpha: 0, duration: .7 }, 0)
+    .fromTo('.wall', { scale: 1.32 }, { scale: 1.04, duration: 6, ease: 'power1.out' }, 0)
+    .to('.hero-shade', { opacity: 1, duration: 1.6 }, 5.2)
+    .to('.hero-head h1 .ln > span', { yPercent: 0, skewX: -8, duration: 1.6, stagger: .35, ease: 'power3.out' }, 5.8)
+    .to('.hero-head .eyebrow, .hero-sub, .hero-cta', { autoAlpha: 1, y: 0, duration: 1, stagger: .22, ease: 'power2.out' }, 6.4)
+    .to({}, { duration: 1.2 });
+  $$('.col').forEach((c, i) => heroTl.fromTo(c, { y: i % 2 ? -90 : 90 }, { y: i % 2 ? 150 : -150, duration: heroTl.duration() }, 0));
+
+  /* ---------- 2. Story ---------- */
+  // Word-by-word light-up, kept to real words so em stays intact
+  $$('[data-words]').forEach(el => {
+    const wrap = n => {
+      [...n.childNodes].forEach(ch => {
+        if (ch.nodeType === 3) {
+          const f = document.createDocumentFragment();
+          ch.textContent.split(/(\s+)/).forEach(t => {
+            if (!t.trim()) { f.append(t); return; }
+            const s = document.createElement('span');
+            s.className = 'w'; s.textContent = t; f.append(s);
+          });
+          ch.replaceWith(f);
+        } else wrap(ch);
+      });
+    };
+    wrap(el);
+    gsap.fromTo($$('.w', el), { opacity: .14 }, {
+      opacity: 1, stagger: .06, ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 52%', scrub: true }
+    });
+  });
+  gsap.fromTo('.story-pics .a', { y: 80 }, { y: -60, ease: 'none', scrollTrigger: { trigger: '.story-pics', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.fromTo('.story-pics .b', { y: 180 }, { y: -40, ease: 'none', scrollTrigger: { trigger: '.story-pics', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.from('.stats > div', { y: 50, opacity: 0, stagger: .15, ease: 'power2.out', scrollTrigger: { trigger: '.stats', start: 'top 92%', end: 'top 62%', scrub: true } });
+  gsap.fromTo('.marquee .track', { xPercent: 0 }, { xPercent: -28, ease: 'none', scrollTrigger: { trigger: '.marquee', start: 'top bottom', end: 'bottom top', scrub: true } });
+
+  /* ---------- 3. Gloss: the walk-round, one frame per scroll tick ---------- */
+  const FRAMES = 120, seq = $('#seq'), sc = seq.getContext('2d'), ac = $('#amb').getContext('2d');
+  const imgs = new Array(FRAMES);
+  let curFrame = 0, seqStarted = false;
+  const url = i => `seq/${String(i + 1).padStart(3, '0')}.webp`;
+  function loadFrame(i) {
+    if (imgs[i]) return;
+    const im = new Image();
+    im.decoding = 'async';
+    im.onload = () => { im.ok = true; if (Math.abs(i - curFrame) < 6) paintFrame(); };
+    im.src = url(i);
+    imgs[i] = im;
+  }
+  function startSeq() {
+    if (seqStarted) return;
+    seqStarted = true;
+    // Coarse pass first so any scroll speed has something close to show
+    for (let i = 0; i < FRAMES; i += 8) loadFrame(i);
+    setTimeout(() => { for (let i = 0; i < FRAMES; i++) loadFrame(i); }, 400);
+  }
+  function paintFrame() {
+    let im = null;
+    for (let d = 0; d < FRAMES; d++) {
+      const a = imgs[curFrame - d], b = imgs[curFrame + d];
+      if (a && a.ok) { im = a; break; }
+      if (b && b.ok) { im = b; break; }
+    }
+    if (!im) return;
+    const cw = seq.clientWidth, ch = seq.clientHeight;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    if (seq.width !== Math.round(cw * dpr)) { seq.width = Math.round(cw * dpr); seq.height = Math.round(ch * dpr); }
+    const k = Math.max(seq.width / im.naturalWidth, seq.height / im.naturalHeight) * 1.04;
+    const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
+    sc.drawImage(im, (seq.width - dw) / 2, (seq.height - dh) / 2, dw, dh);
+    ac.drawImage(im, 0, 0, 18, 32);
+  }
+  loadFrame(0);
+  imgs[0].addEventListener('load', paintFrame);
+  ScrollTrigger.create({ trigger: '.gloss', start: 'top 250%', onEnter: startSeq, once: true });
+  const beats = $$('.beat'), ticks = $$('.ticks li');
+  const gloss = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '.gloss', start: 'top top', end: '+=360%', pin: true, scrub: true }
+  });
+  const fp = { f: 0 };
+  gloss.to(fp, { f: FRAMES - 1, duration: 9, onUpdate: () => {
+    const f = Math.round(fp.f);
+    if (f !== curFrame) { curFrame = f; paintFrame(); }
+    const b = fp.f < 40 ? 0 : fp.f < 80 ? 1 : 2;
+    ticks.forEach((t, i) => t.classList.toggle('on', i === b));
+  } }, 0);
+  gloss.fromTo('.gloss-word', { xPercent: 8 }, { xPercent: -46, duration: 9 }, 0);
+  beats.forEach((b, i) => {
+    const t = i * 3;
+    const yb = innerWidth / innerHeight < .9 ? 0 : -50;
+    gsap.set(b, { yPercent: yb + 12 });
+    gloss.to(b, { autoAlpha: 1, yPercent: yb, duration: .5, ease: 'power2.out' }, t + .1);
+    if (i < 2) gloss.to(b, { autoAlpha: 0, yPercent: yb - 12, duration: .5, ease: 'power2.in' }, t + 2.4);
+  });
+
+  /* ---------- 4. Services lane: horizontal, cards lean with your speed ---------- */
+  const track = $('.lane-track');
+  const laneDist = () => Math.max(track.scrollWidth - innerWidth, 0);
+  const lane = gsap.to(track, {
+    x: () => -laneDist(), ease: 'none',
+    scrollTrigger: { trigger: '.lane', start: 'top top', end: () => '+=' + laneDist(), pin: true, scrub: true, invalidateOnRefresh: true }
+  });
+  $$('.svc').forEach((card, i) => {
+    const media = $('.svc-media', card);
+    gsap.fromTo(card, { y: i % 2 ? 44 : -44, rotate: i % 2 ? 2.4 : -2.4 }, {
+      y: i % 2 ? -14 : 14, rotate: i % 2 ? -.8 : .8, ease: 'none',
+      scrollTrigger: { trigger: card, containerAnimation: lane, start: 'left right', end: 'right left', scrub: true }
+    });
+    if (media) gsap.fromTo(media, { xPercent: -6 }, { xPercent: 6, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: lane, start: 'left right', end: 'right left', scrub: true } });
+  });
+  const skewTo = gsap.quickTo('.svc', 'skewX', { duration: .4, ease: 'power3' });
+  ScrollTrigger.create({
+    trigger: '.lane', start: 'top top', end: () => '+=' + laneDist(),
+    onUpdate: self => skewTo(clamp(-9, 9, self.getVelocity() / -260))
+  });
+  ScrollTrigger.addEventListener('scrollEnd', () => skewTo(0));
+
+  /* ---------- 5. Foam rises, then a squeegee clears the screen ---------- */
+  const bub = $('#bubbles'), bc = bub.getContext('2d');
+  let BW = 0, BH = 0, bubs = [], sprites = [];
+  function makeSprite(r) {
+    const c = document.createElement('canvas'); c.width = c.height = r * 2 + 2;
+    const g = c.getContext('2d');
+    const rad = g.createRadialGradient(r * .72, r * .68, r * .08, r, r, r);
+    rad.addColorStop(0, '#ffffff');
+    rad.addColorStop(.62, '#f7f8f8');
+    rad.addColorStop(.88, '#d9e4ea');
+    rad.addColorStop(1, '#b3c6d2');
+    g.fillStyle = rad; g.beginPath(); g.arc(r + 1, r + 1, r, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath(); g.ellipse(r * .68, r * .6, r * .17, r * .11, -.6, 0, 7); g.fill();
+    return c;
+  }
+  function fitFoam() {
+    BW = innerWidth; BH = bub.parentElement.offsetHeight;
+    bub.width = BW; bub.height = BH;
+    const rnd = seeded(29), n = clamp(160, 760, Math.round(BW * BH / 2300));
+    bubs = [];
+    for (let i = 0; i < n; i++) bubs.push({ x: rnd() * BW, y: rnd() * BH * 1.1, r: 14 + rnd() * rnd() * 58, j: rnd() * 90 });
+    bubs.sort((a, b) => a.y - b.y);
+    sprites = [24, 44, 76].map(makeSprite);
+    drawFoam(foamP.p);
+  }
+  const foamP = { p: 0 };
+  function drawFoam(p) {
+    bc.globalCompositeOperation = 'source-over';
+    bc.clearRect(0, 0, BW, BH);
+    if (p <= 0.001 || p >= .999) return;
+    const rise = gsap.parseEase('power1.inOut')(clamp(0, 1, p / .5));
+    const front = lerp(BH + 120, -140, rise);
+    bc.fillStyle = '#f5f3ee';
+    // Wavy top so the solid foam never shows a straight edge
+    bc.beginPath();
+    bc.moveTo(0, BH);
+    for (let x = 0; x <= BW + 24; x += 24) bc.lineTo(x, front + 96 + Math.sin(x * .013) * 26 + Math.sin(x * .037 + 2) * 14);
+    bc.lineTo(BW, BH);
+    bc.closePath();
+    bc.fill();
+    for (const b of bubs) {
+      const depth = b.y - front + b.j;
+      if (depth < 0) continue;
+      const r = b.r * clamp(0, 1, depth / 110);
+      if (r < 1) continue;
+      const sp = sprites[b.r < 26 ? 0 : b.r < 46 ? 1 : 2];
+      bc.drawImage(sp, b.x - r, b.y - r, r * 2, r * 2);
+    }
+    if (p > .54) {
+      // Squeegee: everything behind the blade is wiped clean
+      const q = (p - .54) / .46;
+      const lean = BH * .22;
+      const bx = lerp(-lean - 60, BW + lean + 60, q);
+      bc.globalCompositeOperation = 'destination-out';
+      bc.beginPath();
+      bc.moveTo(0, 0); bc.lineTo(bx + lean, 0); bc.lineTo(bx - lean, BH); bc.lineTo(0, BH); bc.closePath();
+      bc.fill();
+      bc.globalCompositeOperation = 'source-over';
+      bc.lineCap = 'butt';
+      bc.strokeStyle = '#08090b'; bc.lineWidth = 18;
+      bc.beginPath(); bc.moveTo(bx + lean, 0); bc.lineTo(bx - lean, BH); bc.stroke();
+      bc.strokeStyle = '#f2a93b'; bc.lineWidth = 6;
+      bc.beginPath(); bc.moveTo(bx + lean - 12, 0); bc.lineTo(bx - lean - 12, BH); bc.stroke();
+    }
+  }
+  fitFoam();
+  ScrollTrigger.addEventListener('refreshInit', () => { if (BW !== innerWidth) fitFoam(); });
+  gsap.set('.foam-text', { opacity: 0 });
+  gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: '.foam', start: 'top top', end: '+=220%', pin: true, scrub: true,
+      onUpdate: self => { $('.foam').style.background = self.progress > .48 ? 'var(--soap)' : 'var(--ink)'; },
+      onLeave: () => { $('.foam').style.background = 'var(--soap)'; }
+    }
+  })
+    .to(foamP, { p: 1, duration: 10, onUpdate: () => drawFoam(foamP.p) }, 0)
+    .to('.foam-text', { opacity: 1, duration: .01 }, 4.9);
+  gsap.fromTo('.foam-text h2', { scale: .92 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.foam', start: 'top -100%', end: '+=120%', scrub: true } });
+
+  /* ---------- 6. Prices ---------- */
+  gsap.from('.picker', { y: 70, opacity: 0, ease: 'power2.out', scrollTrigger: { trigger: '.price-grid', start: 'top 95%', end: 'top 62%', scrub: true } });
+  gsap.from('#extras tbody tr', { x: 40, opacity: 0, stagger: .1, ease: 'power2.out', scrollTrigger: { trigger: '#extras', start: 'top 92%', end: 'bottom 72%', scrub: true } });
+
+  /* ---------- 7. Polish ---------- */
+  const narrow = () => innerWidth <= 860;
+  const nums = $$('.tiers .n');
+  const tierP = { p: 0 };
+  const showTiers = () => nums.forEach((n, i) => { n.textContent = Math.round(+n.dataset.to * clamp(0, 1, tierP.p * 1.6 - i * .2)); });
+  ScrollTrigger.matchMedia({
+    '(min-width: 861px)': () => {
+      gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: { trigger: '.polish', start: 'top top', end: '+=240%', pin: true, scrub: true }
+      })
+        .from('.pane:nth-child(1)', { yPercent: 104, duration: 2, ease: 'power2.out' }, 0)
+        .from('.pane:nth-child(2)', { yPercent: -104, duration: 2, ease: 'power2.out' }, .4)
+        .from('.pane:nth-child(3)', { yPercent: 104, duration: 2, ease: 'power2.out' }, .8)
+        .from('.polish-copy > .eyebrow, .polish-copy h2, .polish-copy > p:not(.polish-note)', { x: 70, opacity: 0, stagger: .3, duration: 1.2, ease: 'power2.out' }, 1)
+        .from('.steps li', { y: 24, opacity: 0, stagger: .25, duration: .7, ease: 'power2.out' }, 2.4)
+        .to(tierP, { p: 1, duration: 2.6, onUpdate: showTiers }, 3.4)
+        .from('.polish-note', { opacity: 0, duration: .6 }, 5.4)
+        .to({}, { duration: 1 });
+    },
+    '(max-width: 860px)': () => {
+      tierP.p = 0; showTiers();
+      gsap.to(tierP, { p: 1, ease: 'none', onUpdate: showTiers, scrollTrigger: { trigger: '.tiers', start: 'top 96%', end: 'top 60%', scrub: true } });
+      gsap.from('.pane', { yPercent: i => i % 2 ? -60 : 60, ease: 'none', scrollTrigger: { trigger: '.panes', start: 'top 95%', end: 'top 40%', scrub: true } });
+    }
+  });
+
+  /* ---------- 8. Truck: scroll adds tonnes ---------- */
+  const T = { box: $('#tBox'), stripe: $('#tStripe'), name: $('#tName'), chassis: $('#tChassis'), r1: $('#tRear'), r2: $('#tRear2') };
+  const spins = $$('#truck .spin');
+  const TONS = [1, 3, 5, 10];
+  const tonN = $('#tonN'), truckRows = $$('#truckTable tr');
+  let curTon = -1;
+  function setTruck(v, roll) {
+    // v runs 0..3, one step per column on the price board
+    const w = lerp(150, 540, v / 3), h = lerp(112, 186, v / 3);
+    const right = 585, x = right - w, y = 250 - h;
+    T.box.setAttribute('x', x); T.box.setAttribute('y', y); T.box.setAttribute('width', w); T.box.setAttribute('height', h);
+    T.stripe.setAttribute('x', x); T.stripe.setAttribute('width', w); T.stripe.setAttribute('y', 250 - 30);
+    T.name.setAttribute('x', x + w / 2); T.name.setAttribute('y', 250 - h * .42); T.name.setAttribute('font-size', lerp(36, 84, v / 3));
+    T.chassis.setAttribute('x', x - 4); T.chassis.setAttribute('width', 780 - x);
+    T.r1.setAttribute('transform', `translate(${x + w * .3} 272)`);
+    T.r2.setAttribute('transform', `translate(${x + w * .3 - 68} 272)`);
+    T.r2.setAttribute('opacity', clamp(0, 1, (v - 1.6) * 3));
+    spins.forEach(s => s.setAttribute('transform', `rotate(${roll})`));
+    const idx = Math.round(v);
+    if (idx !== curTon) {
+      curTon = idx;
+      tonN.textContent = TONS[idx];
+      gsap.fromTo(tonN, { yPercent: 40, opacity: .2 }, { yPercent: 0, opacity: 1, duration: .35, ease: 'power3.out', overwrite: true });
+      truckRows.forEach(tr => [...tr.children].forEach((c, i) => c.classList.toggle('hot', i === idx + 1)));
+    }
+  }
+  setTruck(0, 0);
+  const tv = { v: 0, roll: 0 };
+  gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '#trucks', start: 'top top', end: '+=300%', pin: true, scrub: true }
+  })
+    .fromTo('#truck', { x: () => -innerWidth * .7 }, { x: 0, duration: 2, ease: 'power2.out' }, 0)
+    .to(tv, { roll: 1500, duration: 2, ease: 'power2.out', onUpdate: () => setTruck(tv.v, tv.roll) }, 0)
+    .from('.truck-table', { y: 60, opacity: 0, duration: 1 }, 1)
+    .to(tv, { v: 1, duration: 1, ease: 'power2.inOut', onUpdate: () => setTruck(tv.v, tv.roll) }, 2.6)
+    .to(tv, { v: 2, duration: 1, ease: 'power2.inOut', onUpdate: () => setTruck(tv.v, tv.roll) }, 4.2)
+    .to(tv, { v: 3, duration: 1, ease: 'power2.inOut', onUpdate: () => setTruck(tv.v, tv.roll) }, 5.8)
+    .fromTo('.road .dash', { x: 0 }, { x: -900, duration: 7.4 }, 0)
+    .to({}, { duration: .8 });
+  gsap.fromTo('.board', { rotateX: 16, rotate: -3, scale: .9, transformPerspective: 1100 }, { rotateX: 0, rotate: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '.board', start: 'top 98%', end: 'top 30%', scrub: true } });
+  gsap.from('.strip', { x: i => (i - 1) * 70, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.strips', start: 'top 98%', end: 'top 60%', scrub: true } });
+
+  /* ---------- 9. Loyalty: scroll stamps the card ---------- */
+  const stamps = $$('#cells .stamp');
+  const firstFree = $$('#cells .free')[0];
+  const count = $('#count');
+  const WORDS = ['Your first wash', 'Wash 1 of 5', 'Wash 2 of 5', 'Wash 3 of 5', 'Wash 4 of 5', 'Wash 5 of 5', 'This one is free.'];
+  gsap.set(stamps, { scale: 2.4, opacity: 0 });
+  const burst = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  burst.setAttribute('viewBox', '-100 -100 200 200'); burst.setAttribute('class', 'burst');
+  for (let a = 0; a < 16; a++) {
+    const l = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const t = a * Math.PI / 8;
+    l.setAttribute('d', `M${Math.cos(t) * 50} ${Math.sin(t) * 50}L${Math.cos(t) * 92} ${Math.sin(t) * 92}`);
+    l.setAttribute('stroke', a % 2 ? '#cf1f2e' : '#08090b'); l.setAttribute('stroke-width', 5); l.setAttribute('stroke-linecap', 'round');
+    burst.append(l);
+  }
+  firstFree.append(burst);
+  const loyal = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: '#loyalty', start: 'top top', end: '+=300%', pin: true, scrub: true,
+      onUpdate: self => { count.textContent = WORDS[clamp(0, 6, Math.floor((self.progress - .12) / .13) + 1)]; }
+    }
+  });
+  loyal.fromTo('#lcard', { rotateX: 42, rotateY: -22, rotateZ: 6, y: 90, scale: .86 }, { rotateX: 0, rotateY: 0, rotateZ: 0, y: 0, scale: 1, duration: 1.4, ease: 'power2.out' }, 0);
+  stamps.forEach((st, i) => {
+    const t = 1.5 + i * 1.3;
+    loyal.to(st, { scale: 1, opacity: 1, duration: .28, ease: 'power4.in' }, t)
+      .fromTo('#lcard', { y: 0 }, { y: 7, duration: .08 }, t + .28)
+      .to('#lcard', { y: 0, duration: .22, ease: 'back.out(3)' }, t + .36);
+  });
+  loyal.fromTo(firstFree, { scale: 1, rotate: -4 }, { scale: 1.5, rotate: 4, duration: .4, ease: 'back.out(3)' }, 8.2)
+    .to(burst, { opacity: 1, duration: .1 }, 8.25)
+    .fromTo(burst, { scale: .5 }, { scale: 1.2, duration: .7, ease: 'power3.out' }, 8.25)
+    .to(burst, { opacity: 0, duration: .3 }, 8.75)
+    .to({}, { duration: .6 });
+
+  /* ---------- 10. Reviews: a deck that deals itself ---------- */
+  const revs = $$('.rev');
+  gsap.set(revs, { yPercent: -50 });
+  const deal = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '#reviews', start: 'top top', end: () => '+=' + (revs.length * 70) + '%', pin: true, scrub: true }
+  });
+  revs.forEach((r, i) => {
+    const rot = (i % 2 ? 1 : -1) * (1.2 + (i % 3) * .7);
+    if (i === 0) { gsap.set(r, { rotate: rot }); return; }
+    gsap.set(r, { y: () => innerHeight * .9, rotate: rot * 4 });
+    deal.to(r, { y: 0, rotate: rot, duration: 1, ease: 'power2.out' }, i - 1);
+    for (let k = 0; k < i; k++) deal.to(revs[k], { scale: 1 - (i - k) * .035, y: -(i - k) * 15, opacity: i - k > 2 ? 0 : 1, duration: 1 }, i - 1);
+  });
+  deal.to({}, { duration: .5 });
+
+  /* ---------- 11. Visit ---------- */
+  $$('[data-chars]').forEach(el => {
+    const split = n => [...n.childNodes].forEach(ch => {
+      if (ch.nodeType !== 3) return split(ch);
+      const f = document.createDocumentFragment();
+      [...ch.textContent].forEach(c => {
+        if (c === ' ') { f.append(' '); return; }
+        const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; f.append(s);
+      });
+      ch.replaceWith(f);
+    });
+    split(el);
+  });
+  gsap.from('.dirty .ch', {
+    yPercent: 110, rotate: 9, opacity: 0, stagger: .05, ease: 'power3.out',
+    scrollTrigger: { trigger: '.dirty', start: 'top 92%', end: 'top 34%', scrub: true }
+  });
+  gsap.from('.info dt, .info dd', { y: 24, opacity: 0, stagger: .05, ease: 'power2.out', scrollTrigger: { trigger: '.info', start: 'top 92%', end: 'top 60%', scrub: true } });
+  gsap.from('.visit-pics figure', { yPercent: i => [24, -18, 24][i], opacity: 0, ease: 'none', scrollTrigger: { trigger: '.visit-pics', start: 'top 100%', end: 'top 50%', scrub: true } });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+
+  function drawSeqStatic() {
+    const seq = $('#seq'), im = new Image();
+    im.onload = () => { seq.width = im.naturalWidth; seq.height = im.naturalHeight; seq.getContext('2d').drawImage(im, 0, 0); $('#amb').getContext('2d').drawImage(im, 0, 0, 18, 32); };
+    im.src = 'seq/040.webp';
+  }
+})();
+</script>
+</body>
+</html>
