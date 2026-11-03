@@ -1747,6 +1747,7 @@ function onMatchEnd(e, m) {
   if (G.attract) { setTimeout(() => { if (G.attract) newMatch(true); }, 2500); return; }
   const you = e.winner === 0;
   G.views[e.winner].celebrate(m.T, 8, true);
+  G.views[e.winner].react('dance', { loop: true, until: 10 }); // the winner dances
   G.views[1 - e.winner].dejected(m.T, 4.3);
   Sound.applause(1.3, 5); crowd.cheer(1.2);
   led.flash(`${m.pl[e.winner].name.toUpperCase()} WINS`, '#d4ff3a', '#10170a', 8);
