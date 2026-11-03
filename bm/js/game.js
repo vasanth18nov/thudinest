@@ -2039,6 +2039,7 @@ function pause(on) {
 }
 function showEnd(e, m) {
   G.mode = 'end';
+  if (G.views[e.winner]) G.views[e.winner].react('dance', { loop: true, until: 1e9 }); // the winner keeps dancing on the result card
   const you = e.winner === 0, P = m.pl;
   $('endTitle').textContent = you ? 'Match won' : 'Match lost'; $('endTitle').className = you ? 'win' : '';
   $('endSub').textContent = `${P[0].name} v ${P[1].name} · ${DIFFS[G.s.diff].name}`;
