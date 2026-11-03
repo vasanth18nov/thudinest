@@ -421,7 +421,7 @@ function makeRacket(frame, grip) {
 /* The realistic Mixamo characters from the cricket game, the sporty ones: each wears what it was downloaded in. */
 export const CHARS = {
   footballer: { name: 'Leo Hart', short: 'Hart', h: 1.83, racket: [0x1f6bff, 0xf2f4fb], look: 'all white' },
-  ch42: { name: 'Rio Santos', short: 'Santos', h: 1.79, racket: [0xff3b30, 0x15161a], look: 'red tee' },
+  ch42: { name: 'Vasanth', short: 'Vasanth', h: 1.79, racket: [0xff3b30, 0x15161a], look: 'red tee' },
   remy: { name: 'Remy Laurent', short: 'Laurent', h: 1.84, racket: [0xffcf1a, 0x15161a], look: 'grey tee' },
   adam: { name: 'Adam Novak', short: 'Novak', h: 1.81, racket: [0x00c389, 0xf2f4fb], look: 'tracksuit' },
   ch01: { name: 'Kai Brandt', short: 'Brandt', h: 1.8, racket: [0xff7a1a, 0x15161a], look: 'white polo' },
