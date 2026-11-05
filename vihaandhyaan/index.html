@@ -155,7 +155,7 @@ html:not(.motion) .progress-car { display: none; }
 .fact p { margin: 0; font-size: clamp(17px, 2.4vw, 21px); }
 
 /* ---- the brothers in letters (the particle ring from Kavin's page) */
-.letters { background: radial-gradient(60vmax 50vmax at 72% 50%, rgba(31, 111, 224, 0.22), transparent 65%), radial-gradient(40vmax 40vmax at 20% 80%, rgba(255, 138, 31, 0.12), transparent 70%), var(--ink); color: var(--white); padding: 0; }
+.letters { background: radial-gradient(60vmax 50vmax at 72% 50%, rgba(31, 111, 224, 0.22), transparent 65%), radial-gradient(40vmax 40vmax at 20% 80%, rgba(255, 138, 31, 0.12), transparent 70%), var(--ink); color: var(--white); padding: 0; overflow: hidden; }
 .letters-stage {
   min-height: 100svh; width: min(1180px, 100% - 32px); margin-inline: auto;
   display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(24px, 5vw, 70px); padding-block: 40px;
@@ -283,6 +283,45 @@ html.motion .stop { position: absolute; inset: 0 0 auto 0; border: 0; opacity: 0
 .pitch h2 { position: relative; z-index: 1; font-size: clamp(30px, 8vw, 72px); margin: 0; }
 .pitch .roller { position: absolute; bottom: 30px; left: 0; width: 70px; z-index: 2; }
 html:not(.motion) .pitch .roller { left: 50%; margin-left: -35px; }
+
+/* ---- game time: Floodlit Over, under the lights */
+.cricket {
+  background: radial-gradient(70% 60% at 50% 110%, #1d5a3a 0, transparent 70%), linear-gradient(#060b1c, #0b1633 60%, #0d2a24);
+  color: var(--white); overflow: hidden; padding: clamp(80px, 12vw, 130px) 0;
+}
+.beam { position: absolute; top: -10%; width: 46vw; height: 130%; pointer-events: none; opacity: 0.18; mix-blend-mode: screen;
+  background: linear-gradient(rgba(255, 246, 210, 0.55), rgba(255, 246, 210, 0) 70%); filter: blur(6px); }
+.beam.l { left: -6vw; clip-path: polygon(0 0, 22% 0, 100% 100%, 40% 100%); }
+.beam.r { right: -6vw; clip-path: polygon(78% 0, 100% 0, 60% 100%, 0 100%); }
+.pylon { position: absolute; top: 18px; display: grid; grid-template-columns: repeat(4, 12px); gap: 5px; padding: 6px; background: #1b2236; border-radius: 6px; }
+.pylon i { width: 12px; height: 12px; border-radius: 50%; background: #3a4260; }
+.pylon.l { left: 4vw; } .pylon.r { right: 4vw; }
+.cricket.lit .pylon i { background: #fff6d2; box-shadow: 0 0 14px 4px rgba(255, 246, 210, 0.8); }
+.cricket .kicker { color: rgba(255,255,255,0.6); }
+.cricket .lede { color: rgba(255,255,255,0.78); }
+.cricket-grid { position: relative; display: grid; gap: 36px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .cricket-grid { grid-template-columns: 0.9fr 1.1fr; } }
+.cricket h2 { font-size: clamp(30px, 6.5vw, 56px); }
+.cricket h2 em { font-style: normal; color: var(--yellow); }
+.facts-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 26px; padding: 0; list-style: none; }
+.facts-row li { border: 1.5px solid rgba(255,255,255,0.25); border-radius: 999px; padding: 6px 13px; font-size: 14px; font-weight: 500; background: rgba(255,255,255,0.05); }
+.play-btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-size: 18px; padding: 15px 26px; }
+.play-btn svg { width: 18px; height: 18px; }
+.screen-wrap { perspective: 1200px; position: relative; }
+.screen {
+  display: block; position: relative; border-radius: 20px; overflow: hidden; border: 3px solid #0d0d0c;
+  box-shadow: 0 0 0 6px #1b2236, 0 40px 70px -24px rgba(0,0,0,0.8); transform-origin: 50% 100%; text-decoration: none; color: var(--white);
+}
+.screen img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.screen .bug { position: absolute; left: 12px; top: 12px; background: rgba(6, 11, 28, 0.85); border-radius: 8px; padding: 6px 10px; font: 400 12px/1 'Rubik Mono One', sans-serif; letter-spacing: 0.04em; }
+.screen .bug b { color: var(--yellow); font-weight: 400; }
+.screen .go { position: absolute; inset: auto 12px 12px auto; width: 58px; height: 58px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+.screen .go svg { width: 22px; height: 22px; margin-left: 3px; }
+.six { position: absolute; right: 7%; top: 9%; z-index: 2; font: 400 clamp(34px, 7vw, 64px)/1 'Rubik Mono One', sans-serif; color: var(--yellow); transform: rotate(-8deg); text-shadow: 0 6px 0 #0d0d0c; pointer-events: none; opacity: 0; }
+html:not(.motion) .six { display: none; }
+.flyball { position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; pointer-events: none; opacity: 0; z-index: 3;
+  background: radial-gradient(circle at 35% 35%, #ff7a6b, #c4241b 60%, #7d140f); box-shadow: 0 0 18px rgba(255, 90, 79, 0.6); }
+.flyball::after { content: ''; position: absolute; inset: 10% 46%; background: repeating-linear-gradient(#fbfbf7 0 2px, transparent 2px 4px); border-radius: 2px; }
 
 /* ---- garage: the race */
 .garage { background: var(--ink); color: var(--white); overflow: hidden; }
@@ -572,6 +611,35 @@ html.motion .grow-text p { position: absolute; left: 0; right: 0; bottom: 0; }
   <section class="pitch" aria-label="Match day">
     <h2 data-words>Every day<br>is match day</h2>
     <svg class="roller" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#fff" stroke="#15130f" stroke-width="3"/><path d="M32 18l10 7-4 12H26l-4-12z" fill="#15130f"/><path d="M32 18V4M42 25l13-5M38 37l9 12M26 37l-9 12M22 25L9 20" stroke="#15130f" stroke-width="3" fill="none"/></svg>
+  </section>
+
+  <!-- ============ GAME TIME: CRICKET ============ -->
+  <section class="cricket" id="cricket" aria-label="Play Floodlit Over, the cricket game">
+    <span class="beam l" aria-hidden="true"></span><span class="beam r" aria-hidden="true"></span>
+    <span class="pylon l" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="pylon r" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="flyball" aria-hidden="true"></span>
+    <div class="wrap cricket-grid">
+      <div class="cricket-copy">
+        <p class="kicker">Game time · Under the lights</p>
+        <h2>Pad up,<br><em>boys.</em></h2>
+        <p class="lede" data-words>Floodlit Over is a 3D cricket game right here on Thudinest. Bat and bowl a T20 against a World XI, with commentary calling every shot. Take turns, or play on the same phone.</p>
+        <ul class="facts-row">
+          <li>🏏 Bat and bowl</li><li>🎙️ Live commentary</li><li>📱 Works on phones</li><li>🆓 Free, no download</li>
+        </ul>
+        <a class="btn play-btn" href="/cricket/">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>Play Floodlit Over
+        </a>
+      </div>
+      <div class="screen-wrap">
+        <span class="six" aria-hidden="true">SIX!</span>
+        <a class="screen" href="/cricket/" aria-label="Play Floodlit Over">
+          <img src="/images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy">
+          <span class="bug">FLOODLIT <b>OVER</b></span>
+          <span class="go" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 3l12 7-12 7z" fill="#15130f"/></svg></span>
+        </a>
+      </div>
+    </div>
   </section>
 
   <!-- ============ GARAGE ============ -->
@@ -1139,6 +1207,19 @@ html.motion .grow-text p { position: absolute; left: 0; right: 0; bottom: 0; }
     scrollTrigger: { trigger: '.pitch', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
   });
   gsap.from('.pitch h2', { scale: 0.6, ease: 'none', scrollTrigger: { trigger: '.pitch', start: 'top bottom', end: 'center center', scrub: true } });
+
+  // ---- game time: the floodlights warm up, the screen tips up into view, and a ball sails out for six
+  const cr = $('.cricket');
+  gsap.fromTo('.cricket .beam', { opacity: 0 }, { opacity: 1, ease: 'none', scrollTrigger: { trigger: cr, start: 'top 85%', end: 'top 25%', scrub: true } });
+  ScrollTrigger.create({ trigger: cr, start: 'top 55%', end: 'bottom top', onToggle: (self) => cr.classList.toggle('lit', self.isActive) });
+  gsap.fromTo('.screen', { rotationX: 38, scale: 0.86, y: 60, opacity: 0.3 }, { rotationX: 0, scale: 1, y: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: '.screen-wrap', start: 'top 95%', end: 'top 45%', scrub: true } });
+  gsap.fromTo('.cricket-copy', { y: 70, opacity: 0 }, { y: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: cr, start: 'top 85%', end: 'top 35%', scrub: true } });
+  const fly = gsap.timeline({ scrollTrigger: { trigger: cr, start: 'top 60%', end: 'center 30%', scrub: 0.4, invalidateOnRefresh: true } });
+  fly.set('.flyball', { opacity: 1 })
+    .fromTo('.flyball', { x: () => innerWidth * 0.12 }, { x: () => innerWidth * 0.95, ease: 'none', duration: 1 }, 0)
+    .fromTo('.flyball', { y: () => cr.offsetHeight * 0.85, rotate: 0, scale: 0.6 }, { y: () => cr.offsetHeight * 0.06, rotate: 720, scale: 1.3, ease: 'power2.out', duration: 1 }, 0)
+    .to('.flyball', { opacity: 0, duration: 0.1 }, 0.92)
+    .fromTo('.six', { opacity: 0, scale: 0.3, rotate: -30 }, { opacity: 1, scale: 1, rotate: -8, ease: 'back.out(3)', duration: 0.3 }, 0.75);
 
   // ---- 5. the garage: pinned; lights, then both cars to the line with the scroll (always a tie)
   const raceTl = gsap.timeline({
