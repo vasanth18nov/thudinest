@@ -14,7 +14,7 @@ Deployed via Netlify → add your Netlify URL here.
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
   batting game, **Guest Rush** (`/guest-rush/`), a 3D homestay game, and
   **Rally Point** (`/bm/`), a 3D badminton game, and **Final Whistle**
-  (`/football/`), a 3D football game — see below.
+  (`/football/`), a 3D football game on a futsal court or in a stadium — see below.
 
 ## Adding Property Photos
 
@@ -305,10 +305,16 @@ match simulations) are in `~/thudinest-assets/bm/`.
 
 ## Final Whistle (`/football/`)
 
-A standalone 3D football game on a full-size 105 x 68 m pitch under the floodlights. The menu offers four modes:
+A standalone 3D football game with two grounds: the **futsal court** (the default; a 40 x 20 m artificial-turf court
+in a floodlit cage at night, five a side, 3 x 2 m goals, the ball playing off the rebound boards and netting so there
+are no throw-ins, corners or goal kicks; the clubhouse, supporters on benches, coconut palms and the city lights
+around it, `js/futsal.js`) and the **stadium** (a full-size 105 x 68 m pitch, eleven or seven a side,
+`js/stadium.js`). The ground is chosen in Player vs AI setup and remembered; Quick match always goes to the futsal
+court. Every player's own squad number is painted on the back of his shirt (the footballer's printed 7 is removed,
+`numberedMaterial` in `js/kit.js`). The menu offers four modes:
 
-- **Quick match**: your saved side against a random opponent, medium difficulty, 2½-minute halves
-- **Player vs AI**: pick both sides (Thudinest Coimbatore, Team AMH, Ragging Bulls, World XI, the sides and names
+- **Quick match**: your saved side against a random opponent on the futsal court, medium difficulty, 2½-minute halves
+- **Player vs AI**: pick the ground and both sides (Thudinest Coimbatore, Team AMH, Ragging Bulls, World XI, the sides and names
   from Floodlit Over), the difficulty (easy, medium, hard), the half length (2, 3, 5 or 7½ minutes, shown as two
   45-minute halves) and the team size (11 a side, or 7 a side, the default on phones)
 - **Penalty shootout**: five each at the same goal, then sudden death; you take your side's kicks and keep goal
@@ -358,7 +364,7 @@ Files: `football/index.html` (HUD, menus, styles), `football/js/main.js` (boot, 
 `audio.js`. It uses the three.js r170 bundle from Rally Point (`bm/vendor/three.js`) and the cricket game's player
 model and clips, so it adds no new 3D assets. Add `?lite` for the lighter renderer (no bloom, a smaller crowd and
 shadow map; automatic on phones), `?play=quick`, `?play=shootout` or `?play=practice` to skip the menu, and `?debug`
-for `window.__fw` (the match, `shot(n, camera)` to step and draw a moment, `perf()` for the cost of a frame).
+for `window.__fw` (add `&ground=stadium` to the `?play=` links for the big pitch; the match, `shot(n, camera)` to step and draw a moment, `perf()` for the cost of a frame).
 
 **Changing a squad** — edit `TEAMS` at the top of `football/js/main.js` (name, short name, colours, kit and
 keeper's kit, and the XI in order: keeper, four defenders, three midfielders, three forwards).

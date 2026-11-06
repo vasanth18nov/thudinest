@@ -27,14 +27,20 @@ export const store = {
   set(k, v) { try { localStorage.setItem('fw.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
 };
 
-/* the pitch: 105 x 68, FIFA's preferred size */
-export const P = {
-  HL: 52.5, HW: 34,
-  goalW: 3.66, goalH: 2.44, goalD: 2.2, // half width of the goal mouth, crossbar height, net depth
-  boxL: 16.5, boxW: 20.16, sixL: 5.5, sixW: 9.16, spot: 11, circle: 9.15, arc: 1,
-  post: 0.06, // post and bar radius
-  ballR: 0.11,
+/* the grounds. stadium: 105 x 68, FIFA's preferred size. futsal: a 40 x 20 floodlit five-a-side court in a cage,
+   3 x 2 m goals, the ball playing off the boards and netting (no throw-ins, corners or goal kicks).
+   P holds the current ground; setGround() swaps it. k scales distances to the pitch (1 on the big pitch), kp is the
+   same for things that scale less (a player's reach and his runs). */
+export const GROUNDS = {
+  stadium: { kind: 'stadium', HL: 52.5, HW: 34, goalW: 3.66, goalH: 2.44, goalD: 2.2, boxL: 16.5, boxW: 20.16, sixL: 5.5, sixW: 9.16, spot: 11, circle: 9.15, arc: 1, walls: false, wallX: 0, wallZ: 0 },
+  futsal: { kind: 'futsal', HL: 20, HW: 10, goalW: 1.5, goalH: 2.0, goalD: 1.0, boxL: 6, boxW: 7.5, sixL: 2.5, sixW: 4, spot: 6, circle: 3, arc: 0.25, walls: true, wallX: 21.4, wallZ: 11.1 },
 };
+export const P = { post: 0.06, ballR: 0.11 };
+export function setGround(kind) {
+  Object.assign(P, GROUNDS[kind] || GROUNDS.futsal);
+  P.k = P.HL / 52.5; P.kp = Math.max(P.k, 0.5);
+}
+setGround('futsal');
 
 export function canvasTex(w, h, draw, o = {}) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;

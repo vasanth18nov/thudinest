@@ -117,7 +117,7 @@ export class Ball {
     for (const s of [-1, 1]) {
       const depth = s * p.x - P.HL, pdepth = s * q.x - P.HL;
       if (depth < -0.3 || depth > P.goalD + 0.6) continue;
-      const roofAt = (dd) => P.goalH + (1.9 - P.goalH) * clamp(dd / P.goalD, 0, 1);
+      const backTop = P.goalH * 0.78, roofAt = (dd) => P.goalH + (backTop - P.goalH) * clamp(dd / P.goalD, 0, 1);
       const inside = (dd, z, y) => dd > 0 && dd < P.goalD && Math.abs(z) < P.goalW && y < roofAt(dd);
       const wasIn = inside(pdepth, q.z, q.y);
       if (wasIn) {
@@ -136,9 +136,25 @@ export class Ball {
       } else if (depth > 0 && !inside(depth, p.z, p.y) && inside(depth, q.z, q.y) === false) {
         // outside the frame: the ball can't pass through the net from behind or the side
         if (depth > 0.05 && depth < P.goalD && Math.abs(p.z) < P.goalW + r && Math.abs(q.z) >= P.goalW + r && p.y < roofAt(depth)) { p.z = Math.sign(q.z) * (P.goalW + r); v.z *= -0.2; v.x *= 0.6; }
-        if (pdepth >= P.goalD + r && depth < P.goalD + r && Math.abs(p.z) < P.goalW && p.y < 1.9) { p.x = s * (P.HL + P.goalD + r); v.x *= -0.2; }
+        if (pdepth >= P.goalD + r && depth < P.goalD + r && Math.abs(p.z) < P.goalW && p.y < backTop) { p.x = s * (P.HL + P.goalD + r); v.x *= -0.2; }
         if (q.y >= roofAt(depth) + r && p.y < roofAt(depth) + r && depth > 0 && depth < P.goalD && Math.abs(p.z) < P.goalW) { p.y = roofAt(depth) + r; v.y = Math.abs(v.y) * 0.25; v.x *= 0.7; v.z *= 0.7; }
       }
+    }
+    if (P.walls) {
+      // the cage: rebound boards to 1 m (lively), netting above them to 7 m (dead), and the netting roof
+      const wx = P.wallX - r, wz = P.wallZ - r;
+      const hit = (axis, lim) => {
+        if (Math.abs(p[axis]) <= lim) return;
+        p[axis] = Math.sign(p[axis]) * lim;
+        const board = p.y < 1.0, vn = Math.abs(v[axis]);
+        v[axis] = -Math.sign(p[axis]) * vn * (board ? 0.62 : 0.12);
+        const o = axis === 'x' ? 'z' : 'x'; v[o] *= board ? 0.86 : 0.45; v.y *= board ? 0.9 : 0.4;
+        this.spin.multiplyScalar(0.5);
+        if (vn > 3) this.events.push({ type: board ? 'board' : 'fence', speed: vn, at: p.clone() });
+      };
+      hit('x', wx); hit('z', wz);
+      if (p.y > 7.5) { p.y = 7.5; v.y = -Math.abs(v.y) * 0.2; }
+      return;
     }
     // the advertising boards stop a ball that runs on out of play
     const bz = P.HW + 4.1, bx = P.HL + 4.9;

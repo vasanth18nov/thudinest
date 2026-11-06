@@ -21,20 +21,22 @@ export class Cam {
     const portrait = aspect < 1;
     const want = new V3(), look = new V3();
     let fov = 34;
+    // distances scale with the ground: the futsal court is a third the size of the big pitch
+    const m = clamp(P.k * 1.15, 0.45, 1), mb = Math.max(m, 0.55);
     if (this.mode === 'broadcast') {
       // the gantry slides along the near side; closer in on play near the goals and on the near touchline
-      const nearGoal = clamp((Math.abs(F.x) - 30) / 22, 0, 1);
+      const nearGoal = clamp((Math.abs(F.x) - 30 * P.k) / (22 * P.k), 0, 1);
       // a phone's screen is small: the camera comes in closer so the players read
       const ph = o.phone && !portrait ? 0.8 : 1;
-      const dist = ((portrait ? 64 : 47) - nearGoal * 6 + clamp(-F.z, -20, 20) * 0.2) * ph;
-      const h = ((portrait ? 34 : 22) - nearGoal * 2) * ph;
+      const dist = ((portrait ? 64 : 47) - nearGoal * 6 + clamp(-F.z / m, -20, 20) * 0.2) * ph * m;
+      const h = ((portrait ? 34 : 22) - nearGoal * 2) * ph * m;
       want.set(F.x * 0.92, h, F.z * 0.3 + dist);
       look.set(F.x, 0, F.z * 0.62 - 1.5);
       fov = portrait ? 46 : clamp(36 - (aspect - 1.6) * 4, 28, 40);
     } else if (this.mode === 'behind') {
       const d = o.dir || 1;
-      want.set(F.x - d * (portrait ? 26 : 19), portrait ? 16 : 11, F.z * 0.85);
-      look.set(F.x + d * 14, 0, F.z);
+      want.set(F.x - d * (portrait ? 26 : 19) * mb, (portrait ? 16 : 11) * mb, F.z * 0.85);
+      look.set(F.x + d * 14 * mb, 0, F.z);
       fov = portrait ? 58 : 46;
     } else if (this.mode === 'penalty') {
       const spot = o.spot || F, d = o.dir || 1;
@@ -44,13 +46,13 @@ export class Cam {
     } else if (this.mode === 'goal') {
       // round the scorer
       this.orbit += dt * 0.28;
-      const r = 9, s = o.subject || F;
+      const r = 9 * Math.max(m, 0.72), s = o.subject || F;
       want.set(s.x + Math.sin(this.orbit) * r, 3.2, s.z + Math.cos(this.orbit) * r);
       look.set(s.x, 1.2, s.z);
       fov = portrait ? 56 : 40;
     } else if (this.mode === 'end') {
       this.orbit += dt * 0.12;
-      want.set(Math.sin(this.orbit) * 40, 18, Math.cos(this.orbit) * 40);
+      want.set(Math.sin(this.orbit) * 40 * m * 1.25, 18 * m * 1.15, Math.cos(this.orbit) * 40 * m * 1.25);
       look.set(0, 0, 0); fov = 40;
     }
     const kp = this.cut ? 1e3 : this.mode === 'goal' ? 2 : 2.6;

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#060b1c">
 <title>Final Whistle | Thudinest Games</title>
-<meta name="description" content="Final Whistle: a free 3D football game. Play a full match against the computer under the floodlights, take a penalty shootout, or practise your finishing. No download, no account.">
+<meta name="description" content="Final Whistle: a free 3D football game. Five a side on a floodlit futsal court or eleven a side in the stadium, against the computer; a penalty shootout; practice. No download, no account.">
 <meta property="og:title" content="Final Whistle | Thudinest Games">
 <meta property="og:description" content="3D football under the floodlights: matches against the computer, penalty shootouts and practice. Free in your browser.">
 <meta property="og:image" content="https://thudinest.com/football/og.jpg">
@@ -44,6 +44,7 @@
 html, body { margin: 0; height: 100%; background: var(--night); color: var(--chalk); font: 600 15px/1.4 var(--ui); overflow: hidden; overscroll-behavior: none; }
 body { user-select: none; -webkit-user-select: none; touch-action: none; }
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#vignette { position: fixed; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(120% 95% at 50% 45%, transparent 58%, rgba(2, 4, 14, 0.42)); }
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
 .display { font-family: var(--display); font-weight: 900; letter-spacing: 0.01em; text-transform: uppercase; }
 
@@ -125,8 +126,8 @@ a.chipbtn { color: var(--chalk); }
 .tr { position: absolute; right: max(14px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); display: flex; gap: 8px; pointer-events: auto; }
 .round { width: 44px; height: 44px; border-radius: 50%; background: var(--panel); border: 1px solid var(--rule); display: grid; place-items: center; }
 .round svg { width: 20px; height: 20px; }
-#radar { position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: 220px; height: 143px; border-radius: 10px; background: rgba(8, 40, 22, 0.55); border: 1px solid rgba(255,255,255,0.22); }
-body.touch-ui #radar { width: 150px; height: 98px; bottom: auto; top: max(12px, env(safe-area-inset-top)); }
+#radar { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); width: 220px; height: 143px; border-radius: 10px; background: rgba(8, 40, 22, 0.55); border: 1px solid rgba(255,255,255,0.22); }
+body.touch-ui #radar { width: 150px; height: 98px; bottom: auto; right: auto; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top)); }
 #power { position: absolute; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 156px); transform: translateX(-50%); width: 220px; height: 14px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); overflow: hidden; opacity: 0; transition: opacity .15s; }
 #power.on { opacity: 1; }
 #power i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--turf), var(--gold) 70%, var(--coral)); transform-origin: 0 50%; transform: scaleX(0); }
@@ -182,6 +183,7 @@ body.touch-ui #touch.live { display: block; }
 </head>
 <body>
 <canvas id="scene"></canvas>
+<div id="vignette"></div>
 
 <div id="loader">
   <div class="box">
@@ -235,12 +237,12 @@ body.touch-ui #touch.live { display: block; }
   <div class="card">
     <p class="kick">Thudinest Games · 3D football</p>
     <h1 class="title">Final<span>Whistle</span></h1>
-    <p class="sub">Eleven a side under the floodlights. Dribble, pass, shoot and tackle against the computer, take a shootout, or practise your finishing.</p>
+    <p class="sub">Five a side at the Thudinest futsal court, or eleven a side in the stadium, under the floodlights. Dribble, pass, shoot and tackle against the computer, take a shootout, or practise your finishing.</p>
     <div class="modes">
-      <button class="mode hero" data-mode="quick" style="--c: var(--gold)"><span class="ic">▶</span><b>Quick match</b><small>Kick off now: your side against a random team</small></button>
-      <button class="mode" data-mode="match" style="--c: var(--turf)"><span class="ic">VS</span><b>Player vs AI</b><small>Pick the teams, difficulty, length and size</small></button>
+      <button class="mode hero" data-mode="quick" style="--c: var(--gold)"><span class="ic">▶</span><b>Quick match</b><small>Kick off now on the futsal court, against a random team</small></button>
+      <button class="mode" data-mode="match" style="--c: var(--turf)"><span class="ic">VS</span><b>Player vs AI</b><small>Pick the ground, the teams, difficulty and length</small></button>
       <button class="mode" data-mode="shootout" style="--c: var(--coral)"><span class="ic">11</span><b>Penalty shootout</b><small>Five each, then sudden death</small></button>
-      <button class="mode" data-mode="practice" style="--c: var(--mint)"><span class="ic">◎</span><b>Practice</b><small>You, a striker partner, two defenders and a keeper</small></button>
+      <button class="mode" data-mode="practice" style="--c: var(--mint)"><span class="ic">◎</span><b>Practice</b><small>You and a partner against two defenders and a keeper</small></button>
     </div>
     <div class="row">
       <button class="chipbtn" id="helpBtn">Controls</button>
@@ -262,9 +264,10 @@ body.touch-ui #touch.live { display: block; }
         <div><label class="kick" style="color:var(--muted)">Opponent</label><div class="tpick" id="pickB"></div></div>
       </div>
     </div>
+    <div class="field"><label>Ground</label><div class="seg" id="segGround"><button data-v="futsal">Futsal court · 5 a side</button><button data-v="stadium">Stadium · full pitch</button></div></div>
     <div class="field"><label>Difficulty</label><div class="seg" id="segDiff"><button data-v="easy">Easy</button><button data-v="medium">Medium</button><button data-v="hard">Hard</button></div></div>
     <div class="field" data-for="match"><label>Half length</label><div class="seg" id="segLen"><button data-v="120">2 min</button><button data-v="180">3 min</button><button data-v="300">5 min</button><button data-v="450">7½ min</button></div></div>
-    <div class="field" data-for="match"><label>Team size</label><div class="seg" id="segSize"><button data-v="11">11 a side</button><button data-v="7">7 a side (lighter on phones)</button></div></div>
+    <div class="field" id="sizeField"><label>Team size</label><div class="seg" id="segSize"><button data-v="11">11 a side</button><button data-v="7">7 a side (lighter on phones)</button></div></div>
     <div class="row" style="margin-top:24px"><button class="btn" id="kickoffBtn">Kick off</button><button class="btn ghost" id="setupBack">Back</button></div>
   </div>
 </div>

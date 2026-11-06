@@ -2,8 +2,9 @@
    LED boards, four stands with a crowd that jumps for a goal, floodlight towers and a dusk sky. */
 import { THREE, V3, P, canvasTex, LITE, clamp, rand } from './util.js';
 
-export function buildStadium(scene, renderer) {
-  const S = { nets: [], flags: [], boards: [], crowdMat: null, time: 0, hype: 0 };
+export function buildStadium(world, renderer) {
+  const scene = new THREE.Group(); world.add(scene); // everything of this ground in one group, so it can be swapped
+  const S = { root: scene, nets: [], flags: [], boards: [], crowdMat: null, time: 0, hype: 0 };
   const maxAniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
   /* ---- sky: a dusk gradient with a few stars */
@@ -99,72 +100,7 @@ export function buildStadium(scene, renderer) {
     scene.add(group);
   }
 
-  /* ---- goals: posts and bar, the stanchions behind, and the nets (line grids that bulge when the ball goes in) */
-  const postMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0.1, emissive: 0x222222 });
-  const backMat = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.6 });
-  const netMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
-  for (const s of [-1, 1]) {
-    const g = new THREE.Group(), gx = s * (P.HL + P.post);
-    const cyl = (r, h, mat) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 14), mat); m.castShadow = true; return m; };
-    for (const t of [-1, 1]) { const p = cyl(P.post, P.goalH + P.post, postMat); p.position.set(gx, (P.goalH + P.post) / 2, t * (P.goalW + P.post)); g.add(p); }
-    const bar = cyl(P.post, 2 * (P.goalW + 2 * P.post), postMat); bar.rotation.x = Math.PI / 2; bar.position.set(gx, P.goalH + P.post / 2, 0); g.add(bar);
-    const bx = s * (P.HL + P.goalD), backTop = 1.9;
-    for (const t of [-1, 1]) {
-      const st = cyl(0.03, backTop, backMat); st.position.set(bx, backTop / 2, t * P.goalW); g.add(st);
-      const top = cyl(0.03, P.goalD, backMat); top.rotation.z = Math.PI / 2; top.position.set(s * (P.HL + P.goalD / 2), backTop + (P.goalH - backTop) / 2, t * P.goalW);
-      top.rotation.z = Math.PI / 2 - s * Math.atan2(P.goalH - backTop, P.goalD); g.add(top);
-      const foot = cyl(0.03, P.goalD, backMat); foot.rotation.z = Math.PI / 2; foot.position.set(s * (P.HL + P.goalD / 2), 0.03, t * P.goalW); g.add(foot);
-    }
-    const tb = cyl(0.03, 2 * P.goalW, backMat); tb.rotation.x = Math.PI / 2; tb.position.set(bx, backTop, 0); g.add(tb);
-    // the nets: back, roof and sides, each a grid of points (u, v) joined to their neighbours
-    const panels = [
-      { name: 'back', nu: 30, nv: 10, at: (u, v, o) => o.set(bx, v * backTop, (u - 0.5) * 2 * P.goalW), n: new V3(s, 0, 0) },
-      { name: 'roof', nu: 30, nv: 8, at: (u, v, o) => o.set(s * (P.HL + v * P.goalD), lerp(P.goalH, backTop, v), (u - 0.5) * 2 * P.goalW), n: new V3(0, 1, 0) },
-      { name: 'left', nu: 8, nv: 10, at: (u, v, o) => o.set(s * (P.HL + u * P.goalD), v * lerp(P.goalH, backTop, u), -P.goalW), n: new V3(0, 0, -1) },
-      { name: 'right', nu: 8, nv: 10, at: (u, v, o) => o.set(s * (P.HL + u * P.goalD), v * lerp(P.goalH, backTop, u), P.goalW), n: new V3(0, 0, 1) },
-    ];
-    const net = { side: s, panels: [] };
-    for (const pn of panels) {
-      const pts = [], base = [], tmp = new V3();
-      for (let j = 0; j <= pn.nv; j++) for (let i = 0; i <= pn.nu; i++) { pn.at(i / pn.nu, j / pn.nv, tmp); base.push(tmp.x, tmp.y, tmp.z); }
-      const idx = [];
-      const id = (i, j) => j * (pn.nu + 1) + i;
-      for (let j = 0; j <= pn.nv; j++) for (let i = 0; i <= pn.nu; i++) { if (i < pn.nu) idx.push(id(i, j), id(i + 1, j)); if (j < pn.nv) idx.push(id(i, j), id(i, j + 1)); }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(base.slice(), 3)); geo.setIndex(idx);
-      const ls = new THREE.LineSegments(geo, netMat); g.add(ls);
-      net.panels.push({ ...pn, geo, base: Float32Array.from(base), off: new Float32Array(base.length / 3), vel: new Float32Array(base.length / 3), active: false });
-    }
-    S.nets.push(net);
-    scene.add(g);
-  }
-  function lerp(a, b, t) { return a + (b - a) * t; }
-  // push a net out where the ball hit it (p: world point, amt: metres)
-  S.bulge = (side, p, amt) => {
-    const net = S.nets.find((n) => n.side === side); if (!net) return;
-    for (const pn of net.panels) {
-      const b = pn.base;
-      for (let k = 0; k < pn.off.length; k++) {
-        const dx = b[k * 3] - p.x, dy = b[k * 3 + 1] - p.y, dz = b[k * 3 + 2] - p.z, d2 = dx * dx + dy * dy + dz * dz;
-        const f = Math.exp(-d2 / 0.7);
-        if (f > 0.01) { pn.vel[k] += amt * f * 9; pn.active = true; }
-      }
-    }
-  };
-  function updateNets(dt) {
-    for (const net of S.nets) for (const pn of net.panels) {
-      if (!pn.active) continue;
-      const pos = pn.geo.attributes.position.array, b = pn.base; let e = 0;
-      for (let k = 0; k < pn.off.length; k++) {
-        // a damped spring; the edges are tied to the frame
-        pn.vel[k] += (-60 * pn.off[k] - 7 * pn.vel[k]) * dt; pn.off[k] += pn.vel[k] * dt; e += Math.abs(pn.off[k]) + Math.abs(pn.vel[k]) * 0.1;
-        const o = clamp(pn.off[k], -0.25, 0.7);
-        pos[k * 3] = b[k * 3] + pn.n.x * o; pos[k * 3 + 1] = b[k * 3 + 1] + pn.n.y * o * 0.4; pos[k * 3 + 2] = b[k * 3 + 2] + pn.n.z * o;
-      }
-      pn.geo.attributes.position.needsUpdate = true;
-      if (e < 0.002) { pn.active = false; pn.off.fill(0); pn.vel.fill(0); for (let k = 0; k < pos.length; k++) pos[k] = b[k]; }
-    }
-  }
+  const updateNets = addGoals(scene, S);
 
   /* ---- corner flags */
   {
@@ -315,4 +251,76 @@ export function buildStadium(scene, renderer) {
     updateNets(dt);
   };
   return S;
+}
+
+/* the goals (posts, bar, stanchions) and their nets, line grids that bulge when the ball goes in; sized from P */
+export function addGoals(scene, S) {
+  const lerp = (a, b, t) => a + (b - a) * t;
+  /* ---- goals: posts and bar, the stanchions behind, and the nets (line grids that bulge when the ball goes in) */
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0.1, emissive: 0x222222 });
+  const backMat = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.6 });
+  const netMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+  for (const s of [-1, 1]) {
+    const g = new THREE.Group(), gx = s * (P.HL + P.post);
+    const cyl = (r, h, mat) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 14), mat); m.castShadow = true; return m; };
+    for (const t of [-1, 1]) { const p = cyl(P.post, P.goalH + P.post, postMat); p.position.set(gx, (P.goalH + P.post) / 2, t * (P.goalW + P.post)); g.add(p); }
+    const bar = cyl(P.post, 2 * (P.goalW + 2 * P.post), postMat); bar.rotation.x = Math.PI / 2; bar.position.set(gx, P.goalH + P.post / 2, 0); g.add(bar);
+    const bx = s * (P.HL + P.goalD), backTop = P.goalH * 0.78;
+    for (const t of [-1, 1]) {
+      const st = cyl(0.03, backTop, backMat); st.position.set(bx, backTop / 2, t * P.goalW); g.add(st);
+      const top = cyl(0.03, P.goalD, backMat); top.rotation.z = Math.PI / 2; top.position.set(s * (P.HL + P.goalD / 2), backTop + (P.goalH - backTop) / 2, t * P.goalW);
+      top.rotation.z = Math.PI / 2 - s * Math.atan2(P.goalH - backTop, P.goalD); g.add(top);
+      const foot = cyl(0.03, P.goalD, backMat); foot.rotation.z = Math.PI / 2; foot.position.set(s * (P.HL + P.goalD / 2), 0.03, t * P.goalW); g.add(foot);
+    }
+    const tb = cyl(0.03, 2 * P.goalW, backMat); tb.rotation.x = Math.PI / 2; tb.position.set(bx, backTop, 0); g.add(tb);
+    // the nets: back, roof and sides, each a grid of points (u, v) joined to their neighbours
+    const panels = [
+      { name: 'back', nu: 30, nv: 10, at: (u, v, o) => o.set(bx, v * backTop, (u - 0.5) * 2 * P.goalW), n: new V3(s, 0, 0) },
+      { name: 'roof', nu: 30, nv: 8, at: (u, v, o) => o.set(s * (P.HL + v * P.goalD), lerp(P.goalH, backTop, v), (u - 0.5) * 2 * P.goalW), n: new V3(0, 1, 0) },
+      { name: 'left', nu: 8, nv: 10, at: (u, v, o) => o.set(s * (P.HL + u * P.goalD), v * lerp(P.goalH, backTop, u), -P.goalW), n: new V3(0, 0, -1) },
+      { name: 'right', nu: 8, nv: 10, at: (u, v, o) => o.set(s * (P.HL + u * P.goalD), v * lerp(P.goalH, backTop, u), P.goalW), n: new V3(0, 0, 1) },
+    ];
+    const net = { side: s, panels: [] };
+    for (const pn of panels) {
+      const pts = [], base = [], tmp = new V3();
+      for (let j = 0; j <= pn.nv; j++) for (let i = 0; i <= pn.nu; i++) { pn.at(i / pn.nu, j / pn.nv, tmp); base.push(tmp.x, tmp.y, tmp.z); }
+      const idx = [];
+      const id = (i, j) => j * (pn.nu + 1) + i;
+      for (let j = 0; j <= pn.nv; j++) for (let i = 0; i <= pn.nu; i++) { if (i < pn.nu) idx.push(id(i, j), id(i + 1, j)); if (j < pn.nv) idx.push(id(i, j), id(i, j + 1)); }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(base.slice(), 3)); geo.setIndex(idx);
+      const ls = new THREE.LineSegments(geo, netMat); g.add(ls);
+      net.panels.push({ ...pn, geo, base: Float32Array.from(base), off: new Float32Array(base.length / 3), vel: new Float32Array(base.length / 3), active: false });
+    }
+    S.nets.push(net);
+    scene.add(g);
+  }
+  // push a net out where the ball hit it (p: world point, amt: metres)
+  S.bulge = (side, p, amt) => {
+    const net = S.nets.find((n) => n.side === side); if (!net) return;
+    for (const pn of net.panels) {
+      const b = pn.base;
+      for (let k = 0; k < pn.off.length; k++) {
+        const dx = b[k * 3] - p.x, dy = b[k * 3 + 1] - p.y, dz = b[k * 3 + 2] - p.z, d2 = dx * dx + dy * dy + dz * dz;
+        const f = Math.exp(-d2 / 0.7);
+        if (f > 0.01) { pn.vel[k] += amt * f * 9; pn.active = true; }
+      }
+    }
+  };
+  function updateNets(dt) {
+    for (const net of S.nets) for (const pn of net.panels) {
+      if (!pn.active) continue;
+      const pos = pn.geo.attributes.position.array, b = pn.base; let e = 0;
+      for (let k = 0; k < pn.off.length; k++) {
+        // a damped spring; the edges are tied to the frame
+        pn.vel[k] += (-60 * pn.off[k] - 7 * pn.vel[k]) * dt; pn.off[k] += pn.vel[k] * dt; e += Math.abs(pn.off[k]) + Math.abs(pn.vel[k]) * 0.1;
+        const o = clamp(pn.off[k], -0.25, 0.7);
+        pos[k * 3] = b[k * 3] + pn.n.x * o; pos[k * 3 + 1] = b[k * 3 + 1] + pn.n.y * o * 0.4; pos[k * 3 + 2] = b[k * 3 + 2] + pn.n.z * o;
+      }
+      pn.geo.attributes.position.needsUpdate = true;
+      if (e < 0.002) { pn.active = false; pn.off.fill(0); pn.vel.fill(0); for (let k = 0; k < pos.length; k++) pos[k] = b[k]; }
+    }
+  }
+
+  return updateNets;
 }

@@ -51,6 +51,14 @@ export function kitMaterials(gltf, kit) {
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d'); g.drawImage(img, 0, 0);
   const id = g.getImageData(0, 0, W, H), d = id.data, M = MASK.data, ms = MASK.size;
+  // the printed 7 on his back goes: each row of it is filled with the plain cloth just beside it
+  {
+    const sx = (v) => Math.round((v / 1024) * W), sy = (v) => Math.round((v / 1024) * H);
+    for (let y = sy(NUM.y0 * 1024 - 4); y < sy((NUM.y0 + NUM.h) * 1024 + 4); y++) {
+      const src = (y * W + sx(522)) * 4;
+      for (let x = sx(536); x < sx(598); x++) { const i = (y * W + x) * 4; d[i] = d[src]; d[i + 1] = d[src + 1]; d[i + 2] = d[src + 2]; }
+    }
+  }
   const cols = { shirt: rgb(kit.shirt), shorts: rgb(kit.shorts), socks: rgb(kit.socks) }, trim = rgb(kit.trim);
   for (let y = 0; y < H; y++) {
     const my = ((y * ms) / H) | 0;
@@ -73,4 +81,36 @@ export function kitMaterials(gltf, kit) {
   const mat = new THREE.MeshStandardMaterial({ map, normalMap: body.normalMap, roughness: 0.78, metalness: 0, color: 0xdedede });
   mat.name = 'Ch38_body';
   return { Ch38_body: mat, Ch38_hair: hair };
+}
+
+/* the shirt number: where it sits on the back in the texture (UV), printed upside down as the 7 was */
+export const NUM = { x0: 515 / 1024, y0: 190 / 1024, w: 100 / 1024, h: 110 / 1024 };
+function numberTexture(n) {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.translate(0, 128); g.scale(1, -1); // upside down, like the texture
+  const txt = String(n);
+  g.font = '800 104px "Arial Narrow", "Roboto Condensed", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const w = g.measureText(txt).width, sx = Math.min(1, 118 / w) * (txt.length > 1 ? 1 : 0.95);
+  g.save(); g.translate(64, 66); g.scale(sx * 0.86, 1); g.fillStyle = '#fff'; g.fillText(txt, 0, 0); g.restore();
+  const t = new THREE.CanvasTexture(c); t.flipY = false; t.anisotropy = 4;
+  return t;
+}
+/* one player's shirt: the team's kit with his own number painted on the back (the kit texture is shared) */
+export function numberedMaterial(base, num, color) {
+  const m = base.clone();
+  const tex = numberTexture(num), col = new THREE.Color(color);
+  m.userData.numTex = tex;
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.numMap = { value: tex }; sh.uniforms.numCol = { value: col };
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform sampler2D numMap; uniform vec3 numCol;')
+      .replace('#include <map_fragment>', `#include <map_fragment>
+        {
+          vec2 q = (vMapUv - vec2(${NUM.x0.toFixed(5)}, ${NUM.y0.toFixed(5)})) / vec2(${NUM.w.toFixed(5)}, ${NUM.h.toFixed(5)});
+          if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0) diffuseColor.rgb = mix(diffuseColor.rgb, numCol * 0.92, texture2D(numMap, q).a);
+        }`);
+  };
+  m.customProgramCacheKey = () => 'fw-shirt-number';
+  return m;
 }

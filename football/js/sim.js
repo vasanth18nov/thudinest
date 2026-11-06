@@ -16,6 +16,7 @@ export const DIFF = {
 };
 // formations: u from own goal line (0) to the opponents' (1), v across the pitch (-1 to 1)
 export const FORMATIONS = {
+  5: [['GK', 0.03, 0], ['DEF', 0.22, 0], ['MID', 0.44, -0.62], ['MID', 0.44, 0.62], ['FWD', 0.7, 0]],
   11: [['GK', 0.02, 0], ['DEF', 0.2, -0.74], ['DEF', 0.17, -0.26], ['DEF', 0.17, 0.26], ['DEF', 0.2, 0.74], ['MID', 0.42, -0.58], ['MID', 0.36, 0], ['MID', 0.42, 0.58], ['FWD', 0.66, -0.6], ['FWD', 0.72, 0], ['FWD', 0.66, 0.6]],
   7: [['GK', 0.02, 0], ['DEF', 0.2, -0.45], ['DEF', 0.2, 0.45], ['MID', 0.42, -0.65], ['MID', 0.38, 0], ['MID', 0.42, 0.65], ['FWD', 0.68, 0]],
 };
@@ -47,7 +48,8 @@ export class Team {
     const form = FORMATIONS[size] || FORMATIONS[11];
     // the squad is listed as an XI (keeper, four defenders, three midfielders, three forwards); a seven picks its
     // centre-backs, the midfield and the centre-forward from it
-    const squad = def.squad, slots = size === 7 ? [0, 2, 3, 5, 6, 7, 9] : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // a five takes the keeper, a centre-back, the two wide forwards as its wingers and the centre-forward as the pivot
+    const squad = def.squad, slots = size === 5 ? [0, 2, 8, 10, 9] : size === 7 ? [0, 2, 3, 5, 6, 7, 9] : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     this.players = form.map(([role, u, v], i) => new Player(this, i, squad[slots[i]] || squad[i % squad.length], role, [u, v]));
     this.controlled = null; this.pens = [];
   }
@@ -95,14 +97,14 @@ export class Match {
   }
   practiceReset(first) {
     const you = this.teams[0];
-    const s = you.dir, x = s * rand(18, 30), z = rand(-18, 18);
+    const s = you.dir, x = s * (P.HL - rand(10, 22) * P.kp * 1.1), z = rand(-0.5, 0.5) * P.HW;
     this.ball.place(x, z);
     this.ball.owner = null;
     for (const p of this.all) { p.state = 'move'; p.act = null; p.kick = null; p.vel.set(0, 0, 0); if (p.body) p.body.stop(); }
     const [a, b] = you.players;
-    a.pos.set(x - s * 1.2, 0, z); b.pos.set(x - s * 6, 0, -z * 0.4 + 6); a.yaw = b.yaw = yawOf(s, 0);
+    a.pos.set(x - s * 1.2, 0, z); b.pos.set(x - s * 6 * P.kp, 0, -z * 0.4 + 6 * P.kp); a.yaw = b.yaw = yawOf(s, 0);
     const [gk, d1, d2] = this.teams[1].players;
-    gk.pos.set(s * (P.HL - 1), 0, 0); d1.pos.set(s * (P.HL - 14), 0, -7); d2.pos.set(s * (P.HL - 14), 0, 7);
+    gk.pos.set(s * (P.HL - 1), 0, 0); d1.pos.set(s * (P.HL - 14 * P.kp * 0.75), 0, -7 * P.kp); d2.pos.set(s * (P.HL - 14 * P.kp * 0.75), 0, 7 * P.kp);
     for (const p of this.teams[1].players) p.yaw = yawOf(-s, 0);
     you.controlled = a; this.giveBall(a);
     this.phase = 'play'; this.restart = null;
@@ -164,7 +166,7 @@ export class Match {
     if (type === 'corner') taker.yaw = yawOf(team.goalX * 0.85 - taker.pos.x, -taker.pos.z);
     if (type === 'kickoff') {
       const mate = team.players.filter((p) => p !== taker && !p.keeper).sort((a, c) => a.dist(at) - c.dist(at))[0];
-      if (mate) { mate.pos.set(-team.dir * 2.5, 0, 3); }
+      if (mate) { mate.pos.set(-team.dir * 2.5 * P.kp, 0, 3 * P.kp); }
     }
     if (type === 'penalty') {
       const gk = opp.keeper; gk.pos.set(opp.ownGoalX + opp.dir * 0.2, 0, 0); gk.yaw = yawOf(opp.dir, 0);
@@ -186,18 +188,18 @@ export class Match {
     else if (type === 'corner') {
       if (attacking) {
         if (p.role === 'FWD' || (p.role === 'MID' && p.home.v === 0) || (p.role === 'DEF' && Math.abs(p.home.v) < 0.4 && Math.random() < 0.5)) return _v2.set(t.goalX - d * rand(6, 13), 0, rand(-9, 9));
-        return _v2.set(t.goalX - d * rand(22, 32), 0, v * 22);
+        return _v2.set(t.goalX - d * rand(22, 32) * P.k, 0, v * 22 * P.k);
       }
-      if (p.role === 'FWD' && p.home.v !== 0) return _v2.set(t.ownGoalX + d * 30, 0, v * 15);
-      return _v2.set(t.ownGoalX + d * rand(4, 12), 0, rand(-10, 10));
+      if (p.role === 'FWD' && p.home.v !== 0) return _v2.set(t.ownGoalX + d * 30 * P.k, 0, v * 15 * P.k);
+      return _v2.set(t.ownGoalX + d * rand(4, 12) * P.k, 0, rand(-10, 10) * P.k);
     } else if (type === 'goalkick') {
       if (p.keeper) return _v2.set(at.x - d * 0.6, 0, at.z);
       u = attacking ? Math.max(0.24, u * 0.8 + 0.08) : Math.min(0.68, u + 0.1);
       if (!attacking && t.uOf(team.ownGoalX + team.dir * P.boxL) < u + 0.01) u = Math.min(u, t.uOf(team.ownGoalX + team.dir * (P.boxL + 1)));
     } else if (type === 'penalty') {
       // everyone outside the box and behind the ball
-      const bx = team.goalX - team.dir * (P.boxL + 2);
-      return _v2.set(bx - team.dir * rand(0, 8), 0, rand(-18, 18));
+      const bx = team.goalX - team.dir * (P.boxL + 2 * P.kp);
+      return _v2.set(bx - team.dir * rand(0, 8) * P.kp, 0, rand(-0.6, 0.6) * P.HW);
     } else {
       // throw-ins and free kicks: shape around the ball
       const bu = t.uOf(at.x), bv = at.z / P.HW;
@@ -207,7 +209,8 @@ export class Match {
     // nobody within 9.15 m of a free kick or kick-off but the taker's side
     if (!attacking && (type === 'freekick' || type === 'corner' || type === 'kickoff')) {
       const dx = x - at.x, dz = z - at.z, dd = Math.hypot(dx, dz);
-      if (dd < 9.6) return _v2.set(at.x + (dx / (dd || 1)) * 9.6, 0, at.z + (dz / (dd || 1)) * 9.6);
+      const keep = P.walls ? 5 : 9.6; // futsal: 5 m from the ball
+      if (dd < keep) return _v2.set(at.x + (dx / (dd || 1)) * keep, 0, at.z + (dz / (dd || 1)) * keep);
     }
     return _v2.set(x, 0, z);
   }
@@ -275,7 +278,7 @@ export class Match {
     let v;
     const to = k.to.clone();
     if (k.kind === 'shot') {
-      const s = 16 + 16 * k.power;
+      const s = P.walls ? 13 + 12 * k.power : 16 + 16 * k.power; // the futsal ball is heavier
       // accuracy: wider with power past 85% and with a defender close; the human's is a little better than the AI's
       const press = this.pressure(p), sd = (hum ? 0.05 : D.shot) * (0.55 + k.power * k.power) * (1 + press) / p.skill;
       const dist = p.dist(to);
@@ -450,26 +453,26 @@ export class Match {
     if (!q) {
       // nobody that way: play it into space
       const d = _v1.copy(mv); if (d.lengthSq() < 0.05) p.dir(d); d.normalize();
-      return this.startKick(p, 'pass', _v2.set(p.pos.x + d.x * 14, 0, p.pos.z + d.z * 14), 0.5);
+      return this.startKick(p, 'pass', _v2.set(p.pos.x + d.x * 14 * P.kp, 0, p.pos.z + d.z * 14 * P.kp), 0.5);
     }
     if (through) {
       // into the space ahead of him, toward goal
       const ahead = _v2.set(q.team.dir, 0, 0).multiplyScalar(0.75).addScaledVector(q.vel.lengthSq() > 1 ? _v3.copy(q.vel).normalize() : _v3.set(0, 0, 0), 0.25).normalize();
-      const lead = clamp(p.dist(q.pos) * 0.32, 5, 12);
+      const lead = clamp(p.dist(q.pos) * 0.32, 5 * P.kp, 12 * P.kp);
       const to = _v4.set(q.pos.x + ahead.x * lead, 0, clamp(q.pos.z + ahead.z * lead, -P.HW + 2, P.HW - 2));
       to.x = clamp(to.x, -P.HL + 2, P.HL - 2);
-      const long = p.dist(to) > 32 || this.laneOpen(p.pos, to, p.team.opp) < 0.3;
+      const long = p.dist(to) > 32 * P.kp || this.laneOpen(p.pos, to, p.team.opp) < 0.3;
       return this.startKick(p, long ? 'lob' : 'through', to, 0.6, { receiver: q });
     }
     // to his feet, leading him if he's running
     const dist = p.dist(q.pos), t = rollTime(groundSpeed(dist, 5), dist);
     const to = _v2.set(q.pos.x + q.vel.x * t * 0.7, 0, q.pos.z + q.vel.z * t * 0.7);
-    const air = dist > 38 || this.laneOpen(p.pos, q.pos, p.team.opp) < 0.15;
+    const air = dist > 38 * P.kp || this.laneOpen(p.pos, q.pos, p.team.opp) < 0.15;
     return this.startKick(p, air ? 'lob' : 'pass', to, 0.5, { receiver: q });
   }
   humanCross(p, mv) {
     const team = p.team, gx = team.goalX;
-    const to = _v2.set(gx - team.dir * rand(7, 11), 0, rand(-4, 4));
+    const to = _v2.set(gx - team.dir * rand(7, 11) * P.kp, 0, rand(-4, 4) * P.kp);
     const q = team.players.filter((x) => x !== p && !x.keeper).sort((a, c) => a.dist(to) - c.dist(to))[0];
     if (q) to.set(q.pos.x * 0.4 + to.x * 0.6, 0, q.pos.z * 0.4 + to.z * 0.6);
     return this.startKick(p, 'cross', to, 0.7, { receiver: q });
@@ -562,7 +565,8 @@ export class Match {
     }
     p.pos.addScaledVector(p.vel, dt); p.pos.y = 0;
     // stay on the playing area (the keepers may stand on the line)
-    p.pos.x = clamp(p.pos.x, -P.HL - 2.5, P.HL + 2.5); p.pos.z = clamp(p.pos.z, -P.HW - 2.5, P.HW + 2.5);
+    const mx = P.walls ? P.wallX - 0.35 : P.HL + 2.5, mz = P.walls ? P.wallZ - 0.35 : P.HW + 2.5;
+    p.pos.x = clamp(p.pos.x, -mx, mx); p.pos.z = clamp(p.pos.z, -mz, mz);
     // facing: the way he moves, or a point he watches (keepers, defenders jockeying, waiting at a restart)
     const sp = Math.hypot(p.vel.x, p.vel.z);
     let yawT = p.yaw;
@@ -609,7 +613,8 @@ export class Match {
     b.pos.x += b.vel.x * dt; b.pos.z += b.vel.z * dt; b.pos.y = P.ballR;
     b.spin.set(b.vel.z / b.r, 0, -b.vel.x / b.r);
     // a ball dribbled over the line goes out
-    if (Math.abs(b.pos.z) > P.HW + 0.2 || Math.abs(b.pos.x) > P.HL + 0.2) { b.owner = null; }
+    if (P.walls) { b.pos.x = clamp(b.pos.x, -P.wallX + 0.2, P.wallX - 0.2); b.pos.z = clamp(b.pos.z, -P.wallZ + 0.2, P.wallZ - 0.2); }
+    else if (Math.abs(b.pos.z) > P.HW + 0.2 || Math.abs(b.pos.x) > P.HL + 0.2) { b.owner = null; }
   }
 
   /* ------------------------------------------------------------ contacts: winning the ball, tackles, saves */
@@ -637,11 +642,11 @@ export class Match {
       // a keeper gathers what he gets to; a shot may beat him (pace, and how far he had to go), be parried, or held
       const shot = this.shot && this.shot.team !== p.team && this.t - this.shot.t < 2.5;
       if (shot && rel > 11) {
-        const skill = p.team.human ? 0.8 : this.D.keep;
+        const skill = P.walls ? Math.max(p.team.human ? 0.8 : this.D.keep, 0.68) * 1.16 : (p.team.human ? 0.8 : this.D.keep);
         const chance = clamp(skill * (1.5 - rel / 44) * (p.state === 'dive' ? 0.95 : 1.08), 0.15, 0.97);
         p.cool = 0.5;
         if (Math.random() > chance) { this.emit('beaten', { p }); return; }
-        if (rel < 21 && Math.random() < 0.5) this.keeperGather(p); else this.parry(p);
+        if (rel < (P.walls ? 25 : 21) && Math.random() < (P.walls ? 0.72 : 0.5)) this.keeperGather(p); else this.parry(p);
         return;
       }
       this.keeperGather(p); return;
@@ -754,6 +759,12 @@ export class Match {
       if (held || slow || out || this.phaseT > 4.5 || (b.vel.x < -1 && this.phaseT > 0.6)) { this.emit(held ? 'pensave' : 'penmiss'); this.penResult(false); }
       return;
     }
+    if (this.mode === 'practice' && P.walls) {
+      // in the cage the ball never goes out: a goal, or a new ball once the defenders or the keeper have it
+      if (Math.abs(b.pos.x) > P.HL + r && Math.abs(b.prev.x) <= P.HL + r + 0.5 && Math.abs(b.pos.z) < P.goalW && b.pos.y < P.goalH && Math.sign(b.pos.x) === this.teams[0].dir) { this.teams[0].score++; this.goalFor(this.teams[0]); return; }
+      if (b.owner && b.owner.team === this.teams[1]) { this.lostT = (this.lostT || 0) + DT; if (this.lostT > 1.4) { this.lostT = 0; this.phase = 'dead'; this.phaseT = 0; this.after = { practice: true, wait: 0.4 }; } } else this.lostT = 0;
+      return;
+    }
     if (this.mode === 'practice') {
       if (Math.abs(b.pos.x) > P.HL + r || Math.abs(b.pos.z) > P.HW + r) {
         const s = Math.sign(b.pos.x), goal = Math.abs(b.prev.x) <= P.HL + r + 0.4 && Math.abs(b.pos.z) < P.goalW && b.pos.y < P.goalH && Math.abs(b.pos.x) > P.HL + r;
@@ -771,6 +782,7 @@ export class Match {
         this.goalFor(scorer);
         return;
       }
+      if (P.walls) return; // in the cage it plays on off the boards
       // over the goal line: a goal kick or a corner
       const def = this.teams.find((t) => t.dir === -s); // the team defending that end
       if (this.lastTeam === def) { def.opp.stats.corners++; this.dead('corner', def.opp, b.pos.clone()); }
@@ -778,7 +790,7 @@ export class Match {
       this.emit('out', { kind: this.lastTeam === def ? 'corner' : 'goalkick' });
       return;
     }
-    if (Math.abs(b.pos.z) > P.HW + r) {
+    if (!P.walls && Math.abs(b.pos.z) > P.HW + r) {
       const to = this.lastTeam ? this.lastTeam.opp : this.teams[0];
       this.dead('throwin', to, b.pos.clone());
       this.emit('out', { kind: 'throwin' });

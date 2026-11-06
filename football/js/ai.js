@@ -109,8 +109,8 @@ export function think(M, p, dt) {
       }
       return;
     }
-    if (c.second === p && p.dist(b.pos) < 18) { goTo(p, _a.lerpVectors(p.icept || b.pos, shapeSpot(M, p, c.attacking, _b), 0.45), SPEED.run * pace); return; }
-    shapeSpot(M, p, c.attacking, _a); goTo(p, _a, p.dist(_a) > 7 ? SPEED.run * pace : SPEED.jog * pace); p.face = b.pos;
+    if (c.second === p && p.dist(b.pos) < 18 * P.kp) { goTo(p, _a.lerpVectors(p.icept || b.pos, shapeSpot(M, p, c.attacking, _b), 0.45), SPEED.run * pace); return; }
+    shapeSpot(M, p, c.attacking, _a); goTo(p, _a, p.dist(_a) > 7 * P.kp ? SPEED.run * pace : SPEED.jog * pace); p.face = b.pos;
     return;
   }
   if (own.team !== t) return defend(M, p, c, own, dt, pace);
@@ -132,14 +132,14 @@ function defend(M, p, c, own, dt, pace) {
   }
   if (c.cover === p) {
     const gd = _a.subVectors(goal, own.pos).setY(0).normalize();
-    _b.set(own.pos.x + gd.x * 7, 0, own.pos.z + gd.z * 7);
+    _b.set(own.pos.x + gd.x * 7 * P.kp, 0, own.pos.z + gd.z * 7 * P.kp);
     goTo(p, _b, SPEED.run * pace); p.face = own.pos; return;
   }
   // the rest: the shape, a little tighter, and in the way of a pass on its way
   if (M.pass && M.pass.team !== t && !M.ball.owner) { /* handled as loose ball */ }
   shapeSpot(M, p, false, _a);
   // narrow to the middle when the ball is in the box area
-  if (M.inBox(t, M.ball.pos, 8)) _a.z *= 0.6;
+  if (M.inBox(t, M.ball.pos, 8 * P.k)) _a.z *= 0.6;
   goTo(p, _a, p.dist(_a) > 6 ? SPEED.run * pace : SPEED.jog * pace); p.face = M.ball.pos;
 }
 
@@ -149,8 +149,8 @@ function support(M, p, c, own, dt, pace) {
   if (k >= 0 && p.role !== 'FWD') {
     // an angle for a pass: ahead and to one side of the ball carrier, clear of opponents
     const side = k === 0 ? (p.pos.z > own.pos.z ? 1 : -1) : (p.pos.z > own.pos.z ? 1 : -1);
-    _a.set(own.pos.x + d * 9, 0, own.pos.z + side * 11);
-    _a.z = clamp(_a.z, -P.HW + 3, P.HW - 3); _a.x = clamp(_a.x, -P.HL + 3, P.HL - 3);
+    _a.set(own.pos.x + d * 9 * P.kp, 0, own.pos.z + side * 11 * P.kp);
+    _a.z = clamp(_a.z, -P.HW + 3 * P.kp, P.HW - 3 * P.kp); _a.x = clamp(_a.x, -P.HL + 3 * P.kp, P.HL - 3 * P.kp);
     goTo(p, _a, SPEED.run * pace); p.face = own.pos; return;
   }
   if (p.role === 'FWD') {
@@ -173,20 +173,21 @@ function carrier(M, p, dt) {
   const goal = _c.set(t.goalX, 0, 0), distG = p.dist(goal);
   p.thinkT -= dt;
   // dribble: toward goal, away from opponents in front, inside the touchlines
-  const dir = _a.set(goal.x - p.pos.x, 0, (goal.z - p.pos.z) * (distG > 30 ? 0.35 : 1)).normalize();
-  let space = 12;
+  const dir = _a.set(goal.x - p.pos.x, 0, (goal.z - p.pos.z) * (distG > 30 * P.k ? 0.35 : 1)).normalize();
+  const R = 7 * Math.max(P.k, 0.6); // the radius he watches for opponents
+  let space = 12 * P.kp;
   for (const o of opp.players) {
     const dx = o.pos.x - p.pos.x, dz = o.pos.z - p.pos.z, dd = Math.hypot(dx, dz);
-    if (dd < 7 && dd > 0.01) {
+    if (dd < R && dd > 0.01) {
       const front = (dx * dir.x + dz * dir.z) / dd;
-      if (front > -0.2) { const w = (7 - dd) / 7 * (0.6 + front); dir.x -= (dx / dd) * w * 0.9; dir.z -= (dz / dd) * w * 0.9; }
+      if (front > -0.2) { const w = (R - dd) / R * (0.6 + front); dir.x -= (dx / dd) * w * 0.9; dir.z -= (dz / dd) * w * 0.9; }
       if (front > 0.3) space = Math.min(space, dd);
     }
   }
-  if (Math.abs(p.pos.z) > P.HW - 5) dir.z -= Math.sign(p.pos.z) * 0.6;
-  if (t.dir * p.pos.x > P.HL - 3) dir.x -= t.dir * 0.8;
+  if (Math.abs(p.pos.z) > P.HW - 5 * P.kp) dir.z -= Math.sign(p.pos.z) * 0.6;
+  if (t.dir * p.pos.x > P.HL - 3 * P.kp) dir.x -= t.dir * 0.8;
   dir.normalize();
-  const sprint = space > 6 && distG > 18;
+  const sprint = space > 6 * P.kp && distG > 18 * P.k;
   const top = (sprint ? SPEED.ballSprint : SPEED.ballRun) * pace;
   p.want.set(dir.x * top, 0, dir.z * top); p.sprint = sprint;
   if (p.thinkT > 0 || p.busy) return;
@@ -196,11 +197,14 @@ function carrier(M, p, dt) {
   const ang = goalAngle(p.pos, t.goalX);
   const lane = M.laneOpen(p.pos, goal, opp);
   let shot = 0;
-  if (distG < 32) shot = (1 - distG / 34) * 1.7 * clamp(ang / 0.3, 0.25, 1) * (0.55 + 0.45 * lane) + (M.inBox(opp, p.pos) ? 0.35 : 0) + (distG < 13 ? 0.5 : 0);
-  if (shot > 0.22 + Math.random() * 0.2) {
+  const KS = Math.max(P.k, 0.42); // futsal shooting range, relative to the pitch, is a little longer
+  if (distG < 32 * KS) shot = (1 - distG / (34 * KS)) * 1.7 * clamp(ang / 0.3, 0.25, 1) * (0.55 + 0.45 * lane) + (M.inBox(opp, p.pos) ? 0.35 : 0) + (distG < 13 * KS ? 0.5 : 0);
+  // on the small court a shot is always on, so a futsal player waits for a clear sight of goal
+  if (P.walls) shot *= (0.4 + 0.6 * lane) * (Math.random() < 0.42 ? 0 : 1); // and he doesn't shoot at every chance
+  if (shot > (P.walls ? 0.4 + Math.random() * 0.3 : 0.22 + Math.random() * 0.2)) {
     const gk = opp.keeper, side = (gk.pos.z > 0 ? -1 : 1) * (Math.random() < 0.22 ? -1 : 1);
     const aim = _b.set(t.goalX, rand(0.25, 1.7), side * (P.goalW - rand(0.45, 1.0)));
-    M.startKick(p, 'shot', aim, clamp(0.55 + distG / 45 + rand(-0.05, 0.12), 0.55, 0.96), { curl: Math.random() < 0.3 ? -side * t.dir * rand(5, 10) : 0 });
+    M.startKick(p, 'shot', aim, clamp(0.55 + distG / (45 * KS) + rand(-0.05, 0.12), 0.55, 0.96), { curl: Math.random() < 0.3 ? -side * t.dir * rand(5, 10) : 0 });
     return;
   }
   // the pass
@@ -208,39 +212,39 @@ function carrier(M, p, dt) {
   for (const q of t.players) {
     if (q === p) continue;
     if (q.keeper && press < 0.6) continue;
-    const dist = p.dist(q.pos); if (dist < 5 || dist > 45) continue;
+    const dist = p.dist(q.pos); if (dist < 5 * P.kp || dist > 45 * P.kp) continue;
     const prog = t.uOf(q.pos.x) - t.uOf(p.pos.x);
-    let open = 8; for (const o of opp.players) open = Math.min(open, o.dist(q.pos));
+    let open = 8 * P.kp; for (const o of opp.players) open = Math.min(open, o.dist(q.pos));
     const ln = M.laneOpen(p.pos, q.pos, opp);
-    let s = prog * 4.6 + (prog < 0 ? prog * 2.5 : 0) + (open / 8) * 0.55 + ln * 0.9 - (dist > 28 ? (dist - 28) / 14 : 0) - (q.keeper ? 0.8 : 0);
+    let s = prog * 4.6 + (prog < 0 ? prog * 2.5 : 0) + (open / (8 * P.kp)) * 0.55 + ln * 0.9 - (dist > 28 * P.kp ? (dist - 28 * P.kp) / 14 : 0) - (q.keeper ? 0.8 : 0);
     if (ln < 0.3) s -= 1.6; // a lane with a man in it
-    if (dist > 36 && open < 6) s -= 1.2; // a long ball needs a free man
+    if (dist > 36 * P.kp && open < 6 * P.kp) s -= 1.2; // a long ball needs a free man
     if (s > bs) { bs = s; best = q; through = false; }
     // a through ball for a forward with space behind
     if ((q.role === 'FWD' || (q.role === 'MID' && q.vel.x * t.dir > 2)) && t.uOf(q.pos.x) > 0.55) {
-      const ahead = _b.set(q.pos.x + t.dir * 9, 0, q.pos.z * 0.85);
-      if (Math.abs(ahead.x) < P.HL - 3) {
-        let sp = 10; for (const o of opp.players) if (!o.keeper) sp = Math.min(sp, o.dist(ahead));
-        if (sp < 7 || sp - q.dist(ahead) < 1.5) continue; // only when he gets there first
-        const st = (t.uOf(ahead.x) - t.uOf(p.pos.x)) * 4.6 + (sp / 10) * 0.8 + M.laneOpen(p.pos, ahead, opp) * 0.7 - (sp < 6 ? 1.2 : 0.35);
+      const ahead = _b.set(q.pos.x + t.dir * 9 * P.kp, 0, q.pos.z * 0.85);
+      if (Math.abs(ahead.x) < P.HL - 3 * P.kp) {
+        let sp = 10 * P.kp; for (const o of opp.players) if (!o.keeper) sp = Math.min(sp, o.dist(ahead));
+        if (sp < 7 * P.kp || sp - q.dist(ahead) < 1.5) continue; // only when he gets there first
+        const st = (t.uOf(ahead.x) - t.uOf(p.pos.x)) * 4.6 + (sp / (10 * P.kp)) * 0.8 + M.laneOpen(p.pos, ahead, opp) * 0.7 - (sp < 6 * P.kp ? 1.2 : 0.35);
         if (st > bs) { bs = st; best = q; through = true; bt = ahead.clone(); }
       }
     }
   }
-  const dribble = clamp(space / 10, 0, 1) * 1.15 + 0.35 - press * 1.2;
+  const dribble = clamp(space / (10 * P.kp), 0, 1) * 1.15 + 0.35 - press * 1.2;
   // a cross from wide in the last fifth
-  if (t.uOf(p.pos.x) > 0.83 && Math.abs(p.pos.z) > P.boxW - 2 && (bs < 1.1 || Math.random() < 0.4)) {
+  if (!P.walls && t.uOf(p.pos.x) > 0.83 && Math.abs(p.pos.z) > P.boxW - 2 && (bs < 1.1 || Math.random() < 0.4)) {
     const runners = t.players.filter((q) => q !== p && !q.keeper && M.inBox(opp, q.pos, 4));
     const r = runners.length ? pick(runners) : null;
     const to = _b.set(t.goalX - t.dir * rand(6, 12), 0, r ? r.pos.z * 0.6 : rand(-4, 4));
     M.startKick(p, Math.random() < 0.35 ? 'pass' : 'cross', to, 0.7, { receiver: r }); return;
   }
   if (best && ((press > 0.55 && bs > 0.0) || bs > dribble + 0.3 || (bs > 1.3 && Math.random() < 0.3))) {
-    if (through) M.startKick(p, p.dist(bt) > 36 || M.laneOpen(p.pos, bt, opp) < 0.1 ? 'lob' : 'through', bt, 0.6, { receiver: best });
+    if (through) M.startKick(p, p.dist(bt) > 36 * P.kp || M.laneOpen(p.pos, bt, opp) < 0.1 ? 'lob' : 'through', bt, 0.6, { receiver: best });
     else {
       const dist = p.dist(best.pos);
       const lead = _b.set(best.pos.x + best.vel.x * dist / 18, 0, best.pos.z + best.vel.z * dist / 18);
-      M.startKick(p, dist > 36 || M.laneOpen(p.pos, lead, opp) < 0.08 ? 'lob' : 'pass', lead, 0.5, { receiver: best });
+      M.startKick(p, dist > 36 * P.kp || M.laneOpen(p.pos, lead, opp) < 0.08 ? 'lob' : 'pass', lead, 0.5, { receiver: best });
     }
     return;
   }
@@ -263,7 +267,7 @@ export function thinkKeeper(M, p, dt) {
     if (M.phase !== 'play') return;
     if (p.holdT <= 0) {
       // give it out: a throw to a free defender, or a long kick upfield
-      const opts = t.players.filter((q) => q !== p && q.dist(p.pos) < 32 && q.dist(p.pos) > 8 && M.laneOpen(p.pos, q.pos, t.opp) > 0.45);
+      const opts = t.players.filter((q) => q !== p && q.dist(p.pos) < 32 * P.kp && q.dist(p.pos) > 8 * P.k && M.laneOpen(p.pos, q.pos, t.opp) > 0.45);
       p.holding = false;
       if (opts.length && Math.random() < 0.65) { const q = pick(opts); M.startKick(p, 'throw', q.pos, 0.5, { receiver: q, hands: true }); }
       else {
@@ -297,13 +301,13 @@ export function thinkKeeper(M, p, dt) {
       if (M.penaltyKick && !p.guessed) {
         p.guessed = true;
         const right = Math.random() < 0.4 + 0.25 * skill;
-        if (M.mode === 'shootout' && t.human) tz = M.humanDive === null ? p.pos.z : M.humanDive * (P.goalW - 0.8);
-        else if (!right) tz = -Math.sign(threat.zc || 1) * rand(1.5, 2.8);
+        if (M.mode === 'shootout' && t.human) tz = M.humanDive === null ? p.pos.z : M.humanDive * P.goalW * 0.78;
+        else if (!right) tz = -Math.sign(threat.zc || 1) * rand(0.4, 0.76) * P.goalW;
         p.penTarget = tz;
       }
       if (M.penaltyKick) tz = p.penTarget ?? tz;
       const need = tz - p.pos.z;
-      if (Math.abs(need) > 1.1 && Math.abs(need) < 4.5) {
+      if (Math.abs(need) > Math.min(1.1, P.goalW * 0.5) && Math.abs(need) < P.goalW + 1.2) {
         // dive: the Mixamo save goes to his left (world (cos yaw, 0, -sin yaw)); mirrored for his right
         const mirror = Math.sign(need) === Math.sign(-Math.sin(p.yaw) || 1) ? 1 : -1;
         const sp = clamp(Math.abs(need) / Math.min(0.62, tAvail) * (0.8 + skill * 0.35), 3, 7.8);
@@ -327,7 +331,7 @@ export function thinkKeeper(M, p, dt) {
   if (own && own.team !== t && M.inBox(t, own.pos, 2)) {
     const d = p.dist(own.pos);
     const nearestDef = Math.min(...t.players.filter((q) => !q.keeper).map((q) => q.dist(own.pos)));
-    if (d < 11 && nearestDef > 2.5) {
+    if (d < 11 * P.kp && nearestDef > 2.5) {
       goTo(p, own.pos, SPEED.run);
       if (d < 1.6 && Math.random() < dt * 3 * skill) { b.owner = null; M.keeperGather(p); M.emit('save', { p, caught: true, smother: true }); }
       return;
@@ -335,7 +339,7 @@ export function thinkKeeper(M, p, dt) {
   }
   // his angle: on the line from the middle of the goal to the ball, a few metres out
   const bd = hyp(b.pos.x - line, b.pos.z);
-  const out = clamp(bd * 0.11, 0.6, 4.8);
+  const out = clamp(bd * 0.11, 0.5, 4.8 * P.kp);
   const dx = b.pos.x - line, dz = b.pos.z, l = Math.hypot(dx, dz) || 1;
   _a.set(line + (dx / l) * out, 0, clamp((dz / l) * out, -P.goalW + 0.4, P.goalW - 0.4));
   if (fwd * (_a.x - line) < 0.4) _a.x = line + fwd * 0.4;
@@ -346,7 +350,7 @@ export function thinkKeeper(M, p, dt) {
 export function restartChoice(M, r) {
   const t = r.team, tk = r.taker, opp = t.opp;
   const mates = t.players.filter((q) => q !== tk);
-  const open = (q) => { let m = 9; for (const o of opp.players) m = Math.min(m, o.dist(q.pos)); return m; };
+  const open = (q) => { let m = 9 * P.kp; for (const o of opp.players) m = Math.min(m, o.dist(q.pos)); return m; };
   if (r.type === 'kickoff') {
     const q = mates.filter((x) => !x.keeper).sort((a, b) => a.dist(tk.pos) - b.dist(tk.pos))[0];
     M.startKick(tk, 'pass', q.pos, 0.4, { receiver: q, noSwitch: true }); return;
@@ -359,7 +363,7 @@ export function restartChoice(M, r) {
     M.startKick(tk, 'shot', aim, rand(0.7, 0.88)); return;
   }
   if (r.type === 'throwin') {
-    const q = mates.filter((x) => !x.keeper && x.dist(tk.pos) < 22).sort((a, b) => open(b) - open(a))[0] || mates[1];
+    const q = mates.filter((x) => !x.keeper && x.dist(tk.pos) < 22 * P.kp).sort((a, b) => open(b) - open(a))[0] || mates[1];
     M.startKick(tk, 'throw', q.pos, 0.5, { receiver: q }); return;
   }
   if (r.type === 'corner') {
@@ -370,13 +374,13 @@ export function restartChoice(M, r) {
   }
   if (r.type === 'freekick') {
     const goal = _b.set(t.goalX, 0, 0), d = tk.dist(goal);
-    if (d < 30 && Math.abs(tk.pos.z) < 20) {
+    if (d < 30 * Math.max(P.k, 0.42) && Math.abs(tk.pos.z) < 20 * P.k) {
       const side = Math.random() < 0.5 ? -1 : 1;
       M.startKick(tk, 'shot', _a.set(t.goalX, rand(1.2, 2.1), side * (P.goalW - 0.6)), 0.78, { curl: -side * t.dir * 10 }); return;
     }
   }
   // goal kicks and free kicks elsewhere: short to a free man, or long upfield
-  const shortOpts = mates.filter((q) => !q.keeper && q.dist(tk.pos) < 28 && open(q) > 6);
+  const shortOpts = mates.filter((q) => !q.keeper && q.dist(tk.pos) < 28 * P.kp && open(q) > 6 * P.kp);
   if (shortOpts.length && Math.random() < 0.5) { const q = pick(shortOpts); M.startKick(tk, 'pass', q.pos, 0.5, { receiver: q }); return; }
   const fw = mates.filter((q) => q.role !== 'DEF' && !q.keeper).sort((a, b) => open(b) - open(a))[0];
   M.startKick(tk, 'clear', fw ? fw.pos : _a.set(t.xOf(0.6), 0, 0), 0.9, { receiver: fw });
