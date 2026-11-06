@@ -246,14 +246,18 @@ function handleEvents(M) {
   for (const e of M.events) {
     switch (e.type) {
       case 'kick': Sound.kick(clamp(e.speed / 30, 0.15, 1)); break;
-      case 'shot': if (M.mode !== 'shootout') ticker(`Shot · ${e.p.short} (${Math.round(e.speed * 3.6)} km/h)`, e.p.team.def.color); if (M.mode === 'practice') $('prSpeed').textContent = `Last shot ${Math.round(e.speed * 3.6)} km/h`; GROUND.S.hype = Math.max(GROUND.S.hype, 0.35); break;
-      case 'post': Sound.post(); Sound.ooh(); ticker('Off the woodwork!'); break;
-      case 'board': Sound.kick(clamp(e.speed / 22, 0.15, 0.6)); break;
+      case 'shot': G.shotAt = performance.now(); if (M.mode !== 'shootout') ticker(`Shot · ${e.p.short} (${Math.round(e.speed * 3.6)} km/h)`, e.p.team.def.color); if (M.mode === 'practice') $('prSpeed').textContent = `Last shot ${Math.round(e.speed * 3.6)} km/h`; GROUND.S.hype = Math.max(GROUND.S.hype, 0.35); break;
+      case 'post': Sound.post(); Sound.ooh(); GROUND.S.react?.('groan', 1); ticker('Off the woodwork!'); break;
+      case 'board':
+        Sound.kick(clamp(e.speed / 22, 0.15, 0.6));
+        // a shot that beat the keeper but not the goal: off the end boards beside the posts
+        if (performance.now() - (G.shotAt || 0) < 1600 && e.at && Math.abs(e.at.x) > P.HL - 0.5) { G.shotAt = 0; Sound.groan(); GROUND.S.react?.('groan', 0.9); }
+        break;
       case 'fence': Sound.net(); break;
       case 'net': Sound.net(); GROUND.S.bulge(e.side, e.at, clamp(e.speed * 0.02, 0.1, 0.55)); break;
-      case 'save': Sound.ooh(); setTimeout(() => Sound.clap(), 400); if (M.mode !== 'shootout') ticker(`${e.smother ? 'Smothered' : e.caught ? 'Held' : 'Saved'} by ${e.p.short}`, e.p.team.def.color); break;
+      case 'save': Sound.ooh(); setTimeout(() => Sound.clap(), 400); G.shotAt = 0; GROUND.S.react?.('groan', 0.7); setTimeout(() => GROUND.S.react?.('clap', 0.8), 900); if (M.mode !== 'shootout') ticker(`${e.smother ? 'Smothered' : e.caught ? 'Held' : 'Saved'} by ${e.p.short}`, e.p.team.def.color); break;
       case 'goal': {
-        Sound.roar(); GROUND.S.hype = 1.2;
+        Sound.roar(); GROUND.S.hype = 1.2; GROUND.S.react?.('goal');
         if (M.mode === 'shootout') break;
         const sc = e.scorer, min = Math.max(1, Math.ceil(((e.clock ?? M.clock) / (M.halfLen * 2)) * 90));
         banner('Goal!', sc ? `${sc.short} ${M.mode === 'match' ? min + "'" : ''}${e.own ? ' (own goal)' : ''}` : '', 2600);
@@ -262,9 +266,11 @@ function handleEvents(M) {
         break;
       }
       case 'whistle': Sound.whistle(e.foul ? 'foul' : 'short'); break;
-      case 'foul': ticker(`Foul by ${e.p.short}`, e.p.team.def.color); break;
-      case 'out': if (e.kind === 'corner') ticker('Corner'); else if (e.kind === 'goalkick') ticker('Goal kick'); break;
-      case 'restart': if (e.kind === 'penalty' && M.mode === 'match') banner('Penalty!', '', 1600); if (e.kind === 'kickoff') Sound.cheer(); break;
+      case 'foul': Sound.fanWhistles(rand(3, 7) | 0); ticker(`Foul by ${e.p.short}`, e.p.team.def.color); break;
+      case 'out':
+        if ((e.kind === 'goalkick' || e.kind === 'corner') && performance.now() - (G.shotAt || 0) < 2500) { G.shotAt = 0; Sound.groan(); }
+        if (e.kind === 'corner') ticker('Corner'); else if (e.kind === 'goalkick') ticker('Goal kick'); break;
+      case 'restart': if (e.kind === 'penalty' && M.mode === 'match') banner('Penalty!', '', 1600); if (e.kind === 'kickoff') { Sound.cheer(); GROUND.S.react?.('clap', 0.8); } break;
       case 'fade': fade(); break;
       case 'tackle': if (e.won) Sound.kick(0.2); break;
       case 'halftime':
@@ -287,7 +293,7 @@ function handleEvents(M) {
             if (win === t) p.body.play('dance', { loop: true, from: rand(0, 2) });
             else if (win) p.body.play('missed', { from: 2.8, rate: rand(0.9, 1.1) });
           }
-          Sound.roar();
+          Sound.roar(); GROUND.S.react?.('goal');
         }, 900);
         setTimeout(() => { if (G.M === M) showResult('full'); }, 3200);
         break;
@@ -295,7 +301,7 @@ function handleEvents(M) {
       case 'pen': {
         renderPens();
         banner(e.scored ? 'Goal!' : M.lastShotSaved ? 'Saved!' : 'Missed!', `${e.team.short} ${e.kicks[e.team.side].filter(Boolean).length}`, 1500);
-        if (!e.scored) Sound.ooh();
+        if (!e.scored) { Sound.ooh(); GROUND.S.react?.('groan', 1); } else GROUND.S.react?.('goal');
         M.lastShotSaved = false;
         break;
       }
@@ -497,7 +503,8 @@ async function boot() {
 }
 boot();
 if (DEBUG) window.__fw = {
-  G, TEAMS, cam, camera, scene, Input, startMatch, get M() { return G.M; },
+  G, TEAMS, cam, camera, scene, Input, startMatch, get M() { return G.M; }, get S() { return GROUND.S; },
+  draw() { if (composer) composer.render(); else renderer.render(scene, camera); },
   // step the match n times (no input) and draw that moment from a camera mode
   shot(n, mode, o = {}) {
     const M = G.M; G.paused = true; $('pause').hidden = true;

@@ -1,9 +1,10 @@
 /* The futsal ground: a 40 x 20 m artificial-turf court in a floodlit cage at night. Rebound boards with printed
    panels, steel posts and netting (left off the camera's side so it never sits in front of the play), six
-   floodlight towers, the clubhouse with its sign, a few dozen supporters on benches, coconut palms and the lights
+   floodlight towers, the clubhouse with its sign, a covered stand and terraces full of supporters, coconut palms and the lights
    of the city beyond. Everything in one group so the ground can be swapped. */
 import { THREE, V3, P, canvasTex, LITE, clamp, rand } from './util.js';
 import { addGoals } from './stadium.js';
+import { buildFans } from './fans.js';
 
 export function buildFutsal(world, renderer) {
   const scene = new THREE.Group(); world.add(scene);
@@ -162,7 +163,7 @@ export function buildFutsal(world, renderer) {
     const towerMat = new THREE.MeshStandardMaterial({ color: 0x5a6272, roughness: 0.5, metalness: 0.6 });
     const lamp = new THREE.MeshBasicMaterial({ color: 0xfff5e0, toneMapped: false });
     const halo = canvasTex(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,248,225,0.9)'); gr.addColorStop(0.25, 'rgba(255,240,200,0.35)'); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
-    const spots = [[-WX - 1.6, -WZ - 1.6], [WX + 1.6, -WZ - 1.6], [-WX - 1.6, WZ + 1.6], [WX + 1.6, WZ + 1.6], [-WX * 0.33, -WZ - 1.6], [WX * 0.33, -WZ - 1.6]];
+    const spots = [[-WX - 1.6, -WZ - 1.6], [WX + 1.6, -WZ - 1.6], [-WX - 1.6, WZ + 1.6], [WX + 1.6, WZ + 1.6], [-WX * 0.33, -WZ - 7.4], [WX * 0.33, -WZ - 7.4]]; // the middle two behind the stand
     for (const [x, z] of spots) {
       const h = 12.5;
       const t = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, h, 10), towerMat); t.position.set(x, h / 2, z); t.castShadow = true; scene.add(t);
@@ -200,49 +201,73 @@ export function buildFutsal(world, renderer) {
     const s2 = new THREE.Mesh(new THREE.BoxGeometry(13.4, 2.8, 0.2), new THREE.MeshStandardMaterial({ color: 0x111522 })); s2.position.set(-14, 8.4, z + 2.9); scene.add(s2);
   }
 
-  /* ---- supporters on benches along the far side, and at the ends */
+  /* ---- the stand along the far side (covered, five rows of plastic seats) and a terrace behind each goal, with the
+     supporters in them: real people sitting, clapping, holding their heads, jumping up for a goal (fans.js) */
   {
-    const benchMat = new THREE.MeshStandardMaterial({ color: 0x3a6fd0, roughness: 0.7 });
-    const people = [];
-    const bench = (x0, x1, z, rows, ry) => {
+    const seats = [], fill = LITE ? 0.45 : 0.78, STEP = 0.4, DEPTH = 0.85, PITCH = 0.62;
+    const concrete = new THREE.MeshStandardMaterial({ color: 0x8b8f98, roughness: 0.92 });
+    const seatMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55 });
+    const tiers = [], planks = [];
+    /* a block of rows: origin (x0..x1 along it) at front z, rows going back; `along` the axis the rows run on */
+    const block = (len, rows, place, ry) => {
       for (let r = 0; r < rows; r++) {
-        const zz = z - r * 0.9 * Math.sign(z || 1), hh = 0.45 + r * 0.45;
-        const b = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(x1 - x0), hh, 0.5), benchMat); b.position.set((x0 + x1) / 2, hh / 2, zz); b.receiveShadow = true; scene.add(b);
-        for (let x = x0 + 0.4; x < x1 - 0.3; x += rand(0.55, 1.4)) if (Math.random() < 0.75) people.push({ x, y: hh, z: zz, ry });
+        const top = STEP + r * STEP;
+        const t = new THREE.BoxGeometry(len, top, DEPTH); t.translate(0, top / 2, -(r + 0.5) * DEPTH); tiers.push(place(t));
+        for (let x = -len / 2 + PITCH / 2; x < len / 2 - 0.2; x += PITCH) {
+          const pk = new THREE.BoxGeometry(PITCH * 0.86, 0.06, 0.42); pk.translate(x, top + 0.03, -(r + 0.5) * DEPTH - 0.12);
+          const c = new THREE.Color(((x / PITCH) | 0) % 9 === 4 || r === rows - 1 && ((x / PITCH) | 0) % 3 === 0 ? 0xffc53d : 0x1f4fd0).multiplyScalar(0.85 + Math.random() * 0.15);
+          const n = pk.attributes.position.count, cols = new Float32Array(n * 3); for (let i = 0; i < n; i++) c.toArray(cols, i * 3);
+          pk.setAttribute('color', new THREE.BufferAttribute(cols, 3)); planks.push(place(pk));
+          if (Math.random() < fill) {
+            const v = new V3(x + (Math.random() - 0.5) * 0.06, top + 0.06, -(r + 0.5) * DEPTH - 0.1);
+            const w = place(null, v); seats.push({ x: w.x, y: w.y, z: w.z, ry });
+          }
+        }
       }
     };
-    bench(4, WX - 1, -WZ - 2.4, 3, 0);
-    bench(-WX + 1, -16, -WZ - 2.4, 2, 0);
-    // a crowd block: body and head in one instanced geometry, bobbing; jumping for a goal
-    const geo = new THREE.BufferGeometry();
-    {
-      const parts = [[new THREE.BoxGeometry(0.44, 0.6, 0.28), 0.3, 0], [new THREE.BoxGeometry(0.2, 0.23, 0.21), 0.74, 1]];
-      const pos = [], nor = [], head = [], idx = []; let off = 0;
-      for (const [g, yy, h] of parts) {
-        g.translate(0, yy, 0); const pa = g.attributes.position, na = g.attributes.normal;
-        for (let i = 0; i < pa.count; i++) { pos.push(pa.getX(i), pa.getY(i), pa.getZ(i)); nor.push(na.getX(i), na.getY(i), na.getZ(i)); head.push(h); }
-        for (let i = 0; i < g.index.count; i++) idx.push(g.index.getX(i) + off); off += pa.count;
-      }
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('aHead', new THREE.Float32BufferAttribute(head, 1)); geo.setIndex(idx);
+    // the main stand: rows run along x, facing +z (the court)
+    const MZ = -WZ - 1.7, ML = 37;
+    block(ML, 5, (g, v) => { if (g) return g.translate(0, 0, MZ); return v.set(v.x, v.y, v.z + MZ); }, 0);
+    // terraces behind each goal: rows run along z, facing the court
+    for (const sx of [-1, 1]) {
+      const EX = sx * (WX + 1.3), EL = 13;
+      block(EL, 3, (g, v) => {
+        // local (x along, z back) → world: along z, back away from the court in x
+        if (g) { g.rotateY(sx < 0 ? Math.PI / 2 : -Math.PI / 2); return g.translate(EX, 0, 0); }
+        return sx < 0 ? v.set(EX + v.z, v.y, -v.x) : v.set(EX - v.z, v.y, v.x);
+      }, sx < 0 ? Math.PI / 2 : -Math.PI / 2);
     }
-    const phase = new Float32Array(people.length).map(() => Math.random());
-    geo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 1));
-    const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    mat.onBeforeCompile = (sh) => {
-      sh.uniforms.uTime = { value: 0 }; sh.uniforms.uHype = { value: 0 }; S.crowdMat = sh;
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aPhase; attribute float aHead; uniform float uTime; uniform float uHype; varying float vHead;')
-        .replace('#include <begin_vertex>', `#include <begin_vertex>
-          vHead = aHead;
-          transformed.y += sin(uTime * 1.7 + aPhase * 6.0) * 0.03 + max(0.0, sin(uTime * (7.0 + fract(aPhase * 7.0) * 3.0) + aPhase * 30.0)) * 0.4 * uHype;`);
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vHead;')
-        .replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.45, 0.3, 0.21), vHead);');
-    };
-    const mesh = new THREE.InstancedMesh(geo, mat, people.length);
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
-    const shirts = [0x2350b8, 0xffc53d, 0xf2f2f2, 0x17784a, 0xd6162f, 0xff8a1f, 0x222833, 0x5b8cff, 0x8a2be2];
-    people.forEach((p, i) => { q.setFromAxisAngle(new V3(0, 1, 0), p.ry); m4.compose(new V3(p.x, p.y, p.z), q, new V3(1, 1, 1).multiplyScalar(rand(0.9, 1.05))); mesh.setMatrixAt(i, m4); col.setHex(shirts[(Math.random() * shirts.length) | 0]).multiplyScalar(rand(0.65, 1)); mesh.setColorAt(i, col); });
-    mesh.castShadow = true; mesh.frustumCulled = false; scene.add(mesh);
+    const tm = new THREE.Mesh(THREE.mergeGeometries(tiers), concrete); tm.receiveShadow = true; scene.add(tm);
+    scene.add(new THREE.Mesh(THREE.mergeGeometries(planks), seatMat));
+    // the stand's back wall, roof on steel columns, a lit fascia
+    const backZ = MZ - 5 * DEPTH, steel = new THREE.MeshStandardMaterial({ color: 0x39404d, roughness: 0.5, metalness: 0.7 });
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(ML + 0.4, 3.4, 0.25), concrete); wall.position.set(0, 1.7, backZ - 0.12); scene.add(wall);
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(ML + 1.2, 0.22, 6.2), new THREE.MeshStandardMaterial({ color: 0x2b313c, roughness: 0.6, metalness: 0.4 }));
+    roof.position.set(0, 6.3, backZ + 2.7); roof.rotation.x = -0.06; roof.castShadow = true; scene.add(roof);
+    for (let x = -ML / 2; x <= ML / 2 + 0.1; x += ML / 4) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 6.3, 8), steel); c.position.set(x, 3.15, backZ + 0.2); scene.add(c); }
+    const fascia = canvasTex(1024, 64, (g, w, h) => {
+      g.fillStyle = '#0d1424'; g.fillRect(0, 0, w, h);
+      g.font = '900 42px "Arial Narrow", Impact, system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'center';
+      for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#3fe0a2' : '#ffd23f'; g.fillText(i % 2 ? 'FINAL WHISTLE' : 'THUDINEST FUTSAL', (i + 0.5) * w / 4, h / 2 + 2); }
+    });
+    const fm = new THREE.Mesh(new THREE.PlaneGeometry(ML + 1.2, 0.6), new THREE.MeshBasicMaterial({ map: fascia, toneMapped: false }));
+    fm.position.set(0, 6.05, backZ + 5.82); scene.add(fm);
+    // lamps under the roof so the faces are lit
+    const under = new THREE.MeshBasicMaterial({ color: 0xfff3dc, toneMapped: false });
+    for (let x = -ML / 2 + 2; x < ML / 2; x += 4.4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.18), under); l.rotation.x = Math.PI / 2; l.position.set(x, 6.17, backZ + 3.6); scene.add(l); }
+    const standLight = new THREE.PointLight(0xfff0d8, LITE ? 30 : 45, 26, 1.6); standLight.position.set(0, 5.4, MZ - 0.5); scene.add(standLight);
+    if (!LITE) { const l2 = standLight.clone(); l2.position.x = -11; scene.add(l2); const l3 = standLight.clone(); l3.position.x = 11; scene.add(l3); }
+
+    const fans = buildFans(scene, seats);
+    S.fans = fans.uniforms; S.crowdCount = seats.length;
   }
+  /* the crowd's mood: stand = on their feet for a goal, groan = hands on heads, clap = applause */
+  S.stand = 0; S.groan = 0; S.clap = 0;
+  S.react = (kind, v = 1) => {
+    if (kind === 'goal') { S.stand = 1.6; S.clap = 0; S.groan = 0; }
+    else if (kind === 'groan') { S.groan = Math.max(S.groan, v * 1.3); S.clap = 0; }
+    else if (kind === 'clap') S.clap = Math.max(S.clap, v * 1.4);
+  };
 
   /* ---- coconut palms round the ground */
   {
@@ -284,7 +309,8 @@ export function buildFutsal(world, renderer) {
   S.bulge = S.bulge || (() => {});
   S.update = (dt) => {
     S.time += dt; S.hype = Math.max(0, S.hype - dt * 0.18);
-    if (S.crowdMat) { S.crowdMat.uniforms.uTime.value = S.time; S.crowdMat.uniforms.uHype.value = clamp(S.hype, 0, 1); }
+    S.stand = Math.max(0, S.stand - dt * 0.2); S.groan = Math.max(0, S.groan - dt * 0.55); S.clap = Math.max(0, S.clap - dt * 0.3);
+    if (S.fans) { const F = S.fans; F.uTime.value = S.time; F.uHype.value = clamp(S.stand, 0, 1); F.uGroan.value = clamp(S.groan, 0, 1); F.uClap.value = clamp(Math.max(S.clap, S.groan > 0.05 ? 0 : (S.hype - 0.3) * 1.2), 0, 1); }
     for (const g of S.glows) g.material.opacity = 0.85 + Math.sin(S.time * 3 + g.position.x) * 0.04;
     updateNets(dt);
   };

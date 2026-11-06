@@ -307,8 +307,8 @@ match simulations) are in `~/thudinest-assets/bm/`.
 
 A standalone 3D football game with two grounds: the **futsal court** (the default; a 40 x 20 m artificial-turf court
 in a floodlit cage at night, five a side, 3 x 2 m goals, the ball playing off the rebound boards and netting so there
-are no throw-ins, corners or goal kicks; the clubhouse, supporters on benches, coconut palms and the city lights
-around it, `js/futsal.js`) and the **stadium** (a full-size 105 x 68 m pitch, eleven or seven a side,
+are no throw-ins, corners or goal kicks; a covered stand along the far side and a terrace behind each goal full of
+supporters, the clubhouse, coconut palms and the city lights around it, `js/futsal.js`) and the **stadium** (a full-size 105 x 68 m pitch, eleven or seven a side,
 `js/stadium.js`). The ground is chosen in Player vs AI setup and remembered; Quick match always goes to the futsal
 court. Every player's own squad number is painted on the back of his shirt (the footballer's printed 7 is removed,
 `numberedMaterial` in `js/kit.js`). The menu offers four modes:
@@ -356,13 +356,27 @@ kicked long. Difficulty changes reaction times, tackling, accuracy, the keepers 
 Cameras: the broadcast view from the near touchline (default; closer in on a phone), a view from behind the play
 (C), one behind the penalty taker, and a slow orbit round the scorer after a goal. The ground: mown stripes and FIFA
 markings, goals with nets, corner flags, scrolling LED boards, four stands with an instanced crowd that jumps for a
-goal, floodlight towers and a dusk sky (`js/stadium.js`). The crowd sounds are Rally Point's recordings
-(`bm/sfx`, CC0); the kicks, the referee's whistle, the woodwork and the net are synthesised (`js/audio.js`).
+goal, floodlight towers and a dusk sky (`js/stadium.js`).
+
+The futsal supporters (`js/fans.js`) are real people: five of the Mixamo characters in `cricket/players` (Adam,
+Josh, Pete and two others), baked by `football/tools/fans` into `football/models/fans.*`, each cut to about 1,000
+triangles with their textures in one atlas and six poses stored per vertex: seated, two clapping frames, hands on head,
+and two frames of jumping up with arms raised. The vertex shader blends the poses, so some 330 people (190 on a
+phone) are five draw calls; each has his own timing, and about half wear a shirt recoloured from the team colours and
+everyday ones. They clap a kick-off and a save, hold their heads at a save, a near miss or the woodwork, and are on
+their feet for a goal. To change the people or poses: serve the repo root on port 8767, edit
+`football/tools/fans/poses.py` and run it, then `python3 football/tools/fans/bake.py adam,ch01,ch42,josh,pete 1000`.
+
+Sound (`js/audio.js`): Rally Point's crowd recordings (`bm/sfx`, CC0) for the murmur of the ground, the oohs,
+applause and cheers, under a synthesised crowd: a swell of voices that rises as an attack nears goal, a drum and
+handclap chant that starts up in quiet spells and after a goal, fans whistling at fouls. The kicks, the referee's
+whistle, the woodwork and the net are synthesised too. On iPhones the page asks for the playback audio session, so
+the game is heard with the silent switch on.
 
 Files: `football/index.html` (HUD, menus, styles), `football/js/main.js` (boot, menus, loop, drawing),
-`sim.js` (the match), `ai.js`, `rig.js`, `kit.js`, `ball.js`, `kicks.js`, `stadium.js`, `camera.js`, `input.js`,
-`audio.js`. It uses the three.js r170 bundle from Rally Point (`bm/vendor/three.js`) and the cricket game's player
-model and clips, so it adds no new 3D assets. Add `?lite` for the lighter renderer (no bloom, a smaller crowd and
+`sim.js` (the match), `ai.js`, `rig.js`, `kit.js`, `ball.js`, `kicks.js`, `stadium.js`, `futsal.js`, `fans.js`,
+`camera.js`, `input.js`, `audio.js`. It uses the three.js r170 bundle from Rally Point (`bm/vendor/three.js`) and the
+cricket game's player models and clips; its only assets of its own are the baked supporters in `football/models`. Add `?lite` for the lighter renderer (no bloom, a smaller crowd and
 shadow map; automatic on phones), `?play=quick`, `?play=shootout` or `?play=practice` to skip the menu, and `?debug`
 for `window.__fw` (add `&ground=stadium` to the `?play=` links for the big pitch; the match, `shot(n, camera)` to step and draw a moment, `perf()` for the cost of a frame).
 

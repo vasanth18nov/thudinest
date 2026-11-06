@@ -1,0 +1,117 @@
+<!doctype html><body><script type="module">
+import { THREE, V3, loadAll, makeBody, setPose } from './pose.js';
+import { MeshoptSimplifier as MS } from './meshopt_simplifier.module.js';
+const q = new URLSearchParams(location.search);
+const names = q.get('n').split(','), POSES = JSON.parse(await (await fetch('./poses.json')).text());
+const ORDERP = ['sit', 'clapA', 'clapB', 'groan', 'upA', 'upB'];
+const TARGET = +(q.get('tris') || 1400), CS = +(q.get('cell') || 256);
+await MS.ready;
+const G = await loadAll(names);
+const scene = new THREE.Scene();
+const _m = new THREE.Matrix4(), _s = new THREE.Matrix4(), _full = new THREE.Matrix4(), _n3 = new THREE.Matrix3(), _v = new V3();
+function skin(mesh) { // world positions and normals of every vertex in the current pose
+  const g = mesh.geometry, P = g.attributes.position, N = g.attributes.normal, SI = g.attributes.skinIndex, SW = g.attributes.skinWeight;
+  const sk = mesh.skeleton, pos = new Float32Array(P.count * 3), nrm = new Float32Array(P.count * 3);
+  for (let i = 0; i < P.count; i++) {
+    _s.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    for (let k = 0; k < 4; k++) {
+      const w = SW.getComponent(i, k); if (!w) continue;
+      const b = SI.getComponent(i, k);
+      _m.multiplyMatrices(sk.bones[b].matrixWorld, sk.boneInverses[b]);
+      for (let e = 0; e < 16; e++) _s.elements[e] += _m.elements[e] * w;
+    }
+    _full.copy(mesh.parent.matrixWorld).identity(); // the skinned result is already in world space (bone matrixWorld)
+    _full.multiplyMatrices(_s, mesh.bindMatrix).premultiply(mesh.bindMatrixInverse).premultiply(mesh.matrixWorld);
+    // three's shader: bindMatrixInverse * skin * bindMatrix * v, then modelMatrix
+    _v.fromBufferAttribute(P, i).applyMatrix4(_full); pos.set([_v.x, _v.y, _v.z], i * 3);
+    _n3.setFromMatrix4(_full); _v.fromBufferAttribute(N, i).applyMatrix3(_n3).normalize(); nrm.set([_v.x, _v.y, _v.z], i * 3);
+  }
+  return { pos, nrm };
+}
+const SKIP = /eye|lash|mouth|teeth|tongue/i;
+// a cut-out material whose texture never reaches the cut-off draws nothing in the game either: leave it out
+function invisible(m) {
+  if (!(m.alphaTest > 0) || !m.map || !m.map.image) return false;
+  const t = document.createElement('canvas'); t.width = t.height = 128; const g = t.getContext('2d'); g.drawImage(m.map.image, 0, 0, 128, 128);
+  const d = g.getImageData(0, 0, 128, 128).data; let mx = 0; for (let i = 3; i < d.length; i += 4) mx = Math.max(mx, d[i]);
+  return mx < m.alphaTest * 255;
+}
+// atlas cells
+const cells = []; let atlas = null;
+const chars = [];
+for (const name of names) {
+  const o = makeBody(scene, G[name]);
+  const meshes = []; o.b.model.traverse((m) => { if (m.isSkinnedMesh && !SKIP.test(m.material.name) && !invisible(m.material)) meshes.push(m); });
+  const perPose = {};
+  for (const pn of ORDERP) {
+    setPose(o, POSES[pn]); o.b.root.updateMatrixWorld(true);
+    perPose[pn] = meshes.map(skin);
+  }
+  // where the seated feet rest; the standing poses are set down there, a little forward of the seat
+  let sitMin = 1e9; for (const s of perPose.sit) for (let i = 1; i < s.pos.length; i += 3) sitMin = Math.min(sitMin, s.pos[i]);
+  const hipSeat = o.kneeH + 0.02 - 0.12; // the seat surface sits this far below where the hips were baked
+  const total = meshes.reduce((a, m) => a + m.geometry.index.count / 3, 0);
+  const out = { name, pos: ORDERP.map(() => []), nrm: [[], []], uv: [], cloth: [], idx: [] };
+  let vbase = 0;
+  for (let mi = 0; mi < meshes.length; mi++) {
+    const m = meshes[mi], g = m.geometry, mat = m.material;
+    // texture cell
+    const cell = { x: (cells.length % 8) * CS, y: Math.floor(cells.length / 8) * CS, mat, name: `${name}/${mat.name}` }; cells.push(cell);
+    const src = perPose.sit[mi].pos;
+    const idx = new Uint32Array(g.index.array);
+    const want = Math.max(60, Math.round((idx.length / 3) * TARGET / total)) * 3;
+    let [simp] = MS.simplify(idx, src, 3, want, 1.0, []); 
+    if (simp.length > want * 1.4 && MS.simplifySloppy) { const [s2] = MS.simplifySloppy(idx, src, 3, want, 0.02); console.log('sloppy', name, mat.name, simp.length / 3, '->', s2.length / 3); simp = s2; }
+    const remap = new Map(), list = [];
+    for (const v of simp) if (!remap.has(v)) { remap.set(v, vbase + list.length); list.push(v); }
+    for (const v of simp) out.idx.push(remap.get(v));
+    const UV = g.attributes.uv;
+    for (const v of list) {
+      ORDERP.forEach((pn, pi) => { const p = perPose[pn][mi].pos; out.pos[pi].push(p[v * 3], p[v * 3 + 1], p[v * 3 + 2]); });
+      for (const [k, pn] of [[0, 'sit'], [1, 'upA']]) { const n = perPose[pn][mi].nrm; out.nrm[k].push(n[v * 3], n[v * 3 + 1], n[v * 3 + 2]); }
+      let u = UV.getX(v), w = UV.getY(v);
+      u = Math.min(1, Math.max(0, u)); w = Math.min(1, Math.max(0, w));
+      const pad = 3;
+      out.uv.push(cell.x + pad + u * (CS - 2 * pad), cell.y + pad + w * (CS - 2 * pad)); // pixels; normalised below
+    }
+    vbase += list.length;
+  }
+  // seated poses: the seat surface at y 0; standing poses: feet where the seated feet were, a step forward
+  const minY = (arr) => { let m = 1e9; for (let i = 1; i < arr.length; i += 3) m = Math.min(m, arr[i]); return m; };
+  const seatFoot = sitMin - hipSeat;
+  ORDERP.forEach((pn, pi) => {
+    const a = out.pos[pi], stand = pn.startsWith('up');
+    const dy = stand ? -minY(a) + seatFoot + (pn === 'upA' ? 0.07 : 0) : -hipSeat, dz = stand ? 0.3 : 0;
+    for (let i = 0; i < a.length; i += 3) { a[i + 1] += dy; a[i + 2] += dz; }
+  });
+  out.nv = vbase; out.ni = out.idx.length; out.tris = out.ni / 3; out.seatFoot = seatFoot;
+  chars.push(out);
+}
+// the atlas: each material's colour map, scaled into its cell; alpha marks cutouts (0), cloth (~0.65) and skin (1)
+const rows = Math.ceil(cells.length / 8), W = CS * 8, H = CS * rows;
+for (const ch of chars) ch.uv = ch.uv.map((x, i) => (i % 2 ? x / H : x / W));
+const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+g.fillStyle = '#777'; g.fillRect(0, 0, W, H);
+for (const cl of cells) {
+  const m = cl.mat, img = m.map && m.map.image;
+  const t = document.createElement('canvas'); t.width = t.height = CS; const tg = t.getContext('2d');
+  if (img) tg.drawImage(img, 0, 0, CS, CS); else { tg.fillStyle = '#' + m.color.getHexString(); tg.fillRect(0, 0, CS, CS); }
+  const d = tg.getImageData(0, 0, CS, CS), a = d.data, col = m.color.clone().convertLinearToSRGB();
+  const hair = /hair/i.test(m.name);
+  for (let i = 0; i < a.length; i += 4) {
+    let r = a[i] * col.r, gg = a[i + 1] * col.g, b = a[i + 2] * col.b; a[i] = r; a[i + 1] = gg; a[i + 2] = b;
+    if (a[i + 3] < (m.alphaTest > 0 ? m.alphaTest * 255 : 128)) { a[i + 3] = 0; continue; }
+    const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), sat = mx ? (mx - mn) / mx : 0, v = mx / 255;
+    let h = 0; if (mx !== mn) { if (mx === r) h = ((gg - b) / (mx - mn)) * 60; else if (mx === gg) h = (2 + (b - r) / (mx - mn)) * 60; else h = (4 + (r - gg) / (mx - mn)) * 60; } if (h < 0) h += 360;
+    const skinish = h >= 5 && h <= 45 && sat > 0.18 && sat < 0.68 && v > 0.3 && r > gg && gg > b;
+    a[i + 3] = hair || skinish ? 255 : 166;
+  }
+  tg.putImageData(d, 0, 0);
+  const pad = 3; g.clearRect(cl.x, cl.y, CS, CS);
+  // edge bleed: draw stretched once, then the real image inset
+  g.drawImage(t, cl.x, cl.y, CS, CS); g.clearRect(cl.x + pad, cl.y + pad, CS - 2 * pad, CS - 2 * pad);
+  g.drawImage(t, cl.x + pad, cl.y + pad, CS - 2 * pad, CS - 2 * pad);
+}
+window.result = { chars, cells: cells.map((c) => c.name), atlas: c.toDataURL('image/webp', 0.86), W, H, rows };
+window.done = true;
+</script>
