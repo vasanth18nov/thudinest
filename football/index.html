@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#060b1c">
+<title>Final Whistle | Thudinest Games</title>
+<meta name="description" content="Final Whistle: a free 3D football game. Play a full match against the computer under the floodlights, take a penalty shootout, or practise your finishing. No download, no account.">
+<meta property="og:title" content="Final Whistle | Thudinest Games">
+<meta property="og:description" content="3D football under the floodlights: matches against the computer, penalty shootouts and practice. Free in your browser.">
+<meta property="og:image" content="https://thudinest.com/football/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@500;600;700;800&display=swap">
+<link rel="modulepreload" href="../bm/vendor/three.js">
+<style>
+[hidden] { display: none !important; }
+/* Layout: the full-bleed WebGL stadium under a broadcast HUD pinned to the safe-area corners (score bug top left,
+   camera and pause top right, the radar bottom centre, banners in the middle). On touch screens a floating stick on
+   the left half and a thumb cluster of buttons on the right. Menus are cards over the live stadium. */
+:root {
+  --night: #060b1c;
+  --panel: rgba(8, 13, 32, 0.86);
+  --panel-soft: rgba(8, 13, 32, 0.6);
+  --rule: rgba(230, 236, 255, 0.12);
+  --rule-strong: rgba(230, 236, 255, 0.26);
+  --chalk: #f3f5fb;
+  --muted: #9aa5c3;
+  --gold: #ffd23f;
+  --gold-ink: #1b1400;
+  --turf: #2fb05a;
+  --mint: #3fe0a2;
+  --coral: #ff5b4f;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --ui: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--night); color: var(--chalk); font: 600 15px/1.4 var(--ui); overflow: hidden; overscroll-behavior: none; }
+body { user-select: none; -webkit-user-select: none; touch-action: none; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+.display { font-family: var(--display); font-weight: 900; letter-spacing: 0.01em; text-transform: uppercase; }
+
+/* ---- loading */
+#loader { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: radial-gradient(80% 70% at 50% 30%, #12245a, var(--night)); }
+#loader .box { width: min(420px, 100% - 48px); text-align: center; }
+#loader h1 { font: 900 clamp(52px, 13vw, 96px)/0.85 var(--display); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.01em; }
+#loader h1 span { color: var(--gold); }
+#loader p { color: var(--muted); margin: 0 0 22px; }
+.bar { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--turf), var(--gold)); transform-origin: 0 50%; transform: scaleX(0.04); transition: transform .25s; }
+#loadStep { margin-top: 10px; font-size: 13px; color: var(--muted); }
+#fatal { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: var(--night); padding: 24px; text-align: center; }
+
+/* ---- cards (menus) */
+.scrim { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(4,7,18,0.25), rgba(4,7,18,0.75)); overflow-y: auto; touch-action: pan-y; }
+.card { width: min(760px, 100%); background: var(--panel); border: 1px solid var(--rule); border-radius: 22px; padding: clamp(18px, 3vw, 30px); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 40px 90px rgba(0,0,0,0.55); }
+.card.narrow { width: min(460px, 100%); }
+.title { font: 900 clamp(48px, 10vw, 92px)/0.82 var(--display); text-transform: uppercase; margin: 0; letter-spacing: 0.005em; }
+.title span { color: var(--gold); display: block; }
+.kick { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mint); margin: 0 0 10px; font-weight: 800; }
+.sub { color: var(--muted); margin: 10px 0 22px; max-width: 46ch; }
+.modes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 560px) { .modes { grid-template-columns: 1fr; } }
+.mode {
+  text-align: left; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--rule);
+  display: grid; grid-template-columns: 46px 1fr; gap: 4px 14px; align-items: center; transition: transform .15s, border-color .15s, background .15s;
+}
+.mode:hover, .mode:focus-visible { border-color: var(--gold); background: rgba(255, 210, 63, 0.07); transform: translateY(-2px); outline: none; }
+.mode .ic { grid-row: span 2; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: var(--c, var(--turf)); color: var(--night); font: 900 22px var(--display); }
+.mode b { font: 900 24px/1 var(--display); text-transform: uppercase; }
+.mode small { color: var(--muted); font-size: 13px; font-weight: 600; }
+.mode.hero { grid-column: 1 / -1; background: linear-gradient(110deg, rgba(47,176,90,0.22), rgba(255,210,63,0.12)); border-color: rgba(255,210,63,0.4); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+.chipbtn { padding: 9px 14px; border-radius: 999px; border: 1px solid var(--rule-strong); background: rgba(255,255,255,0.04); font-weight: 700; font-size: 14px; }
+.chipbtn:hover { border-color: var(--chalk); }
+a.chipbtn { color: var(--chalk); }
+.btn { padding: 13px 24px; border-radius: 999px; font-weight: 800; font-size: 16px; background: var(--gold); color: var(--gold-ink); box-shadow: 0 5px 0 #a3830f; transition: transform .1s, box-shadow .1s; }
+.btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a3830f; }
+.btn.ghost { background: rgba(255,255,255,0.06); color: var(--chalk); box-shadow: inset 0 0 0 1px var(--rule-strong); }
+.btn.ghost:active { transform: translateY(1px); }
+.field { margin-top: 18px; }
+.field > label { display: block; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 800; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { padding: 9px 14px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--rule); font-weight: 700; }
+.seg button.on { background: var(--chalk); color: var(--night); border-color: var(--chalk); }
+.teams { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: start; }
+.teams .vs { font: 900 28px var(--display); color: var(--muted); padding-top: 36px; }
+.tpick { display: grid; gap: 6px; }
+.tpick button { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--rule); text-align: left; font-weight: 700; }
+.tpick button.on { border-color: var(--gold); background: rgba(255,210,63,0.1); }
+.tpick button:disabled { opacity: 0.3; cursor: default; }
+.kitsw { width: 26px; height: 26px; border-radius: 7px; flex: none; background: linear-gradient(135deg, var(--a) 0 55%, var(--b) 55%); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25); }
+@media (max-width: 560px) { .teams { grid-template-columns: 1fr; } .teams .vs { padding: 0; text-align: center; } }
+.stats { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px 14px; margin: 18px 0 4px; font-size: 15px; }
+.stats .k { text-align: center; color: var(--muted); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.stats .a { text-align: right; font-weight: 800; } .stats .b { text-align: left; font-weight: 800; }
+.final { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 10px 0 4px; }
+.final .t { font: 900 clamp(22px, 5vw, 32px)/1 var(--display); text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+.final .s { font: 900 clamp(54px, 12vw, 84px)/1 var(--display); }
+.scorers { text-align: center; color: var(--muted); font-size: 14px; min-height: 1em; }
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin-top: 14px; font-size: 14px; }
+.keys kbd { font: 800 12px var(--ui); padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid var(--rule-strong); white-space: nowrap; }
+.keys span { color: var(--muted); }
+
+/* ---- the HUD */
+#hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+.bug {
+  position: absolute; left: max(14px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top));
+  display: flex; align-items: stretch; border-radius: 12px; overflow: hidden; background: var(--panel); border: 1px solid var(--rule);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.35); font-family: var(--display); font-weight: 900; text-transform: uppercase;
+}
+.bug .tm { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 22px; letter-spacing: 0.03em; }
+.bug .tm i { width: 6px; align-self: stretch; border-radius: 3px; background: var(--c); }
+.bug .sc { background: rgba(255,255,255,0.08); padding: 6px 12px; font-size: 26px; display: flex; align-items: center; gap: 8px; }
+.bug .clk { background: var(--gold); color: var(--gold-ink); padding: 6px 10px; font-size: 22px; display: flex; align-items: center; min-width: 74px; justify-content: center; }
+.poss { position: absolute; left: max(14px, env(safe-area-inset-left)); top: calc(max(12px, env(safe-area-inset-top)) + 50px); width: 210px; height: 4px; border-radius: 4px; overflow: hidden; display: flex; background: rgba(255,255,255,0.1); }
+.poss i { display: block; height: 100%; transition: width .6s; }
+.tr { position: absolute; right: max(14px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); display: flex; gap: 8px; pointer-events: auto; }
+.round { width: 44px; height: 44px; border-radius: 50%; background: var(--panel); border: 1px solid var(--rule); display: grid; place-items: center; }
+.round svg { width: 20px; height: 20px; }
+#radar { position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: 220px; height: 143px; border-radius: 10px; background: rgba(8, 40, 22, 0.55); border: 1px solid rgba(255,255,255,0.22); }
+body.touch-ui #radar { width: 150px; height: 98px; bottom: auto; top: max(12px, env(safe-area-inset-top)); }
+#power { position: absolute; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 156px); transform: translateX(-50%); width: 220px; height: 14px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); overflow: hidden; opacity: 0; transition: opacity .15s; }
+#power.on { opacity: 1; }
+#power i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--turf), var(--gold) 70%, var(--coral)); transform-origin: 0 50%; transform: scaleX(0); }
+body.touch-ui #power { bottom: auto; top: 46%; }
+#tag { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); padding: 3px 9px 4px; border-radius: 8px; background: var(--gold); color: var(--gold-ink); font: 900 15px/1 var(--display); text-transform: uppercase; white-space: nowrap; letter-spacing: 0.04em; }
+#tag::after { content: ''; position: absolute; left: 50%; bottom: -6px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: var(--gold); }
+#banner { position: absolute; left: 0; right: 0; top: 36%; text-align: center; font: 900 clamp(56px, 13vw, 150px)/0.9 var(--display); text-transform: uppercase; letter-spacing: 0.01em; color: var(--chalk); text-shadow: 0 10px 40px rgba(0,0,0,0.6); opacity: 0; transform: scale(0.8); transition: opacity .25s, transform .4s cubic-bezier(.2,1.6,.4,1); }
+#banner.on { opacity: 1; transform: scale(1); }
+#banner small { display: block; font: 800 clamp(16px, 3vw, 24px)/1.2 var(--ui); letter-spacing: 0.04em; text-transform: none; color: var(--gold); margin-top: 10px; }
+#hint { position: absolute; left: 50%; top: calc(max(12px, env(safe-area-inset-top)) + 4px); transform: translateX(-50%); padding: 8px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--rule); font-size: 14px; white-space: nowrap; opacity: 0; transition: opacity .2s; }
+#hint.on { opacity: 1; }
+body.touch-ui #hint { top: auto; bottom: 46%; }
+#ticker { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); max-width: 40vw; font-size: 14px; color: var(--chalk); }
+#ticker div { padding: 6px 12px; border-radius: 10px; background: var(--panel-soft); margin-top: 6px; animation: tick .3s ease-out; border-left: 3px solid var(--c, var(--gold)); }
+@keyframes tick { from { opacity: 0; transform: translateY(8px); } }
+body.touch-ui #ticker { display: none; }
+#pens { position: absolute; left: 50%; top: max(12px, env(safe-area-inset-top)); transform: translateX(-50%); display: grid; gap: 6px; padding: 10px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); }
+#pens .pr { display: flex; align-items: center; gap: 8px; font: 900 18px var(--display); text-transform: uppercase; }
+#pens .pr b { min-width: 74px; }
+#pens .pr i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); }
+#pens .pr i.g { background: var(--mint); border-color: var(--mint); } #pens .pr i.m { background: var(--coral); border-color: var(--coral); }
+#fade { position: fixed; inset: 0; z-index: 20; background: #000; opacity: 0; pointer-events: none; transition: opacity .18s; }
+#fade.on { opacity: 1; }
+#practice { position: absolute; right: max(14px, env(safe-area-inset-right)); top: calc(max(12px, env(safe-area-inset-top)) + 56px); padding: 10px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); text-align: right; pointer-events: auto; }
+#practice b { font: 900 30px/1 var(--display); display: block; }
+#practice small { color: var(--muted); }
+#practice button { margin-top: 8px; }
+
+/* ---- touch controls */
+#touch { position: fixed; inset: 0; z-index: 12; pointer-events: none; display: none; }
+body.touch-ui #touch.live { display: block; }
+#stickZone { position: absolute; left: 0; top: 18%; bottom: 0; width: 48%; pointer-events: auto; touch-action: none; }
+#stickBase { position: absolute; left: 0; top: 0; width: 140px; height: 140px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: rgba(8, 13, 32, 0.3); opacity: 0; transition: opacity .15s; pointer-events: none; }
+#stickBase.on { opacity: 1; }
+#stickKnob { position: absolute; left: 40px; top: 40px; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.85); box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+.pad { position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); width: 236px; height: 220px; pointer-events: none; }
+.tb {
+  position: absolute; border-radius: 50%; display: grid; place-items: center; pointer-events: auto; touch-action: none;
+  background: rgba(8, 13, 32, 0.62); border: 2px solid rgba(255,255,255,0.35); font: 900 15px/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; color: var(--chalk);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .08s, background .08s;
+}
+.tb.down { transform: scale(0.92); background: rgba(255,255,255,0.25); }
+#bShoot { right: 0; bottom: 18px; width: 96px; height: 96px; background: rgba(255, 91, 79, 0.75); border-color: #ffb3ac; font-size: 20px; }
+#bPass { right: 108px; bottom: 0; width: 74px; height: 74px; background: rgba(47, 176, 90, 0.7); border-color: #9ff0bd; }
+#bThrough { right: 112px; bottom: 90px; width: 62px; height: 62px; }
+#bTackle { right: 18px; bottom: 128px; width: 66px; height: 66px; background: rgba(31, 111, 224, 0.7); border-color: #a8c8ff; }
+#bSprint { right: 186px; bottom: 54px; width: 58px; height: 58px; }
+#rotate { position: fixed; inset: 0; z-index: 70; display: none; place-items: center; background: rgba(6, 11, 28, 0.94); text-align: center; padding: 24px; }
+#rotate svg { width: 72px; height: 72px; margin-bottom: 14px; animation: rot 2.4s ease-in-out infinite; }
+@keyframes rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+@media (orientation: portrait) and (max-width: 820px) { body.touch-ui.playing #rotate.allow { display: grid; } }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div id="loader">
+  <div class="box">
+    <h1>Final <span>Whistle</span></h1>
+    <p>3D football under the floodlights</p>
+    <div class="bar"><i id="loadBar"></i></div>
+    <div id="loadStep">Building the stadium…</div>
+  </div>
+</div>
+<div id="fatal" hidden><div><h2 class="display" style="font-size:42px;margin:0 0 8px">Couldn't start the game</h2><p id="fatalMsg" style="color:var(--muted)"></p><p><a href="../" style="color:var(--gold)">Back to Thudinest</a></p></div></div>
+
+<!-- ============ HUD ============ -->
+<div id="hud" hidden>
+  <div class="bug" id="bug">
+    <div class="tm" id="tmA"><i></i><span>HOM</span></div>
+    <div class="sc"><span id="scA">0</span>–<span id="scB">0</span></div>
+    <div class="tm" id="tmB"><span>AWY</span><i></i></div>
+    <div class="clk" id="clk">00:00</div>
+  </div>
+  <div class="poss" id="poss"><i id="possA"></i><i id="possB"></i></div>
+  <div class="tr">
+    <button class="round" id="camBtn" aria-label="Change camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="4"/></svg></button>
+    <button class="round" id="pauseBtn" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  </div>
+  <canvas id="radar" width="440" height="286"></canvas>
+  <div id="power"><i id="powerFill"></i></div>
+  <div id="tag" hidden>Player</div>
+  <div id="banner"></div>
+  <div id="hint"></div>
+  <div id="ticker"></div>
+  <div id="pens" hidden></div>
+  <div id="practice" hidden><small>Goals</small><b id="prGoals">0</b><small id="prSpeed">Shoot with Space</small><br><button class="chipbtn" id="prReset">New ball (R)</button></div>
+</div>
+<div id="fade"></div>
+
+<!-- touch controls -->
+<div id="touch">
+  <div id="stickZone"><div id="stickBase"><div id="stickKnob"></div></div></div>
+  <div class="pad">
+    <button class="tb" id="bShoot">Shoot</button>
+    <button class="tb" id="bPass">Pass</button>
+    <button class="tb" id="bThrough">Thru</button>
+    <button class="tb" id="bTackle">Tackle</button>
+    <button class="tb" id="bSprint">Sprint</button>
+  </div>
+</div>
+<div id="rotate" class="allow"><div><svg viewBox="0 0 24 24" fill="none" stroke="#ffd23f" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg><h2 class="display" style="font-size:36px;margin:0">Turn your phone</h2><p style="color:var(--muted)">Final Whistle plays best in landscape.</p><button class="chipbtn" id="rotateDismiss">Play in portrait</button></div></div>
+
+<!-- ============ MENUS ============ -->
+<div class="scrim" id="menu" hidden>
+  <div class="card">
+    <p class="kick">Thudinest Games · 3D football</p>
+    <h1 class="title">Final<span>Whistle</span></h1>
+    <p class="sub">Eleven a side under the floodlights. Dribble, pass, shoot and tackle against the computer, take a shootout, or practise your finishing.</p>
+    <div class="modes">
+      <button class="mode hero" data-mode="quick" style="--c: var(--gold)"><span class="ic">▶</span><b>Quick match</b><small>Kick off now: your side against a random team</small></button>
+      <button class="mode" data-mode="match" style="--c: var(--turf)"><span class="ic">VS</span><b>Player vs AI</b><small>Pick the teams, difficulty, length and size</small></button>
+      <button class="mode" data-mode="shootout" style="--c: var(--coral)"><span class="ic">11</span><b>Penalty shootout</b><small>Five each, then sudden death</small></button>
+      <button class="mode" data-mode="practice" style="--c: var(--mint)"><span class="ic">◎</span><b>Practice</b><small>You, a striker partner, two defenders and a keeper</small></button>
+    </div>
+    <div class="row">
+      <button class="chipbtn" id="helpBtn">Controls</button>
+      <button class="chipbtn" id="soundBtn">Sound: on</button>
+      <button class="chipbtn" id="camMenuBtn">Camera: broadcast</button>
+      <a class="chipbtn" href="../" style="text-decoration:none">Thudinest games</a>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="setup" hidden>
+  <div class="card">
+    <p class="kick" id="setupKick">Player vs AI</p>
+    <h2 class="title" style="font-size:clamp(40px,8vw,64px)" id="setupTitle">Match setup</h2>
+    <div class="field">
+      <div class="teams">
+        <div><label class="kick" style="color:var(--muted)">Your team</label><div class="tpick" id="pickA"></div></div>
+        <div class="vs">VS</div>
+        <div><label class="kick" style="color:var(--muted)">Opponent</label><div class="tpick" id="pickB"></div></div>
+      </div>
+    </div>
+    <div class="field"><label>Difficulty</label><div class="seg" id="segDiff"><button data-v="easy">Easy</button><button data-v="medium">Medium</button><button data-v="hard">Hard</button></div></div>
+    <div class="field" data-for="match"><label>Half length</label><div class="seg" id="segLen"><button data-v="120">2 min</button><button data-v="180">3 min</button><button data-v="300">5 min</button><button data-v="450">7½ min</button></div></div>
+    <div class="field" data-for="match"><label>Team size</label><div class="seg" id="segSize"><button data-v="11">11 a side</button><button data-v="7">7 a side (lighter on phones)</button></div></div>
+    <div class="row" style="margin-top:24px"><button class="btn" id="kickoffBtn">Kick off</button><button class="btn ghost" id="setupBack">Back</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="pause" hidden>
+  <div class="card narrow">
+    <p class="kick">Paused</p>
+    <h2 class="title" style="font-size:56px">Time out</h2>
+    <div class="row" style="flex-direction:column;align-items:stretch">
+      <button class="btn" id="resumeBtn">Resume</button>
+      <button class="btn ghost" id="restartBtn">Restart</button>
+      <button class="btn ghost" id="pauseCam">Camera: broadcast</button>
+      <button class="btn ghost" id="pauseSound">Sound: on</button>
+      <button class="btn ghost" id="pauseHelp">Controls</button>
+      <button class="btn ghost" id="quitBtn">Quit to menu</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="half" hidden>
+  <div class="card narrow">
+    <p class="kick" id="halfKick">Half time</p>
+    <div class="final" id="halfScore"></div>
+    <div class="scorers" id="halfScorers"></div>
+    <div class="stats" id="halfStats"></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="secondHalfBtn">Start the second half</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="full" hidden>
+  <div class="card narrow">
+    <p class="kick" id="fullKick">Full time</p>
+    <div class="final" id="fullScore"></div>
+    <div class="scorers" id="fullScorers"></div>
+    <div class="stats" id="fullStats"></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="rematchBtn">Play again</button><button class="btn ghost" id="fullMenuBtn">Menu</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="help" hidden>
+  <div class="card narrow">
+    <p class="kick">How to play</p>
+    <h2 class="title" style="font-size:48px">Controls</h2>
+    <div class="keys" id="keysDesk">
+      <kbd>WASD / arrows</kbd><span>Move (as the camera sees it)</span>
+      <kbd>Shift</kbd><span>Sprint</span>
+      <kbd>Space</kbd><span>Hold to power a shot, release to strike. Push a direction to pick a corner</span>
+      <kbd>J</kbd><span>Pass to the teammate you push toward. Without the ball: switch player</span>
+      <kbd>K</kbd><span>Through ball into space</span>
+      <kbd>L</kbd><span>Tackle (sprinting or from further away: slide). On the ball: cross</span>
+      <kbd>E</kbd><span>Switch to the player nearest the ball</span>
+      <kbd>C</kbd><span>Camera: broadcast or behind the play</span>
+      <kbd>Esc / P</kbd><span>Pause</span>
+    </div>
+    <div class="keys">
+      <kbd>Touch</kbd><span>Stick on the left half of the screen. Shoot: hold and release. Pass (switches player when you haven't the ball), Thru, Sprint (hold), Tackle (on the ball: cross)</span>
+      <kbd>Shootout</kbd><span>Taking: push a side and hold Shoot. Keeping: push left or right as he runs up to choose your dive</span>
+    </div>
+    <div class="row"><button class="btn" id="helpClose">Got it</button></div>
+  </div>
+</div>
+
+<script>
+window.__fatal = (msg, detail) => { document.getElementById('fatal').hidden = false; document.getElementById('fatalMsg').textContent = msg + (detail ? ' (' + detail + ')' : ''); };
+window.addEventListener('error', (e) => { if (!window.__booted) window.__fatal('Something went wrong while loading.', e.message); });
+setTimeout(() => { if (!window.__booted) window.__fatal('Your browser could not load the game (it needs a recent browser with WebGL).'); }, 20000);
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -13,7 +13,8 @@ Deployed via Netlify → add your Netlify URL here.
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
   batting game, **Guest Rush** (`/guest-rush/`), a 3D homestay game, and
-  **Rally Point** (`/bm/`), a 3D badminton game — see below.
+  **Rally Point** (`/bm/`), a 3D badminton game, and **Final Whistle**
+  (`/football/`), a 3D football game — see below.
 
 ## Adding Property Photos
 
@@ -301,6 +302,66 @@ How it works:
 
 Build tools and the headless tests (Playwright on the Mac's GPU, and Node
 match simulations) are in `~/thudinest-assets/bm/`.
+
+## Final Whistle (`/football/`)
+
+A standalone 3D football game on a full-size 105 x 68 m pitch under the floodlights. The menu offers four modes:
+
+- **Quick match**: your saved side against a random opponent, medium difficulty, 2½-minute halves
+- **Player vs AI**: pick both sides (Thudinest Coimbatore, Team AMH, Ragging Bulls, World XI, the sides and names
+  from Floodlit Over), the difficulty (easy, medium, hard), the half length (2, 3, 5 or 7½ minutes, shown as two
+  45-minute halves) and the team size (11 a side, or 7 a side, the default on phones)
+- **Penalty shootout**: five each at the same goal, then sudden death; you take your side's kicks and keep goal
+  for theirs (push a side as he runs up to choose your dive)
+- **Practice**: you and a striker partner against two defenders and a keeper; the ball resets after a goal or when
+  it goes out (R for a new ball)
+
+Controls. Keyboard: WASD or arrows move (as the camera sees it), Shift sprints, Space held and released shoots (the
+longer, the harder; push a side to pick a corner, a weak shot is placed and curled), J passes to the teammate you push
+toward (without the ball it switches player), K plays a through ball into space, L tackles (sprinting or from further
+away, a slide; on the ball, a cross), E switches to the player nearest the ball, C changes the camera, Esc or P
+pauses. Touch: a floating stick on the left half of the screen and Shoot (hold), Pass / Switch, Thru, Sprint (hold)
+and Tackle / Cross buttons, their labels following the play. A restart (kick-off, throw-in, corner, goal kick, free
+kick, penalty) waits for your button; the hint at the top says which.
+
+The match. Every player is the footballer from the cricket game (`cricket/players/footballer.glb`, the rigged Mixamo
+Ch38 character, converted from its FBX), wearing his team's kit: his white kit is recoloured texel by texel by
+garment, the shirt, shorts and socks found from the mesh's own skin weights (`js/kit.js`), so skin, face, hair and
+boots stay as they are. He plays the Mixamo clips in `cricket/players/moves.json` (Running, Breathing Idle, the
+sidestep for moving across or backward, Goalkeeper Diving Save, catches and the overhand throw, a victory cheer for a
+goal, Silly Dancing for the winners at full time and a frustrated straighten-up for the losers), blended by speed
+with the run's rate matched to his pace; kicks, passes, slide and standing tackles, headers and the keeper's ready
+crouch are laid over the clips on the same skeleton (`js/rig.js`, after Rally Point's retargeting). The ball
+(`js/ball.js`) has drag, spin and the Magnus force (struck shots curl and dip), bounces that lose pace on the grass,
+rolling resistance, posts and a crossbar it rebounds from, and nets that catch it and bulge. Passes and shots are
+solved against that physics (`js/kicks.js`), so a pass arrives at the feet it was meant for. The laws: kick-offs,
+goals, throw-ins, corners, goal kicks, fouls from a mistimed tackle (a free kick, or a penalty in the box), two halves
+with the ends changed, and stats (possession, shots, on target, passes, tackles, corners, fouls).
+
+The AI (`js/ai.js`): each side holds a 4-3-3 (or a 2-3-1 at seven a side) that shifts with the ball; the player
+who gets to a loose ball first chases it; the nearest defender presses goal-side of the man on the ball and tackles
+when it is there to win, the next covers; in possession two teammates offer angles and the forwards run in behind.
+On the ball a player weighs a shot, every pass (progress, how open the receiver is, the lane), a through ball for a
+runner who gets there first, a cross from wide, a clearance under pressure, or a dribble into space. The keeper
+narrows the angle, reads where a shot will cross the line, steps or dives (the save's chance falls with the pace of
+the shot), comes off his line one on one, claims loose balls in his box and gives the ball back out, thrown short or
+kicked long. Difficulty changes reaction times, tackling, accuracy, the keepers and the pace.
+
+Cameras: the broadcast view from the near touchline (default; closer in on a phone), a view from behind the play
+(C), one behind the penalty taker, and a slow orbit round the scorer after a goal. The ground: mown stripes and FIFA
+markings, goals with nets, corner flags, scrolling LED boards, four stands with an instanced crowd that jumps for a
+goal, floodlight towers and a dusk sky (`js/stadium.js`). The crowd sounds are Rally Point's recordings
+(`bm/sfx`, CC0); the kicks, the referee's whistle, the woodwork and the net are synthesised (`js/audio.js`).
+
+Files: `football/index.html` (HUD, menus, styles), `football/js/main.js` (boot, menus, loop, drawing),
+`sim.js` (the match), `ai.js`, `rig.js`, `kit.js`, `ball.js`, `kicks.js`, `stadium.js`, `camera.js`, `input.js`,
+`audio.js`. It uses the three.js r170 bundle from Rally Point (`bm/vendor/three.js`) and the cricket game's player
+model and clips, so it adds no new 3D assets. Add `?lite` for the lighter renderer (no bloom, a smaller crowd and
+shadow map; automatic on phones), `?play=quick`, `?play=shootout` or `?play=practice` to skip the menu, and `?debug`
+for `window.__fw` (the match, `shot(n, camera)` to step and draw a moment, `perf()` for the cost of a frame).
+
+**Changing a squad** — edit `TEAMS` at the top of `football/js/main.js` (name, short name, colours, kit and
+keeper's kit, and the XI in order: keeper, four defenders, three midfielders, three forwards).
 
 ## Files
 
