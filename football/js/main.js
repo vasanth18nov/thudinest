@@ -18,7 +18,7 @@ const TEAMS = {
   thudinest: {
     id: 'thudinest', name: 'Thudinest Coimbatore', short: 'THU', color: '#3b6ff0', alt: '#ffc53d',
     kit: { shirt: 0x2350b8, shorts: 0x1b3a80, socks: 0xffc53d, trim: 0xffc53d }, gkKit: { shirt: 0x19a85a, shorts: 0x101418, socks: 0x19a85a, trim: 0x0b3a24 },
-    squad: [pl('Durai', 1, { gk: true }), pl('Sabari', 45), pl('Venkatesh', 33), pl('Govind', 9), pl('Thananjay', 10), pl('Harsha', 7), pl('Vikrant Sahoo', 23, { short: 'Sahoo' }), pl('Pooja', 27), pl('Vasanth', 18), pl('Kavin', 11), pl('Jay', 3)],
+    squad: [pl('Durai', 1, { gk: true }), pl('Sabari', 45), pl('Vihaan', 33), pl('Govind', 9), pl('Thananjay', 10), pl('Harsha', 7), pl('Vikrant Sahoo', 23, { short: 'Sahoo' }), pl('Pooja', 27), pl('Vasanth', 18), pl('Kavin', 11), pl('Jay', 3)],
   },
   amh: {
     id: 'amh', name: 'Team AMH', short: 'AMH', color: '#1f9a5d', alt: '#ff9f1c',
@@ -231,7 +231,7 @@ function handleEvents(M) {
         const sc = e.scorer, min = Math.max(1, Math.ceil(((e.clock ?? M.clock) / (M.halfLen * 2)) * 90));
         banner('Goal!', sc ? `${sc.short} ${M.mode === 'match' ? min + "'" : ''}${e.own ? ' (own goal)' : ''}` : '', 2600);
         if (M.mode === 'match') { (e.team.scorers || (e.team.scorers = [])).push(`${sc ? sc.short : 'Own goal'} ${min}'${e.own ? ' (og)' : ''}`); ticker(`GOAL · ${e.team.name} ${M.teams[0].score}–${M.teams[1].score}`, e.team.def.color); }
-        G.goalCamT = 3.6;
+        G.goalCamT = 5.6; // the orbit round the dancers
         break;
       }
       case 'whistle': Sound.whistle(e.foul ? 'foul' : 'short'); break;

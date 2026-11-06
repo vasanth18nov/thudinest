@@ -98,7 +98,7 @@ export class Match {
     const s = you.dir, x = s * rand(18, 30), z = rand(-18, 18);
     this.ball.place(x, z);
     this.ball.owner = null;
-    for (const p of this.all) { p.state = 'move'; p.act = null; p.kick = null; p.vel.set(0, 0, 0); }
+    for (const p of this.all) { p.state = 'move'; p.act = null; p.kick = null; p.vel.set(0, 0, 0); if (p.body) p.body.stop(); }
     const [a, b] = you.players;
     a.pos.set(x - s * 1.2, 0, z); b.pos.set(x - s * 6, 0, -z * 0.4 + 6); a.yaw = b.yaw = yawOf(s, 0);
     const [gk, d1, d2] = this.teams[1].players;
@@ -785,7 +785,11 @@ export class Match {
     }
   }
   goalFor(team) {
-    if (this.mode === 'shootout') { this.emit('goal', { team, scorer: this.lastTouch, shootout: true }); return; }
+    if (this.mode === 'shootout') {
+      // a scored penalty: the taker dances
+      const tk = this.lastTouch; if (tk && tk.team === team && tk.body) { tk.want.set(0, 0, 0); tk.body.play('dance', { loop: true }); }
+      this.emit('goal', { team, scorer: tk, shootout: true }); return;
+    }
     const scorer = this.lastTouch && this.lastTouch.team === team ? this.lastTouch : null;
     const own = this.lastTouch && this.lastTouch.team !== team;
     if (this.shot && this.shot.team === team) team.stats.onTarget++;
@@ -827,13 +831,15 @@ export class Match {
       // the celebration
       const c = this.celebrant;
       if (c) {
-        if (this.phaseT > 1.6 && c.state === 'celebrate') { c.want.set(0, 0, 0); if (c.body && !c.body.reacting) c.body.play('cheer', { rate: 1.1 }); }
+        // the scorer stops and breaks into the silly dance; his teammates join in as they reach him
+        if (this.phaseT > 1.3 && c.state === 'celebrate') { c.want.set(0, 0, 0); c.vel.multiplyScalar(0.5); if (c.body && !c.body.reacting) c.body.play('dance', { loop: true }); }
         for (const p of c.team.players) if (p !== c && !p.keeper && p.state === 'move') {
-          const d = p.dist(c.pos); if (d > 2) { p.want.set(c.pos.x - p.pos.x, 0, c.pos.z - p.pos.z).normalize().multiplyScalar(Math.min(6, d)); p.face = c.pos; }
-          else p.want.set(0, 0, 0);
+          const d = p.dist(c.pos);
+          if (d > 2.6) { p.want.set(c.pos.x - p.pos.x, 0, c.pos.z - p.pos.z).normalize().multiplyScalar(Math.min(6, d)); p.face = c.pos; }
+          else { p.want.set(0, 0, 0); p.vel.multiplyScalar(0.6); p.face = c.pos; if (p.body && !p.body.reacting) p.body.play('dance', { loop: true, from: rand(0, 3), rate: rand(0.92, 1.08) }); }
         }
       }
-      if (this.phaseT > 4.2) {
+      if (this.phaseT > 6.2) {
         this.emit('fade');
         if (this.mode === 'practice') { this.practiceReset(); return; }
         if (this.checkTime(true)) return;
