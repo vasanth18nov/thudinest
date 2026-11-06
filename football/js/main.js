@@ -18,7 +18,7 @@ const TEAMS = {
   thudinest: {
     id: 'thudinest', name: 'Thudinest Coimbatore', short: 'THU', color: '#3b6ff0', alt: '#ffc53d',
     kit: { shirt: 0x2350b8, shorts: 0x1b3a80, socks: 0xffc53d, trim: 0xffc53d }, gkKit: { shirt: 0x19a85a, shorts: 0x101418, socks: 0x19a85a, trim: 0x0b3a24 },
-    squad: [pl('Durai', 1, { gk: true }), pl('Sabari', 45), pl('Vihaan', 33), pl('Govind', 9), pl('Thananjay', 10), pl('Harsha', 7), pl('Vikrant Sahoo', 23, { short: 'Sahoo' }), pl('Pooja', 27), pl('Vasanth', 18), pl('Kavin', 11), pl('Dhyaan', 3)],
+    squad: [pl('Durai', 1, { gk: true }), pl('Sabari', 45), pl('Vihaan', 33), pl('Govind', 9), pl('Thananjay', 10), pl('Harsha', 7), pl('Vikrant Sahoo', 23, { short: 'Sahoo' }), pl('Pooja', 27), pl('Vasanth', 18), pl('Kavin', 25), pl('Dhyaan', 3)],
   },
   amh: {
     id: 'amh', name: 'Team AMH', short: 'AMH', color: '#1f9a5d', alt: '#ff9f1c',

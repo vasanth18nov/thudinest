@@ -284,6 +284,39 @@ html.motion .stop { position: absolute; inset: 0 0 auto 0; border: 0; opacity: 0
 .pitch .roller { position: absolute; bottom: 30px; left: 0; width: 70px; z-index: 2; }
 html:not(.motion) .pitch .roller { left: 50%; margin-left: -35px; }
 
+/* ---- game time: Final Whistle, where the brothers are on the team sheet */
+.fw {
+  color: var(--white); overflow: hidden; padding: clamp(80px, 12vw, 130px) 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 22px),
+    radial-gradient(80% 70% at 85% 20%, #1d3f8f, transparent 70%),
+    linear-gradient(#0a1433, #0c1c45);
+}
+.fw .kicker { color: rgba(255,255,255,0.6); }
+.fw .lede { color: rgba(255,255,255,0.8); }
+.fw-grid { position: relative; display: grid; gap: 36px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .fw-grid { grid-template-columns: 1.1fr 0.9fr; } }
+.fw h2 { font-size: clamp(30px, 6.5vw, 56px); }
+.fw h2 em { font-style: normal; color: var(--yellow); }
+.sheet { margin: 22px 0 26px; max-width: 420px; background: var(--paper); color: var(--ink); border-radius: 16px; border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--yellow); overflow: hidden; }
+.sheet header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #2350b8; color: var(--white); font: 400 13px/1 'Rubik Mono One', sans-serif; letter-spacing: 0.03em; }
+.sheet header i { width: 16px; height: 16px; border-radius: 4px; background: linear-gradient(135deg, #2350b8 0 50%, #ffc53d 50%); border: 2px solid var(--white); }
+.sheet ol { list-style: none; margin: 0; padding: 6px 0; }
+.sheet li { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 10px; padding: 9px 14px; border-top: 1px dashed rgba(21,19,15,0.18); }
+.sheet li:first-child { border-top: 0; }
+.sheet li b { font: 400 22px/1 'Rubik Mono One', sans-serif; color: #2350b8; }
+.sheet li span { font-weight: 700; font-size: 17px; }
+.sheet li small { font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+.sheet li.star { background: rgba(255, 210, 63, 0.35); }
+.sheet li.star span::after { content: ' ★'; color: #e8392f; }
+.sheet .more { padding: 8px 14px 12px; font-size: 13px; color: var(--soft); }
+.fw-screen { display: block; border-radius: 20px; overflow: hidden; border: 3px solid #0d0d0c; box-shadow: 0 0 0 6px #1b2236, 0 40px 70px -24px rgba(0,0,0,0.8); position: relative; transform-origin: 50% 50%; }
+.fw-screen img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.fw-screen .go { position: absolute; right: 12px; bottom: 12px; width: 58px; height: 58px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+.fw-screen .go svg { width: 22px; height: 22px; margin-left: 3px; }
+.fw-wrap { perspective: 1200px; }
+
 /* ---- game time: Floodlit Over, under the lights */
 .cricket {
   background: radial-gradient(70% 60% at 50% 110%, #1d5a3a 0, transparent 70%), linear-gradient(#060b1c, #0b1633 60%, #0d2a24);
@@ -611,6 +644,35 @@ html.motion .grow-text p { position: absolute; left: 0; right: 0; bottom: 0; }
   <section class="pitch" aria-label="Match day">
     <h2 data-words>Every day<br>is match day</h2>
     <svg class="roller" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#fff" stroke="#15130f" stroke-width="3"/><path d="M32 18l10 7-4 12H26l-4-12z" fill="#15130f"/><path d="M32 18V4M42 25l13-5M38 37l9 12M26 37l-9 12M22 25L9 20" stroke="#15130f" stroke-width="3" fill="none"/></svg>
+  </section>
+
+  <!-- ============ GAME TIME: FOOTBALL ============ -->
+  <section class="fw" id="football-game" aria-label="Play Final Whistle, the football game">
+    <div class="wrap fw-grid">
+      <div class="fw-copy">
+        <p class="kicker">Game time · On the pitch</p>
+        <h2>They're on<br><em>the team sheet.</em></h2>
+        <p class="lede" data-words>Final Whistle is the 3D football game on Thudinest. Pick Thudinest Coimbatore and Vihaan and Dhyaan are in the eleven, and every goal ends in a silly dance.</p>
+        <div class="sheet">
+          <header><i aria-hidden="true"></i>Thudinest Coimbatore</header>
+          <ol>
+            <li class="star"><b>33</b><span>Vihaan</span><small>Defender</small></li>
+            <li class="star"><b>3</b><span>Dhyaan</span><small>Forward</small></li>
+            <li><b>25</b><span>Kavin</span><small>Forward</small></li>
+          </ol>
+          <p class="more">and eight more, with Durai in goal</p>
+        </div>
+        <a class="btn play-btn" href="/football/">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>Play Final Whistle
+        </a>
+      </div>
+      <div class="fw-wrap">
+        <a class="fw-screen" href="/football/" aria-label="Play Final Whistle">
+          <img src="/images/games/final-whistle.jpg" alt="Final Whistle: a striker running at goal under floodlights" width="800" height="450" loading="lazy">
+          <span class="go" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 3l12 7-12 7z" fill="#15130f"/></svg></span>
+        </a>
+      </div>
+    </div>
   </section>
 
   <!-- ============ GAME TIME: CRICKET ============ -->
@@ -1207,6 +1269,12 @@ html.motion .grow-text p { position: absolute; left: 0; right: 0; bottom: 0; }
     scrollTrigger: { trigger: '.pitch', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
   });
   gsap.from('.pitch h2', { scale: 0.6, ease: 'none', scrollTrigger: { trigger: '.pitch', start: 'top bottom', end: 'center center', scrub: true } });
+
+  // ---- game time: Final Whistle. The screen swings round to face you, the team sheet fills in a line at a time
+  const fw = $('.fw');
+  gsap.fromTo('.fw-copy', { y: 70, opacity: 0 }, { y: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: fw, start: 'top 85%', end: 'top 35%', scrub: true } });
+  gsap.fromTo('.fw-screen', { rotationY: -38, rotationX: 10, scale: 0.85, opacity: 0.3 }, { rotationY: 0, rotationX: 0, scale: 1, opacity: 1, ease: 'none', scrollTrigger: { trigger: '.fw-wrap', start: 'top 95%', end: 'top 40%', scrub: true } });
+  $$('.sheet li').forEach((li, i) => gsap.fromTo(li, { x: -60, opacity: 0 }, { x: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: '.sheet', start: `top ${88 - i * 7}%`, end: `top ${62 - i * 7}%`, scrub: true } }));
 
   // ---- game time: the floodlights warm up, the screen tips up into view, and a ball sails out for six
   const cr = $('.cricket');
