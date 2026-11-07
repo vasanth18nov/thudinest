@@ -1,0 +1,21 @@
+{
+  "edit_key_hash": "e155db686e48f33b27a946b2bcc6802ec7a71f3d56916490b5a99c4fba3d775d",
+  "updated_at": "2026-11-07T12:32:32.282Z",
+  "businessName": "Liquor shop",
+  "theme": "retail",
+  "description": "Test",
+  "phone": "",
+  "whatsapp": "",
+  "email": "test@gmail.com",
+  "address": "Selak selatan",
+  "images": [
+    "images/image-new-8adeb79f.jpg",
+    "images/image-new-30a89ad5.jpg",
+    "images/image-new-baea2f64.jpg",
+    "images/image-new-1798f9e2.jpg",
+    "images/image-new-336a44bc.jpg"
+  ],
+  "logo": "logo.jpg",
+  "social": {},
+  "cloud": null
+}
