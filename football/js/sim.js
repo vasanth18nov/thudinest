@@ -29,8 +29,11 @@ export class Player {
     this.pos = new V3(); this.vel = new V3(); this.want = new V3(); this.yaw = 0; this.yawRate = 0;
     this.state = 'move'; this.t = 0; this.act = null; this.kick = null;
     this.cool = 0; this.sprint = false; this.face = null; // face: a point to face instead of the way he moves
-    this.pace = rand(0.95, 1.05) * (role === 'FWD' ? 1.03 : role === 'GK' ? 0.92 : 1);
-    this.skill = rand(0.85, 1.1);
+    // the team's strength (a 0 to 100 rating; the club sides are 78) and his own: a star is quicker and surer
+    const q = team.q || 0, star = info.star ? 1 : 0;
+    this.star = !!info.star;
+    this.pace = rand(0.95, 1.05) * (role === 'FWD' ? 1.03 : role === 'GK' ? 0.92 : 1) * (1 + 0.015 * q) + star * 0.02;
+    this.skill = rand(0.88, 1.07) * (1 + 0.1 * q) + star * 0.1;
     this.thinkT = Math.random() * 0.3; this.plan = null; this.runTo = null; this.runT = 0;
     this.body = null; this.lateral = 0; this.lean = 0;
   }
@@ -43,13 +46,15 @@ export class Player {
 export class Team {
   constructor(def, side, size, human) {
     this.def = def; this.name = def.name; this.short = def.short; this.kit = def.kit; this.gkKit = def.gkKit;
+    this.q = clamp(((def.rate || 78) - 78) / 12, -1.2, 1.1);
     this.side = side; this.dir = side === 0 ? 1 : -1; this.human = human;
     this.score = 0; this.stats = { shots: 0, onTarget: 0, poss: 0, passes: 0, passOk: 0, tackles: 0, fouls: 0, corners: 0 };
     const form = FORMATIONS[size] || FORMATIONS[11];
     // the squad is listed as an XI (keeper, four defenders, three midfielders, three forwards); a seven picks its
     // centre-backs, the midfield and the centre-forward from it
     // a five takes the keeper, a centre-back, the two wide forwards as its wingers and the centre-forward as the pivot
-    const squad = def.squad, slots = size === 5 ? [0, 2, 8, 10, 9] : size === 7 ? [0, 2, 3, 5, 6, 7, 9] : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // (a side may name its own five, so its stars play on the futsal court)
+    const squad = def.squad, slots = size === 5 ? (def.five || [0, 2, 8, 10, 9]) : size === 7 ? (def.seven || [0, 2, 3, 5, 6, 7, 9]) : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     this.players = form.map(([role, u, v], i) => new Player(this, i, squad[slots[i]] || squad[i % squad.length], role, [u, v]));
     this.controlled = null; this.pens = [];
   }
@@ -72,6 +77,13 @@ export class Match {
     const size = this.mode === 'practice' ? 11 : o.size;
     this.teams = [new Team(o.teams[0], 0, size, o.human === 0), new Team(o.teams[1], 1, size, o.human === 1)];
     this.teams[0].opp = this.teams[1]; this.teams[1].opp = this.teams[0];
+    // each side plays to the difficulty, sharpened or blunted by its strength
+    for (const t of this.teams) {
+      // (not how often they decide or tackle, nor the side's pace: quicker legs overrun their own touches and passes)
+      const D = this.D, q = t.q;
+      t.D = { react: D.react * (1 - 0.25 * q), tackle: clamp(D.tackle * (1 + 0.2 * q), 0.2, 0.95), pass: D.pass * (1 - 0.3 * q), shot: D.shot * (1 - 0.3 * q),
+        keep: clamp(D.keep * (1 + 0.13 * q), 0.4, 0.95), pace: D.pace, think: D.think, humanKeep: clamp(0.8 * (1 + 0.09 * q), 0.6, 0.92) };
+    }
     if (this.mode === 'practice') {
       // you and a striker partner against two defenders and a keeper, at one end
       const keep = (t, idx) => { t.players = t.players.filter((p) => idx.includes(p.i)); };
@@ -132,7 +144,7 @@ export class Match {
     this.phase = 'dead'; this.phaseT = 0; this.after = { shootout: true, over, wait: 2.4 };
   }
   setRestart(type, team, spot = null, extra = {}) {
-    this.phase = 'restart'; this.phaseT = 0; this.pass = null; this.penaltyKick = false;
+    this.phase = 'restart'; this.phaseT = 0; this.pass = null; this.penaltyKick = false; this.penStruck = null;
     for (const p of this.all) { p.seen = null; p.guessed = false; p.penTarget = null; p.holding = false; }
     if (type === 'penalty' && this.mode === 'shootout') this.lastPen = { team, done: false };
     const b = this.ball; b.owner = null; b.vel.set(0, 0, 0); b.spin.set(0, 0, 0);
@@ -244,6 +256,15 @@ export class Match {
       this.emit('touch', { p });
     }
   }
+  /* the give and go: having laid it off, he bursts past his marker for the return (yours always; the computer's sometimes) */
+  giveAndGo(p, r, through) {
+    if (!r || p.keeper || this.phase !== 'play' || this.mode === 'shootout') return;
+    if (!p.team.human && Math.random() > (p.role === 'DEF' ? 0.15 : 0.45)) return;
+    const d = p.team.dir, ahead = (through ? 6 : 10) * P.kp;
+    const x = clamp(Math.max(r.pos.x * d, p.pos.x * d) * d + d * ahead, -P.HL + 2 * P.kp, P.HL - 2 * P.kp);
+    const z = clamp(p.pos.z + (p.pos.z - r.pos.z) * 0.35, -P.HW + 2 * P.kp, P.HW - 2 * P.kp);
+    p.goRun = { x, z, until: this.t + 2.4 };
+  }
   setControlled(team, p) { if (team.controlled !== p) { team.controlled = p; team.switchT = this.t; this.emit('switch', { p }); } }
 
   /* ------------------------------------------------------------ actions */
@@ -273,7 +294,7 @@ export class Match {
       if (!p.keeper) b.pos.z = clamp(b.pos.z, -P.HW + 0.15, P.HW - 0.15);
     } else if (b.owner === p && p.keeper && k.o.hands) b.pos.set(p.pos.x, 1.2, p.pos.z);
     else b.pos.y = P.ballR;
-    const from = b.pos, D = this.D, hum = p.team.human;
+    const from = b.pos, D = p.team.D, hum = p.team.human;
     const err = (sd) => (Math.random() + Math.random() + Math.random() - 1.5) * 1.15 * sd;
     let v;
     const to = k.to.clone();
@@ -290,6 +311,7 @@ export class Match {
       p.team.stats.shots++;
       const onT = Math.abs(to.z) < P.goalW && to.y < P.goalH;
       this.shot = { p, team: p.team, t: this.t, onTarget: onT, speed: s };
+      if (this.penaltyKick) this.penStruck = this.t;
       this.emit('shot', { p, speed: s });
     } else if (k.kind === 'pass' || k.kind === 'through') {
       const sd = (hum ? 0.022 : D.pass) / p.skill, dist = p.dist(to);
@@ -299,6 +321,7 @@ export class Match {
       p.team.stats.passes++;
       this.pass = { from: p, to: k.receiver, team: p.team, t: this.t, target: to };
       if (k.receiver && p.team.human && !k.o.noSwitch) this.setControlled(p.team, k.receiver);
+      this.giveAndGo(p, k.receiver, k.kind === 'through');
     } else {
       // lofted: crosses, long balls, clearances, throw-ins
       const dist = p.dist(to), sd = (hum ? 0.03 : D.pass * 1.3) / p.skill;
@@ -350,6 +373,8 @@ export class Match {
   /* ------------------------------------------------------------ the step */
   step(dt, input) {
     this.t += dt; this.phaseT += dt;
+    // a penalty in a match is over once the keeper has dealt with it or it has gone past: open play after it is open play
+    if (this.penaltyKick && this.mode !== 'shootout' && this.phase === 'play' && this.penStruck != null && this.t - this.penStruck > 1.6) this.penaltyKick = false;
     const b = this.ball;
     if (this.phase === 'play' || this.phase === 'restart') {
       if (this.mode === 'match' && this.phase === 'play') this.clock += dt;
@@ -432,7 +457,7 @@ export class Match {
       const cos = (dx * d.x + dz * d.z) / dist;
       if (cos < 0.25) continue;
       const lane = this.laneOpen(me, q.pos, team.opp);
-      const s = cos * 3 - dist / 35 + lane * 0.8 + (through && q.role === 'FWD' ? 0.6 : 0);
+      const s = cos * 3 - dist / 35 + lane * 0.8 + (through && q.role === 'FWD' ? 0.6 : 0) + (q.goRun ? 0.5 : 0); // the man on a give and go wants it back
       if (s > bs) { bs = s; best = q; }
     }
     return best;
@@ -642,8 +667,10 @@ export class Match {
       // a keeper gathers what he gets to; a shot may beat him (pace, and how far he had to go), be parried, or held
       const shot = this.shot && this.shot.team !== p.team && this.t - this.shot.t < 2.5;
       if (shot && rel > 11) {
-        const skill = P.walls ? Math.max(p.team.human ? 0.8 : this.D.keep, 0.68) * 1.16 : (p.team.human ? 0.8 : this.D.keep);
-        const chance = clamp(skill * (1.5 - rel / 44) * (p.state === 'dive' ? 0.95 : 1.08), 0.15, 0.97);
+        const skill = P.walls ? Math.max(p.team.human ? p.team.D.humanKeep : p.team.D.keep, 0.68) * 1.16 : (p.team.human ? p.team.D.humanKeep : p.team.D.keep);
+        let chance = clamp(skill * (1.5 - rel / 44) * (p.state === 'dive' ? 0.95 : 1.08), 0.15, 0.97);
+        // a penalty well struck beats even a keeper who went the right way, more often than not
+        if (this.penaltyKick) { chance *= P.walls ? 0.42 : 0.6; if (this.mode !== 'shootout') this.penaltyKick = false; }
         p.cool = 0.5;
         if (Math.random() > chance) { this.emit('beaten', { p }); return; }
         if (rel < (P.walls ? 25 : 21) && Math.random() < (P.walls ? 0.72 : 0.5)) this.keeperGather(p); else this.parry(p);
@@ -671,7 +698,7 @@ export class Match {
       const gk = t.opp.keeper, side = gk.pos.z > 0 ? -1 : 1;
       const aim = new V3(t.goalX, rand(0.2, 1.4), side * rand(1.2, P.goalW - 0.35));
       const d = Math.hypot(aim.x - b.pos.x, aim.z - b.pos.z), s = rand(12, 17);
-      const sd = (t.human ? 0.06 : this.D.shot * 1.1) / p.skill;
+      const sd = (t.human ? 0.06 : t.D.shot * 1.1) / p.skill;
       aim.z += (Math.random() - 0.5) * 2 * sd * d;
       v = new V3((aim.x - b.pos.x) / d * s, (aim.y - b.pos.y) / (d / s) - 0.5 * 9.81 * (d / s) * 0.1, (aim.z - b.pos.z) / d * s);
       t.stats.shots++;
@@ -722,7 +749,7 @@ export class Match {
     if (own && own.team === p.team) return;
     if (dBall < (slide ? 0.85 : 0.75) && b.pos.y < 0.8) {
       p.tackled = true;
-      const D = this.D;
+      const D = p.team.D;
       // a standing tackle can be shrugged off by a skilful dribbler; a slide that reaches the ball wins it
       const pWin = slide ? 0.9 : (p.team.human ? 0.7 : D.tackle) * (own ? 1.1 / own.skill : 1);
       if (Math.random() < pWin) {

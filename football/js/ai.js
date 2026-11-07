@@ -39,7 +39,7 @@ function ctx(M) {
 }
 // how soon p can get to the ball, following its roll
 function interceptTime(M, p) {
-  const b = M.ball, sp = SPEED.sprint * p.pace * M.D.pace;
+  const b = M.ball, sp = SPEED.sprint * p.pace * p.team.D.pace;
   let x = b.pos.x, z = b.pos.z, vx = b.vel.x, vz = b.vel.z, y = b.pos.y, vy = b.vel.y;
   for (let t = 0; t <= 3.2; t += 0.1) {
     if (t > 0) {
@@ -78,7 +78,7 @@ function goTo(p, tgt, top, out = p.want) {
 
 /* ---- an outfield player */
 export function think(M, p, dt) {
-  const b = M.ball, D = M.D, t = p.team, pace = p.pace * D.pace;
+  const b = M.ball, D = p.team.D, t = p.team, pace = p.pace * D.pace;
   p.face = null; p.sprint = false;
   if (M.phase === 'restart') return; // updateRestart holds everyone
   if (M.mode === 'shootout') { p.want.set(0, 0, 0); p.face = b.pos; return; }
@@ -113,12 +113,17 @@ export function think(M, p, dt) {
     shapeSpot(M, p, c.attacking, _a); goTo(p, _a, p.dist(_a) > 7 * P.kp ? SPEED.run * pace : SPEED.jog * pace); p.face = b.pos;
     return;
   }
-  if (own.team !== t) return defend(M, p, c, own, dt, pace);
+  if (own.team !== t) { p.goRun = null; return defend(M, p, c, own, dt, pace); }
+  // the run after a give and go: into the space past his marker, calling for the return
+  if (p.goRun) {
+    if (M.t > p.goRun.until || own === p) p.goRun = null;
+    else { goTo(p, _a.set(p.goRun.x, 0, p.goRun.z), SPEED.sprint * pace); p.sprint = true; p.face = b.pos; return; }
+  }
   return support(M, p, c, own, dt, pace);
 }
 
 function defend(M, p, c, own, dt, pace) {
-  const t = p.team, D = M.D, goal = _c.set(t.ownGoalX, 0, 0);
+  const t = p.team, D = t.D, goal = _c.set(t.ownGoalX, 0, 0);
   if (c.presser === p) {
     // goal side of him, closing; jockey when near; tackle when the ball is there to be won
     const gd = _a.subVectors(goal, own.pos).setY(0).normalize();
@@ -126,8 +131,10 @@ function defend(M, p, c, own, dt, pace) {
     const stand = d > 4 ? 1.4 : 0.9;
     _b.set(own.pos.x + gd.x * stand + own.vel.x * 0.25, 0, own.pos.z + gd.z * stand + own.vel.z * 0.25);
     goTo(p, _b, (d > 6 ? SPEED.sprint : d > 2.5 ? SPEED.run : SPEED.jog + 1) * pace); p.sprint = d > 6; p.face = own.pos;
-    if (d < 1.8 && p.cool <= 0 && Math.random() < dt * (0.45 + D.tackle * 1.3)) M.tackle(p, false);
-    else if (d > 1.8 && d < 3.4 && Math.hypot(own.vel.x, own.vel.z) > 5 && Math.random() < dt * D.tackle * 0.35) M.tackle(p, true);
+    // how often he goes in is the difficulty's; a stronger side wins more of them (sim.js tackle), it doesn't dive in more
+    const TR = M.D.tackle;
+    if (d < 1.8 && p.cool <= 0 && Math.random() < dt * (0.45 + TR * 1.3)) M.tackle(p, false);
+    else if (d > 1.8 && d < 3.4 && Math.hypot(own.vel.x, own.vel.z) > 5 && Math.random() < dt * TR * 0.35) M.tackle(p, true);
     return;
   }
   if (c.cover === p) {
@@ -169,7 +176,7 @@ function support(M, p, c, own, dt, pace) {
 
 /* ---- on the ball */
 function carrier(M, p, dt) {
-  const t = p.team, opp = t.opp, D = M.D, b = M.ball, pace = p.pace * D.pace;
+  const t = p.team, opp = t.opp, D = t.D, b = M.ball, pace = p.pace * D.pace;
   const goal = _c.set(t.goalX, 0, 0), distG = p.dist(goal);
   p.thinkT -= dt;
   // dribble: toward goal, away from opponents in front, inside the touchlines
@@ -259,9 +266,9 @@ function goalAngle(pos, gx) {
 
 /* ---- the keeper */
 export function thinkKeeper(M, p, dt) {
-  const t = p.team, b = M.ball, D = M.D, line = t.ownGoalX, fwd = t.dir;
+  const t = p.team, b = M.ball, D = t.D, line = t.ownGoalX, fwd = t.dir;
   p.face = b.pos; p.sprint = false;
-  const skill = t.human ? 0.8 : D.keep;
+  const skill = t.human ? D.humanKeep : D.keep;
   if (p.state === 'hold') {
     p.holdT -= dt; p.want.set(0, 0, 0);
     if (M.phase !== 'play') return;
@@ -300,7 +307,7 @@ export function thinkKeeper(M, p, dt) {
       let tz = threat.zc;
       if (M.penaltyKick && !p.guessed) {
         p.guessed = true;
-        const right = Math.random() < 0.4 + 0.25 * skill;
+        const right = Math.random() < 0.3 + 0.22 * skill; // keepers guess right about half the time
         if (M.mode === 'shootout' && t.human) tz = M.humanDive === null ? p.pos.z : M.humanDive * P.goalW * 0.78;
         else if (!right) tz = -Math.sign(threat.zc || 1) * rand(0.4, 0.76) * P.goalW;
         p.penTarget = tz;
@@ -357,9 +364,10 @@ export function restartChoice(M, r) {
   }
   if (r.type === 'penalty') {
     M.penaltyKick = true;
+    // into a corner (low mostly, sometimes high), now and then down the middle; scaled to the goal
     const side = Math.random() < 0.5 ? -1 : 1;
-    const aim = _a.set(t.goalX, Math.random() < 0.3 ? rand(1.3, 2.0) : rand(0.25, 0.8), side * (P.goalW - rand(0.5, 1.2)));
-    if (Math.random() < 0.12) aim.z = rand(-0.4, 0.4); // down the middle
+    const aim = _a.set(t.goalX, Math.random() < 0.28 ? rand(0.95, P.goalH * 0.74) : rand(0.2, 0.6), side * P.goalW * rand(0.52, 0.84));
+    if (Math.random() < 0.1) aim.z = rand(-0.15, 0.15) * P.goalW; // down the middle
     M.startKick(tk, 'shot', aim, rand(0.7, 0.88)); return;
   }
   if (r.type === 'throwin') {

@@ -9,6 +9,9 @@ import { Match, DT } from './sim.js';
 import { Cam } from './camera.js';
 import { Input, initInput, pollInput, consumeTaps } from './input.js';
 import { Sound } from './audio.js';
+import { NATIONS, GROUPS, REAL_2026 } from './nations.js';
+import { WC, ROUNDS } from './worldcup.js';
+import { Replay } from './replay.js';
 
 window.__booted = true;
 const loadBar = (p, step) => { $('loadBar').style.transform = `scaleX(${clamp(p, 0.04, 1).toFixed(3)})`; if (step) $('loadStep').textContent = step; };
@@ -38,6 +41,30 @@ const TEAMS = {
   },
 };
 const TEAM_IDS = Object.keys(TEAMS);
+// every side: the Thudinest clubs and the 48 nations of the 2026 World Cup (nations.js)
+const ALL = Object.assign({}, TEAMS, NATIONS);
+
+/* the kits for a match: the away side changes if the shirts are alike, and each keeper wears a colour unlike
+   both sides' shirts and the other keeper's */
+const rgbOf = (c) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
+const lumOf = (c) => { const [r, g, b] = rgbOf(c); return (r * 0.3 + g * 0.59 + b * 0.11) / 255; };
+function colDist(a, b) { const A = rgbOf(a), B = rgbOf(b); return Math.hypot((A[0] - B[0]) * 0.9, (A[1] - B[1]) * 1.2, (A[2] - B[2]) * 0.8) + Math.abs(lumOf(a) - lumOf(b)) * 90; }
+const GK_COLOURS = [0x19a85a, 0xff7a1a, 0x7b3fd1, 0xf2c51a, 0x15151a, 0xff4fa3, 0x2ad4e0, 0x8bd12a];
+function changeKit(def) { return def.away || (lumOf(def.kit.shirt) > 0.55 ? { shirt: 0x1d2440, shorts: 0x1d2440, socks: 0x1d2440, trim: 0xffffff } : { shirt: 0xf2f2f2, shorts: 0xf2f2f2, socks: 0xf2f2f2, trim: def.kit.shirt }); }
+function matchSides(da, db) {
+  const ka = da.kit; let kb = db.kit;
+  if (colDist(ka.shirt, kb.shirt) < 120) { const alt = changeKit(db); kb = colDist(ka.shirt, alt.shirt) >= 120 ? alt : (lumOf(ka.shirt) > 0.55 ? { shirt: 0x15151a, shorts: 0x15151a, socks: 0x15151a, trim: 0xffffff } : { shirt: 0xf2f2f2, shorts: 0xf2f2f2, socks: 0xf2f2f2, trim: 0x15151a }); }
+  const outfield = [ka.shirt, kb.shirt], used = [];
+  const gkFor = (def) => {
+    const ok = (c) => outfield.every((o) => colDist(o, c) > 140) && used.every((o) => colDist(o, c) > 140);
+    let g = def.gkKit && ok(def.gkKit.shirt) ? def.gkKit : null;
+    if (!g) { const c = GK_COLOURS.find(ok) ?? 0x15151a; g = { shirt: c, shorts: lumOf(c) > 0.5 ? 0x15151a : c, socks: c, trim: lumOf(c) > 0.5 ? 0x15151a : 0xffffff }; }
+    used.push(g.shirt); return g;
+  };
+  const css = (n) => '#' + n.toString(16).padStart(6, '0');
+  const side = (def, kit) => Object.assign({}, def, { kit, gkKit: gkFor(def), color: css(kit.shirt), alt: css(kit.trim === kit.shirt ? kit.shorts : kit.trim) });
+  return [side(da, ka), side(db, kb)];
+}
 
 /* ------------------------------------------------------------------ renderer and scene */
 if (COARSE) document.body.classList.add('touch-ui');
@@ -85,7 +112,7 @@ const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.32, 12), new THREE.M
 arrow.rotation.x = Math.PI; arrow.visible = false; scene.add(arrow);
 
 /* ------------------------------------------------------------------ loading the footballer */
-const G = { M: null, bodies: new Map(), cfg: null, paused: false, mats: {}, K: null, gl: null, camPref: store.get('cam', 'broadcast'), tickerN: 0, last: 0, acc: 0, over: false, goalCamT: 0 };
+const G = { rec: new Replay(), replay: false, replayAt: 0, skipReplay: false, M: null, bodies: new Map(), cfg: null, paused: false, mats: {}, K: null, gl: null, camPref: store.get('cam', 'broadcast'), tickerN: 0, last: 0, acc: 0, over: false, goalCamT: 0 };
 async function loadAssets() {
   const loader = new THREE.GLTFLoader();
   const glP = new Promise((res, rej) => loader.load('../cricket/players/footballer.glb', res, (e) => { if (e.total) loadBar(0.2 + 0.6 * (e.loaded / e.total), 'Lacing up the boots…'); }, rej));
@@ -95,9 +122,9 @@ async function loadAssets() {
   loadBar(0.88, 'Painting the kits…');
   await new Promise((r) => setTimeout(r, 0));
 }
-function matsFor(teamId, gk) {
-  const key = teamId + (gk ? ':gk' : '');
-  if (!G.mats[key]) G.mats[key] = kitMaterials(G.gl, gk ? TEAMS[teamId].gkKit : TEAMS[teamId].kit);
+function matsFor(kit) {
+  const key = [kit.shirt, kit.shorts, kit.socks, kit.trim].join(':');
+  if (!G.mats[key]) G.mats[key] = kitMaterials(G.gl, kit);
   return G.mats[key];
 }
 
@@ -118,7 +145,9 @@ function clearMatch() {
 function startMatch(cfg) {
   clearMatch();
   G.cfg = cfg; G.over = false; G.paused = false; G.goalCamT = 0;
-  const teams = [TEAMS[cfg.a], TEAMS[cfg.b]];
+  G.rec.reset(); G.replay = false; G.replayAt = 0; $('replayChip').hidden = true; document.body.classList.remove('replaying');
+  document.body.classList.toggle('pens', cfg.mode === 'shootout'); // no mini map for a shootout
+  const teams = matchSides(ALL[cfg.a], ALL[cfg.b]);
   const ground = cfg.ground || 'futsal';
   useGround(ground);
   const size = ground === 'futsal' ? 5 : cfg.size || 11;
@@ -126,7 +155,7 @@ function startMatch(cfg) {
   G.M = M;
   for (const t of M.teams) for (const p of t.players) {
     // his team's kit with his own number on the back
-    const base = matsFor(t.def.id, p.keeper), kit = p.keeper ? t.def.gkKit : t.def.kit;
+    const kit = p.keeper ? t.def.gkKit : t.def.kit, base = matsFor(kit);
     const b = new Body(scene, G.K, { Ch38_body: numberedMaterial(base.Ch38_body, p.num, kit.num ?? kit.trim), Ch38_hair: base.Ch38_hair });
     b.blob = new THREE.Mesh(blobGeo, blobMat); b.blob.renderOrder = 1; scene.add(b.blob);
     p.body = b; G.bodies.set(p.id, b);
@@ -144,11 +173,13 @@ function startMatch(cfg) {
   $('ticker').innerHTML = '';
   cam.setMode(cfg.mode === 'shootout' ? 'penalty' : G.camPref); cam.snap();
   if (cfg.mode === 'shootout') renderPens();
-  if (cfg.mode === 'match') banner(`${A.short} v ${B.short}`, `${A.name} against ${B.name}`, 2200);
+  if (cfg.mode === 'match') banner(`${A.short} v ${B.short}`, cfg.wc ? `World Cup 2026 · ${cfg.wc.label}` : `${A.name} against ${B.name}`, 2400);
+  if (cfg.mode === 'shootout' && cfg.wc) banner('Penalties', `${cfg.wc.label} · ${A.short} ${cfg.wcScore[0]}–${cfg.wcScore[1]} ${B.short}`, 2400);
   if (cfg.mode === 'practice') banner('Practice', 'Score past the keeper. New ball: R', 2200);
   Sound.init();
 }
-function hideAll() { for (const id of ['menu', 'setup', 'pause', 'half', 'full', 'help']) $(id).hidden = true; }
+function hideAll() { for (const id of ['menu', 'setup', 'pause', 'half', 'full', 'help', 'picker', 'wc']) $(id).hidden = true; }
+function toHub() { toMenu(); $('menu').hidden = true; openHub(); }
 function toMenu() {
   clearMatch(); hideAll(); $('hud').hidden = true; $('touch').classList.remove('live'); document.body.classList.remove('playing');
   $('menu').hidden = false; cam.setMode('end'); cam.snap();
@@ -263,6 +294,8 @@ function handleEvents(M) {
         banner('Goal!', sc ? `${sc.short} ${M.mode === 'match' ? min + "'" : ''}${e.own ? ' (own goal)' : ''}` : '', 2600);
         if (M.mode === 'match') { (e.team.scorers || (e.team.scorers = [])).push(`${sc ? sc.short : 'Own goal'} ${min}'${e.own ? ' (og)' : ''}`); ticker(`GOAL · ${e.team.name} ${M.teams[0].score}–${M.teams[1].score}`, e.team.def.color); }
         G.goalCamT = 5.6; // the orbit round the dancers
+        // the replay, once the celebration has begun
+        if (M.mode === 'match' && store.get('replays', true)) { G.goalRecT = G.rec.t; G.goalX = Math.sign(M.ball.pos.x || e.team.goalX) * P.HL; G.replayAt = performance.now() + 2700; }
         break;
       }
       case 'whistle': Sound.whistle(e.foul ? 'foul' : 'short'); break;
@@ -295,6 +328,14 @@ function handleEvents(M) {
           }
           Sound.roar(); GROUND.S.react?.('goal');
         }, 900);
+        // a World Cup match: the result goes in now; a knockout draw goes to penalties
+        const wcNext = G.cfg.wc ? wcFulltime(M) : null;
+        if (wcNext === 'pens') {
+          setTimeout(() => { if (G.M === M) banner('Penalties!', `${A.short} ${A.score}–${B.score} ${B.short} · it goes to a shootout`, 2600); }, 2800);
+          const c = G.cfg;
+          setTimeout(() => { if (G.M === M) startMatch({ mode: 'shootout', ground: c.ground, a: c.a, b: c.b, diff: c.diff, wc: c.wc, wcScore: [A.score, B.score] }); }, 5600);
+          break;
+        }
         setTimeout(() => { if (G.M === M) showResult('full'); }, 3200);
         break;
       }
@@ -329,6 +370,11 @@ function showResult(which) {
     const win = A.score > B.score ? A : B.score > A.score ? B : null;
     $('fullKick').textContent = win ? (win === A ? 'Full time · you win' : `Full time · ${win.name} win`) : M.mode === 'shootout' ? 'Shootout over' : 'Full time · a draw';
   }
+  if (which === 'full') {
+    const wc = !!G.cfg.wc;
+    $('rematchBtn').textContent = wc ? 'Continue' : 'Play again';
+    if (wc && M.mode === 'shootout') { const [p, q] = G.cfg.wcScore; $('fullScorers').innerHTML = `${p}–${q} after full time, ${A.score}–${B.score} on penalties`; }
+  }
   $(which).hidden = false;
 }
 const onT = (M, t) => t.stats.onTarget;
@@ -343,6 +389,13 @@ function frame(now) {
   if (Input.pauseTap) { Input.pauseTap = false; if (G.M && !G.over && $('half').hidden) togglePause(); }
   if (Input.camTap) { Input.camTap = false; cycleCam(); }
   const M = G.M;
+  // the goal replay: the match waits while it plays
+  if (M && G.replay && !G.paused) {
+    if (G.skipReplay || !G.rec.step(M, dt, camera)) endReplay(M);
+    GROUND.S.update(dt);
+    if (composer) composer.render(); else renderer.render(scene, camera);
+    return;
+  }
   if (M && !G.paused) {
     // the stick, as the camera sees it
     cam.groundDir(Input.x, Input.y, simIn.move);
@@ -368,7 +421,16 @@ function frame(now) {
     if (n) consumeTaps();
     if (G.acc > DT * 4) G.acc = 0;
     handleEvents(M);
+    if (G.replayAt && now >= G.replayAt) {
+      G.replayAt = 0;
+      if (M.phase === 'goal' && G.rec.start(G.goalRecT, G.goalX)) {
+        G.replay = true; G.skipReplay = false; $('replayChip').hidden = false; document.body.classList.add('replaying'); ring.visible = arrow.visible = false; $('tag').hidden = true;
+        $('banner').classList.remove('on');
+        return;
+      }
+    }
     poseAll(M, dt, now);
+    if (M.mode === 'match') G.rec.record(M, dt);
     // camera
     let mode = G.camPref, subject = null;
     const pen = M.restart && M.restart.type === 'penalty' || (M.penaltyKick && (M.phase === 'play' || M.phase === 'dead'));
@@ -390,6 +452,12 @@ function frame(now) {
   GROUND.S.hype = Math.max(GROUND.S.hype, Sound.hype * 0.9);
   GROUND.S.update(dt);
   if (composer) composer.render(); else renderer.render(scene, camera);
+}
+function endReplay(M) {
+  G.replay = false; G.skipReplay = false; $('replayChip').hidden = true; document.body.classList.remove('replaying');
+  // back to the celebration's last moments, then the kick-off
+  if (M.phase === 'goal') M.phaseT = Math.max(M.phaseT, 4.6);
+  G.goalCamT = Math.min(G.goalCamT, 1.4); G.acc = 0; cam.snap(); consumeTaps();
 }
 function poseAll(M, dt, now) {
   const me = M.human && M.human.controlled, has = me && M.ball.owner === me;
@@ -425,48 +493,143 @@ function resize() {
 addEventListener('resize', resize);
 
 /* ------------------------------------------------------------------ menus */
-const cfgStore = { a: store.get('teamA', 'thudinest'), b: store.get('teamB', 'world'), diff: store.get('diff', 'medium'), half: store.get('half', 180), size: store.get('size', LITE ? 7 : 11), ground: store.get('ground', 'futsal') };
+const cfgStore = { a: store.get('teamA', 'thudinest'), b: store.get('teamB', 'world'), wcTeam: store.get('wcTeam', 'esp'), diff: store.get('diff', 'medium'), half: store.get('half', 180), size: store.get('size', LITE ? 7 : 11), ground: store.get('ground', 'futsal') };
 if (cfgStore.ground !== 'stadium') cfgStore.ground = 'futsal';
-if (!TEAMS[cfgStore.a]) cfgStore.a = 'thudinest';
-if (!TEAMS[cfgStore.b] || cfgStore.b === cfgStore.a) cfgStore.b = TEAM_IDS.find((t) => t !== cfgStore.a);
+if (!ALL[cfgStore.a]) cfgStore.a = 'thudinest';
+if (!ALL[cfgStore.b] || cfgStore.b === cfgStore.a) cfgStore.b = TEAM_IDS.find((t) => t !== cfgStore.a);
+if (!NATIONS[cfgStore.wcTeam]) cfgStore.wcTeam = 'esp';
 let setupMode = 'match';
+
+/* a side's badge: the flag for a nation, the kit colours for a club */
+const badge = (id, cls = '') => { const t = ALL[id]; return t.flag ? `<img class="flag ${cls}" src="${t.flag}" alt="">` : `<span class="kitsw ${cls === 'lg' || cls === '' ? 'big' : ''}" style="--a:${t.color};--b:${t.alt}"></span>`; };
+const strength = (id) => { const r = ALL[id].rate || 78, n = clamp(Math.round((r - 60) / 6), 1, 5); return `<span class="str" title="Strength ${r}">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'f' : ''}"></i>`).join('')}</span>`; };
+const subOf = (id) => { const t = ALL[id]; return t.nation ? `Group ${t.group} · strength ${t.rate}` : 'Thudinest side'; };
+function teamCard(el, id) { el.innerHTML = `${badge(id)}<span><b>${ALL[id].name}</b><small>${subOf(id)}</small></span><span class="chev">›</span>`; }
+
+/* the picker: the clubs, or the 48 nations by group */
+let pickFor = null;
+function openPicker(key) {
+  pickFor = key;
+  const nationsOnly = key === 'wc';
+  $('pickTabs').hidden = nationsOnly;
+  $('pickKick').textContent = key === 'wc' ? 'Choose your nation' : key === 'a' ? 'Your team' : 'Opponent';
+  const cur = key === 'wc' ? cfgStore.wcTeam : cfgStore[key];
+  const tab = nationsOnly ? 'wc' : (ALL[cur].nation ? 'wc' : 'clubs');
+  paintPicker(tab); $('picker').hidden = false;
+}
+function paintPicker(tab) {
+  const key = pickFor, cur = key === 'wc' ? cfgStore.wcTeam : cfgStore[key], other = key === 'a' ? cfgStore.b : key === 'b' ? cfgStore.a : null;
+  $('pickTabs').querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.tab === tab); b.onclick = () => paintPicker(b.dataset.tab); });
+  const btn = (id) => `<button class="pteam ${id === cur ? 'on' : ''}" data-t="${id}" ${id === other ? 'disabled' : ''}>${badge(id, 'sm')}<span class="nm">${ALL[id].name}</span>${ALL[id].nation ? strength(id) : ''}</button>`;
+  $('pickBody').innerHTML = tab === 'clubs'
+    ? `<div class="pclubs">${TEAM_IDS.map(btn).join('')}</div>`
+    : `<div class="pgroups">${Object.keys(GROUPS).map((g) => `<div class="pgroup"><h4>Group ${g}</h4>${GROUPS[g].map(btn).join('')}</div>`).join('')}</div>`;
+  $('pickBody').querySelectorAll('.pteam').forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset.t;
+    if (key === 'wc') { cfgStore.wcTeam = id; store.set('wcTeam', id); } else { cfgStore[key] = id; store.set(key === 'a' ? 'teamA' : 'teamB', id); }
+    $('picker').hidden = true; paintPickers();
+  }));
+}
 function paintPickers() {
-  for (const [id, key, other] of [['pickA', 'a', 'b'], ['pickB', 'b', 'a']]) {
-    $(id).innerHTML = TEAM_IDS.map((t) => `<button data-t="${t}" class="${cfgStore[key] === t ? 'on' : ''}" ${cfgStore[other] === t ? 'disabled' : ''}><span class="kitsw" style="--a:${TEAMS[t].color};--b:${TEAMS[t].alt}"></span>${TEAMS[t].name}</button>`).join('');
-    $(id).querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { cfgStore[key] = b.dataset.t; store.set(key === 'a' ? 'teamA' : 'teamB', b.dataset.t); paintPickers(); }));
-  }
+  teamCard($('pickA'), setupMode === 'wc' ? cfgStore.wcTeam : cfgStore.a); teamCard($('pickB'), cfgStore.b);
+  $('pickA').onclick = () => openPicker(setupMode === 'wc' ? 'wc' : 'a'); $('pickB').onclick = () => openPicker('b');
+  $('pickBWrap').hidden = $('setupVs').hidden = setupMode === 'wc';
   const seg = (id, key) => $(id).querySelectorAll('button').forEach((b) => {
     b.classList.toggle('on', String(cfgStore[key]) === b.dataset.v);
     b.onclick = () => { cfgStore[key] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; store.set(key, cfgStore[key]); paintPickers(); };
   });
   seg('segDiff', 'diff'); seg('segLen', 'half'); seg('segSize', 'size'); seg('segGround', 'ground');
   // team size only applies in the stadium (futsal is five a side)
-  $('sizeField').hidden = setupMode !== 'match' || cfgStore.ground !== 'stadium';
+  $('sizeField').hidden = setupMode === 'shootout' || cfgStore.ground !== 'stadium';
 }
 function openSetup(mode) {
-  setupMode = mode; hideAll(); paintPickers();
-  $('setupKick').textContent = mode === 'shootout' ? 'Penalty shootout' : 'Player vs AI';
-  $('setupTitle').textContent = mode === 'shootout' ? 'Shootout setup' : 'Match setup';
-  document.querySelectorAll('[data-for="match"]').forEach((el) => (el.hidden = mode !== 'match'));
+  setupMode = mode; hideAll();
+  $('setupKick').textContent = mode === 'shootout' ? 'Penalty shootout' : mode === 'wc' ? 'World Cup 2026' : 'Player vs AI';
+  $('setupTitle').textContent = mode === 'shootout' ? 'Shootout setup' : mode === 'wc' ? 'Your nation' : 'Match setup';
+  document.querySelectorAll('[data-for="match"]').forEach((el) => (el.hidden = mode === 'shootout'));
   paintPickers();
-  $('kickoffBtn').textContent = mode === 'shootout' ? 'To the spot' : 'Kick off';
+  $('kickoffBtn').textContent = mode === 'shootout' ? 'To the spot' : mode === 'wc' ? 'Start the World Cup' : 'Kick off';
   $('setup').hidden = false;
+}
+
+/* ------------------------------------------------------------------ the World Cup hub */
+const roundsShort = ['R32', 'R16', 'QF', 'SF', 'Final'];
+function tableHTML(g, mine, full = true) {
+  const rows = WC.table(g);
+  const thirds = WC.s.thirds || [];
+  return `<thead><tr><th style="text-align:left">${full ? '' : 'Group ' + g}</th><th>P</th>${full ? '<th>W</th><th>D</th><th>L</th>' : ''}<th>GD</th><th>Pts</th></tr></thead><tbody>${rows.map((r, i) => {
+    const q = WC.s.stage === 'ko' ? (i < 2 ? 'q' : thirds.includes(r.id) ? 'q3' : '') : '';
+    return `<tr class="${r.id === mine ? 'me' : ''} ${q}"><td class="tm">${badge(r.id, 'sm')}${full ? ALL[r.id].name : ALL[r.id].short}</td><td>${r.p}</td>${full ? `<td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>` : ''}<td>${r.gf - r.ga > 0 ? '+' : ''}${r.gf - r.ga}</td><td><b>${r.pts}</b></td></tr>`;
+  }).join('')}</tbody>`;
+}
+function openHub() {
+  hideAll(); const s = WC.s, me = s.team, T = NATIONS[me];
+  $('wcFlag').src = T.flag; $('wcName').textContent = T.name;
+  $('wcSub').textContent = `Group ${T.group} · strength ${T.rate} · ${({ easy: 'easy', medium: 'medium', hard: 'hard' })[s.diff]} · ${s.ground === 'futsal' ? 'futsal court' : 'stadium'}`;
+  const nx = WC.next(), st = $('wcStatus');
+  st.className = 'wcstatus';
+  if (s.champion === me) { st.classList.add('champ'); st.innerHTML = `<span class="big">World champions</span>${T.name} have won the 2026 World Cup.<span class="real">In the real tournament, ${REAL_2026.final}</span>`; }
+  else if (s.out) {
+    st.classList.add('out');
+    st.innerHTML = `<span class="big">${s.out.stage === 'Group stage' ? 'Out in the group' : `Out in the ${s.out.stage.toLowerCase()}`}</span>${s.out.by ? `Beaten by ${ALL[s.out.by].name}. ` : ''}${ALL[s.champion].name} went on to win the cup in this run.<span class="real">In the real tournament, ${REAL_2026.final}</span>`;
+  } else if (s.stage === 'group') st.innerHTML = s.md === 0 ? `Three group games. The top two in each group go through, with the eight best third-placed sides.` : `Matchday ${s.md + 1} of 3.`;
+  else st.innerHTML = `Through to the ${ROUNDS[s.ko.round].toLowerCase()}. Lose and you go home; a draw goes to penalties.`;
+  if (nx) {
+    $('wcNext').hidden = false;
+    $('wcNext').innerHTML = `<div class="side">${badge(me)}${T.short}</div><div class="mid"><small>${nx.label}</small><b>v</b><button class="btn" id="wcPlay">${nx.knockout ? (nx.label === 'Final' ? 'Play the final' : 'Play') : `Play matchday ${s.md + 1}`}</button></div><div class="side r">${ALL[nx.opp].short}${badge(nx.opp)}</div>`;
+    $('wcPlay').onclick = () => playWC();
+  } else $('wcNext').hidden = true;
+  $('wcTableTitle').textContent = `Group ${T.group}`;
+  $('wcTable').innerHTML = tableHTML(T.group, me);
+  $('wcLog').innerHTML = s.log.length ? s.log.map((l) => {
+    const r = l.gf > l.ga || (l.pens && l.pens[0] > l.pens[1]) ? 'w' : l.gf < l.ga || (l.pens && l.pens[0] < l.pens[1]) ? 'l' : 'd';
+    return `<li>${badge(l.opp, 'sm')}<span>${ALL[l.opp].name}</span><small>${l.label.replace(/^Group . · /, '')}</small><span class="res ${r}">${l.gf}–${l.ga}${l.pens ? ` <small>(${l.pens[0]}–${l.pens[1]} p)</small>` : ''}</span></li>`;
+  }).join('') : '<li><small>Your results will appear here.</small></li>';
+  $('wcGroups').innerHTML = Object.keys(GROUPS).map((g) => `<table class="tbl">${tableHTML(g, me, false)}</table>`).join('');
+  $('wcBracketBox').hidden = !s.ko;
+  if (s.ko) {
+    $('wcBracket').innerHTML = s.ko.rounds.map((ties, i) => `<div><h4>${ROUNDS[i]}</h4><div class="ties">${ties.map((t) => {
+      const sc = (x) => (t.w ? `${x === 'a' ? t.ga : t.gb}${t.pa !== undefined ? `<small> (${x === 'a' ? t.pa : t.pb})</small>` : ''}` : '');
+      const row = (x) => `<span class="${t.w && t.w !== t[x] ? 'lost' : ''}">${badge(t[x], 'sm')}${ALL[t[x]].short}</span><b>${sc(x)}</b>`;
+      return `<div class="tie ${t.a === me || t.b === me ? 'me' : ''}">${row('a')}${row('b')}</div>`;
+    }).join('')}</div></div>`).join('');
+  }
+  $('wc').hidden = false;
+}
+function playWC() {
+  const s = WC.s, nx = WC.next(); if (!nx) return;
+  startMatch({ mode: 'match', ground: s.ground, a: s.team, b: nx.opp, diff: s.diff, half: s.half, size: s.size, wc: nx });
+}
+/* a World Cup match is over: the result goes in at once (a knockout draw first goes to penalties) */
+function wcFulltime(M) {
+  const cfg = G.cfg, [A, B] = M.teams;
+  if (cfg.mode === 'shootout') { WC.record(cfg.wcScore[0], cfg.wcScore[1], [A.score, B.score]); return 'done'; }
+  if (cfg.wc.knockout && A.score === B.score) return 'pens';
+  WC.record(A.score, B.score); return 'done';
 }
 function wireMenus() {
   document.querySelectorAll('.mode').forEach((b) => b.addEventListener('click', () => {
     Sound.init();
     const m = b.dataset.mode;
-    if (m === 'quick') { const opp = pick(TEAM_IDS.filter((t) => t !== cfgStore.a)); startMatch({ mode: 'match', ground: 'futsal', a: cfgStore.a, b: opp, diff: 'medium', half: 150 }); }
+    if (m === 'quick') { const opp = pick((ALL[cfgStore.a].nation ? Object.keys(NATIONS) : TEAM_IDS).filter((t) => t !== cfgStore.a)); startMatch({ mode: 'match', ground: 'futsal', a: cfgStore.a, b: opp, diff: 'medium', half: 150 }); }
     else if (m === 'match' || m === 'shootout') openSetup(m);
+    else if (m === 'wc') { if (WC.load()) { hideAll(); openHub(); } else openSetup('wc'); }
     else if (m === 'practice') startMatch({ mode: 'practice', ground: cfgStore.ground, a: cfgStore.a, b: cfgStore.b === cfgStore.a ? 'world' : cfgStore.b, diff: cfgStore.diff });
   }));
-  $('kickoffBtn').onclick = () => startMatch(setupMode === 'shootout' ? { mode: 'shootout', ground: cfgStore.ground, a: cfgStore.a, b: cfgStore.b, diff: cfgStore.diff } : { mode: 'match', ground: cfgStore.ground, a: cfgStore.a, b: cfgStore.b, diff: cfgStore.diff, half: cfgStore.half, size: cfgStore.size });
+  $('pickClose').onclick = () => { $('picker').hidden = true; };
+  $('wcMenu').onclick = () => { hideAll(); $('menu').hidden = false; };
+  $('wcQuit').onclick = () => {
+    const b = $('wcQuit');
+    if (b.dataset.armed) { WC.clear(); delete b.dataset.armed; b.textContent = 'Abandon this run'; openSetup('wc'); return; }
+    b.dataset.armed = '1'; b.textContent = 'Tap again to abandon'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'Abandon this run'; }, 3000);
+  };
+  $('kickoffBtn').onclick = () => setupMode === 'wc' ? (WC.start(cfgStore.wcTeam, { diff: cfgStore.diff, half: cfgStore.half, ground: cfgStore.ground, size: cfgStore.size }), openHub()) : startMatch(setupMode === 'shootout' ? { mode: 'shootout', ground: cfgStore.ground, a: cfgStore.a, b: cfgStore.b, diff: cfgStore.diff } : { mode: 'match', ground: cfgStore.ground, a: cfgStore.a, b: cfgStore.b, diff: cfgStore.diff, half: cfgStore.half, size: cfgStore.size });
   $('setupBack').onclick = () => { hideAll(); $('menu').hidden = false; };
   $('pauseBtn').onclick = () => togglePause();
   $('camBtn').onclick = () => cycleCam();
   $('resumeBtn').onclick = () => togglePause(false);
   $('restartBtn').onclick = () => startMatch(G.cfg);
-  $('quitBtn').onclick = () => toMenu();
+  $('quitBtn').onclick = () => (G.cfg && G.cfg.wc && WC.s ? toHub() : toMenu());
   $('pauseCam').onclick = () => cycleCam();
   $('camMenuBtn').onclick = () => cycleCam();
   const soundLab = () => { const t = `Sound: ${Sound.on ? 'on' : 'off'}`; $('soundBtn').textContent = t; $('pauseSound').textContent = t; };
@@ -476,7 +639,7 @@ function wireMenus() {
   const openHelp = () => { $('help').hidden = false; };
   $('helpBtn').onclick = openHelp; $('pauseHelp').onclick = openHelp; $('helpClose').onclick = () => { $('help').hidden = true; };
   $('secondHalfBtn').onclick = () => { $('half').hidden = true; if (G.M) { G.M.resumeOK = true; fade(); } };
-  $('rematchBtn').onclick = () => startMatch(G.cfg);
+  $('rematchBtn').onclick = () => (G.cfg && G.cfg.wc ? toHub() : startMatch(G.cfg));
   $('fullMenuBtn').onclick = () => toMenu();
   $('prReset').onclick = () => { if (G.M) { G.M.practiceReset(); fade(); } };
   $('rotateDismiss').onclick = () => $('rotate').classList.remove('allow');
@@ -487,23 +650,25 @@ function wireMenus() {
 async function boot() {
   resize();
   initInput(() => Sound.init());
+  const skip = () => { if (G.replay) G.skipReplay = true; };
+  addEventListener('pointerdown', skip, true); addEventListener('keydown', skip, true);
   wireMenus();
   requestAnimationFrame(frame);
   try { await loadAssets(); }
   catch (e) { window.__fatal('The players could not be loaded.', e && e.message); throw e; }
   // warm the kits for the default sides so the first kick-off is quick
-  matsFor(cfgStore.a, false); matsFor(cfgStore.b, false);
+  { const [a, b] = matchSides(ALL[cfgStore.a], ALL[cfgStore.b]); matsFor(a.kit); matsFor(b.kit); }
   loadBar(1, 'Ready');
   $('loader').hidden = true;
   const q = params.get('play');
-  if (q === 'quick' || q === 'match') startMatch({ mode: 'match', a: cfgStore.a, b: params.get('vs') && TEAMS[params.get('vs')] ? params.get('vs') : cfgStore.b, diff: params.get('diff') || 'medium', half: +params.get('half') || 150, ground: params.get('ground') === 'stadium' ? 'stadium' : 'futsal', size: +params.get('size') || (LITE ? 7 : 11) });
+  if (q === 'quick' || q === 'match') startMatch({ mode: 'match', a: params.get('as') && ALL[params.get('as')] ? params.get('as') : cfgStore.a, b: params.get('vs') && ALL[params.get('vs')] ? params.get('vs') : cfgStore.b, diff: params.get('diff') || 'medium', half: +params.get('half') || 150, ground: params.get('ground') === 'stadium' ? 'stadium' : 'futsal', size: +params.get('size') || (LITE ? 7 : 11) });
   else if (q === 'shootout') startMatch({ mode: 'shootout', ground: params.get('ground') === 'stadium' ? 'stadium' : 'futsal', a: cfgStore.a, b: cfgStore.b, diff: 'medium' });
   else if (q === 'practice') startMatch({ mode: 'practice', ground: params.get('ground') === 'stadium' ? 'stadium' : 'futsal', a: cfgStore.a, b: cfgStore.b, diff: 'medium' });
   else $('menu').hidden = false;
 }
 boot();
 if (DEBUG) window.__fw = {
-  G, TEAMS, cam, camera, scene, Input, startMatch, get M() { return G.M; }, get S() { return GROUND.S; },
+  G, TEAMS, cam, camera, scene, Input, startMatch, get M() { return G.M; }, get S() { return GROUND.S; }, WC, openHub, ALL,
   draw() { if (composer) composer.render(); else renderer.render(scene, camera); },
   // step the match n times (no input) and draw that moment from a camera mode
   shot(n, mode, o = {}) {

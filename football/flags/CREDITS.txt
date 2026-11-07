@@ -1,0 +1,2 @@
+Flags: Twemoji by Twitter, Inc and other contributors, https://github.com/twitter/twemoji
+Licensed under CC BY 4.0, https://creativecommons.org/licenses/by/4.0/

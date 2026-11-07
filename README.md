@@ -311,11 +311,17 @@ are no throw-ins, corners or goal kicks; a covered stand along the far side and 
 supporters, the clubhouse, coconut palms and the city lights around it, `js/futsal.js`) and the **stadium** (a full-size 105 x 68 m pitch, eleven or seven a side,
 `js/stadium.js`). The ground is chosen in Player vs AI setup and remembered; Quick match always goes to the futsal
 court. Every player's own squad number is painted on the back of his shirt (the footballer's printed 7 is removed,
-`numberedMaterial` in `js/kit.js`). The menu offers four modes:
+`numberedMaterial` in `js/kit.js`). The menu offers five modes:
 
 - **Quick match**: your saved side against a random opponent on the futsal court, medium difficulty, 2½-minute halves
+- **World Cup 2026**: pick one of the 48 nations of the 2026 World Cup and take it through its real group (three
+  matchdays; the other results are played out from the sides' ratings), then the 48-team format's round of 32 (the
+  twelve winners, twelve runners-up and eight best third-placed sides), last 16, quarter-finals, semi-finals and the
+  final. A knockout draw goes to a penalty shootout you take. The hub shows your fixture, your group table, your road,
+  the bracket and all twelve groups; the run is saved in the browser as you go (`js/worldcup.js`). At the end it
+  tells you how it really finished: Spain beat Argentina 1–0 after extra time on 19 July 2026.
 - **Player vs AI**: pick the ground and both sides (Thudinest Coimbatore, Team AMH, Ragging Bulls, World XI, the sides and names
-  from Floodlit Over), the difficulty (easy, medium, hard), the half length (2, 3, 5 or 7½ minutes, shown as two
+  from Floodlit Over, or any of the 48 nations), the difficulty (easy, medium, hard), the half length (2, 3, 5 or 7½ minutes, shown as two
   45-minute halves) and the team size (11 a side, or 7 a side, the default on phones)
 - **Penalty shootout**: five each at the same goal, then sudden death; you take your side's kicks and keep goal
   for theirs (push a side as he runs up to choose your dive)
@@ -375,10 +381,21 @@ the game is heard with the silent switch on.
 
 Files: `football/index.html` (HUD, menus, styles), `football/js/main.js` (boot, menus, loop, drawing),
 `sim.js` (the match), `ai.js`, `rig.js`, `kit.js`, `ball.js`, `kicks.js`, `stadium.js`, `futsal.js`, `fans.js`,
+`nations.js`, `worldcup.js`, `replay.js`,
 `camera.js`, `input.js`, `audio.js`. It uses the three.js r170 bundle from Rally Point (`bm/vendor/three.js`) and the
 cricket game's player models and clips; its only assets of its own are the baked supporters in `football/models`. Add `?lite` for the lighter renderer (no bloom, a smaller crowd and
 shadow map; automatic on phones), `?play=quick`, `?play=shootout` or `?play=practice` to skip the menu, and `?debug`
 for `window.__fw` (add `&ground=stadium` to the `?play=` links for the big pitch; the match, `shot(n, camera)` to step and draw a moment, `perf()` for the cost of a frame).
+
+**The nations** (`js/nations.js`): each of the 48 has its real group, home and change colours, a strength rating
+(0 to 100) and a starting XI from its final 2026 squad with the numbers they wore (from the squad lists on Wikipedia,
+football365, the Croatian federation, SI and Seneweb; stars are marked `*`), plus the five it sends out on the futsal
+court. The rating makes a side's passing, shooting, tackling, keeping and reactions surer or shakier (not its pace or
+how often it goes into tackles, which the matches showed backfires). Flags are Twemoji (CC BY 4.0, `football/flags`).
+
+**Goal replays** (`js/replay.js`): the last eight seconds are recorded every frame (each player's place and the 20
+bones of his pose, the ball); after a goal the build-up plays back from a low camera beside the goal, slowing as the
+ball goes in. A tap or key skips it.
 
 **Changing a squad** — edit `TEAMS` at the top of `football/js/main.js` (name, short name, colours, kit and
 keeper's kit, and the XI in order: keeper, four defenders, three midfielders, three forwards).
