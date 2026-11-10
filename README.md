@@ -303,6 +303,43 @@ How it works:
 Build tools and the headless tests (Playwright on the Mac's GPU, and Node
 match simulations) are in `~/thudinest-assets/bm/`.
 
+## Set Point (`/tennis/`)
+
+A 3D tennis game: singles on centre court at the Thudinest Open, a floodlit stadium at twilight. You play the near
+end against the computer at three levels (Club, Challenger, Grand Slam), in the broadcast view or courtside. Three
+formats: Quick (first to four games, a tiebreak at 3 all), a set to six, or best of three sets, with real scoring
+(15, 30, 40, deuce, advantage, tiebreaks to seven, the serve changing every game and every two points in a tiebreak).
+
+- **The tennis** (`js/sim.js`, no graphics, so it runs headless in Node for test matches): the ball flies with drag and
+  the Magnus lift of its spin (topspin dips and kicks, slice floats and skids), bounces off the hard court with
+  friction that grips or skids it, and clips the tape now and then. A solver finds the launch that lands each shot where
+  it was aimed and clears the net by the shot's margin; then a mishit spreads it by timing and skill. Shots: topspin,
+  flat (a perfectly timed topspin from inside the baseline), slice, drop shot, lob, volley, drop volley, smash; serves
+  flat, kick and slice, with faults, double faults and lets. Each player plans where to take the ball (a groundstroke
+  as it falls through a metre after the bounce, on the rise when it would push him far back, a volley before the bounce
+  at the net, an overhead on a lob) and runs there; a short ball attacked takes him to the net.
+- **The computer** reads the ball late or early by its level, lets go a ball it judges out, mixes topspin, slice,
+  lobs against a net player, drop shots against a deep one, approach shots and passing shots, and aims away from you,
+  nearer the lines the better it is. Headless test matches between the levels give about 60% of first serves in, rallies
+  of four to seven shots, and winners and errors in roughly equal numbers; the stronger level wins every match.
+- **Controls**: three shots (J topspin, K slice or with the stick pulled back a drop shot, L lob; at the net a volley, a
+  drop volley or a lob; over your head a smash) and the same three for the serve (flat, kick, slice). Press just before
+  the ball arrives: the ring under your feet lights up while a press would be Perfect. Auto-run takes you to the ball
+  and the stick aims; with it off the stick moves you.
+- **The look**: Rally Point's players, clips and IK, with tennis strokes keyed for a right-hander (a low-to-high
+  forehand, a two-handed backhand, slices, volleys, the serve with its toss, trophy position and racket drop, the smash)
+  and 68.5 cm rackets. A blue acrylic court inside green, the net with its centre strap and singles sticks, LED boards,
+  four stands of seats whose front rows are Final Whistle's real spectators (they clap, hold their heads, stand up for a
+  big point) and the rows above an instanced crowd, floodlight masts, the umpire in his chair, a score screen, a
+  twilight sky with stars and the moon.
+- **The broadcast**: score bug with sets, games and points, the umpire's calls spoken ("Fifteen love", "Deuce",
+  "Advantage", "Game, set and match"), serve speeds, Perfect timing, break, set and match points, line reviews on
+  close calls (the ball's mark, in or out by so many millimetres), replays of the best points, and full match stats
+  (aces, double faults, first serves in, fastest serve, winners, errors, break points and net points won).
+
+Files: `tennis/index.html`, `tennis/js/sim.js`, `tennis/js/game.js`, `tennis/og.jpg`; it loads three.js, the players,
+the clips and the crowd sounds from `bm/` and the spectators from `football/models`.
+
 ## Final Whistle (`/football/`)
 
 A standalone 3D football game with two grounds: the **futsal court** (the default; a 40 x 20 m artificial-turf court
