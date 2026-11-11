@@ -9,6 +9,8 @@ Deployed via Netlify → add your Netlify URL here.
 ## What's Inside
 
 - **Landing page** — Property details, photo gallery, amenities, house rules
+  - Scroll driven: the hero photo opens from a window to the full screen, the rooms slide past sideways, the four offers stack as cards, the road on the map draws itself. All plain CSS and one small scroll loop in `index.html` (classes prefixed `th-`), no libraries. Motion is switched off for visitors who ask for reduced motion.
+  - Fonts are self hosted in `fonts/` (Fraunces and Instrument Sans, both SIL Open Font License).
 - **Game Hub** — Indian Rummy, Chess (Hard AI), Ping Pong with power-ups, and
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
