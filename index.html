@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="theme-color" content="#f4efe4">
+<meta name="theme-color" content="#04080c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Thudinest &#183; Cozy container homestay on MTP Road, Coimbatore</title>
@@ -2835,6 +2835,95 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
 @media (prefers-reduced-motion: reduce) {
   #screen-landing *, #screen-landing *::before, #screen-landing *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* =====================================================================
+   DARK THEME. Night sky base, deep peacock green panels, aqua and gold
+   for light. Plus the letter ring, parallax and the livelier reveals.
+   ===================================================================== */
+#screen-landing {
+  --bg: #04080c; --bg2: #091118; --green: #0b2522; --green2: #14403a; --teal: #46d6c3;
+  --line: rgba(244,239,228,0.13); --mute: #9db0ab; --mute-d: #a4b6b1;
+  background: var(--bg); color: var(--paper);
+}
+#screen-landing::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(62vw 62vw at 88% -12%, rgba(70,214,195,0.13), transparent 62%), radial-gradient(54vw 54vw at -12% 58%, rgba(42,68,200,0.16), transparent 62%), radial-gradient(40vw 40vw at 70% 110%, rgba(216,162,58,0.07), transparent 60%); }
+.th, .th-foot { position: relative; z-index: 1; }
+.th-dark { background: linear-gradient(180deg, var(--green), #081b19); }
+.th-amen.th-dark { background: #081b19; }
+.th-foot { background: #081b19; }
+.th-cta.th-dark { background: linear-gradient(180deg, var(--green), #081b19); }
+.th-extras, .th-faq-sec { background: var(--bg2); box-shadow: 0 -1px 0 var(--line); }
+/* nav */
+.th-nav { background: rgba(8,16,20,0.62); border-color: rgba(244,239,228,0.1); color: var(--paper); box-shadow: 0 10px 40px -18px rgba(0,0,0,0.8); }
+.th-nav.solid { background: rgba(8,16,20,0.86); box-shadow: 0 16px 44px -18px rgba(0,0,0,0.9); }
+.th-links a { color: var(--mute-d); }
+.th-links a:hover { color: var(--paper); background: rgba(244,239,228,0.08); }
+.th-links a.on { color: var(--ink); background: var(--aqua); }
+.th-burger { background: var(--paper); } .th-burger span { background: var(--ink); }
+.th-menu { background: #071a18; }
+/* buttons */
+.th-btn-ink { background: var(--paper); color: var(--ink) !important; }
+.th-btn-ink .th-ic { background: var(--ink); color: var(--aqua); }
+.th-btn-ink::before { background: var(--aqua); }
+.th-btn-line { border-color: rgba(244,239,228,0.22); color: var(--paper) !important; }
+.th-btn-line .th-ic { background: var(--paper); color: var(--ink); }
+.th-btn-line::before { background: var(--paper); }
+.th-btn-line:hover { color: var(--ink) !important; }
+.th-btn-line:hover .th-ic { background: var(--ink); color: var(--aqua); }
+.th-btn-aqua { box-shadow: 0 0 34px -8px rgba(70,214,195,0.7); }
+.th-chip { background: rgba(244,239,228,0.04); }
+/* pieces that assumed paper */
+.th-fill .w { opacity: 0.2; }
+.th-who::before { background: linear-gradient(90deg, var(--green2), var(--green)); }
+.th-who-ic { color: var(--aqua); }
+.th-card-in { box-shadow: 0 -22px 60px -30px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(244,239,228,0.08); }
+.th-c4 { --bg: #0d1a22; }
+.th-game-img { box-shadow: 0 30px 60px -34px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(244,239,228,0.08); }
+.th-marq div:first-child { color: var(--paper); }
+.th-map { box-shadow: inset 0 0 0 1px rgba(244,239,228,0.1), 0 40px 80px -40px rgba(70,214,195,0.35); }
+.th-steps li::before { background: var(--bg); }
+.th-steps li > span { background: var(--green2); box-shadow: 0 0 26px -8px var(--aqua); }
+.th-note { color: #f3b1a4; border-color: rgba(240,130,110,0.45); background: rgba(200,82,63,0.12); }
+.th-faq details[open] summary span { background: var(--aqua); color: var(--ink); }
+.th-top { background: #10201f; color: var(--paper); border-color: rgba(244,239,228,0.18); }
+.th-h1 em, .th-h2 em, .th-big em, .th-fill em { background: linear-gradient(100deg, #46d6c3 10%, #7fb4ff 55%, #d8a23a 110%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 0.08em; }
+.th-hero-over .th-big em { background: none; color: var(--aqua); }
+.th-fill em .w { color: var(--aqua); }
+.th-fill em { background: none; color: inherit; }
+.th-score b { text-shadow: 0 0 80px rgba(70,214,195,0.35); }
+.th-word { background: linear-gradient(180deg, var(--paper) 30%, rgba(244,239,228,0.25)); -webkit-background-clip: text; background-clip: text; }
+.th-word span { color: transparent; }
+.th-word span:nth-child(n+6) { color: var(--aqua); }
+
+/* the letter ring */
+.th-statement .th-wrap { align-items: center; }
+.th-ring { position: relative; width: clamp(260px, 31vw, 450px); aspect-ratio: 1 / 1; }
+.th-ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(70,214,195,0.35); box-shadow: 0 0 90px rgba(70,214,195,0.14), inset 0 0 90px rgba(70,214,195,0.07); }
+.th-ring::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; background: radial-gradient(circle 6px at 50% 6px, var(--aqua) 96%, transparent); filter: drop-shadow(0 0 10px var(--aqua)); animation: th-spin 18s linear infinite; pointer-events: none; }
+.th-ring canvas { position: absolute; inset: 5%; width: 90%; height: 90%; display: block; cursor: pointer; border-radius: 50%; touch-action: pan-y; }
+.th-ring-chip { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); display: flex; align-items: center; gap: 11px; padding: 8px 16px 8px 8px; border-radius: 999px; white-space: nowrap; background: rgba(8,16,20,0.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(244,239,228,0.1), 0 20px 50px rgba(0,0,0,0.6); }
+.th-ring-chip span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--aqua); color: var(--ink); font: 700 11px/1 var(--sans); }
+.th-ring-chip b { font: 600 0.9rem/1 var(--sans); }
+.th-ring-chip i { width: 56px; height: 4px; border-radius: 4px; background: rgba(244,239,228,0.14); overflow: hidden; }
+.th-ring-chip u { display: block; height: 100%; background: var(--aqua); transform-origin: 0 50%; transform: scaleX(0); }
+
+/* livelier motion */
+.th-motion [data-r='pop'] { transform: translateY(60px) scale(0.88); transition: opacity 0.8s var(--ease), transform 1.1s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.th-motion [data-r='side'] { transform: translateX(90px); transition: opacity 0.7s var(--ease), transform 1s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.th-motion [data-r='pop'].in, .th-motion [data-r='side'].in { transform: none; }
+.th-motion .th-who[data-r='side'] { transition: opacity 0.7s var(--ease), transform 1s cubic-bezier(0.34, 1.4, 0.64, 1), padding 0.5s var(--ease), color 0.4s; }
+.th-motion .th-h1 .th-ln:first-child { transform: translateX(calc(var(--e) * -12vw)); }
+.th-motion .th-h1 .th-ln:last-child { transform: translateX(calc(var(--e) * 12vw)); }
+.th-motion .th-shot img { width: 118%; max-width: none; margin-left: -9%; transform: translate3d(calc(var(--px, 0) * 1%), 0, 0); transition: none; }
+.th-motion .th-shot:hover img { transform: translate3d(calc(var(--px, 0) * 1%), 0, 0); }
+.th-motion .th-card-vis > img[data-par] { top: -12%; height: 124%; transform: translate3d(0, calc(var(--py, 0) * 1%), 0); }
+@media (max-width: 820px) {
+  .th-ring { width: min(80vw, 360px); margin: 10px auto 0; }
+  .th-motion [data-r='side'] { transform: translateX(44px); }
+}
+.th-card { --bg: linear-gradient(135deg, #17483f, #0b2522 70%); }
+.th-card.th-c2 { --bg: linear-gradient(135deg, #3350dc, #2236a8); }
+.th-card.th-c3 { --bg: linear-gradient(135deg, #e3b04a, #c98f2a); }
+.th-card.th-c4 { --bg: linear-gradient(135deg, #14242e, #0a141b); }
 </style>
 <script>
 // Switch scroll-driven motion on before first paint, unless the visitor asked for reduced motion.
@@ -2985,7 +3074,10 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <p class="th-fill" id="th-fill">Not just a place to sleep. A quiet, <em>photogenic</em> home right on <em>MTP Road,</em> close to VG Hospital, restaurants and shops, with everything you need for a <em>short, easy getaway.</em></p>
           <a class="th-link" href="#space" data-jump>More about the space <svg class="th-i"><use href="#i-arrow"/></svg></a>
         </div>
-        <svg class="th-feather" id="th-feather" viewBox="0 0 32 40" aria-hidden="true"><use href="#i-plume"/></svg>
+        <div class="th-ring" data-r="pop">
+          <canvas id="th-hero-cv" aria-label="Animated letters forming Thudinest, the home, a peacock feather, the bed, Wi-Fi, a map pin, hosting, cricket, games and WhatsApp. Tap to skip ahead." role="img"></canvas>
+          <div class="th-ring-chip" aria-live="polite"><span id="th-hero-no">01</span><b id="th-hero-name">Thudinest</b><i aria-hidden="true"><u id="th-hero-bar"></u></i></div>
+        </div>
       </div>
     </section>
 
@@ -3041,10 +3133,10 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <a class="th-btn th-btn-ink" data-r style="--d:3" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
         </div>
         <div>
-          <article class="th-who" data-r><small>01</small><h3>Couples &amp; solo travellers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-heart"/></svg></span><p>A private little home with a bedroom, attached bathroom, living area and kitchenette, just for you.</p><span class="th-who-tag">A quiet, private stay on MTP Road</span></article>
-          <article class="th-who" data-r><small>02</small><h3>Remote workers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-laptop"/></svg></span><p>A work desk by the window, free Wi-Fi and quiet hours after 10 PM: easy to get a few days of work done.</p><span class="th-who-tag">Stay a few days and get work done</span></article>
-          <article class="th-who" data-r><small>03</small><h3>Hospital visits</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-hosp"/></svg></span><p>Visiting someone at VG Hospital? Stay a short distance away on MTP Road, with restaurants and shops nearby.</p><span class="th-who-tag">Close to care, restaurants and shops</span></article>
-          <article class="th-who" data-r><small>04</small><h3>Small businesses</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-store"/></svg></span><p>Got an access code from us? Publish a free single-page website in minutes, or run a live survey with a QR code.</p><span class="th-who-tag">Live in about two minutes</span></article>
+          <article class="th-who" data-r="side" style="--d:0"><small>01</small><h3>Couples &amp; solo travellers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-heart"/></svg></span><p>A private little home with a bedroom, attached bathroom, living area and kitchenette, just for you.</p><span class="th-who-tag">A quiet, private stay on MTP Road</span></article>
+          <article class="th-who" data-r="side" style="--d:1"><small>02</small><h3>Remote workers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-laptop"/></svg></span><p>A work desk by the window, free Wi-Fi and quiet hours after 10 PM: easy to get a few days of work done.</p><span class="th-who-tag">Stay a few days and get work done</span></article>
+          <article class="th-who" data-r="side" style="--d:0"><small>03</small><h3>Hospital visits</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-hosp"/></svg></span><p>Visiting someone at VG Hospital? Stay a short distance away on MTP Road, with restaurants and shops nearby.</p><span class="th-who-tag">Close to care, restaurants and shops</span></article>
+          <article class="th-who" data-r="side" style="--d:1"><small>04</small><h3>Small businesses</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-store"/></svg></span><p>Got an access code from us? Publish a free single-page website in minutes, or run a live survey with a QR code.</p><span class="th-who-tag">Live in about two minutes</span></article>
         </div>
       </div>
     </section>
@@ -3070,7 +3162,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
               </ul>
               <a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
             </div>
-            <div class="th-card-vis"><img src="./images/exterior.jpg" alt="Thudinest container home" width="1069" height="602" loading="lazy"></div>
+            <div class="th-card-vis"><img data-par src="./images/exterior.jpg" alt="Thudinest container home" width="1069" height="602" loading="lazy"></div>
           </div></article>
           <article class="th-card th-c2" style="--i:1"><div class="th-card-in">
             <div>
@@ -3157,12 +3249,12 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
             <li><b data-count="100" data-suffix="%">100%</b><small>response rate</small></li>
           </ul>
           <ul class="th-rates">
-            <li class="th-rate" data-r>Cleanliness<i style="--w:98%"></i><b>4.9</b></li>
-            <li class="th-rate" data-r>Accuracy<i style="--w:100%"></i><b>5.0</b></li>
-            <li class="th-rate" data-r>Check-in<i style="--w:100%"></i><b>5.0</b></li>
-            <li class="th-rate" data-r>Communication<i style="--w:100%"></i><b>5.0</b></li>
-            <li class="th-rate" data-r>Location<i style="--w:98%"></i><b>4.9</b></li>
-            <li class="th-rate" data-r>Value<i style="--w:98%"></i><b>4.9</b></li>
+            <li class="th-rate" data-r="side" style="--d:0">Cleanliness<i style="--w:98%"></i><b>4.9</b></li>
+            <li class="th-rate" data-r="side" style="--d:1">Accuracy<i style="--w:100%"></i><b>5.0</b></li>
+            <li class="th-rate" data-r="side" style="--d:2">Check-in<i style="--w:100%"></i><b>5.0</b></li>
+            <li class="th-rate" data-r="side" style="--d:3">Communication<i style="--w:100%"></i><b>5.0</b></li>
+            <li class="th-rate" data-r="side" style="--d:4">Location<i style="--w:98%"></i><b>4.9</b></li>
+            <li class="th-rate" data-r="side" style="--d:5">Value<i style="--w:98%"></i><b>4.9</b></li>
           </ul>
           <div class="th-mentions" data-r>
             <small>Guests mention</small>
@@ -3181,9 +3273,9 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <p class="th-p" data-r style="--d:2">22 games in your browser, on a phone or a laptop. Three of our favourites:</p>
         </div>
         <div class="th-games-grid">
-          <a class="th-game" href="/tennis/" data-r style="--d:0"><div class="th-game-img"><img src="./images/games/set-point.jpg" alt="Set Point: a floodlit tennis stadium, the near player hitting a forehand" width="800" height="450" loading="lazy"><span class="th-new">New</span><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Tennis</small><h3>Set Point</h3><p>Topspin, slice, volleys and aces under the floodlights at the Thudinest Open.</p></a>
-          <a class="th-game" href="/football/" data-r style="--d:1"><div class="th-game-img"><img src="./images/games/final-whistle.jpg" alt="Final Whistle: a striker running at goal under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Football</small><h3>Final Whistle</h3><p>Take your nation through the 2026 World Cup, on a floodlit futsal court or in the stadium.</p></a>
-          <a class="th-game" href="/cricket/" data-r style="--d:2"><div class="th-game-img"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Cricket</small><h3>Floodlit Over</h3><p>Thudinest Coimbatore take on the World XI, ball by ball.</p></a>
+          <a class="th-game" href="/tennis/" data-r="pop" style="--d:0"><div class="th-game-img"><img src="./images/games/set-point.jpg" alt="Set Point: a floodlit tennis stadium, the near player hitting a forehand" width="800" height="450" loading="lazy"><span class="th-new">New</span><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Tennis</small><h3>Set Point</h3><p>Topspin, slice, volleys and aces under the floodlights at the Thudinest Open.</p></a>
+          <a class="th-game" href="/football/" data-r="pop" style="--d:1"><div class="th-game-img"><img src="./images/games/final-whistle.jpg" alt="Final Whistle: a striker running at goal under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Football</small><h3>Final Whistle</h3><p>Take your nation through the 2026 World Cup, on a floodlit futsal court or in the stadium.</p></a>
+          <a class="th-game" href="/cricket/" data-r="pop" style="--d:2"><div class="th-game-img"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Cricket</small><h3>Floodlit Over</h3><p>Thudinest Coimbatore take on the World XI, ball by ball.</p></a>
         </div>
         <a class="th-btn th-btn-ink" data-r href="#" onclick="showScreen('home'); return false;">All 22 games<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
       </div>
@@ -8591,6 +8683,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   var bar = $('#th-progress'), hero = $('#th-hero'), heroCopy = $('#th-hero-copy'), heroOver = $('#th-hero-over'), heroPin = $('.th-hero-pin');
   var space = $('#space'), spacePin = $('.th-space-pin'), track = $('#th-track'), spaceBar = $('#th-space-bar'), count = $('#th-count');
   var cards = $$('.th-card'), marq = $$('#th-marq div'), map = $('#th-map'), steps = $('#th-steps'), word = $('#th-word'), feather = $('#th-feather');
+  var pars = $$('[data-par]');
   var spyLinks = $$('.th-links a[data-spy]'), spyT = spyLinks.map(function (a) { return document.getElementById(a.getAttribute('data-spy')); });
   var vh = 0, vw = 0, lastW = -1, trackRun = 0, lastY = 0, queued = false;
 
@@ -8640,7 +8733,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     track.style.transform = 'translate3d(' + (-sp * trackRun).toFixed(1) + 'px,0,0)';
     spaceBar.style.setProperty('--p', sp.toFixed(4));
     var c = vw / 2, idx = 0;
-    for (var s = 0; s < shots.length; s++) { if (shots[s].getBoundingClientRect().left < c) idx = s; }
+    for (var s = 0; s < shots.length; s++) { var sr = shots[s].getBoundingClientRect(); if (sr.left < c) idx = s; shots[s].style.setProperty('--px', (clamp((sr.left + sr.width / 2 - c) / vw, -1, 1) * -8).toFixed(2)); }
     var label = '0' + (idx + 1); if (count.textContent !== label) count.textContent = label;
 
     // cards stack and settle back
@@ -8650,6 +8743,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
       inner.style.setProperty('--s', clamp(1 - (rb.top - ra.top) / ra.height, 0, 1).toFixed(3));
     }
+
+    // photos drift a little slower than the page
+    for (var q = 0; q < pars.length; q++) { var pr = pars[q].parentNode.getBoundingClientRect(); if (pr.bottom > 0 && pr.top < vh) pars[q].style.setProperty('--py', (clamp((pr.top + pr.height / 2 - vh / 2) / vh, -1, 1) * -9).toFixed(2)); }
 
     // marquee follows the scroll
     var mr = marq[0].parentNode.getBoundingClientRect();
@@ -8675,6 +8771,253 @@ document.addEventListener('DOMContentLoaded',()=>{
   // coming back from the game hub
   var show = window.showScreen;
   if (typeof show === 'function') window.showScreen = function (name) { show.apply(this, arguments); if (name === 'landing') { lastW = -1; measure(); req(); } };
+})();
+</script>
+<script>
+// =====================================================================
+// HERO PARTICLES: a ring of small "thudinest" characters that plays on
+// its own, morphing through scenes (the word, the home, a peacock
+// feather, the bed, Wi-Fi, the map pin, hosting & surveys, cricket,
+// games, WhatsApp). Between scenes each character bursts out and springs
+// to its next spot, drawn as a streak in flight and a letter at rest.
+// Tap the ring to skip ahead. Pauses off-screen; still for reduced motion.
+// =====================================================================
+(function () {
+  var cv = document.getElementById('th-hero-cv');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d'), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  //          0 deep green  1 green    2 mint     3 pale     4 peach    5 cyan     6 indigo   7 white
+  var PAL = ['#2348b8', '#1fb6c9', '#5fe0e6', '#d4f1f8', '#e6b45a', '#2fd4a0', '#8a78ff', '#eef2fb'];
+  var CHARS = 'thudinest';
+  var HOLD = 2700, MOVE = 1500;
+  var SCENES = [
+    ['Thudinest', drawWord], ['Container home', drawHouse], ['Peacock garden', drawFeather], ['Cozy bedroom', drawBed],
+    ['Free Wi-Fi', drawWifi], ['On MTP Road', drawPin], ['Hosting & surveys', drawMonitor], ['3D cricket', drawCricket],
+    ['22 free games', drawController], ['WhatsApp us', drawChat]
+  ];
+  var noEl = document.getElementById('th-hero-no'), nameEl = document.getElementById('th-hero-name'), barEl = document.getElementById('th-hero-bar');
+  var S = 0, DPR = 1, N = 0, P = null, T = [], sprites = [], glyph = 8, running = false, visible = false, last = 0, mx = -1e4, my = -1e4;
+  var cur = 0, nxt = 0, phase = 'hold', t0 = 0, built = false;
+
+  // ---------- scene drawings (square canvas of side w) ----------
+  function rr(x, X, Y, W, H, R) { x.beginPath(); x.roundRect(X, Y, W, H, R); }
+  function drawWord(x, w) {
+    x.textBaseline = 'middle'; x.lineJoin = 'round';
+    var fs = 100; x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif';
+    var widest = Math.max(x.measureText('THUDI').width, x.measureText('NEST').width);
+    fs = fs * (w * 0.78) / widest; x.font = '800 ' + fs + 'px Outfit, Figtree, sans-serif';
+    var cols = [2, 1, 5, 1, 4, 2, 1, 3, 5], k = 0, lh = fs * 0.95;
+    ['THUDI', 'NEST'].forEach(function (line, li) {
+      var cx = (w - x.measureText(line).width) / 2, y = w / 2 + (li - 0.5) * lh;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i]; x.lineWidth = fs * 0.07; x.strokeStyle = PAL[0]; x.strokeText(ch, cx, y);
+        x.fillStyle = PAL[cols[k++ % cols.length]]; x.fillText(ch, cx, y); cx += x.measureText(ch).width;
+      }
+    });
+  }
+  function drawHouse(x, w) {
+    var u = w / 100, o = 10 * u;
+    x.save(); x.translate(o, o + 4 * u); x.scale(0.8, 0.8);
+    x.fillStyle = PAL[0]; x.fillRect(4 * u, 6 * u, 92 * u, 6 * u);
+    x.fillStyle = PAL[3]; x.fillRect(12 * u, 12 * u, 76 * u, 28 * u);
+    x.fillStyle = PAL[1]; for (var i = 0; i <= 4; i++) x.fillRect((12 + i * 18.6) * u, 12 * u, 2.2 * u, 28 * u);
+    x.fillStyle = PAL[2]; x.fillRect(8 * u, 38 * u, 84 * u, 4 * u);
+    x.fillStyle = PAL[0]; x.fillRect(16 * u, 42 * u, 68 * u, 36 * u);
+    x.fillStyle = PAL[5]; x.fillRect(42 * u, 48 * u, 14 * u, 24 * u);
+    x.fillStyle = PAL[4]; [[24, 50], [76, 50], [30, 62], [70, 62]].forEach(function (p) { x.beginPath(); x.arc(p[0] * u, p[1] * u, 2 * u, 0, 7); x.fill(); });
+    x.fillStyle = PAL[1]; x.beginPath(); x.ellipse(10 * u, 76 * u, 12 * u, 11 * u, 0, 0, 7); x.ellipse(90 * u, 74 * u, 13 * u, 13 * u, 0, 0, 7); x.fill();
+    x.fillStyle = PAL[2]; x.fillRect(0, 80 * u, 100 * u, 6 * u);
+    x.restore();
+  }
+  function drawFeather(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 36 * u;
+    x.save(); x.translate(cx, 50 * u); x.rotate(-0.32); x.translate(-cx, -50 * u);
+    x.strokeStyle = PAL[2]; x.lineCap = 'round';
+    for (var i = 0; i < 70; i++) {                              // barbs fanning from the shaft
+      var t = i / 70, y = 14 * u + t * 72 * u, len = (t < 0.55 ? 22 + 10 * Math.sin(t / 0.55 * Math.PI) : 22 - (t - 0.55) * 28) * u;
+      x.lineWidth = 0.9 * u; x.strokeStyle = t < 0.6 ? PAL[1] : PAL[0];
+      [-1, 1].forEach(function (s) { x.beginPath(); x.moveTo(cx, y); x.quadraticCurveTo(cx + s * len * 0.5, y - 4 * u, cx + s * len, y - 9 * u); x.stroke(); });
+    }
+    x.lineWidth = 1.6 * u; x.strokeStyle = PAL[3]; x.beginPath(); x.moveTo(cx, 12 * u); x.lineTo(cx, 94 * u); x.stroke();
+    var e = [[17, 21, PAL[4]], [13.5, 17, PAL[1]], [10.5, 13.5, PAL[5]], [6.5, 9, PAL[6]]];
+    e.forEach(function (r) { x.fillStyle = r[2]; x.beginPath(); x.ellipse(cx, cy, r[0] * u, r[1] * u, 0, 0, 7); x.fill(); });
+    x.restore();
+  }
+  function drawBed(x, w) {
+    var u = w / 100;
+    x.fillStyle = PAL[0]; rr(x, 12 * u, 24 * u, 8 * u, 56 * u, 2 * u); x.fill(); rr(x, 80 * u, 50 * u, 8 * u, 30 * u, 2 * u); x.fill();
+    x.fillStyle = PAL[0]; x.fillRect(12 * u, 66 * u, 76 * u, 6 * u);
+    x.fillStyle = PAL[3]; rr(x, 20 * u, 52 * u, 64 * u, 14 * u, 3 * u); x.fill();
+    x.fillStyle = PAL[7]; rr(x, 22 * u, 42 * u, 18 * u, 11 * u, 5 * u); x.fill();
+    x.fillStyle = PAL[1]; rr(x, 40 * u, 48 * u, 46 * u, 18 * u, 4 * u); x.fill();
+    x.fillStyle = PAL[4]; for (var i = 0; i < 4; i++) { x.beginPath(); x.arc((48 + i * 10) * u, 57 * u, 2 * u, 0, 7); x.fill(); }
+    x.fillStyle = PAL[2]; x.fillRect(14 * u, 72 * u, 4 * u, 8 * u); x.fillRect(82 * u, 72 * u, 4 * u, 8 * u);
+    x.fillStyle = PAL[5]; x.font = '800 ' + 12 * u + 'px Outfit, sans-serif'; x.fillText('z', 60 * u, 28 * u); x.font = '800 ' + 9 * u + 'px Outfit, sans-serif'; x.fillText('z', 71 * u, 18 * u);
+  }
+  function drawWifi(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 72 * u; x.lineCap = 'round';
+    [[44, PAL[0]], [31, PAL[1]], [18, PAL[2]]].forEach(function (a) { x.lineWidth = 8 * u; x.strokeStyle = a[1]; x.beginPath(); x.arc(cx, cy, a[0] * u, Math.PI * 1.22, Math.PI * 1.78); x.stroke(); });
+    x.fillStyle = PAL[4]; x.beginPath(); x.arc(cx, cy, 6 * u, 0, 7); x.fill();
+  }
+  function drawPin(x, w) {
+    var u = w / 100, cx = 50 * u;
+    x.fillStyle = PAL[0]; x.beginPath(); x.ellipse(cx, 86 * u, 22 * u, 5 * u, 0, 0, 7); x.fill();
+    x.fillStyle = PAL[1]; x.beginPath(); x.moveTo(cx, 82 * u);
+    x.bezierCurveTo(cx - 6 * u, 70 * u, cx - 28 * u, 52 * u, cx - 28 * u, 36 * u); x.arc(cx, 36 * u, 28 * u, Math.PI, 0); x.bezierCurveTo(cx + 28 * u, 52 * u, cx + 6 * u, 70 * u, cx, 82 * u); x.fill();
+    x.fillStyle = PAL[3]; x.beginPath(); x.arc(cx, 36 * u, 13 * u, 0, 7); x.fill();
+    x.fillStyle = PAL[4]; x.beginPath(); x.moveTo(cx - 7 * u, 38 * u); x.lineTo(cx, 30 * u); x.lineTo(cx + 7 * u, 38 * u); x.closePath(); x.fill(); x.fillRect(cx - 5 * u, 38 * u, 10 * u, 6 * u);
+  }
+  function drawMonitor(x, w) {
+    var u = w / 100;
+    rr(x, 10 * u, 16 * u, 80 * u, 54 * u, 6 * u); x.lineWidth = 6 * u; x.strokeStyle = PAL[0]; x.stroke();
+    [[22, 22, 1], [36, 34, 2], [50, 28, 4], [64, 42, 1], [78, 18, 5]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.fillRect((b[0] - 5) * u, (64 - b[1]) * u, 9 * u, b[1] * u); });
+    x.fillStyle = PAL[0]; x.fillRect(44 * u, 73 * u, 12 * u, 10 * u); x.fillRect(32 * u, 83 * u, 36 * u, 5 * u);
+  }
+  function drawCricket(x, w) {
+    var u = w / 100;
+    x.save(); x.translate(44 * u, 52 * u); x.rotate(-0.62);
+    x.fillStyle = PAL[0]; rr(x, -3.5 * u, -46 * u, 7 * u, 26 * u, 3 * u); x.fill();                // handle
+    x.fillStyle = PAL[4]; for (var i = 0; i < 5; i++) x.fillRect(-4 * u, (-44 + i * 5) * u, 8 * u, 2 * u);
+    x.fillStyle = PAL[3]; rr(x, -9 * u, -20 * u, 18 * u, 62 * u, 6 * u); x.fill();                  // blade
+    x.fillStyle = PAL[2]; x.fillRect(-2 * u, -16 * u, 4 * u, 54 * u);
+    x.restore();
+    x.fillStyle = '#e8574f'; x.beginPath(); x.arc(74 * u, 72 * u, 11 * u, 0, 7); x.fill();
+    x.strokeStyle = PAL[7]; x.lineWidth = 1.4 * u; x.beginPath(); x.arc(64 * u, 72 * u, 10 * u, -0.9, 0.9); x.stroke(); x.beginPath(); x.arc(84 * u, 72 * u, 10 * u, Math.PI - 0.9, Math.PI + 0.9); x.stroke();
+    x.fillStyle = PAL[1]; x.fillRect(8 * u, 86 * u, 84 * u, 4 * u);
+  }
+  function drawController(x, w) {
+    var u = w / 100, ox = 8 * u, oy = 28 * u, k = 0.84;
+    x.save(); x.translate(ox, oy); x.scale(k, k);
+    x.beginPath(); x.moveTo(26 * u, 6 * u); x.lineTo(74 * u, 6 * u);
+    x.bezierCurveTo(96 * u, 6 * u, 102 * u, 56 * u, 92 * u, 64 * u); x.bezierCurveTo(84 * u, 70 * u, 74 * u, 52 * u, 66 * u, 46 * u); x.lineTo(34 * u, 46 * u);
+    x.bezierCurveTo(26 * u, 52 * u, 16 * u, 70 * u, 8 * u, 64 * u); x.bezierCurveTo(-2 * u, 56 * u, 4 * u, 6 * u, 26 * u, 6 * u); x.closePath();
+    x.fillStyle = PAL[1]; x.fill(); x.lineWidth = 4 * u; x.strokeStyle = PAL[0]; x.stroke();
+    x.fillStyle = PAL[3]; x.fillRect(18 * u, 20 * u, 16 * u, 5 * u); x.fillRect(23.5 * u, 14.5 * u, 5 * u, 16 * u);
+    [[72, 16, 4], [80, 23, 5], [64, 23, 6], [72, 30, 7]].forEach(function (b) { x.fillStyle = PAL[b[2]]; x.beginPath(); x.arc(b[0] * u, b[1] * u, 4 * u, 0, 7); x.fill(); });
+    x.restore();
+  }
+  function drawChat(x, w) {
+    var u = w / 100, cx = 50 * u, cy = 46 * u;
+    x.fillStyle = PAL[1]; x.beginPath(); x.arc(cx, cy, 34 * u, 0, 7); x.fill();
+    x.beginPath(); x.moveTo(26 * u, 66 * u); x.lineTo(16 * u, 86 * u); x.lineTo(38 * u, 76 * u); x.closePath(); x.fill();
+    x.fillStyle = PAL[0]; x.beginPath(); x.arc(cx, cy, 26 * u, 0, 7); x.fill();
+    x.fillStyle = PAL[3]; [-11, 0, 11].forEach(function (d, i) { x.fillStyle = [PAL[3], PAL[4], PAL[3]][i]; x.beginPath(); x.arc(cx + d * u, cy, 4.5 * u, 0, 7); x.fill(); });
+  }
+
+  function nearestPal(r, g, b) {
+    var best = 0, bd = 1e9;
+    for (var i = 0; i < PAL.length; i++) { var c = parseInt(PAL[i].slice(1), 16), d = Math.pow((c >> 16) - r, 2) + Math.pow(((c >> 8) & 255) - g, 2) + Math.pow((c & 255) - b, 2); if (d < bd) { bd = d; best = i; } }
+    return best === 7 && r > 200 && g < 120 ? 4 : best;
+  }
+  var RED = '#e8574f';
+  function sample(draw) {
+    var sc = 0.5, sw = Math.max(1, Math.round(S * sc));
+    var oc = document.createElement('canvas'); oc.width = oc.height = sw;
+    var x = oc.getContext('2d', { willReadFrequently: true }); draw(x, sw);
+    var d = x.getImageData(0, 0, sw, sw).data, pts = [], step = Math.max(1, Math.round(glyph * 0.58 * sc));
+    for (var yy = 0; yy < sw; yy += step) for (var xx = 0; xx < sw; xx += step) {
+      var i = (yy * sw + xx) * 4; if (d[i + 3] < 140) continue;
+      var red = d[i] > 200 && d[i + 1] < 110 && d[i + 2] < 110;
+      pts.push([xx / sc + (Math.random() - 0.5) * step, yy / sc + (Math.random() - 0.5) * step, red ? 8 : nearestPal(d[i], d[i + 1], d[i + 2])]);
+    }
+    for (var k = pts.length - 1; k > 0; k--) { var j = (Math.random() * (k + 1)) | 0, t = pts[k]; pts[k] = pts[j]; pts[j] = t; }
+    var out = new Float32Array(N * 3);
+    for (var n = 0; n < N; n++) {
+      var p = pts.length ? pts[n % pts.length] : [S / 2, S / 2, 1], rep = n >= pts.length;
+      out[n * 3] = p[0] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 1] = p[1] + (rep ? (Math.random() - 0.5) * 2.5 : 0); out[n * 3 + 2] = p[2];
+    }
+    return out;
+  }
+  function buildSprites() {
+    sprites = PAL.concat([RED]).map(function (col) {
+      return CHARS.split('').map(function (ch) {
+        var s = Math.ceil(glyph * 1.4 * DPR), c = document.createElement('canvas'); c.width = c.height = s;
+        var x = c.getContext('2d'); x.font = '700 ' + Math.round(glyph * DPR) + 'px "JetBrains Mono", ui-monospace, monospace';
+        x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(ch, s / 2, s / 2 + DPR * 0.5);
+        return c;
+      });
+    });
+  }
+  var COLORS = PAL.concat([RED]);
+
+  function layout() {
+    var r = cv.getBoundingClientRect(); if (!r.width) return;
+    S = r.width; DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = cv.height = Math.round(S * DPR);
+    glyph = S < 420 ? 6 : 7;
+    var want = Math.round(Math.min(S < 420 ? 1500 : 2600, (S * S) / (S < 420 ? 95 : 120)));
+    if (!P || want !== N) {
+      N = want; P = new Float32Array(N * 7);
+      for (var i = 0; i < N; i++) {
+        var a = Math.random() * Math.PI * 2, rad = S * 0.46 * Math.sqrt(Math.random());
+        P[i * 7] = S / 2 + Math.cos(a) * rad; P[i * 7 + 1] = S / 2 + Math.sin(a) * rad;
+        P[i * 7 + 4] = (Math.random() * CHARS.length) | 0; P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.35 + Math.random() * 0.65;
+      }
+    }
+    buildSprites();
+    T = SCENES.map(function (sc) { return sample(sc[1]); });
+    built = true;
+  }
+
+  function label(i) { noEl.textContent = (i + 1 < 10 ? '0' : '') + (i + 1); nameEl.textContent = SCENES[i][0]; }
+  function advance(now) {
+    nxt = (cur + 1) % SCENES.length; phase = 'move'; t0 = now; label(nxt);
+    for (var i = 0; i < N; i++) { P[i * 7 + 5] = Math.random() * Math.PI * 2; P[i * 7 + 6] = 0.3 + Math.random() * 0.7; }
+  }
+  var ease = function (t) { t = Math.min(1, Math.max(0, t)); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+  function tick(now) {
+    if (!running) return;
+    requestAnimationFrame(tick);
+    if (!built) return;
+    var dt = Math.min(2.5, (now - (last || now)) / 16.67); last = now;
+    if (!t0) t0 = now + 1000; // let the opening word settle a little longer
+    var A, B, tt = 0;
+    if (phase === 'hold') {
+      A = B = T[cur];
+      var hp = (now - t0) / HOLD; barEl.style.transform = 'scaleX(' + Math.max(0, Math.min(1, hp)) + ')';
+      if (hp >= 1 && !reduce) advance(now);
+    }
+    if (phase === 'move') {
+      A = T[cur]; B = T[nxt]; tt = ease((now - t0) / MOVE); barEl.style.transform = 'scaleX(0)';
+      if (now - t0 >= MOVE) { cur = nxt; phase = 'hold'; t0 = now; A = B = T[cur]; tt = 0; }
+    }
+    var burst = phase === 'move' ? Math.sin(Math.PI * tt) : 0, R = S * 0.36, time = now * 0.001;
+    var k = 1 - Math.pow(1 - 0.09, dt), damp = Math.pow(0.8, dt);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, S, S);
+    ctx.lineCap = 'round'; ctx.lineWidth = glyph * 0.55;
+    var gs = glyph * 1.4, half = gs / 2;
+    for (var i = 0; i < N; i++) {
+      var o = i * 7, j = i * 3, ang = P[o + 5] + time * 0.3, br = burst * R * P[o + 6];
+      var tx = A[j] + (B[j] - A[j]) * tt + Math.cos(ang) * br, ty = A[j + 1] + (B[j + 1] - A[j + 1]) * tt + Math.sin(ang) * br;
+      tx += Math.sin(time * 1.3 + i) * 0.5; ty += Math.cos(time * 1.1 + i * 0.7) * 0.5;
+      var x = P[o], y = P[o + 1], vx = P[o + 2], vy = P[o + 3];
+      if (reduce) { x = tx; y = ty; vx = vy = 0; }
+      else {
+        var dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy;
+        if (d2 < 4200) { var f = (1 - d2 / 4200) * 2 * dt, dd = Math.sqrt(d2 + 1); vx += dx / dd * f; vy += dy / dd * f; }
+        vx = (vx + (tx - x) * k) * damp; vy = (vy + (ty - y) * k) * damp; x += vx * dt; y += vy * dt;
+      }
+      P[o] = x; P[o + 1] = y; P[o + 2] = vx; P[o + 3] = vy;
+      var c = (tt < 0.5 ? A[j + 2] : B[j + 2]) | 0, sp = vx * vx + vy * vy;
+      if (sp > 1.6) { var len = Math.min(5, Math.sqrt(sp) * 0.9 + 1); ctx.strokeStyle = COLORS[c]; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * len, y - vy * len); ctx.stroke(); }
+      else ctx.drawImage(sprites[c][P[o + 4]], x - half, y - half, gs, gs);
+    }
+  }
+  function setRunning(on) { if (on === running) return; running = on; if (on) { last = 0; requestAnimationFrame(tick); } }
+
+  cv.addEventListener('click', function () { if (phase === 'hold') { if (reduce) { cur = (cur + 1) % SCENES.length; label(cur); requestAnimationFrame(function (n) { var r = running; running = true; tick(n); running = r; }); } else advance(performance.now()); } });
+  cv.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', function () { mx = my = -1e4; });
+  var resizeT = 0; window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(layout, 200); });
+  document.addEventListener('visibilitychange', function () { setRunning(visible && !document.hidden); });
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 100px Outfit'), document.fonts.load('700 10px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
+  Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 2500); })]).then(function () {
+    layout(); label(0);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(visible && !document.hidden); }).observe(cv);
+    else { visible = true; setRunning(true); }
+  });
+  window.__tlHero = { get scene() { return cur; }, get n() { return N; }, next: function () { advance(performance.now()); } };
 })();
 </script>
 
