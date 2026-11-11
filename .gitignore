@@ -31,3 +31,4 @@ kavin/*.mp4
 kavin/*.png
 kavin/*.PNG
 kavin/*.HEIC
+!mtk/media/*.mp4

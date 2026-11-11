@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MTK Mini Mart · Taman Tenaga, Cheras, Kuala Lumpur</title>
+<meta name="description" content="MTK Mini Mart in Taman Tenaga, Cheras: wines, spirits and beers, a walk-in cooler, soft drinks, groceries, gift packages, and bill payments, reloads and Touch 'n Go top-ups. Since 2020.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#170a0c">
+<meta property="og:title" content="MTK Mini Mart, Cheras">
+<meta property="og:description" content="Wines, spirits, beers, groceries, gifts and bill payments at 6, Jalan Sembilang, Taman Tenaga, KL.">
+<meta property="og:image" content="https://thudinest.com/mtk/img/front.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23170a0c'/%3E%3Ctext x='50' y='66' font-family='Arial Black,Arial' font-weight='900' font-size='40' text-anchor='middle' fill='%23ffb547'%3EMTK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('motion');
+    // If the animation scripts never load, show everything anyway.
+    setTimeout(function () { if (!window.__mtkReady) document.documentElement.classList.remove('motion'); }, 4000);
+  }
+</script>
+<style>
+  :root {
+    --ink: #170a0c;
+    --ink-2: #22100f;
+    --wood: #2e1914;
+    --maroon: #8e1b2a;
+    --red: #c8283a;
+    --gold: #ffb547;
+    --gold-2: #ffd98a;
+    --cream: #fbf3e6;
+    --cream-2: #efe2cc;
+    --muted: #c9b6a6;
+    --line: rgba(255, 217, 138, .18);
+    --gutter: clamp(16px, 4vw, 56px);
+    --display: 'Bricolage Grotesque', 'Arial Black', system-ui, sans-serif;
+    --serif: 'Fraunces', Georgia, serif;
+    --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; background: var(--ink); overflow-x: clip; }
+  body { font-family: var(--body); color: var(--cream); background: var(--ink); overflow-x: clip; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  img, video, canvas, svg { display: block; max-width: 100%; }
+  ::selection { background: var(--gold); color: var(--ink); }
+  .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter); }
+  .eyebrow { font: 700 12px/1 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); display: inline-flex; align-items: center; gap: 10px; }
+  .eyebrow::before { content: ''; width: 28px; height: 2px; background: currentColor; }
+  h2 { font: 800 clamp(38px, 7vw, 92px)/.95 var(--display); letter-spacing: -.02em; }
+  h2 em { font: italic 500 1em/1 var(--serif); color: var(--gold); letter-spacing: -.01em; }
+  .lede { font-size: clamp(16px, 1.6vw, 19px); color: var(--muted); max-width: 56ch; }
+
+  /* ---------- progress + nav ---------- */
+  .progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; background: linear-gradient(90deg, var(--red), var(--gold)); transform-origin: 0 50%; transform: scaleX(0); }
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; padding: 14px var(--gutter); transition: background .4s, backdrop-filter .4s, transform .5s var(--ease); }
+  .nav.solid { background: rgba(23, 10, 12, .78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .nav.hide { transform: translateY(-100%); }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 800 18px/1 var(--display); letter-spacing: .02em; }
+  .brand b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--maroon); color: var(--gold); font-size: 14px; box-shadow: 0 0 0 1px rgba(255,181,71,.4), 0 0 18px rgba(255,181,71,.25); }
+  .nav-call { text-decoration: none; font: 700 14px/1 var(--body); padding: 12px 18px; border-radius: 999px; background: var(--gold); color: var(--ink); display: inline-flex; gap: 8px; align-items: center; }
+  .nav-call svg { width: 16px; height: 16px; }
+
+  /* ---------- loader ---------- */
+  .loader { position: fixed; inset: 0; z-index: 100; background: var(--ink); display: none; place-items: center; }
+  .motion .loader { display: grid; }
+  .loader .sign { display: flex; gap: clamp(10px, 3vw, 26px); }
+  .bulbword { display: grid; grid-template-columns: repeat(var(--c), 1fr); gap: clamp(3px, .8vw, 6px); }
+  .bulbword i { width: clamp(7px, 1.6vw, 13px); aspect-ratio: 1; border-radius: 50%; background: #3a2220; transition: background .2s, box-shadow .2s; }
+  .bulbword i.on { background: var(--gold-2); box-shadow: 0 0 6px var(--gold), 0 0 16px rgba(255,181,71,.7); }
+  .bulbword i.off { visibility: hidden; }
+  .loader p { position: absolute; bottom: 12vh; left: 0; right: 0; text-align: center; font: 700 12px/1 var(--body); letter-spacing: .3em; color: var(--muted); text-transform: uppercase; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+  .hero-media { position: absolute; inset: 0; clip-path: inset(0 round 0); will-change: clip-path; }
+  .hero-media video, .hero-media img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(23,10,12,.55) 0%, rgba(23,10,12,.15) 35%, rgba(23,10,12,.85) 100%); }
+  .hero-copy { position: absolute; left: 0; right: 0; bottom: clamp(28px, 8vh, 80px); z-index: 2; }
+  .hero h1 { font: 800 clamp(52px, 13vw, 190px)/.85 var(--display); letter-spacing: -.035em; }
+  .hero h1 .line { display: block; overflow: hidden; padding-bottom: .04em; }
+  .hero h1 .line > span { display: inline-block; }
+  .hero h1 em { font: italic 500 .62em/1 var(--serif); color: var(--gold); letter-spacing: -.01em; }
+  .hero-sub { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; justify-content: space-between; }
+  .hero-sub p { font-size: clamp(15px, 1.5vw, 18px); color: var(--cream-2); max-width: 46ch; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(23,10,12,.5); backdrop-filter: blur(6px); font: 700 13px/1 var(--body); color: var(--gold-2); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .scroll-cue { position: absolute; right: var(--gutter); top: 50%; z-index: 2; writing-mode: vertical-rl; font: 700 11px/1 var(--body); letter-spacing: .3em; text-transform: uppercase; color: var(--cream-2); display: flex; align-items: center; gap: 12px; }
+  .scroll-cue::after { content: ''; width: 1px; height: 60px; background: linear-gradient(var(--gold), transparent); animation: drip 2s infinite; transform-origin: top; }
+  @keyframes drip { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* ---------- ticker ---------- */
+  .ticker { background: var(--gold); color: var(--ink); overflow: hidden; padding: 16px 0; transform: rotate(-2deg) scale(1.04); margin: -10px 0 0; position: relative; z-index: 3; }
+  .ticker.alt { background: var(--maroon); color: var(--gold-2); transform: rotate(1.5deg) scale(1.04); }
+  .ticker-track { display: flex; width: max-content; will-change: transform; }
+  .ticker-track span { font: 800 clamp(22px, 3.4vw, 42px)/1 var(--display); text-transform: uppercase; letter-spacing: -.01em; padding: 0 22px; display: inline-flex; align-items: center; gap: 44px; white-space: nowrap; }
+  .ticker-track span::after { content: '✦'; font-size: .6em; }
+
+  /* ---------- statement ---------- */
+  .statement { padding: clamp(110px, 18vh, 200px) 0 clamp(80px, 12vh, 140px); }
+  .statement p.big { font: 600 clamp(28px, 4.6vw, 64px)/1.12 var(--serif); letter-spacing: -.01em; margin-top: 26px; }
+  .statement p.big .w { display: inline-block; }
+  .motion .statement p.big .w { opacity: .14; }
+  .statement p.big .hl { color: var(--gold); font-style: italic; }
+
+  /* ---------- stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; margin-top: clamp(50px, 8vh, 90px); }
+  .stat { background: var(--ink); padding: clamp(20px, 3vw, 36px); }
+  .stat b { display: block; font: 800 clamp(40px, 6vw, 76px)/1 var(--display); color: var(--gold); letter-spacing: -.03em; }
+  .stat span { display: block; margin-top: 10px; color: var(--muted); font-size: 14px; }
+
+  /* ---------- aisles (horizontal) ---------- */
+  .aisles { position: relative; padding: clamp(60px, 10vh, 110px) 0; overflow: hidden; }
+  .aisles-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(30px, 5vh, 50px); }
+  .aisle-track { display: flex; gap: clamp(16px, 2.4vw, 28px); padding: 0 var(--gutter); width: max-content; }
+  .aisle { position: relative; width: min(78vw, 520px); height: min(66vh, 600px); border-radius: 26px; overflow: hidden; flex: none; background: var(--wood); isolation: isolate; }
+  .aisle img { position: absolute; inset: -8% -14%; width: 128%; height: 116%; object-fit: cover; will-change: transform; }
+  .aisle::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(23,10,12,.92)); z-index: 1; }
+  .aisle .cap { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: clamp(20px, 3vw, 32px); }
+  .aisle .num { font: 700 12px/1 var(--body); letter-spacing: .2em; color: var(--gold); }
+  .aisle h3 { font: 800 clamp(30px, 3.6vw, 46px)/1 var(--display); letter-spacing: -.02em; margin: 10px 0 8px; }
+  .aisle p { color: var(--cream-2); font-size: 15px; max-width: 38ch; }
+  .aisle.intro { background: var(--maroon); display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px, 3vw, 40px); width: min(78vw, 420px); }
+  .aisle.intro::after { display: none; }
+  .aisle.intro h3 { font-size: clamp(36px, 4.4vw, 58px); }
+  .aisle.intro .arrow { font: 800 64px/1 var(--display); color: var(--gold); }
+  .hot { position: absolute; top: 18px; right: 18px; z-index: 2; background: var(--gold); color: var(--ink); font: 800 14px/1 var(--display); padding: 10px 14px; border-radius: 999px; transform: rotate(8deg); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+  .hot::before { content: '👍 '; }
+
+  /* ---------- lamp sequence ---------- */
+  .lamp { position: relative; height: 340vh; background: #000; }
+  .lamp-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .lamp canvas { width: 100%; height: 100%; }
+  .lamp-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.7)); pointer-events: none; }
+  .lamp-text { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(40px, 12vh, 110px); pointer-events: none; }
+  .lamp-text .t { position: absolute; left: 0; bottom: 0; max-width: 640px; opacity: 0; transform: translateY(30px); }
+  .lamp-text .t:first-child { opacity: 1; transform: none; }
+  .lamp-text h3 { font: 800 clamp(34px, 5.6vw, 76px)/.95 var(--display); letter-spacing: -.02em; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+  .lamp-text h3 em { font: italic 500 1em/1 var(--serif); color: var(--gold); }
+  .lamp-text p { margin-top: 14px; color: var(--cream-2); font-size: clamp(15px, 1.5vw, 18px); text-shadow: 0 2px 14px rgba(0,0,0,.8); }
+  .sparks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .sparks i { position: absolute; bottom: -10px; width: 4px; height: 4px; border-radius: 50%; background: var(--gold-2); box-shadow: 0 0 8px var(--gold); opacity: 0; animation: rise linear infinite; }
+  @keyframes rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: .9; } 100% { transform: translateY(-105svh) translateX(var(--dx)); opacity: 0; } }
+
+  /* ---------- gifts ---------- */
+  .gifts { padding: clamp(90px, 14vh, 160px) 0; position: relative; }
+  .gifts-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(30px, 5vw, 70px); align-items: center; }
+  .gift-visual { position: relative; aspect-ratio: 4 / 4.4; }
+  .gift-visual .card { position: absolute; border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,.5); }
+  .gift-visual .card img { width: 100%; height: 100%; object-fit: cover; }
+  .gift-visual .c1 { inset: 0 18% 22% 0; }
+  .gift-visual .c2 { inset: 42% 0 0 34%; border: 6px solid var(--ink); }
+  .gift-list { list-style: none; margin-top: 30px; display: grid; gap: 2px; }
+  .gift-list li { display: flex; gap: 18px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--line); }
+  .gift-list li:last-child { border-bottom: 1px solid var(--line); }
+  .gift-list b { font: 800 14px/1 var(--display); color: var(--gold); min-width: 28px; }
+  .gift-list span { font-size: clamp(16px, 1.6vw, 19px); }
+
+  /* ---------- groceries strip ---------- */
+  .pantry { padding: 0 0 clamp(90px, 14vh, 160px); }
+  .pantry-row { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: clamp(12px, 2vw, 22px); margin-top: 40px; align-items: stretch; }
+  .pantry-row figure { border-radius: 22px; overflow: hidden; position: relative; min-height: 380px; }
+  .pantry-row figure img { position: absolute; inset: 0; width: 100%; height: 118%; object-fit: cover; top: -9%; }
+  .pantry-row .note { background: var(--cream); color: var(--ink); border-radius: 22px; padding: clamp(24px, 3vw, 38px); display: flex; flex-direction: column; justify-content: space-between; gap: 30px; }
+  .pantry-row .note h3 { font: 800 clamp(30px, 3.4vw, 46px)/1 var(--display); letter-spacing: -.02em; }
+  .pantry-row .note p { color: #5b4740; }
+  .pantry-row .note .tag { align-self: flex-start; font: 700 12px/1 var(--body); letter-spacing: .18em; text-transform: uppercase; background: var(--maroon); color: var(--gold-2); padding: 9px 12px; border-radius: 999px; }
+
+  /* ---------- services ---------- */
+  .services { background: var(--cream); color: var(--ink); padding: clamp(90px, 14vh, 160px) 0; border-radius: 40px 40px 0 0; position: relative; z-index: 2; }
+  .services .eyebrow { color: var(--maroon); }
+  .services h2 em { color: var(--maroon); }
+  .services .lede { color: #5b4740; }
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: clamp(40px, 6vh, 64px); perspective: 900px; }
+  .svc { background: #fff; border: 1px solid #ecdcc4; border-radius: 18px; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; min-height: 150px; transition: transform .35s var(--ease), box-shadow .35s, background .35s; transform-style: preserve-3d; }
+  .svc:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(142,27,42,.16); background: #fffaf2; }
+  .svc .ico { width: 46px; height: 46px; border-radius: 12px; background: var(--maroon); color: var(--gold-2); display: grid; place-items: center; }
+  .svc .ico svg { width: 24px; height: 24px; }
+  .svc h4 { font: 700 18px/1.2 var(--display); }
+  .svc small { color: #7b6359; font-size: 13px; }
+  .svc.wide { grid-column: span 2; background: var(--maroon); color: var(--cream); border-color: var(--maroon); }
+  .svc.wide .ico { background: var(--gold); color: var(--ink); }
+  .svc.wide small { color: var(--gold-2); }
+  .svc.wide ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .svc.wide li { font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 999px; background: rgba(255,217,138,.16); color: var(--gold-2); }
+
+  /* ---------- call band ---------- */
+  .band { position: relative; min-height: 90svh; display: grid; place-items: center; text-align: center; overflow: hidden; background: #000; }
+  .band video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; transform: scale(1.2); will-change: transform; }
+  .band .inner { position: relative; z-index: 2; padding: 80px var(--gutter); }
+  .band h2 { font-size: clamp(46px, 10vw, 150px); }
+  .band p { color: var(--cream-2); margin: 18px auto 34px; max-width: 46ch; font-size: clamp(16px, 1.6vw, 19px); }
+  .phones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 700 16px/1 var(--body); padding: 18px 24px; border-radius: 999px; background: var(--gold); color: var(--ink); transition: background .3s; will-change: transform; }
+  .btn.ghost { background: rgba(23,10,12,.55); color: var(--cream); border: 1px solid rgba(255,217,138,.4); backdrop-filter: blur(6px); }
+  .btn:hover { background: var(--gold-2); }
+  .btn.ghost:hover { background: rgba(142,27,42,.8); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn small { font-weight: 500; opacity: .7; font-size: 12px; }
+
+  /* ---------- visit ---------- */
+  .visit { padding: clamp(90px, 14vh, 160px) 0 60px; }
+  .visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 5vw, 70px); align-items: center; }
+  .front { position: relative; border-radius: 26px; overflow: hidden; aspect-ratio: 4 / 3; }
+  .front img { width: 100%; height: 100%; object-fit: cover; }
+  .addr { font: 600 clamp(24px, 2.8vw, 36px)/1.2 var(--serif); margin: 22px 0 26px; }
+  .facts { display: grid; gap: 14px; margin-bottom: 30px; }
+  .facts div { display: flex; gap: 14px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; }
+  .facts dt { min-width: 110px; font: 700 12px/1.6 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  .facts dd a { text-decoration: none; border-bottom: 1px solid var(--line); }
+  .facts dd a:hover { border-color: var(--gold); }
+  footer { padding: 40px 0 calc(40px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 30px; justify-content: space-between; }
+  footer a { color: var(--gold-2); }
+  .age { display: inline-flex; align-items: center; gap: 8px; }
+  .age b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--red); color: var(--cream); font-size: 11px; }
+
+  /* ---------- reveal helpers ---------- */
+  .motion .rv { opacity: 0; transform: translateY(40px); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px) {
+    .gifts-grid, .visit-grid { grid-template-columns: 1fr; }
+    .pantry-row { grid-template-columns: 1fr 1fr; }
+    .pantry-row .note { grid-column: 1 / -1; order: -1; }
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 767px) {
+    .scroll-cue { display: none; }
+    .aisles { overflow: visible; }
+    .aisle-track { flex-direction: column; width: auto; }
+    .aisle, .aisle.intro { width: 100%; height: 72svh; max-height: 560px; }
+    .aisle.intro { height: auto; min-height: 260px; }
+    .aisle.intro .arrow { transform: rotate(90deg); align-self: flex-start; }
+    .pantry-row figure { min-height: 260px; }
+    .svc-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .svc { padding: 16px 14px; min-height: 130px; }
+    .svc h4 { font-size: 16px; }
+    .nav-call span { display: none; }
+    .nav-call { padding: 12px; }
+    .facts dt { min-width: 84px; }
+    .btn { width: 100%; justify-content: center; }
+  }
+  @media (max-width: 420px) {
+    .svc.wide { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none !important; }
+    .sparks, .scroll-cue::after, .chip .dot { animation: none !important; display: none; }
+    .lamp { height: auto; }
+    .lamp-stage { position: relative; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loader" aria-hidden="true">
+  <div class="sign" id="bulbs"></div>
+  <p>Pasar Mini · Cheras</p>
+</div>
+
+<div class="progress" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><b>MTK</b> Mini Mart</a>
+  <a class="nav-call magnet" href="tel:+60391747655"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span>03-9174 7655</span></a>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero-media">
+      <video id="heroVid" src="media/counter.mp4" poster="img/counter.jpg" autoplay muted loop playsinline preload="auto" aria-label="The MTK Mini Mart counter with a lit Deepavali lamp display in front of the liquor shelves"></video>
+    </div>
+    <div class="scroll-cue">Scroll</div>
+    <div class="hero-copy wrap">
+      <span class="chip"><span class="dot"></span> Taman Tenaga, Cheras · Since 2020</span>
+      <h1 style="margin-top:18px">
+        <span class="line"><span>MTK</span></span>
+        <span class="line"><span>Mini Mart <em>&amp; more</em></span></span>
+      </h1>
+      <div class="hero-sub">
+        <p>Wines, spirits and beers, a walk-in cooler, soft drinks, groceries and gift packages, plus bill payments and reloads at the counter.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" data-dir="-1"><span>Wines</span><span>Spirits</span><span>Beers</span><span>Walk-in cooler</span><span>Soft drinks</span><span>Gift packages</span><span>Groceries</span><span>Bill payments</span></div></div>
+
+  <section class="statement">
+    <div class="wrap">
+      <span class="eyebrow rv">Your neighbourhood mart</span>
+      <p class="big" id="statement">Wines, spirits and beers from popular brands to our exclusive <span class="hl">Sourced &amp; Certified</span> collection, with liquor for every function and gift packages for your <span class="hl">loved ones, friends and family.</span></p>
+      <div class="stats">
+        <div class="stat rv"><b data-count="2020">2020</b><span>Established</span></div>
+        <div class="stat rv"><b data-count="15">15</b><span>Counter services, from bills to game pins</span></div>
+        <div class="stat rv"><b>Walk&#8209;in</b><span>Cooler for chilled beer and drinks</span></div>
+        <div class="stat rv"><b data-count="2022">2022</b><span>Registered with MyHighst, 2 December</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="aisles" id="aisles">
+    <div class="wrap aisles-head">
+      <div>
+        <span class="eyebrow rv">Walk the aisles</span>
+        <h2 class="rv" style="margin-top:16px">What's on <em>the shelves</em></h2>
+      </div>
+      <p class="lede rv">From the liquor wall to the cold drinks, it's all in one small shop.</p>
+    </div>
+    <div class="aisle-track" id="aisleTrack">
+      <div class="aisle intro">
+        <span class="num">01 / 05</span>
+        <div>
+          <h3>Pick it up on the way home.</h3>
+          <p style="margin-top:12px;color:var(--cream-2)">For a party, a gift or a quiet night in.</p>
+        </div>
+        <span class="arrow">→</span>
+      </div>
+      <article class="aisle">
+        <img src="img/liquor.jpg" alt="Wall of whisky, brandy, wine and spirits in gift boxes" loading="lazy">
+        <span class="hot">HOT!</span>
+        <div class="cap"><span class="num">02 / 05</span><h3>Wines &amp; spirits</h3><p>Whisky, brandy, wine and more, from popular brands to the exclusive Sourced &amp; Certified collection.</p></div>
+      </article>
+      <article class="aisle">
+        <img src="img/drinks.jpg" alt="Aisle of soft drinks, bottled water and canned drinks" loading="lazy" style="object-position:70% 50%">
+        <div class="cap"><span class="num">03 / 05</span><h3>Beer &amp; the walk-in cooler</h3><p>Beer lovers can pick their favourite. The chilled cases are in the walk-in cooler.</p></div>
+      </article>
+      <article class="aisle">
+        <img src="img/grocery-b.jpg" alt="Shelves of snacks, spices and cooking oil" loading="lazy">
+        <div class="cap"><span class="num">04 / 05</span><h3>Soft drinks &amp; snacks</h3><p>A wide range of soft drinks for gifts, parties or just for you.</p></div>
+      </article>
+      <article class="aisle">
+        <img src="img/rabbits.jpg" alt="Red ceramic rabbit figures on a lit display shelf under a HOT sign" loading="lazy">
+        <span class="hot">HOT!</span>
+        <div class="cap"><span class="num">05 / 05</span><h3>Gifts &amp; keepsakes</h3><p>Gift items and packages for your loved ones, friends and family.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lamp" id="lamp" aria-label="The Deepavali lamp display at the counter">
+    <div class="lamp-stage">
+      <canvas id="seq" width="800" height="450"></canvas>
+      <div class="lamp-shade"></div>
+      <div class="sparks" id="sparks"></div>
+      <div class="lamp-text wrap">
+        <div class="t"><h3>Lights on <em>at the counter.</em></h3><p>Keep scrolling to walk around it.</p></div>
+        <div class="t"><h3>Lit up for <em>Deepavali.</em></h3><p>Rows of lamps around a hand-dressed kalasam.</p></div>
+        <div class="t"><h3>Come say <em>hello.</em></h3><p>Festive gifts and drinks are ready at the counter.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gifts" id="gifts">
+    <div class="wrap gifts-grid">
+      <div class="gift-visual">
+        <div class="card c1"><img src="img/liquor.jpg" alt="Boxed bottles on the liquor wall" loading="lazy" style="object-position:30% 30%"></div>
+        <div class="card c2"><img src="img/rabbits.jpg" alt="Red ceramic rabbit gift figures" loading="lazy"></div>
+      </div>
+      <div>
+        <span class="eyebrow rv">For every function</span>
+        <h2 class="rv" style="margin-top:16px">Gift it <em>well.</em></h2>
+        <p class="lede rv" style="margin-top:18px">We've stocked liquor for all kinds of functions since 2020, and we put together gift packages for the people who matter.</p>
+        <ul class="gift-list">
+          <li class="rv"><b>01</b><span>Boxed whisky, brandy and wine</span></li>
+          <li class="rv"><b>02</b><span>Gift packages for loved ones, friends and family</span></li>
+          <li class="rv"><b>03</b><span>Drinks for parties and functions</span></li>
+          <li class="rv"><b>04</b><span>Soft drinks for gifts, parties or personal enjoyment</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pantry">
+    <div class="wrap">
+      <div class="pantry-row">
+        <figure class="rv"><img src="img/grocery-a.jpg" alt="Shelves of spices, snacks and cooking oil" loading="lazy"></figure>
+        <figure class="rv"><img src="img/grocery-b.jpg" alt="Shelves of packed snacks and spice jars" loading="lazy"></figure>
+        <div class="note rv">
+          <span class="tag">Pasar mini</span>
+          <h3>The everyday stuff, too.</h3>
+          <p>Spices, snacks, cooking oil, bottled water and household basics, right in Taman Tenaga.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="wrap">
+      <span class="eyebrow rv">Other facilities</span>
+      <h2 class="rv" style="margin-top:16px">Pay, reload <em>&amp; go.</em></h2>
+      <p class="lede rv" style="margin-top:18px">Skip the queue somewhere else. Settle bills, top up and reload at our counter.</p>
+      <div class="svc-grid" id="svcGrid">
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></span><h4>Touch 'n Go reload</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01M10 7l2-2 2 2M12 5v7"/></svg></span><h4>E-Reload</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8.5 15a5 5 0 0 1 7 0M10.5 17.5a2 2 0 0 1 3 0"/></svg></span><h4>Unifi Home registration</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/><path d="M9.5 17.5h5"/></svg></span><h4>Etiqa car insurance</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></span><h4>All types of bill payments</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span><h4>Utility bills</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a10 10 0 0 1 14 0M8 15.5a6 6 0 0 1 8 0M12 19h.01"/></svg></span><h4>Telco bills</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9 9h6M9 13h6"/></svg></span><h4>Mobile PIN</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 0 4v6h18v-6a2 2 0 0 0 0-4V6H3z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg></span><h4>Digital vouchers</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4M15.5 12h.01M18 14h.01"/></svg></span><h4>Game PIN</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></span><h4>International airtime</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M8 21l3-7 3 3v4M7 11l3-3 4 1 3 3M11 14l-2-4"/></svg></span><h4>Runner service</h4></div>
+        <div class="svc"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18"/><path d="M9 20v-6h6v6"/></svg></span><h4>B2B marketplace</h4></div>
+        <div class="svc wide"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span><h4>Cash out</h4><ul><li>Top up cards</li><li>Pay electricity bills</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="call">
+    <video id="bandVid" src="media/kalasam.mp4" poster="img/kalasam.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <div class="inner">
+      <h2 class="rv">Give us <em>a call.</em></h2>
+      <p class="rv">Ask about stock, gift packages or any of our counter services.</p>
+      <div class="phones rv">
+        <a class="btn magnet" href="tel:+60391747655"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>03-9174 7655 <small>Shop</small></a>
+        <a class="btn ghost magnet" href="tel:+60126747248">012-674 7248 <small>Mobile</small></a>
+        <a class="btn ghost magnet" href="tel:+60162929492">016-292 9492 <small>Mobile</small></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap visit-grid">
+      <figure class="front rv"><img src="img/front.jpg" alt="MTK Mini Mart shopfront with a lit sign and opening-day flower stands" loading="lazy"></figure>
+      <div>
+        <span class="eyebrow rv">Find us</span>
+        <p class="addr rv">6, Jalan Sembilang,<br>Taman Tenaga, 56000<br>Kuala Lumpur</p>
+        <dl class="facts">
+          <div class="rv"><dt>Area</dt><dd>Cheras, Wilayah Persekutuan Kuala Lumpur, Malaysia</dd></div>
+          <div class="rv"><dt>Shop</dt><dd><a href="tel:+60391747655">+60 3-9174 7655</a></dd></div>
+          <div class="rv"><dt>Mobile</dt><dd><a href="tel:+60126747248">012-674 7248</a> · <a href="tel:+60162929492">016-292 9492</a></dd></div>
+        </dl>
+        <a class="btn magnet rv" href="https://www.google.com/maps/search/?api=1&amp;query=3.1138928,101.7258883" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Open in Google Maps</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© MTK Mini Mart, Taman Tenaga, Cheras.</span>
+    <span class="age"><b>21+</b> Alcohol is sold only to customers aged 21 and above. Please drink responsibly.</span>
+    <a href="https://thudinest.com/">thudinest.com</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+  /* ---- scroll-scrubbed lamp frames (also used without GSAP) ---- */
+  var FRAMES = 96, canvas = $('#seq'), ctx = canvas.getContext('2d'), imgs = [], cur = -1;
+  function src(i) { return 'seq/f' + String(i + 1).padStart(3, '0') + '.webp'; }
+  function draw(i) {
+    i = Math.max(0, Math.min(FRAMES - 1, Math.round(i)));
+    var im = imgs[i];
+    // fall back to the nearest loaded frame
+    for (var d = 1; (!im || !im.complete || !im.naturalWidth) && d < FRAMES; d++) im = imgs[i - d] || imgs[i + d];
+    if (!im || !im.naturalWidth || i === cur && canvas.dataset.w == canvas.width) return;
+    cur = i; canvas.dataset.w = canvas.width;
+    var cw = canvas.width, ch = canvas.height, s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
+    var w = im.naturalWidth * s, h = im.naturalHeight * s;
+    ctx.drawImage(im, (cw - w) / 2, (ch - h) / 2, w, h);
+  }
+  function sizeCanvas() {
+    var dpr = Math.min(devicePixelRatio || 1, 2), r = canvas.getBoundingClientRect();
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    cur = -1; draw(lampFrame);
+  }
+  var lampFrame = 0;
+  function loadFrames() {
+    for (var i = 0; i < FRAMES; i++) {
+      var im = new Image(); im.decoding = 'async';
+      (function (k) { im.onload = function () { if (k === 0 || Math.abs(k - lampFrame) < 2) { cur = -1; draw(lampFrame); } }; })(i);
+      im.src = src(i); imgs[i] = im;
+    }
+  }
+  sizeCanvas(); addEventListener('resize', sizeCanvas);
+  new IntersectionObserver(function (e, o) { if (e[0].isIntersecting) { loadFrames(); o.disconnect(); } }, { rootMargin: '150% 0px' }).observe($('#lamp'));
+
+  /* ---- band video plays only when visible ---- */
+  var band = $('#bandVid');
+  new IntersectionObserver(function (e) { e[0].isIntersecting ? band.play().catch(function () {}) : band.pause(); }, { threshold: .1 }).observe(band);
+
+  /* ---- sparks ---- */
+  if (!reduce) {
+    var sp = $('#sparks');
+    for (var i = 0; i < 26; i++) {
+      var s = document.createElement('i');
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.setProperty('--dx', ((Math.random() - .5) * 120) + 'px');
+      s.style.animationDuration = (6 + Math.random() * 7) + 's';
+      s.style.animationDelay = (-Math.random() * 12) + 's';
+      var z = 2 + Math.random() * 4; s.style.width = s.style.height = z + 'px';
+      sp.appendChild(s);
+    }
+  }
+
+  if (!window.gsap || !window.ScrollTrigger) {
+    root.classList.remove('motion');
+    // simple scroll scrub without GSAP
+    addEventListener('scroll', function () {
+      var r = $('#lamp').getBoundingClientRect(), p = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+      lampFrame = p * (FRAMES - 1); draw(lampFrame);
+    }, { passive: true });
+    return;
+  }
+  window.__mtkReady = true;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---- statement words ---- */
+  var st = $('#statement');
+  (function split(el) {
+    var out = [];
+    el.childNodes.forEach(function (n) {
+      if (n.nodeType === 3) {
+        n.textContent.split(/(\s+)/).forEach(function (t) {
+          if (!t) return;
+          out.push(/^\s+$/.test(t) ? document.createTextNode(t) : Object.assign(document.createElement('span'), { className: 'w', textContent: t }));
+        });
+      } else {
+        var cls = n.className;
+        n.textContent.split(/(\s+)/).forEach(function (t) {
+          if (!t) return;
+          out.push(/^\s+$/.test(t) ? document.createTextNode(t) : Object.assign(document.createElement('span'), { className: 'w ' + cls, textContent: t }));
+        });
+      }
+    });
+    el.textContent = ''; out.forEach(function (n) { el.appendChild(n); });
+  })(st);
+
+  if (reduce) { root.classList.remove('motion'); return; }
+
+  /* ---- smooth scroll ---- */
+  var lenis = window.Lenis ? new Lenis({ lerp: 0.1 }) : null;
+  if (lenis) {
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  }
+  $$('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var t = $(a.getAttribute('href')); if (!t) return;
+      e.preventDefault(); lenis ? lenis.scrollTo(t) : t.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* ---- progress + nav ---- */
+  gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
+  var nav = $('#nav'), lastY = 0;
+  ScrollTrigger.create({ start: 0, end: 'max', onUpdate: function (self) {
+    var y = self.scroll();
+    nav.classList.toggle('solid', y > 60);
+    nav.classList.toggle('hide', y > lastY && y > innerHeight * .8);
+    lastY = y;
+  } });
+
+  /* ---- loader: bulb sign spelling MTK ---- */
+  var GLYPHS = {
+    M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+    T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+    K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001']
+  };
+  var bulbs = $('#bulbs'), lit = [];
+  'MTK'.split('').forEach(function (ch) {
+    var g = document.createElement('div'); g.className = 'bulbword'; g.style.setProperty('--c', 5);
+    GLYPHS[ch].forEach(function (row) { row.split('').forEach(function (b) {
+      var i = document.createElement('i'); if (b === '0') i.className = 'off'; else lit.push(i); g.appendChild(i);
+    }); });
+    bulbs.appendChild(g);
+  });
+  if (lenis) lenis.stop();
+  var intro = gsap.timeline({ onComplete: function () { if (lenis) lenis.start(); $('.loader').remove(); } });
+  lit.forEach(function (b, k) { intro.add(function () { b.classList.add('on'); }, 0.15 + k * 0.022); });
+  intro.to('.loader .sign', { scale: 1.08, duration: .25, yoyo: true, repeat: 1, ease: 'power1.inOut' }, '+=0.1')
+       .to('.loader', { clipPath: 'inset(0 0 100% 0)', duration: .9, ease: 'expo.inOut' }, '+=0.15')
+       .from('.hero-media', { scale: 1.25, duration: 1.6, ease: 'expo.out' }, '-=0.6')
+       .from('.hero h1 .line > span', { yPercent: 110, duration: 1.1, stagger: .12, ease: 'expo.out' }, '-=1.3')
+       .from('.hero .chip, .hero-sub p, .scroll-cue', { opacity: 0, y: 24, duration: .8, stagger: .1, ease: 'power3.out' }, '-=0.8')
+       .from('.nav', { yPercent: -100, opacity: 0, duration: .7, ease: 'power3.out' }, '-=0.8');
+
+  /* ---- hero: video shrinks into a rounded card on scroll ---- */
+  gsap.timeline({ scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } })
+    .to('.hero-media', { clipPath: 'inset(6% 5% 14% 5% round 32px)', ease: 'none' }, 0)
+    .to('.hero-media video', { scale: 1.15, ease: 'none' }, 0)
+    .to('.hero-copy', { yPercent: -40, opacity: 0, ease: 'none' }, 0);
+
+  /* ---- tickers: constant drift, scroll velocity adds speed and direction ---- */
+  $$('.ticker-track').forEach(function (track) {
+    track.innerHTML += track.innerHTML;
+    var dir = +track.dataset.dir || -1, x = 0, boost = 0, half = 0;
+    function measure() { half = track.scrollWidth / 2; }
+    measure(); addEventListener('resize', measure);
+    ScrollTrigger.create({ trigger: track, start: 'top bottom', end: 'bottom top', onUpdate: function (s) { boost = gsap.utils.clamp(-14, 14, s.getVelocity() / 140); } });
+    gsap.ticker.add(function () {
+      x += dir * (1.1 + Math.abs(boost)) * (boost < 0 ? -1 : 1);
+      boost *= .92;
+      if (x <= -half) x += half; if (x > 0) x -= half;
+      track.style.transform = 'translate3d(' + x + 'px,0,0)';
+    });
+  });
+
+  /* ---- statement: words light up as you read ---- */
+  gsap.to('#statement .w', { opacity: 1, stagger: .1, ease: 'none', scrollTrigger: { trigger: '#statement', start: 'top 80%', end: 'bottom 45%', scrub: true } });
+
+  /* ---- generic reveals ---- */
+  ScrollTrigger.batch('.rv', {
+    start: 'top 88%',
+    onEnter: function (els) { gsap.to(els, { opacity: 1, y: 0, duration: 1, stagger: .09, ease: 'expo.out', overwrite: 'auto' }); }
+  });
+
+  /* ---- counters ---- */
+  $$('[data-count]').forEach(function (el) {
+    var end = +el.dataset.count, from = end > 1000 ? end - 40 : 0, o = { v: from };
+    el.textContent = from;
+    gsap.to(o, { v: end, duration: 1.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' }, onUpdate: function () { el.textContent = Math.round(o.v); } });
+  });
+
+  /* ---- aisles: horizontal pin on wide screens, stacked reveal on phones ---- */
+  var mm = gsap.matchMedia();
+  mm.add('(min-width: 768px)', function () {
+    var track = $('#aisleTrack');
+    var dist = function () { return track.scrollWidth - innerWidth; };
+    var tween = gsap.to(track, { x: function () { return -dist(); }, ease: 'none',
+      scrollTrigger: { trigger: '#aisles', start: 'top top', end: function () { return '+=' + dist(); }, pin: true, scrub: 1, invalidateOnRefresh: true } });
+    $$('.aisle img', track).forEach(function (img) {
+      gsap.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: 'none', scrollTrigger: { trigger: img.parentNode, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
+    });
+    $$('.aisle .cap', track).forEach(function (cap) {
+      gsap.from(cap.children, { y: 40, opacity: 0, stagger: .08, ease: 'power3.out', scrollTrigger: { trigger: cap.parentNode, containerAnimation: tween, start: 'left 75%', end: 'left 35%', scrub: true } });
+    });
+    $$('.hot', track).forEach(function (h) {
+      gsap.from(h, { scale: 0, rotate: -40, ease: 'back.out(3)', scrollTrigger: { trigger: h.parentNode, containerAnimation: tween, start: 'left 70%', toggleActions: 'play none none reverse' } });
+    });
+  });
+  mm.add('(max-width: 767px)', function () {
+    $$('.aisle').forEach(function (a) {
+      gsap.from(a, { y: 80, scale: .92, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: a, start: 'top 90%' } });
+      var img = $('img', a);
+      if (img) gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: a, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  });
+
+  /* ---- lamp: scrub frames and swap captions ---- */
+  var texts = $$('.lamp-text .t');
+  ScrollTrigger.create({ trigger: '#lamp', start: 'top top', end: 'bottom bottom', scrub: true, onUpdate: function (s) {
+    lampFrame = s.progress * (FRAMES - 1); draw(lampFrame);
+    var idx = Math.min(texts.length - 1, Math.floor(s.progress * texts.length * 0.999));
+    texts.forEach(function (t, k) {
+      var on = k === idx;
+      if (t._on === on) return; t._on = on;
+      gsap.to(t, { opacity: on ? 1 : 0, y: on ? 0 : (k < idx ? -30 : 30), duration: .6, ease: 'power3.out', overwrite: true });
+    });
+  } });
+  gsap.fromTo('#seq', { scale: 1.15 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '#lamp', start: 'top bottom', end: 'top top', scrub: true } });
+
+  /* ---- gifts: stacked cards drift apart ---- */
+  gsap.fromTo('.gift-visual .c1', { rotate: -6, y: 60 }, { rotate: -2, y: -30, ease: 'none', scrollTrigger: { trigger: '.gifts', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.fromTo('.gift-visual .c2', { rotate: 10, y: 140 }, { rotate: 3, y: -40, ease: 'none', scrollTrigger: { trigger: '.gifts', start: 'top bottom', end: 'bottom top', scrub: true } });
+
+  /* ---- pantry parallax ---- */
+  $$('.pantry-row figure img').forEach(function (img, k) {
+    gsap.fromTo(img, { yPercent: k ? 6 : -6 }, { yPercent: k ? -6 : 6, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+
+  /* ---- services: tiles flip in, rise from the dark section ---- */
+  gsap.from('.services', { borderRadius: '120px 120px 0 0', ease: 'none', scrollTrigger: { trigger: '.services', start: 'top bottom', end: 'top 40%', scrub: true } });
+  ScrollTrigger.batch('.svc', {
+    start: 'top 92%',
+    onEnter: function (els) { gsap.fromTo(els, { opacity: 0, y: 50, rotateX: -55 }, { opacity: 1, y: 0, rotateX: 0, duration: .9, stagger: .06, ease: 'back.out(1.6)', overwrite: 'auto' }); }
+  });
+  gsap.set('.svc', { opacity: 0 });
+  $$('.svc').forEach(function (c) {
+    c.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var r = c.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+      gsap.to(c, { rotateY: px * 14, rotateX: -py * 14, duration: .4, ease: 'power2.out' });
+    });
+    c.addEventListener('pointerleave', function () { gsap.to(c, { rotateY: 0, rotateX: 0, duration: .6, ease: 'elastic.out(1,.5)' }); });
+  });
+
+  /* ---- call band: video zooms out ---- */
+  gsap.to('#bandVid', { scale: 1, ease: 'none', scrollTrigger: { trigger: '.band', start: 'top bottom', end: 'bottom top', scrub: true } });
+
+  /* ---- shopfront reveal ---- */
+  gsap.fromTo('.front', { clipPath: 'inset(20% 20% 20% 20% round 26px)' }, { clipPath: 'inset(0% 0% 0% 0% round 26px)', ease: 'none', scrollTrigger: { trigger: '.front', start: 'top 95%', end: 'center 70%', scrub: true } });
+  gsap.fromTo('.front img', { scale: 1.3 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.front', start: 'top 95%', end: 'center 70%', scrub: true } });
+
+  /* ---- magnetic buttons (mouse only) ---- */
+  $$('.magnet').forEach(function (b) {
+    b.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var r = b.getBoundingClientRect();
+      gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * .25, y: (e.clientY - r.top - r.height / 2) * .35, duration: .4, ease: 'power3.out' });
+    });
+    b.addEventListener('pointerleave', function () { gsap.to(b, { x: 0, y: 0, duration: .7, ease: 'elastic.out(1,.4)' }); });
+  });
+
+  addEventListener('load', function () { ScrollTrigger.refresh(); });
+})();
+</script>
+</body>
+</html>
