@@ -2890,8 +2890,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
 .th-fill em .w { color: var(--aqua); }
 .th-fill em { background: none; color: inherit; }
 .th-score b { text-shadow: 0 0 80px rgba(70,214,195,0.35); }
-.th-word { background: linear-gradient(180deg, var(--paper) 30%, rgba(244,239,228,0.25)); -webkit-background-clip: text; background-clip: text; }
-.th-word span { color: transparent; }
+.th-word span { color: var(--paper); }
 .th-word span:nth-child(n+6) { color: var(--aqua); }
 
 /* the letter ring */
@@ -2924,6 +2923,27 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
 .th-card.th-c2 { --bg: linear-gradient(135deg, #3350dc, #2236a8); }
 .th-card.th-c3 { --bg: linear-gradient(135deg, #e3b04a, #c98f2a); }
 .th-card.th-c4 { --bg: linear-gradient(135deg, #14242e, #0a141b); }
+
+/* ---------- more scroll response ---------- */
+.th-h1 em, .th-h2 em, .th-big em { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.th-motion #screen-landing::before { inset: -20%; transform: rotate(calc(var(--sp, 0) * 70deg)); will-change: transform; }
+.th-motion .th-round { clip-path: inset(0 calc((1 - var(--in, 1)) * 7vw) 0 calc((1 - var(--in, 1)) * 7vw) round clamp(28px, 4vw, 56px) clamp(28px, 4vw, 56px) 0 0); }
+.th-motion .th-space.th-round { clip-path: inset(0 calc((1 - var(--in, 1)) * 7vw) -1px calc((1 - var(--in, 1)) * 7vw) round clamp(28px, 4vw, 56px) clamp(28px, 4vw, 56px) 0 0); }
+.th-motion .th-score b { display: inline-block; scale: calc(0.62 + var(--p, 1) * 0.38); transform-origin: 50% 60%; }
+.th-motion .th-score svg { rotate: calc((1 - var(--p, 1)) * -38deg); transform-origin: 50% 100%; }
+.th-motion .th-score svg.r { rotate: calc((1 - var(--p, 1)) * 38deg); }
+.th-motion .th-ring { scale: calc(0.72 + var(--p, 1) * 0.28); rotate: calc((1 - var(--p, 1)) * -16deg); }
+.th-motion .th-map svg.m { scale: calc(1.35 - var(--p, 1) * 0.35); }
+.th-motion .th-cta .th-big .th-ln:first-child { translate: calc((1 - var(--p, 1)) * -16vw) 0; }
+.th-motion .th-cta .th-big .th-ln:last-child { translate: calc((1 - var(--p, 1)) * 16vw) 0; }
+.th-motion .th-cta::before { translate: 0 calc((1 - var(--p, 1)) * 30vh); scale: calc(0.6 + var(--p, 1) * 0.6); }
+.th-motion .th-track, .th-motion .th-marq div { transition: none; }
+@media (min-width: 821px) {
+  .th-motion .th-game:nth-child(1) { translate: 0 calc(var(--g, 0) * 46px); }
+  .th-motion .th-game:nth-child(2) { translate: 0 calc(var(--g, 0) * -46px); }
+  .th-motion .th-game:nth-child(3) { translate: 0 calc(var(--g, 0) * 76px); }
+  .th-games-grid { margin-bottom: 110px; }
+}
 </style>
 <script>
 // Switch scroll-driven motion on before first paint, unless the visitor asked for reduced motion.
@@ -8685,7 +8705,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   var cards = $$('.th-card'), marq = $$('#th-marq div'), map = $('#th-map'), steps = $('#th-steps'), word = $('#th-word'), feather = $('#th-feather');
   var pars = $$('[data-par]');
   var spyLinks = $$('.th-links a[data-spy]'), spyT = spyLinks.map(function (a) { return document.getElementById(a.getAttribute('data-spy')); });
-  var vh = 0, vw = 0, lastW = -1, trackRun = 0, lastY = 0, queued = false;
+  var vh = 0, vw = 0, lastW = -1, trackRun = 0, lastY = 0, queued = false, prevY = window.scrollY, vel = 0;
+  var panels = $$('.th-round'), revs = $('#reviews'), cta = $('#contact'), ring = $('.th-ring'), gamesGrid = $('.th-games-grid');
 
   function measure() {
     vh = window.innerHeight; vw = document.documentElement.clientWidth;
@@ -8716,6 +8737,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     spyT.forEach(function (s, i) { if (!s) return; var r = s.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) at = i; });
     spyLinks.forEach(function (a, i) { a.classList.toggle('on', i === at); });
     if (!motion) return;
+    root.style.setProperty('--sp', (max > 0 ? y / max : 0).toFixed(4));
+    // how fast the page is moving: things lean into the scroll and settle back
+    vel += (clamp(y - prevY, -90, 90) - vel) * 0.22; prevY = y;
+    var skew = (vel * 0.07).toFixed(2);
 
     // hero: window to full screen, then the caption
     var hp = pinProgress(hero, heroPin), e = ease(clamp(hp / 0.58, 0, 1)), o = clamp((hp - 0.56) / 0.22, 0, 1);
@@ -8730,7 +8755,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     // rooms slide sideways
     var sp = pinProgress(space, spacePin);
-    track.style.transform = 'translate3d(' + (-sp * trackRun).toFixed(1) + 'px,0,0)';
+    track.style.transform = 'translate3d(' + (-sp * trackRun).toFixed(1) + 'px,0,0) skewX(' + (-skew) + 'deg)';
     spaceBar.style.setProperty('--p', sp.toFixed(4));
     var c = vw / 2, idx = 0;
     for (var s = 0; s < shots.length; s++) { var sr = shots[s].getBoundingClientRect(); if (sr.left < c) idx = s; shots[s].style.setProperty('--px', (clamp((sr.left + sr.width / 2 - c) / vw, -1, 1) * -8).toFixed(2)); }
@@ -8751,15 +8776,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     var mr = marq[0].parentNode.getBoundingClientRect();
     if (mr.top < vh && mr.bottom > 0) {
       var m = (vh - mr.top) * 0.42;
-      marq[0].style.transform = 'translate3d(' + (-m).toFixed(1) + 'px,0,0)';
-      marq[1].style.transform = 'translate3d(' + (m - vw * 0.2).toFixed(1) + 'px,0,0)';
+      marq[0].style.transform = 'translate3d(' + (-m).toFixed(1) + 'px,0,0) skewX(' + (-skew * 2) + 'deg)';
+      marq[1].style.transform = 'translate3d(' + (m - vw * 0.2).toFixed(1) + 'px,0,0) skewX(' + (skew * 2) + 'deg)';
     }
 
     // the road draws itself, the steps fill, the wordmark rises
     map.style.setProperty('--p', viewProgress(map, 0.95, 0.35).toFixed(3));
     steps.style.setProperty('--p', viewProgress(steps, 0.9, 0.45).toFixed(3));
+    // panels widen as they arrive; the score grows, the games drift, the closing line slides together
+    for (var w = 0; w < panels.length; w++) { var tr = panels[w].getBoundingClientRect().top; if (tr < vh * 1.2 && tr > -vh) panels[w].style.setProperty('--in', clamp((vh - tr) / (vh * 0.55), 0, 1).toFixed(3)); else if (tr <= -vh) panels[w].style.setProperty('--in', 1); }
+    revs.style.setProperty('--p', viewProgress(revs, 1, 0.35).toFixed(3));
+    ring.style.setProperty('--p', viewProgress(ring, 1, 0.5).toFixed(3));
+    gamesGrid.style.setProperty('--g', ((viewProgress(gamesGrid, 1, 0) - 0.5) * 2).toFixed(3));
+    cta.style.setProperty('--p', ease(clamp((vh - cta.getBoundingClientRect().top) / (vh * 0.9), 0, 1)).toFixed(3));
     var wr = word.getBoundingClientRect();
     word.style.setProperty('--p', clamp((vh - wr.top) / (wr.height * 1.15), 0, 1).toFixed(3));
+    if (Math.abs(vel) > 0.05) req();
   }
   function req() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
   window.addEventListener('scroll', req, { passive: true });
