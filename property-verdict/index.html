@@ -4,270 +4,548 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Property Verdict | Thudinest</title>
-<meta name="description" content="A second opinion on the Thalambur and Casa Grande property choice, with EMI figures, rental notes and a checklist to work through before buying.">
-<meta name="theme-color" content="#0c0d10">
+<title>For Lavanya · Thalambur or Casa Grande | Thudinest</title>
+<meta name="description" content="A decision brief for Lavanya: Thalambur or Casa Grande, with loan figures, rental notes and a checklist before buying.">
+<meta name="theme-color" content="#0b0c0f">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 :root{
-  --ink:#0c0d10;
-  --panel:#16181f;
-  --line:#2b2e38;
-  --text:#ede7da;
-  --muted:#a39d91;
-  --amber:#e9a94a;
-  --sage:#9cc8a6;
-  --rust:#d9735a;
+  --ink:#0b0c0f; --panel:#15171d; --panel2:#1b1e27; --line:#2a2d37;
+  --text:#efe8da; --muted:#a29b8e;
+  --amber:#eaa94b; --sage:#9fcbaa; --rust:#da7559; --plum:#b598d6;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  margin:0;
-  background:
-    radial-gradient(900px 500px at 85% -5%, rgba(233,169,74,.13), transparent 60%),
-    radial-gradient(700px 500px at -10% 40%, rgba(156,200,166,.08), transparent 60%),
-    var(--ink);
-  color:var(--text);
-  font:400 18px/1.7 "Fraunces", Georgia, serif;
-  min-height:100vh;
-}
-.wrap{max-width:880px;margin:0 auto;padding:56px 24px 96px}
-.mono{font-family:"JetBrains Mono", ui-monospace, monospace}
-.kicker{
-  font:600 12px/1 "JetBrains Mono", monospace;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--amber);
-}
-h1{
-  font-weight:800;font-size:clamp(40px,7vw,72px);line-height:1.02;
-  letter-spacing:-.02em;margin:18px 0 10px;
-}
-h1 em{font-style:italic;font-weight:400;color:var(--amber)}
-h2{
-  font-weight:600;font-size:clamp(26px,4vw,34px);line-height:1.15;
-  margin:64px 0 16px;letter-spacing:-.01em;
-}
-h2 .num{
-  font:600 13px/1 "JetBrains Mono", monospace;color:var(--amber);
-  display:block;margin-bottom:10px;letter-spacing:.12em;
-}
-p{margin:0 0 16px;color:var(--text)}
-.lede{font-size:21px;color:var(--muted);max-width:640px}
+body{margin:0;background:var(--ink);color:var(--text);font:400 18px/1.7 "Fraunces",Georgia,serif;overflow-x:hidden}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+::selection{background:var(--amber);color:#1a1408}
+
+/* progress */
+#progress{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--sage),var(--amber),var(--rust));z-index:50}
+
+/* drifting orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.35;pointer-events:none;z-index:0}
+.orb.a{width:520px;height:520px;background:#7a4f15;top:-140px;right:-160px}
+.orb.b{width:440px;height:440px;background:#2f5a3d;top:45vh;left:-200px}
+.orb.c{width:380px;height:380px;background:#5b2a22;bottom:-160px;right:10vw}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+main{position:relative;z-index:2}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+/* hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0 40px;position:relative}
+.kicker{font:600 12px/1 "JetBrains Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--amber)}
+.name{font-weight:900;font-size:clamp(76px,17vw,200px);line-height:.9;letter-spacing:-.04em;margin:22px 0 0;
+  display:flex;flex-wrap:wrap}
+.name span{display:inline-block;padding-bottom:.14em;margin-bottom:-.14em;opacity:0;transform:translateY(60%) rotate(8deg);
+  animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(.15s + var(--i)*.07s);
+  background:linear-gradient(180deg,#fff3dc 0%,var(--amber) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes rise{to{opacity:1;transform:none}}
+.role{font-style:italic;font-weight:300;font-size:clamp(22px,3.2vw,32px);color:var(--muted);margin:18px 0 0;
+  opacity:0;animation:fade 1s .9s forwards}
+.role b{font-style:normal;font-weight:500;color:var(--text)}
+@keyframes fade{to{opacity:1}}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;margin-top:40px}
+.question{font-size:clamp(28px,4.4vw,46px);font-weight:500;line-height:1.1;letter-spacing:-.01em;opacity:0;animation:fade 1s 1.2s forwards}
+.question em{color:var(--sage);font-weight:300}
+.question i{color:var(--rust);font-weight:300}
+.scale-box{opacity:0;animation:fade 1.2s 1.4s forwards}
+.scale-box svg{width:100%;height:auto;overflow:visible}
+.scale-cap{font:400 13px/1.5 "JetBrains Mono",monospace;color:var(--muted);text-align:center;margin-top:4px}
+.cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;
+  font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;opacity:0;animation:fade 1s 2s forwards}
+.cue i{width:1px;height:46px;background:linear-gradient(var(--amber),transparent);animation:drip 1.8s ease-in-out infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .9s ease,transform 1s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d,0s)}
+.reveal.left{transform:translateX(-60px)}
+.reveal.right{transform:translateX(60px)}
+.reveal.zoom{transform:scale(.92)}
+.reveal.in{opacity:1;transform:none}
+
+section{padding:70px 0}
+h2{font-weight:700;font-size:clamp(32px,5vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0 0 20px}
+h2 em{font-weight:300;color:var(--amber)}
+.sec-num{font:600 12px/1 "JetBrains Mono",monospace;color:var(--amber);letter-spacing:.2em;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.sec-num::after{content:"";height:1px;width:60px;background:var(--amber);opacity:.5}
+p{margin:0 0 16px}
 .muted{color:var(--muted)}
-ul{padding-left:0;list-style:none;margin:0 0 16px}
-ul li{position:relative;padding:8px 0 8px 28px;border-top:1px solid var(--line)}
-ul li:last-child{border-bottom:1px solid var(--line)}
-ul li::before{
-  content:"";position:absolute;left:4px;top:19px;width:10px;height:10px;
-  border-radius:50%;background:var(--sage);
-}
-.verdict{
-  margin:40px 0 0;padding:32px 32px 30px;border-radius:18px;
-  background:linear-gradient(160deg,#1f2230 0%,var(--panel) 70%);
-  border:1px solid #3a3426;position:relative;overflow:hidden;
-}
-.verdict::after{
-  content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;
-  border-radius:50%;border:1px solid rgba(233,169,74,.35);
-}
-.verdict .tag{
-  display:inline-block;font:600 12px/1 "JetBrains Mono", monospace;
-  background:var(--amber);color:#1a1408;padding:8px 10px;border-radius:6px;
-  letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px;
-}
-.verdict h3{
-  font-weight:700;font-size:30px;line-height:1.15;margin:0 0 14px;
-}
-.verdict p{font-size:18px;margin:0}
-.stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 8px;
-}
-.stat{
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 18px;
-}
-.stat .v{font:600 26px/1.1 "JetBrains Mono", monospace;color:var(--amber)}
-.stat .l{font-size:15px;color:var(--muted);margin-top:8px;line-height:1.4}
-table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:16px}
-th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-th{
-  font:600 12px/1.3 "JetBrains Mono", monospace;text-transform:uppercase;
-  letter-spacing:.1em;color:var(--muted);
-}
-td.n,th.n{text-align:right;font-family:"JetBrains Mono", monospace;white-space:nowrap}
-td.n{color:var(--text)}
-tr.hl td{background:rgba(233,169,74,.06)}
-.pick{
-  display:inline-block;font:600 12px/1 "JetBrains Mono", monospace;padding:6px 8px;border-radius:6px;
-  text-transform:uppercase;letter-spacing:.06em;
-}
-.pick.t{background:rgba(156,200,166,.14);color:var(--sage)}
-.pick.c{background:rgba(217,115,90,.14);color:var(--rust)}
-.pick.m{background:rgba(233,169,74,.12);color:var(--amber)}
-.calc{
-  margin:24px 0;padding:26px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
-}
-.calc label{display:flex;justify-content:space-between;align-items:baseline;font-size:17px}
-.calc .big{font:600 22px/1 "JetBrains Mono", monospace;color:var(--amber)}
-input[type=range]{
-  width:100%;margin:16px 0 6px;accent-color:var(--amber);
-}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
-.box{background:#101216;border:1px solid var(--line);border-radius:12px;padding:16px}
+.lede{font-size:21px;color:var(--muted);max-width:660px}
+
+/* verdict */
+.verdict{position:relative;border-radius:26px;padding:44px 40px;overflow:hidden;
+  background:linear-gradient(150deg,#232637 0%,#16181f 60%);border:1px solid #3d3628}
+.verdict::before{content:"";position:absolute;inset:-2px;border-radius:28px;padding:2px;
+  background:conic-gradient(from var(--ang,0deg),transparent 0 70%,var(--amber) 80%,transparent 90%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:spin 6s linear infinite}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes spin{to{--ang:360deg}}
+.stamp{display:inline-flex;align-items:center;gap:10px;font:600 12px/1 "JetBrains Mono",monospace;letter-spacing:.14em;
+  text-transform:uppercase;background:var(--amber);color:#1a1408;padding:9px 12px;border-radius:8px}
+.stamp i{width:8px;height:8px;border-radius:50%;background:#1a1408;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.verdict h3{font-weight:700;font-size:clamp(28px,4.4vw,44px);line-height:1.08;margin:22px 0 16px;letter-spacing:-.01em}
+.verdict h3 span{color:var(--sage)}
+.verdict p{font-size:19px;color:#d8d0c1;margin:0;max-width:680px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:30px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px 20px;position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform 1.4s .3s cubic-bezier(.2,.8,.2,1)}
+.stat.in::after{transform:scaleX(1)}
+.stat .v{font:600 clamp(26px,3.6vw,34px)/1.1 "JetBrains Mono",monospace;color:var(--amber)}
+.stat .l{font-size:15px;color:var(--muted);margin-top:10px;line-height:1.45}
+
+/* bars */
+.bars{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:30px 28px;margin:24px 0}
+.bars h4{margin:0 0 4px;font-weight:500;font-size:20px}
+.legend{display:flex;gap:20px;font:400 13px/1 "JetBrains Mono",monospace;color:var(--muted);margin:10px 0 26px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:-1px;background:var(--c)}
+.bar-row{margin-bottom:24px}
+.bar-row:last-child{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;font-size:16px;margin-bottom:10px}
+.bar-label b{font-weight:500}
+.bar-label .mono{color:var(--amber);font-size:15px}
+.track{height:34px;background:#0f1115;border-radius:10px;overflow:hidden;display:flex}
+.seg{height:100%;width:0;transition:width 1.6s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;justify-content:flex-end;padding-right:10px;
+  font:600 12px/1 "JetBrains Mono",monospace;color:#14110b;white-space:nowrap;overflow:hidden}
+.seg.p{background:var(--sage)}
+.seg.i{background:var(--rust);transition-delay:.5s}
+.bars.in .seg{width:var(--w)}
+
+/* calculator */
+.calc{margin:24px 0;padding:30px 28px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px}
+.calc label{display:flex;justify-content:space-between;align-items:baseline;font-size:18px}
+.calc .big{font:600 26px/1 "JetBrains Mono",monospace;color:var(--amber)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;margin:22px 0 10px;
+  background:linear-gradient(90deg,var(--amber) var(--fill,33%),#2a2d37 var(--fill,33%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--text);border:5px solid var(--amber);cursor:pointer;box-shadow:0 0 0 8px rgba(234,169,75,.15)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--text);border:5px solid var(--amber);cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.box{background:#0f1115;border:1px solid var(--line);border-radius:14px;padding:18px}
 .box .k{font-size:14px;color:var(--muted)}
-.box .v{font:600 22px/1.3 "JetBrains Mono", monospace;margin-top:6px}
-.callout{
-  border-left:3px solid var(--rust);padding:6px 0 6px 18px;margin:22px 0;color:var(--text);
-}
+.box .v{font:600 24px/1.3 "JetBrains Mono",monospace;margin-top:6px;transition:color .3s}
+.gapbox{margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.gapbox .v{color:var(--amber);font-size:30px}
+
+.callout{margin:28px 0;padding:22px 24px;border-radius:16px;background:rgba(218,117,89,.08);border:1px solid rgba(218,117,89,.35);display:flex;gap:18px}
+.callout .ic{flex:none;width:36px;height:36px;border-radius:50%;background:var(--rust);color:#1a0e0a;display:grid;place-items:center;font:700 18px/1 "JetBrains Mono",monospace}
+.callout p{margin:0}
 .callout strong{color:var(--rust)}
-.checks{counter-reset:c}
-.checks li{counter-increment:c;padding-left:44px}
-.checks li::before{
-  content:counter(c, decimal-leading-zero);background:none;width:auto;height:auto;border-radius:0;
-  top:12px;left:0;font:600 13px/1 "JetBrains Mono", monospace;color:var(--amber);
+
+/* ticker */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:18px 0;margin:30px 0;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.ticker div{display:inline-block;animation:tick 38s linear infinite;font:400 15px/1 "JetBrains Mono",monospace;color:var(--muted)}
+.ticker b{color:var(--amber);font-weight:600}
+.ticker span{margin:0 26px}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* earn */
+.earn{text-align:center;padding:40px 0}
+.earn .huge{font:600 clamp(60px,13vw,140px)/1 "JetBrains Mono",monospace;color:var(--amber);letter-spacing:-.04em}
+.earn .huge small{font-size:.32em;color:var(--muted);letter-spacing:0}
+.earn p{max-width:620px;margin:20px auto 0;color:#d8d0c1}
+
+/* location cards */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 26px;position:relative;overflow:hidden;transition:transform .4s,border-color .4s}
+.card:hover{transform:translateY(-6px);border-color:#3d4150}
+.card .pin{font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--c)}
+.card h4{font-size:28px;font-weight:700;margin:12px 0 4px;line-height:1.1}
+.card .price{font:600 18px/1 "JetBrains Mono",monospace;color:var(--c);margin-bottom:18px}
+.card ul{list-style:none;padding:0;margin:0}
+.card li{padding:9px 0 9px 22px;position:relative;font-size:16px;line-height:1.5;border-top:1px solid var(--line)}
+.card li::before{content:"";position:absolute;left:2px;top:18px;width:8px;height:8px;border-radius:50%;background:var(--c)}
+.card .glow{position:absolute;width:220px;height:220px;border-radius:50%;background:var(--c);opacity:.08;filter:blur(30px);right:-70px;top:-70px}
+
+/* models */
+.models{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+.model{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px 22px}
+.model .n{font:600 40px/1 "JetBrains Mono",monospace;color:var(--line);transition:color 1s .4s}
+.model.in .n{color:var(--plum)}
+.model h5{font-size:20px;font-weight:700;margin:14px 0 6px}
+.model p{font-size:15px;color:var(--muted);margin:0;line-height:1.55}
+
+/* scorecard */
+.score{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:24px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:0}
+.srow .cat{font-size:17px}
+.pick{font:600 11px/1.2 "JetBrains Mono",monospace;padding:8px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.06em;text-align:right}
+.pick.t{background:rgba(159,203,170,.14);color:var(--sage)}
+.pick.c{background:rgba(218,117,89,.14);color:var(--rust)}
+.pick.m{background:rgba(234,169,75,.12);color:var(--amber)}
+.tally{display:flex;gap:4px;height:12px;border-radius:6px;overflow:hidden;margin:22px 0 10px}
+.tally i{flex:var(--f);transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.tally.in i{transform:scaleX(1)}
+.tally i:nth-child(2){transition-delay:.3s}
+.tally i:nth-child(3){transition-delay:.6s}
+.tally-key{display:flex;justify-content:space-between;font:400 13px/1.4 "JetBrains Mono",monospace;color:var(--muted);flex-wrap:wrap;gap:8px}
+
+/* checklist timeline */
+.timeline{position:relative;margin-top:30px;padding-left:44px}
+.timeline .rail{position:absolute;left:14px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.timeline .fill{position:absolute;left:14px;top:6px;width:2px;height:0;background:linear-gradient(var(--sage),var(--amber))}
+.step{position:relative;padding:0 0 30px}
+.step::before{content:attr(data-n);position:absolute;left:-44px;top:0;width:30px;height:30px;border-radius:50%;
+  background:var(--ink);border:2px solid var(--line);display:grid;place-items:center;font:600 11px/1 "JetBrains Mono",monospace;color:var(--muted);transition:all .5s}
+.step.lit::before{border-color:var(--amber);color:var(--amber);box-shadow:0 0 0 6px rgba(234,169,75,.12)}
+.step h5{font-size:21px;font-weight:700;margin:0 0 4px;line-height:1.3}
+.step p{margin:0;color:var(--muted);font-size:16px}
+.step.flag h5{color:var(--rust)}
+
+/* mind */
+.mind{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.chip{border:1px dashed #4a4d58;border-radius:14px;padding:18px 14px;text-align:center;font-size:15px;line-height:1.4;transition:all .6s}
+.chip b{display:block;font:600 22px/1 "JetBrains Mono",monospace;color:var(--plum);margin-bottom:8px}
+
+.needs{list-style:none;padding:0;margin:20px 0 0}
+.needs li{padding:12px 0 12px 32px;position:relative;border-top:1px solid var(--line);font-size:17px}
+.needs li:last-child{border-bottom:1px solid var(--line)}
+.needs li::before{content:"";position:absolute;left:2px;top:18px;width:16px;height:16px;border-radius:4px;border:2px solid var(--muted)}
+
+/* finale */
+.finale{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 0}
+.finale .over{font:600 12px/1 "JetBrains Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.finale h2{font-size:clamp(54px,11vw,128px);font-weight:900;letter-spacing:-.04em;margin:18px 0}
+.finale h2 em{font-style:italic;font-weight:300;color:var(--amber)}
+.finale p{max-width:560px;color:#d8d0c1;font-size:20px}
+
+.foot{border-top:1px solid var(--line);padding:28px 0 60px;font-size:14px;color:var(--muted)}
+
+@media (max-width:720px){
+  .hero-grid,.duo,.grid2,.stats,.models{grid-template-columns:1fr}
+  .mind{grid-template-columns:1fr 1fr}
+  .verdict{padding:32px 24px}
+  .srow{padding:14px 16px}
 }
-.foot{margin-top:72px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
-@media (max-width:640px){
-  .stats,.grid2{grid-template-columns:1fr}
-  .verdict{padding:24px}
-  table{font-size:15px}
-  th,td{padding:11px 8px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal,.name span,.role,.question,.scale-box,.cue{opacity:1!important;transform:none!important}
+  .seg{width:var(--w)!important}
 }
 </style>
 </head>
 <body>
-<main class="wrap">
+<div id="progress"></div>
+<div class="orb a" data-speed="-.15"></div>
+<div class="orb b" data-speed=".1"></div>
+<div class="orb c" data-speed="-.08"></div>
+<div class="grain"></div>
 
-  <div class="kicker">Second opinion · November 2026</div>
-  <h1>Thalambur or<br><em>Casa Grande?</em></h1>
-  <p class="lede">I reviewed the ChatGPT comparison of the two properties and checked its loan maths. The numbers hold up, with one correction. Here is where I land.</p>
+<main>
+<div class="wrap">
 
-  <section class="verdict" aria-labelledby="v">
-    <span class="tag">Verdict</span>
-    <h3 id="v">Thalambur at ₹80 lakh is the stronger financial pick.</h3>
-    <p>Casa Grande only earns its ₹40 lakh premium if it clearly beats Thalambur on land share, construction, distance to OMR, or rental demand. Brand name alone does not justify it. Neither property should be bought until the flood, title and rental checks below are done.</p>
+  <!-- HERO -->
+  <header class="hero" id="hero">
+    <div class="kicker">A decision brief prepared for</div>
+    <h1 class="name" aria-label="Lavanya">
+      <span style="--i:0">L</span><span style="--i:1">a</span><span style="--i:2">v</span><span style="--i:3">a</span><span style="--i:4">n</span><span style="--i:5">y</span><span style="--i:6">a</span>
+    </h1>
+    <p class="role">who has the <b>final say</b> on this one.</p>
+
+    <div class="hero-grid">
+      <div class="question">Two homes in Chennai.<br><em>Thalambur</em> or <i>Casa&nbsp;Grande</i>?<br><span class="muted" style="font-size:.55em;font-weight:300">One choice, twenty years of EMI.</span></div>
+      <div class="scale-box">
+        <svg viewBox="0 0 400 250" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="52" y2="222"><stop offset="0" stop-color="#eaa94b"/><stop offset="1" stop-color="#8a5e20"/></linearGradient>
+          </defs>
+          <path d="M200 52 L200 222" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M150 230 Q200 210 250 230 Z" fill="#8a5e20"/>
+          <circle cx="200" cy="52" r="9" fill="#eaa94b"/>
+          <g id="beam"><rect x="58" y="49" width="284" height="6" rx="3" fill="#eaa94b"/></g>
+          <g id="panL">
+            <path d="M0 0 L-42 64 M0 0 L42 64" stroke="#6b675e" stroke-width="1.5"/>
+            <path d="M-50 64 Q0 96 50 64 Z" fill="#da7559"/>
+            <text y="122" text-anchor="middle" fill="#efe8da" font-family="JetBrains Mono" font-size="13" font-weight="600">Casa Grande</text>
+            <text y="140" text-anchor="middle" fill="#a29b8e" font-family="JetBrains Mono" font-size="12">₹1.2 Cr</text>
+          </g>
+          <g id="panR">
+            <path d="M0 0 L-42 64 M0 0 L42 64" stroke="#6b675e" stroke-width="1.5"/>
+            <path d="M-50 64 Q0 96 50 64 Z" fill="#9fcbaa"/>
+            <text y="122" text-anchor="middle" fill="#efe8da" font-family="JetBrains Mono" font-size="13" font-weight="600">Thalambur</text>
+            <text y="140" text-anchor="middle" fill="#a29b8e" font-family="JetBrains Mono" font-size="12">₹80 L</text>
+          </g>
+        </svg>
+        <div class="scale-cap" id="scaleCap">The brand pulls one way…</div>
+      </div>
+    </div>
+    <div class="cue">Scroll<i></i></div>
+  </header>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="verdict reveal zoom">
+      <span class="stamp"><i></i>The recommendation</span>
+      <h3>On the numbers, <span>Thalambur at ₹80 lakh</span> is the stronger pick.</h3>
+      <p>Casa Grande only earns its ₹40 lakh premium if it clearly beats Thalambur on land share, construction, distance to OMR or rental demand. A brand name alone does not justify it. Neither should be bought until the flood, title and rental checks further down are done.</p>
+    </div>
   </section>
 
-  <h2><span class="num">01</span>What the loan actually costs</h2>
-  <p>Assuming an 80 percent loan at 8 percent interest over 20 years, the monthly gap is larger than the purchase price gap suggests.</p>
+  <!-- LOAN -->
+  <section>
+    <div class="sec-num reveal">01</div>
+    <h2 class="reveal">What the loan <em>really</em> costs</h2>
+    <p class="lede reveal">An 80 percent loan at 8 percent over 20 years. The monthly gap is wider than the price tags suggest.</p>
 
-  <div class="stats">
-    <div class="stat"><div class="v">+₹26,766</div><div class="l">extra EMI every month for Casa Grande</div></div>
-    <div class="stat"><div class="v">+₹32 L</div><div class="l">extra loan principal, plus ₹8 L more down payment</div></div>
-    <div class="stat"><div class="v">+₹32 L</div><div class="l">extra interest paid over 20 years</div></div>
-  </div>
-
-  <table>
-    <thead>
-      <tr><th>At 8 percent, 20 years</th><th class="n">Casa Grande ₹1.2 Cr</th><th class="n">Thalambur ₹80 L</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Loan (80 percent)</td><td class="n">₹96.0 L</td><td class="n">₹64.0 L</td></tr>
-      <tr><td>Down payment (20 percent)</td><td class="n">₹24.0 L</td><td class="n">₹16.0 L</td></tr>
-      <tr><td>Monthly EMI</td><td class="n">₹80,298</td><td class="n">₹53,532</td></tr>
-      <tr><td>Total EMI paid</td><td class="n">₹1.93 Cr</td><td class="n">₹1.28 Cr</td></tr>
-      <tr><td>Interest paid</td><td class="n">₹96.7 L</td><td class="n">₹64.5 L</td></tr>
-    </tbody>
-  </table>
-
-  <div class="callout">
-    <p style="margin:0"><strong>Correction to the ChatGPT analysis.</strong> It describes the gap as an extra ₹32 lakh down payment. The down payment difference is only ₹8 lakh. The ₹32 lakh difference sits in the loan, which is why the monthly EMI and the interest bill grow so much.</p>
-  </div>
-
-  <div class="calc">
-    <label for="rate"><span>Interest rate</span><span class="big" id="rateOut">8.00%</span></label>
-    <input type="range" id="rate" min="6" max="12" step="0.25" value="8" aria-label="Interest rate">
-    <p class="muted" style="font-size:15px;margin:0">Drag to see how sensitive the gap is to the loan rate. Excludes registration, stamp duty, GST, interiors and maintenance.</p>
-    <div class="grid2">
-      <div class="box"><div class="k">Casa Grande EMI</div><div class="v" id="casaEmi">₹80,298</div><div class="k" style="margin-top:8px">Interest over 20 years: <span id="casaInt" class="mono">₹96.7 lakh</span></div></div>
-      <div class="box"><div class="k">Thalambur EMI</div><div class="v" id="thalEmi">₹53,532</div><div class="k" style="margin-top:8px">Interest over 20 years: <span id="thalInt" class="mono">₹64.5 lakh</span></div></div>
+    <div class="stats">
+      <div class="stat reveal" style="--d:0s"><div class="v" data-count="26766" data-prefix="+₹">+₹0</div><div class="l">more EMI every month for Casa Grande</div></div>
+      <div class="stat reveal" style="--d:.12s"><div class="v" data-count="32" data-prefix="+₹" data-suffix=" L">+₹0 L</div><div class="l">more borrowed, plus ₹8 L more down payment</div></div>
+      <div class="stat reveal" style="--d:.24s"><div class="v" data-count="32" data-prefix="+₹" data-suffix=" L">+₹0 L</div><div class="l">more interest paid over 20 years</div></div>
     </div>
-    <div class="box" style="margin-top:14px"><div class="k">Monthly EMI gap</div><div class="v" style="color:var(--amber)" id="gap">₹26,766</div></div>
-  </div>
 
-  <h2><span class="num">02</span>What the extra ₹40 lakh has to earn</h2>
-  <p>Casa Grande needs to rent for roughly ₹26,766 more per month just to match the EMI gap. That is about ₹3.2 lakh a year, before vacancy, maintenance, property tax and the interest on the extra loan. A brand premium rarely produces that on its own.</p>
+    <div class="bars reveal" id="bars">
+      <h4>Everything paid back to the bank over 20 years</h4>
+      <div class="legend"><span style="--c:var(--sage)">Loan principal</span><span style="--c:var(--rust)">Interest</span></div>
+      <div class="bar-row">
+        <div class="bar-label"><b>Casa Grande</b><span class="mono">₹1.93 Cr · EMI ₹80,298</span></div>
+        <div class="track"><div class="seg p" style="--w:49.8%">₹96 L</div><div class="seg i" style="--w:50.2%">₹96.7 L</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><b>Thalambur</b><span class="mono">₹1.28 Cr · EMI ₹53,532</span></div>
+        <div class="track"><div class="seg p" style="--w:33.2%">₹64 L</div><div class="seg i" style="--w:33.5%">₹64.5 L</div></div>
+      </div>
+    </div>
 
-  <h2><span class="num">03</span>Location and rental demand</h2>
-  <ul>
-    <li><strong>Casa Grande (Semmancheri)</strong> sits closer to the OMR employment corridor and has more established residential demand. It should resell more easily if connectivity and amenities are good.</li>
-    <li><strong>Thalambur</strong> is cheaper and can give more land or space per rupee. It reaches Navalur, Siruseri and OMR, but its value depends heavily on the exact road and neighbourhood.</li>
-    <li>Two to three kilometres off the main OMR road can change rental demand and resale. Treat the two localities as different markets, not interchangeable ones.</li>
-    <li>The Housing.com figure of about ₹9,202 per sq ft is an asking rate in Semmancheri, not a registered transaction value. Use it as a rough reference only.</li>
-  </ul>
+    <div class="callout reveal">
+      <div class="ic">!</div>
+      <p><strong>Where the extra money actually goes.</strong> The ₹40 lakh price gap is easy to misread as cash up front. The down payment gap is only ₹8 lakh (₹24 L against ₹16 L). The ₹32 lakh difference is in the loan, which is exactly why the EMI and the interest bill grow so much.</p>
+    </div>
 
-  <h2><span class="num">04</span>Airbnb: be cautious with both</h2>
-  <p>Neither property should be bought on the assumption of tourist-style occupancy. Semmancheri has the better short stay story, with IT staff on assignment, families visiting OMR residents and business travellers. Thalambur's short stay demand needs proof. Your Thudinest experience helps with operations, but Chennai demand and occupancy have to be established independently.</p>
-  <p>Test three income models before committing:</p>
-  <ul>
-    <li><strong>Short stays</strong> (Airbnb), if the building allows it in writing.</li>
-    <li><strong>Monthly furnished rentals</strong> to IT professionals.</li>
-    <li><strong>Traditional 11 month residential lets</strong> as the fallback that always works.</li>
-  </ul>
+    <div class="calc reveal">
+      <label for="rate"><span>Try a different interest rate</span><span class="big" id="rateOut">8.00%</span></label>
+      <input type="range" id="rate" min="6" max="12" step="0.25" value="8" aria-label="Interest rate">
+      <p class="muted" style="font-size:14px;margin:0">Excludes registration, stamp duty, GST, interiors and maintenance.</p>
+      <div class="grid2">
+        <div class="box"><div class="k">Casa Grande EMI</div><div class="v" id="casaEmi">₹80,298</div><div class="k" style="margin-top:8px">Interest: <span id="casaInt" class="mono">₹96.7 lakh</span></div></div>
+        <div class="box"><div class="k">Thalambur EMI</div><div class="v" id="thalEmi">₹53,532</div><div class="k" style="margin-top:8px">Interest: <span id="thalInt" class="mono">₹64.5 lakh</span></div></div>
+      </div>
+      <div class="box gapbox"><div class="k">Extra every month for Casa Grande</div><div class="v" id="gap">₹26,766</div></div>
+    </div>
+  </section>
 
-  <h2><span class="num">05</span>Scorecard</h2>
-  <table>
-    <thead><tr><th>Category</th><th>Leans toward</th></tr></thead>
-    <tbody>
-      <tr class="hl"><td>Purchase affordability</td><td><span class="pick t">Thalambur</span></td></tr>
-      <tr class="hl"><td>Lower loan risk</td><td><span class="pick t">Thalambur</span></td></tr>
-      <tr><td>Return on capital invested</td><td><span class="pick t">Thalambur, likely</span></td></tr>
-      <tr><td>Rental demand</td><td><span class="pick c">Casa Grande</span></td></tr>
-      <tr><td>Airbnb potential</td><td><span class="pick c">Casa Grande, slightly, unproven</span></td></tr>
-      <tr><td>Builder reputation</td><td><span class="pick m">Casa Grande, if RERA checks out</span></td></tr>
-      <tr><td>Long term appreciation</td><td><span class="pick m">Depends on plot and land share</span></td></tr>
-    </tbody>
-  </table>
+  <div class="ticker" aria-hidden="true"><div>
+    <span><b>240</b> EMIs</span><span>Casa Grande <b>₹80,298</b>/month</span><span>Thalambur <b>₹53,532</b>/month</span><span>Gap <b>₹26,766</b></span><span>Rate <b>8%</b></span><span>Loan <b>80%</b></span><span>Price gap <b>₹40 L</b></span><span>Handover <b>Mar vs Dec 2027</b></span>
+    <span><b>240</b> EMIs</span><span>Casa Grande <b>₹80,298</b>/month</span><span>Thalambur <b>₹53,532</b>/month</span><span>Gap <b>₹26,766</b></span><span>Rate <b>8%</b></span><span>Loan <b>80%</b></span><span>Price gap <b>₹40 L</b></span><span>Handover <b>Mar vs Dec 2027</b></span>
+  </div></div>
 
-  <h2><span class="num">06</span>Before you buy either one</h2>
-  <ul class="checks">
-    <li><strong>Flood risk.</strong> Visit Thalambur during heavy rain. Ask about past waterlogging and drainage. Do not decide from a model villa.</li>
-    <li><strong>RERA.</strong> Confirm registration, approved plans and the completion commitment. Check the builder's delivery history.</li>
-    <li><strong>Title.</strong> Get the parent documents and an Encumbrance Certificate, and confirm ownership.</li>
-    <li><strong>Airbnb permission.</strong> Get written confirmation from the builder or apartment association on short stays, visitor access and commercial use.</li>
-    <li><strong>Maintenance.</strong> Check monthly charges and the sinking fund.</li>
-    <li><strong>Dates.</strong> March 2027 and December 2027 are nine months apart. Verify both against RERA commitments, not sales promises.</li>
-    <li><strong>Commute.</strong> Measure actual travel time to OMR at peak hours.</li>
-  </ul>
+  <!-- EARN -->
+  <section class="earn">
+    <div class="sec-num reveal" style="justify-content:center">02 · The bar Casa Grande must clear</div>
+    <div class="huge reveal zoom"><span data-count="3.2" data-dec="1" data-prefix="₹">₹0</span><small> lakh / year</small></div>
+    <p class="reveal">That is the extra rent Casa Grande must bring in just to cover the EMI gap, before vacancy, maintenance and property tax. A brand premium rarely delivers that by itself.</p>
+  </section>
 
-  <h2><span class="num">07</span>What would change my mind</h2>
-  <p>Casa Grande becomes the better buy if it is substantially closer to OMR, has a larger land share, better construction quality and proven rental demand nearby. In that case the premium may be justified. Without those facts, I would not pay the extra ₹40 lakh for the name.</p>
+  <!-- LOCATION -->
+  <section>
+    <div class="sec-num reveal">03</div>
+    <h2 class="reveal">Two places, <em>two markets</em></h2>
+    <p class="lede reveal">Even two or three kilometres off the main OMR road can change rental demand and resale. These are not interchangeable.</p>
+    <div class="duo">
+      <div class="card reveal left" style="--c:var(--rust)"><div class="glow"></div>
+        <div class="pin">Semmancheri</div><h4>Casa Grande</h4><div class="price">₹1.2 Cr · ready Mar 2027</div>
+        <ul>
+          <li>Closer to the OMR employment corridor</li>
+          <li>Steady demand from IT employees and families</li>
+          <li>More established residential area</li>
+          <li>Easier resale if connectivity and amenities hold up</li>
+        </ul>
+      </div>
+      <div class="card reveal right" style="--c:var(--sage)"><div class="glow"></div>
+        <div class="pin">Thalambur</div><h4>Local builder</h4><div class="price">₹80 L · ready Dec 2027</div>
+        <ul>
+          <li>Much lower purchase price</li>
+          <li>Possibly more land or space per rupee</li>
+          <li>Reaches Navalur, Siruseri and OMR</li>
+          <li>Value depends heavily on the exact road and neighbourhood</li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted reveal" style="font-size:15px;margin-top:18px">Housing.com lists Semmancheri around ₹9,202 per sq ft. That is an asking rate, not a registered sale price, so treat it as a rough guide.</p>
+  </section>
 
-  <h2><span class="num">08</span>Details that would sharpen this</h2>
-  <p class="muted">The original review asked for these before giving a final verdict. Once you share them, I can run the five year, ten year and twenty year values, the realistic Airbnb revenue and the after expense return.</p>
-  <ul>
-    <li>Casa Grande project name, property type and built up area</li>
-    <li>Thalambur builder or project name, property type and built up area</li>
-    <li>Planned down payment: 20, 30, 40 or more than 40 percent</li>
-    <li>Main goal: investment with Airbnb, rental income, a future home, or own use plus investment</li>
-    <li>Google Maps pins or brochures for both projects</li>
-  </ul>
+  <!-- AIRBNB -->
+  <section>
+    <div class="sec-num reveal">04</div>
+    <h2 class="reveal">Airbnb: <em>prove it first</em></h2>
+    <p class="reveal">Neither home should be bought expecting tourist style occupancy. Semmancheri has the better short stay story, with IT staff on assignment, families visiting OMR residents and business travellers. Thalambur's short stay demand still needs proof. The Thudinest experience in Coimbatore helps with running it, but Chennai demand has to be checked on its own.</p>
+    <div class="models">
+      <div class="model reveal" style="--d:0s"><div class="n">01</div><h5>Short stays</h5><p>Airbnb, only if the builder or association allows it in writing.</p></div>
+      <div class="model reveal" style="--d:.15s"><div class="n">02</div><h5>Monthly furnished</h5><p>Furnished lets to IT professionals on assignment.</p></div>
+      <div class="model reveal" style="--d:.3s"><div class="n">03</div><h5>11 month lease</h5><p>The traditional rental. The fallback that always works.</p></div>
+    </div>
+  </section>
 
-  <p class="foot">This is an analysis, not financial or legal advice. Figures assume an 8 percent rate and an 80 percent loan, and exclude registration, stamp duty, GST, interiors and maintenance. Confirm final loan terms with your lender and property documents with a qualified advocate before you commit.</p>
+  <!-- SCORECARD -->
+  <section>
+    <div class="sec-num reveal">05</div>
+    <h2 class="reveal">The <em>scorecard</em></h2>
+    <div class="score">
+      <div class="srow reveal" style="--d:0s"><span class="cat">Purchase affordability</span><span class="pick t">Thalambur</span></div>
+      <div class="srow reveal" style="--d:.06s"><span class="cat">Lower loan risk</span><span class="pick t">Thalambur</span></div>
+      <div class="srow reveal" style="--d:.12s"><span class="cat">Return on money invested</span><span class="pick t">Thalambur, likely</span></div>
+      <div class="srow reveal" style="--d:.18s"><span class="cat">Rental demand</span><span class="pick c">Casa Grande</span></div>
+      <div class="srow reveal" style="--d:.24s"><span class="cat">Airbnb potential</span><span class="pick c">Casa Grande, slightly</span></div>
+      <div class="srow reveal" style="--d:.3s"><span class="cat">Builder reputation</span><span class="pick m">Casa Grande, if RERA checks out</span></div>
+      <div class="srow reveal" style="--d:.36s"><span class="cat">Long term appreciation</span><span class="pick m">Depends on plot and land share</span></div>
+    </div>
+    <div class="tally reveal" id="tally"><i style="--f:3;background:var(--sage)"></i><i style="--f:2;background:var(--rust)"></i><i style="--f:2;background:var(--amber)"></i></div>
+    <div class="tally-key"><span style="color:var(--sage)">3 Thalambur</span><span style="color:var(--rust)">2 Casa Grande</span><span style="color:var(--amber)">2 depend on checks</span></div>
+  </section>
 
+  <!-- CHECKLIST -->
+  <section>
+    <div class="sec-num reveal">06</div>
+    <h2 class="reveal">Before signing <em>anything</em></h2>
+    <div class="timeline" id="timeline">
+      <div class="rail"></div><div class="fill" id="fill"></div>
+      <div class="step flag" data-n="01"><h5>Flood risk in Thalambur</h5><p>Visit during heavy rain. Ask neighbours about past waterlogging and drainage. Never decide from a model villa.</p></div>
+      <div class="step" data-n="02"><h5>RERA registration</h5><p>Approved plans, completion commitment and the builder's delivery record.</p></div>
+      <div class="step" data-n="03"><h5>Land title</h5><p>Parent documents, Encumbrance Certificate and clear ownership, checked by an advocate.</p></div>
+      <div class="step" data-n="04"><h5>Written Airbnb permission</h5><p>From the builder or association, covering short stays, visitor access and commercial use.</p></div>
+      <div class="step" data-n="05"><h5>Maintenance costs</h5><p>Monthly charges and the sinking fund.</p></div>
+      <div class="step" data-n="06"><h5>Handover dates</h5><p>March 2027 against December 2027 is nine months. Match both to RERA, not to sales promises.</p></div>
+      <div class="step" data-n="07"><h5>Real commute</h5><p>Drive to OMR at peak hour and time it.</p></div>
+    </div>
+  </section>
+
+  <!-- MIND -->
+  <section>
+    <div class="sec-num reveal">07</div>
+    <h2 class="reveal">What would make <em>Casa Grande</em> worth it</h2>
+    <p class="reveal">If it turns out to be clearly better on these, the premium may be justified:</p>
+    <div class="mind">
+      <div class="chip reveal" style="--d:0s"><b>01</b>Much closer to OMR</div>
+      <div class="chip reveal" style="--d:.1s"><b>02</b>Larger land share</div>
+      <div class="chip reveal" style="--d:.2s"><b>03</b>Better build quality</div>
+      <div class="chip reveal" style="--d:.3s"><b>04</b>Proven rental demand</div>
+    </div>
+  </section>
+
+  <!-- NEEDS -->
+  <section>
+    <div class="sec-num reveal">08</div>
+    <h2 class="reveal">To sharpen <em>the numbers</em></h2>
+    <p class="muted reveal">With these, the brief can add expected values for 2030, 2035 and 2045, realistic Airbnb revenue and the return after all expenses.</p>
+    <ul class="needs">
+      <li class="reveal">Casa Grande project name, property type and built up area</li>
+      <li class="reveal">Thalambur builder, property type and built up area</li>
+      <li class="reveal">Planned down payment: 20, 30, 40 or more than 40 percent</li>
+      <li class="reveal">Main goal: investment with Airbnb, rental income, a future home, or own use plus investment</li>
+      <li class="reveal">Google Maps pins or brochures for both projects</li>
+    </ul>
+  </section>
+
+  <!-- FINALE -->
+  <section class="finale">
+    <div class="over reveal">Over to you</div>
+    <h2 class="reveal zoom">Lavanya's <em>call.</em></h2>
+    <p class="reveal">The aim is a home that builds wealth without turning the next twenty years into a race to pay the EMI.</p>
+  </section>
+
+  <footer class="foot">This is an analysis, not financial or legal advice. Figures assume 8 percent interest and an 80 percent loan, and exclude registration, stamp duty, GST, interiors and maintenance. Confirm loan terms with the lender and property documents with a qualified advocate before committing.</footer>
+
+</div>
 </main>
 
 <script>
-const CASA = 9600000, THAL = 6400000, MONTHS = 240;
-const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
-const lakh = n => '₹' + (n / 100000).toFixed(1) + ' lakh';
-function emi(p, annualPct) {
-  const r = annualPct / 100 / 12;
-  return p * r * Math.pow(1 + r, MONTHS) / (Math.pow(1 + r, MONTHS) - 1);
-}
-function update() {
-  const rate = parseFloat(document.getElementById('rate').value);
-  const c = emi(CASA, rate), t = emi(THAL, rate);
-  document.getElementById('rateOut').textContent = rate.toFixed(2) + '%';
-  document.getElementById('casaEmi').textContent = fmt(c);
-  document.getElementById('thalEmi').textContent = fmt(t);
-  document.getElementById('gap').textContent = fmt(c - t);
-  document.getElementById('casaInt').textContent = lakh(c * MONTHS - CASA);
-  document.getElementById('thalInt').textContent = lakh(t * MONTHS - THAL);
-}
-document.getElementById('rate').addEventListener('input', update);
-update();
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const inr = n => Math.round(n).toLocaleString('en-IN');
+
+  /* count up */
+  function countUp(el) {
+    const to = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0);
+    const pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+    const show = v => el.textContent = pre + (dec ? v.toFixed(dec) : inr(v)) + suf;
+    if (reduce) return show(to);
+    const t0 = performance.now(), dur = 1600;
+    (function step(t) {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+      show(to * e);
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* reveal on scroll */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target;
+      el.classList.add('in');
+      el.querySelectorAll('[data-count]').forEach(countUp);
+      if (el.dataset.count) countUp(el);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* scale, progress, orbs, timeline */
+  const beam = document.getElementById('beam'), panL = document.getElementById('panL'), panR = document.getElementById('panR');
+  const cap = document.getElementById('scaleCap'), bar = document.getElementById('progress');
+  const orbs = [...document.querySelectorAll('.orb')];
+  const tl = document.getElementById('timeline'), fill = document.getElementById('fill'), steps = [...tl.querySelectorAll('.step')];
+  let sway = 0, last = performance.now();
+
+  function setScale(deg) {
+    const r = deg * Math.PI / 180, L = 140;
+    beam.setAttribute('transform', `rotate(${deg} 200 52)`);
+    panL.setAttribute('transform', `translate(${200 - L * Math.cos(r)} ${52 - L * Math.sin(r)})`);
+    panR.setAttribute('transform', `translate(${200 + L * Math.cos(r)} ${52 + L * Math.sin(r)})`);
+  }
+
+  function frame(now) {
+    const y = scrollY, vh = innerHeight;
+    const docH = document.documentElement.scrollHeight - vh;
+    bar.style.transform = `scaleX(${docH > 0 ? y / docH : 0})`;
+    if (!reduce) orbs.forEach(o => o.style.transform = `translateY(${y * o.dataset.speed}px)`);
+
+    /* scale: starts leaning to Casa Grande, tips to Thalambur as you scroll */
+    const p = Math.min(1, y / (vh * 0.8));
+    sway += (now - last) / 1000; last = now;
+    const idle = reduce ? 0 : Math.sin(sway * 1.6) * 1.2 * (1 - p);
+    setScale(-7 + 19 * easeInOut(p) + idle);
+    cap.textContent = p < 0.45 ? 'The brand pulls one way…' : 'the numbers pull the other.';
+
+    /* timeline fill */
+    const rect = tl.getBoundingClientRect();
+    const prog = Math.max(0, Math.min(1, (vh * 0.65 - rect.top) / rect.height));
+    fill.style.height = (prog * (rect.height - 12)) + 'px';
+    steps.forEach(s => s.classList.toggle('lit', s.getBoundingClientRect().top < vh * 0.65));
+
+    requestAnimationFrame(frame);
+  }
+  const easeInOut = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  requestAnimationFrame(frame);
+
+  /* rate calculator */
+  const CASA = 9600000, THAL = 6400000, N = 240;
+  const emi = (p, a) => { const r = a / 1200; return p * r * Math.pow(1 + r, N) / (Math.pow(1 + r, N) - 1); };
+  const lakh = n => '₹' + (n / 100000).toFixed(1) + ' lakh';
+  const rate = document.getElementById('rate');
+  function update() {
+    const a = parseFloat(rate.value), c = emi(CASA, a), t = emi(THAL, a);
+    rate.style.setProperty('--fill', ((a - 6) / 6 * 100) + '%');
+    document.getElementById('rateOut').textContent = a.toFixed(2) + '%';
+    document.getElementById('casaEmi').textContent = '₹' + inr(c);
+    document.getElementById('thalEmi').textContent = '₹' + inr(t);
+    document.getElementById('gap').textContent = '₹' + inr(c - t);
+    document.getElementById('casaInt').textContent = lakh(c * N - CASA);
+    document.getElementById('thalInt').textContent = lakh(t * N - THAL);
+  }
+  rate.addEventListener('input', update);
+  update();
+})();
 </script>
 </body>
 </html>
