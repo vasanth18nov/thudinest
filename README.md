@@ -9,7 +9,8 @@ Deployed via Netlify → add your Netlify URL here.
 ## What's Inside
 
 - **Landing page** — Property details, photo gallery, amenities, house rules
-  - Scroll driven: the hero photo opens from a window to the full screen, the rooms slide past sideways, the four offers stack as cards, the road on the map draws itself. Dark theme, with the animated letter ring beside the intro. All plain CSS and one small scroll loop in `index.html` (classes prefixed `th-`), no libraries. Motion is switched off for visitors who ask for reduced motion.
+  - Hero: a drawn scene on a canvas, no photo. The container home, the garden and a peacock are painted in code. As you scroll he lifts his train and fans it open, the afternoon turns to a blue evening and the house lights come on; tap him and he shivers his train. The house and garden are painted once into day and night layers, the sky, lights and peacock every frame. `?debug` exposes `window.__ths` (state, `info()` with sizes and timings). Without JavaScript the old photo shows instead.
+  - Scroll driven: the hero window opens to the full screen, the rooms slide past sideways, the four offers stack as cards, the road on the map draws itself. Dark theme, with the animated letter ring beside the intro. All plain CSS and one small scroll loop in `index.html` (classes prefixed `th-`), no libraries. Motion is switched off for visitors who ask for reduced motion.
   - Fonts are self hosted in `fonts/` (Fraunces and Instrument Sans, both SIL Open Font License).
 - **Game Hub** — Indian Rummy, Chess (Hard AI), Ping Pong with power-ups, and
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
