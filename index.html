@@ -2946,10 +2946,233 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
   .th-motion .th-game:nth-child(3) { translate: 0 calc(var(--g, 0) * 76px); }
   .th-games-grid { margin-bottom: 110px; }
 }
+
+/* =====================================================================
+   PREMIUM LAYER. A short intro, smooth scrolling, the booking panel and
+   the phone dock, a cursor that answers, magnetic buttons, film grain,
+   one palette for the four cards and photo previews. Each piece falls
+   back: no script, reduced motion or a touch screen all get a calm,
+   complete page.
+   ===================================================================== */
+
+/* ---------- smooth scrolling (Lenis, mouse and trackpad only) ---------- */
+html.lenis, html.lenis body { height: auto; }
+html.lenis.lenis-smooth, html.lenis.lenis-smooth #screen-landing { scroll-behavior: auto !important; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ---------- the intro: a counter, the wordmark, then a curtain ---------- */
+.th-loader { display: none; }
+html.th-loading { overflow: hidden; scrollbar-gutter: stable; }
+html.th-loading .th-loader, .th-loader.out { display: flex; }
+.th-loader { position: fixed; inset: 0; z-index: 12000; flex-direction: column; justify-content: space-between; padding: calc(26px + env(safe-area-inset-top, 0px)) var(--gut) calc(26px + env(safe-area-inset-bottom, 0px)); background: #04080c; color: var(--paper); touch-action: none; will-change: transform; }
+.th-loader::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70vmax 70vmax at 88% -10%, rgba(70,214,195,0.16), transparent 58%), radial-gradient(60vmax 60vmax at -10% 110%, rgba(42,68,200,0.2), transparent 58%); }
+.th-loader::after { content: ''; position: absolute; left: -12%; right: -12%; top: calc(100% - 1px); height: 18vh; background: #04080c; border-radius: 0 0 50% 50%; transform-origin: 50% 0; }
+.th-loader.out { transform: translate3d(0, -100%, 0); transition: transform 1.05s cubic-bezier(0.76, 0, 0.24, 1); }
+.th-loader.out::after { transform: scaleY(0); transition: transform 1.05s cubic-bezier(0.76, 0, 0.24, 1); }
+.th-loader-row { position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; font: 600 11px/1.4 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--mute-d); transition: opacity 0.4s; }
+.th-loader-row span:last-child { text-align: right; }
+.th-loader.leaving .th-loader-row { opacity: 0; }
+.th-loader-mark { position: relative; align-self: center; overflow: hidden; white-space: nowrap; padding: 0.04em 0.12em 0.14em 0.02em; font: 340 clamp(4.2rem, 17vw, 14rem)/0.92 var(--serif); font-variation-settings: 'opsz' 144; letter-spacing: -0.05em; }
+.th-loader-mark i { display: inline-block; font-style: normal; transform: translate3d(0, 112%, 0); animation: th-lm-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: calc(var(--i) * 40ms + 90ms); }
+.th-loader-mark i.n { font-style: italic; color: var(--aqua); }
+.th-loader.leaving .th-loader-mark i { animation: th-lm-out 0.45s cubic-bezier(0.76, 0, 0.24, 1) forwards; animation-delay: calc(var(--i) * 20ms); }
+@keyframes th-lm-in { to { transform: none; } }
+@keyframes th-lm-out { from { transform: none; } to { transform: translate3d(0, -112%, 0); } }
+.th-loader-n { font: 340 clamp(3.2rem, 9vw, 7rem)/0.8 var(--serif); font-variation-settings: 'opsz' 144; letter-spacing: -0.05em; color: var(--paper); font-variant-numeric: tabular-nums; text-transform: none; }
+.th-loader-n b { font-weight: inherit; }
+.th-loader-n small { font: 600 12px/1 var(--sans); letter-spacing: 0.1em; color: var(--aqua); margin-left: 8px; vertical-align: top; }
+.th-loader-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, var(--teal), var(--aqua) 55%, var(--gold)); transform: scaleX(0); transform-origin: 0 50%; }
+
+/* ---------- hero headline, word by word ---------- */
+.th-h1 .th-wd { display: inline-block; }
+.th-motion .th-h1.th-words .th-ln > span { transform: none; transition: none; }
+.th-motion .th-h1.th-words .th-wd { transform: translate3d(0, 115%, 0) rotate(6deg); transform-origin: 0 100%; transition: transform 1.3s var(--ease); transition-delay: calc(var(--w) * 85ms + 60ms); }
+.th-motion .th-h1.th-words.in .th-wd { transform: none; }
+[data-clock-wrap][hidden] { display: none !important; }
+.th-clock i { background: var(--gold) !important; box-shadow: 0 0 10px var(--gold); animation: th-pulse 2.2s ease-in-out infinite; }
+.th-clock b { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- booking: fields, the hero card, the closing bar ---------- */
+.th-book { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.th-book-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.th-f { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-height: 62px; padding: 11px 15px; border-radius: 16px; background: rgba(244,239,228,0.05); border: 1px solid rgba(244,239,228,0.12); cursor: pointer; text-align: left; transition: border-color 0.3s, background-color 0.3s; }
+.th-f:hover { border-color: rgba(244,239,228,0.26); }
+.th-f:focus-within { border-color: var(--aqua); background: rgba(70,214,195,0.07); }
+.th-f .k { font: 600 10.5px/1 var(--sans); letter-spacing: 0.15em; text-transform: uppercase; color: var(--mute-d); }
+.th-f .v { font: 400 1.08rem/1.15 var(--serif); letter-spacing: -0.01em; color: var(--mute-d); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th-f.has .v { color: var(--paper); }
+.th-f input[type='date'] { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: inherit; opacity: 0; cursor: pointer; font-size: 16px; color-scheme: dark; -webkit-appearance: none; appearance: none; background: transparent; }
+.th-f input[type='date']::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: auto; height: auto; margin: 0; padding: 0; cursor: pointer; opacity: 0; }
+.th-f-g { flex: 1 0 106px; padding-left: 13px; padding-right: 12px; cursor: default; }
+.th-step { display: flex; align-items: center; gap: 9px; }
+.th-step button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border-radius: 50%; border: 1px solid rgba(244,239,228,0.24); background: transparent; color: var(--paper); font-size: 13px; cursor: pointer; transition: background-color 0.25s, color 0.25s, opacity 0.25s; }
+.th-step button:hover:not(:disabled) { background: var(--paper); color: var(--ink); }
+.th-step button:disabled { opacity: 0.28; cursor: default; }
+.th-step output { min-width: 1ch; font: 400 1.08rem/1 var(--serif); text-align: center; }
+.th-book-go { flex: 999 1 196px; justify-content: space-between; min-height: 62px; border-radius: 16px; padding-left: 20px; }
+.th-book-go .th-ic { border-radius: 12px; }
+.th-bookcard { display: none; }
+.th-bookcard-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 6px 14px; }
+.th-bookcard-h b { font: 400 1.38rem/1 var(--serif); letter-spacing: -0.02em; }
+.th-bookcard-h a { font: 500 0.8rem/1 var(--sans); color: var(--mute-d); white-space: nowrap; }
+.th-bookcard-h a span, .th-cta-sub b, .th-sheet-s b, .th-dock-i small b { color: var(--gold); }
+.th-bookcard-n { display: flex; align-items: center; gap: 8px; padding: 12px 6px 2px; font-size: 0.8rem; color: var(--mute-d); }
+.th-bookcard-n i { width: 6px; height: 6px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 10px var(--aqua); flex: none; }
+@property --th-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.th-bookcard::before, .th-cta-book::before { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; background: conic-gradient(from var(--th-a), transparent 0 60%, rgba(70,214,195,0.95) 76%, rgba(216,162,58,0.85) 86%, transparent 96%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: th-orbit 7s linear infinite; pointer-events: none; }
+@keyframes th-orbit { to { --th-a: 360deg; } }
+@media (min-width: 1081px) {
+  .th-hero-side { width: min(400px, 34vw); }
+  .th-hero .th-h1 { font-size: clamp(3rem, 7vw, 8.2rem); }
+  .th-hero-meta { max-width: calc(100% - min(400px, 34vw) - 40px); }
+  .th-hero-side .th-row { display: none; }
+  .th-bookcard { display: block; position: relative; margin-top: 4px; padding: 16px; border-radius: 26px; background: linear-gradient(165deg, rgba(22,52,48,0.8), rgba(7,13,17,0.92)); border: 1px solid rgba(244,239,228,0.1); box-shadow: 0 40px 80px -40px rgba(0,0,0,0.9); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3); isolation: isolate; }
+}
+@media (min-width: 1081px) and (max-height: 820px) {
+  .th-hero-side > p { display: none; }
+}
+/* phones: a shorter introduction and both hero buttons on one row, so the drawn scene has room */
+@media (max-width: 560px) {
+  .th-hero-side .th-more { display: none; }
+  .th-hero-side { margin-top: 16px; gap: 16px; }
+  .th-hero-side .th-row { flex-wrap: nowrap; gap: 8px; }
+  .th-hero-side .th-row .th-btn { flex: 1 1 0; min-width: 0; gap: 8px; padding-left: 16px; font-size: 0.9rem; }
+  .th-hero-side .th-row .th-btn .th-ic { width: 36px; height: 36px; font-size: 15px; }
+}
+@media (max-width: 560px) and (max-height: 740px) {
+  .th-hero-side > p { display: none; }
+}
+.th-cta-book { position: relative; isolation: isolate; max-width: 1000px; margin: 0 0 44px; padding: 10px; border-radius: 26px; background: rgba(4,8,12,0.5); border: 1px solid rgba(244,239,228,0.12); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.th-cta-sub { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 12px 6px 2px; color: var(--mute-d); font-size: 0.86rem; }
+@media (min-width: 821px) {
+  .th-cta-book .th-book { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); }
+  .th-cta-book .th-book-row { grid-column: auto; flex-wrap: nowrap; }
+  .th-cta-book .th-book-go { flex: 1 1 auto; }
+}
+
+/* ---------- the booking sheet (a bottom sheet on phones, a dialog on wider screens) ---------- */
+.th-sheet { position: fixed; inset: 0; z-index: 9800; display: flex; align-items: flex-end; justify-content: center; }
+.th-sheet[hidden] { display: none; }
+.th-sheet-bg { position: absolute; inset: 0; background: rgba(2,5,8,0.66); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.45s var(--ease); }
+.th-sheet.open .th-sheet-bg { opacity: 1; }
+.th-sheet-panel { position: relative; width: 100%; max-height: 92vh; max-height: 92svh; overflow-y: auto; overscroll-behavior: contain; padding: 12px 20px calc(22px + env(safe-area-inset-bottom, 0px)); border-radius: 28px 28px 0 0; background: linear-gradient(180deg, #0e2724, #070f12 62%); border: 1px solid rgba(244,239,228,0.1); border-bottom: 0; box-shadow: 0 -30px 80px -20px rgba(0,0,0,0.85); color: var(--paper); transform: translate3d(0, 105%, 0); transition: transform 0.6s var(--ease); }
+.th-sheet.open .th-sheet-panel { transform: none; }
+.th-sheet.drag .th-sheet-panel { transition: none; }
+.th-sheet-grip { display: block; width: 44px; height: 5px; margin: 0 auto 16px; border-radius: 5px; background: rgba(244,239,228,0.24); }
+.th-sheet-x { position: absolute; right: 14px; top: 14px; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(244,239,228,0.16); background: transparent; color: var(--paper); font-size: 18px; cursor: pointer; transition: background-color 0.25s, color 0.25s; }
+.th-sheet-x:hover { background: var(--paper); color: var(--ink); }
+.th-sheet-x .th-i { transform: rotate(45deg); }
+.th-sheet-t { margin: 12px 0 8px; font: 380 clamp(2.1rem, 8vw, 2.8rem)/1 var(--serif); font-variation-settings: 'opsz' 144; letter-spacing: -0.035em; }
+.th-sheet-t em { font-style: italic; color: var(--aqua); }
+.th-sheet-s { margin: 0 0 20px; color: var(--mute-d); font-size: 0.92rem; }
+.th-sheet-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.th-sheet-facts .th-chip { font-size: 0.8rem; padding: 7px 12px; }
+.th-sheet-facts .th-chip i { background: var(--aqua); }
+.th-sheet-wa { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; padding: 15px; border-radius: 16px; border: 1px solid rgba(244,239,228,0.14); font-weight: 600; color: var(--paper) !important; text-decoration: none; transition: background-color 0.25s; }
+.th-sheet-wa:hover { background: rgba(244,239,228,0.06); }
+.th-sheet-wa .th-i { color: #25d366; font-size: 20px; }
+@media (min-width: 821px) {
+  .th-sheet { align-items: center; padding: 24px; }
+  .th-sheet-panel { width: min(540px, 100%); padding: 30px 30px 28px; border-radius: 30px; border-bottom: 1px solid rgba(244,239,228,0.1); opacity: 0; transform: translate3d(0, 34px, 0) scale(0.96); transition: transform 0.6s var(--ease), opacity 0.4s var(--ease); }
+  .th-sheet.open .th-sheet-panel { opacity: 1; transform: none; }
+  .th-sheet-grip { display: none; }
+}
+
+/* ---------- the phone dock ---------- */
+.th-dock { display: none; }
+@media (max-width: 1080px) {
+  .th-fab { display: none; }
+  .th-dock { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 690; display: flex; align-items: center; gap: 8px; max-width: 560px; margin: 0 auto; padding: 8px 8px 8px 16px; border-radius: 22px; background: rgba(8,16,20,0.84); border: 1px solid rgba(244,239,228,0.12); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); box-shadow: 0 20px 50px -16px rgba(0,0,0,0.95); transform: translate3d(0, calc(100% + 40px), 0); transition: transform 0.6s var(--ease); }
+  .th-dock.show { transform: none; }
+}
+.th-dock-i { flex: 1 1 auto; min-width: 0; display: grid; gap: 4px; }
+.th-dock-i > b { font: 400 1.02rem/1 var(--serif); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th-dock-i small { font-size: 0.76rem; color: var(--mute-d); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th-dock-go { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px 0 18px; border-radius: 15px; background: var(--aqua); color: var(--ink) !important; font: 600 0.92rem/1 var(--sans); white-space: nowrap; text-decoration: none; box-shadow: 0 0 30px -8px rgba(70,214,195,0.75); }
+.th-dock-go .th-i { font-size: 15px; }
+.th-dock-wa, .th-dock-go { text-decoration: none; }
+.th-dock-wa { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 15px; background: #25d366; color: #fff !important; font-size: 22px; }
+.th-dock-go:active, .th-dock-wa:active, .th-btn:active { scale: 0.97; }
+
+/* ---------- the four cards: one palette, a glow, a light that follows the pointer ---------- */
+.th-card { --bg: linear-gradient(155deg, #123d36 0%, #0a211e 55%, #060f0f 100%); --glow: rgba(70,214,195,0.24); --ac: var(--aqua); }
+.th-card.th-c2 { --bg: linear-gradient(155deg, #1c2659 0%, #0e1436 55%, #070a1b 100%); --glow: rgba(112,140,255,0.32); --ac: #a9b8ff; --fg: var(--paper); }
+.th-card.th-c3 { --bg: linear-gradient(155deg, #3b2b0f 0%, #1f1709 55%, #0d0a05 100%); --glow: rgba(216,162,58,0.34); --ac: #f0c36a; --fg: var(--paper); }
+.th-card.th-c4 { --bg: linear-gradient(155deg, #35152b 0%, #1c0c18 55%, #0c060b 100%); --glow: rgba(236,98,150,0.26); --ac: #ff9cc2; --fg: var(--paper); }
+.th-card .th-card-in { position: relative; isolation: isolate; border: 1px solid rgba(244,239,228,0.09); }
+.th-card .th-card-in::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: radial-gradient(70% 85% at 95% 0%, var(--glow), transparent 70%); }
+.th-card .th-card-in::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: radial-gradient(560px circle at var(--mx, 50%) var(--my, -30%), rgba(255,255,255,0.08), transparent 42%); opacity: 0; transition: opacity 0.5s; }
+.th-card .th-card-in:hover::after { opacity: 1; }
+.th-card-no { color: var(--ac); opacity: 1 !important; }
+.th-c3 .th-btn-aqua { background: var(--aqua); color: var(--ink) !important; }
+.th-c3 .th-btn-aqua .th-ic { background: var(--ink); color: var(--aqua); }
+.th-c3 .th-survey { background: rgba(3,6,9,0.6); border: 1px solid rgba(244,239,228,0.08); }
+
+/* ---------- who it's for: a photo follows the pointer, the other rows step back ---------- */
+.th-peek { display: none; }
+html.th-fine.th-motion .th-peek { display: block; position: fixed; left: 0; top: 0; z-index: 640; width: 290px; height: 210px; margin: -105px 0 0 -145px; border-radius: 20px; overflow: hidden; pointer-events: none; opacity: 0; scale: 0.4; background: #0b1614; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.95), 0 0 0 1px rgba(244,239,228,0.12); transition: opacity 0.35s var(--ease), scale 0.55s var(--ease); will-change: translate, rotate; }
+html.th-fine.th-motion .th-peek.on { opacity: 1; scale: 1; }
+.th-peek > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; scale: 1.2; transition: opacity 0.45s var(--ease), scale 0.9s var(--ease); }
+.th-peek > .on { opacity: 1; scale: 1; }
+.th-peek .th-browser { display: flex; flex-direction: column; }
+.th-peek .th-site { padding: 16px; gap: 10px; }
+.th-peek .th-site-h { font-size: 1.3rem; }
+.th-peek .th-site-g { min-height: 50px; }
+html.th-fine .th-who::before { display: none; }
+html.th-fine .th-who:hover { color: inherit; }
+html.th-fine .th-who:hover p { color: var(--mute); }
+html.th-fine .th-who:hover > small, html.th-fine .th-who:hover .th-who-tag { color: var(--aqua); }
+html.th-fine.th-motion .th-whos:hover .th-who.in { opacity: 0.3; }
+html.th-fine.th-motion .th-whos .th-who.in:hover { opacity: 1; }
+
+/* ---------- a cursor that answers (mouse and trackpad only) ---------- */
+.th-cur, .th-cur-l { display: none; }
+html.th-fine.th-motion .th-cur, html.th-fine.th-motion .th-cur-l { display: block; position: fixed; left: 0; top: 0; z-index: 11000; pointer-events: none; will-change: transform; transform: translate3d(-120px, -120px, 0); }
+.th-cur { mix-blend-mode: difference; }
+.th-cur i { display: block; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 1.5px solid #fff; transition: transform 0.45s var(--ease), background-color 0.3s, opacity 0.3s; }
+.th-cur.link i { transform: scale(1.75); background: #fff; }
+.th-cur.down i { transform: scale(0.75); }
+.th-cur.link.down i { transform: scale(1.45); }
+.th-cur.media i, .th-cur.hide i { opacity: 0; transform: scale(0.3); }
+.th-cur-l span { display: grid; place-items: center; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: var(--aqua); color: var(--ink); font: 600 11.5px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; transform: scale(0); transition: transform 0.5s var(--ease); box-shadow: 0 18px 40px -16px rgba(0,0,0,0.7); }
+.th-cur-l.on span { transform: scale(1); }
+html.th-fine.th-motion [data-cursor] { cursor: none; }
+
+/* ---------- film grain (larger screens) ---------- */
+.th-grain { display: none; }
+@media (min-width: 821px) {
+  .th-grain { display: block; position: fixed; inset: 0; z-index: 9000; pointer-events: none; background: url(./images/grain.png) 0 0 / 128px 128px repeat; opacity: 0.16; }
+}
+
+/* ---------- into the game hub and back: a curtain where the browser supports it ---------- */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.8s; animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1); }
+html.th-vt-out::view-transition-old(root), html.th-vt-in::view-transition-old(root) { animation-name: th-vt-back; }
+html.th-vt-out::view-transition-new(root), html.th-vt-in::view-transition-new(root) { animation-name: th-vt-wipe; mix-blend-mode: normal; }
+@keyframes th-vt-back { to { opacity: 0.3; transform: scale(0.93); } }
+@keyframes th-vt-wipe { from { clip-path: inset(100% 0 0 0 round 48px 48px 0 0); } to { clip-path: inset(0 0 0 0 round 0); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 </style>
 <script>
-// Switch scroll-driven motion on before first paint, unless the visitor asked for reduced motion.
-(function () { try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('th-motion'); } catch (e) {} })();
+// Before first paint: th-fine for a mouse or trackpad; th-motion unless the visitor asked for reduced
+// motion; th-loading for the short intro on the first visit of a session (with a safety net in case
+// the page script never runs).
+(function () { try {
+  var h = document.documentElement, mq = function (q) { return !!(window.matchMedia && matchMedia(q).matches); };
+  if (mq('(hover: hover) and (pointer: fine)')) h.classList.add('th-fine');
+  if (mq('(prefers-reduced-motion: reduce)')) return;
+  h.classList.add('th-motion');
+  var seen = false; try { seen = sessionStorage.getItem('th-intro') === '1'; } catch (e) {}
+  if (!seen && !location.hash && !/[?&](nointro|debug)\b/.test(location.search)) {
+    h.classList.add('th-loading');
+    setTimeout(function () { h.classList.remove('th-loading'); }, 7000);
+  }
+} catch (e) {} })();
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LodgingBusiness","name":"Thudinest","alternateName":"Thudi Nest No. 2","description":"A cozy container homestay on MTP Road, Thudiyalur, Coimbatore, with instant booking, free parking and free Wi-Fi.","url":"https://thudinest.com/","image":"https://thudinest.com/images/og-thudinest.jpg","telephone":"+91 96980 26106","address":{"@type":"PostalAddress","streetAddress":"MTP Road, Poombuhar Nagar, Thudiyalur","addressLocality":"Coimbatore","addressRegion":"Tamil Nadu","addressCountry":"IN"},"amenityFeature":[{"@type":"LocationFeatureSpecification","name":"Free Wi-Fi","value":true},{"@type":"LocationFeatureSpecification","name":"Free parking","value":true}],"sameAs":["https://www.airbnb.com/rooms/1441766933044504126"]}
 </script>
 </head>
 <body>
@@ -2959,6 +3182,14 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
 
 <!-- ===== THUDINEST LANDING SCREEN ===== -->
 <div id="screen-landing" class="screen" style="display:flex">
+
+  <!-- Intro: the first visit of a session -->
+  <div class="th-loader" id="th-loader" aria-hidden="true">
+    <div class="th-loader-row"><span>Thudinest No. 2</span><span>Container homestay</span></div>
+    <div class="th-loader-mark"><i style="--i:0">t</i><i style="--i:1">h</i><i style="--i:2">u</i><i style="--i:3">d</i><i style="--i:4">i</i><i class="n" style="--i:5">n</i><i class="n" style="--i:6">e</i><i class="n" style="--i:7">s</i><i class="n" style="--i:8">t</i></div>
+    <div class="th-loader-row"><span class="th-loader-n"><b id="th-load-n">0</b><small>%</small></span><span>Thudiyalur<br>Coimbatore</span></div>
+    <i class="th-loader-bar" id="th-load-bar"></i>
+  </div>
 
   <!-- Icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3010,6 +3241,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-5 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/></symbol>
     <symbol id="i-laurel" viewBox="0 0 24 48"><path d="M17 46C9 39 6 26 11 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><g fill="currentColor"><ellipse cx="8" cy="39" rx="2.4" ry="5.4" transform="rotate(-55 8 39)"/><ellipse cx="5" cy="30" rx="2.4" ry="5.4" transform="rotate(-28 5 30)"/><ellipse cx="4.8" cy="20.5" rx="2.3" ry="5" transform="rotate(-8 4.8 20.5)"/><ellipse cx="7.5" cy="11.5" rx="2.1" ry="4.6" transform="rotate(14 7.5 11.5)"/><ellipse cx="15.5" cy="36" rx="2" ry="4.6" transform="rotate(42 15.5 36)"/><ellipse cx="13.6" cy="26" rx="2" ry="4.4" transform="rotate(28 13.6 26)"/><ellipse cx="14" cy="16" rx="1.8" ry="4" transform="rotate(32 14 16)"/></g></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
   </svg>
 
   <div class="th-progress" aria-hidden="true"><i id="th-progress"></i></div>
@@ -3026,7 +3258,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
       <a href="#find" data-jump data-spy="find">Find us</a>
       <a href="#faq" data-jump data-spy="faq">FAQ</a>
     </nav>
-    <a class="th-btn th-btn-ink" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book a stay<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
+    <a class="th-btn th-btn-ink" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" data-sheet>Book a stay<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
     <button class="th-burger" id="th-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="th-menu"><span></span><span></span></button>
   </header>
 
@@ -3044,7 +3276,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
       <a href="#contact" data-jump style="--d:8"><small>09</small>Contact</a>
     </nav>
     <div class="th-row">
-      <a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
+      <a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" data-sheet>Check dates<span class="th-ic"><svg class="th-i"><use href="#i-cal"/></svg></span></a>
       <a class="th-btn th-btn-ghost" href="https://wa.me/601161165161" target="_blank" rel="noopener">WhatsApp<span class="th-ic"><svg class="th-i"><use href="#i-wa"/></svg></span></a>
     </div>
   </div>
@@ -3059,14 +3291,27 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
             <p class="th-eyebrow" data-r>Container homestay · Thudiyalur · Coimbatore</p>
             <h1 class="th-h1" data-r="lines"><span class="th-ln"><span>A cozy little</span></span><span class="th-ln" style="--d:1"><span>home on <em>MTP Road.</em></span></span></h1>
             <div class="th-hero-side" data-r style="--d:3">
-              <p>Thudinest is a compact container homestay in Thudiyalur, Coimbatore, with instant booking, easy parking and free Wi-Fi. And while you're here: free website hosting, live surveys and 22 browser games.</p>
+              <p>Thudinest is a compact container homestay in Thudiyalur, Coimbatore, with instant booking, easy parking and free Wi-Fi.<span class="th-more"> And while you're here: free website hosting, live surveys and 22 browser games.</span></p>
+              <div class="th-bookcard">
+                <div class="th-bookcard-h"><b>Book your stay</b><a href="#reviews" data-jump><span>&#9733;</span> 4.92 · 62 reviews</a></div>
+                <form class="th-book" action="https://www.airbnb.com/rooms/1441766933044504126" method="get" target="_blank" rel="noopener" data-book>
+                  <label class="th-f"><span class="k">Check in</span><span class="v" data-ph="Add date">Add date</span><input type="date" name="check_in" aria-label="Check in date"></label>
+                  <label class="th-f"><span class="k">Check out</span><span class="v" data-ph="Add date">Add date</span><input type="date" name="check_out" aria-label="Check out date"></label>
+                  <div class="th-book-row">
+                    <div class="th-f th-f-g"><span class="k">Guests</span><div class="th-step"><button type="button" data-g="-1" aria-label="Fewer guests"><svg class="th-i"><use href="#i-minus"/></svg></button><output aria-live="polite">2</output><button type="button" data-g="1" aria-label="More guests" disabled><svg class="th-i"><use href="#i-plus"/></svg></button></div><input type="hidden" name="adults" value="2"></div>
+                    <button class="th-btn th-btn-aqua th-book-go" type="submit">Check availability<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></button>
+                  </div>
+                </form>
+                <div class="th-bookcard-n"><i></i>Sleeps 2 · Instant booking · Opens on Airbnb</div>
+              </div>
               <div class="th-row">
-                <a class="th-btn th-btn-ink" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
+                <a class="th-btn th-btn-ink" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" data-sheet>Check dates<span class="th-ic"><svg class="th-i"><use href="#i-cal"/></svg></span></a>
                 <a class="th-btn th-btn-line" href="#space" data-jump>See the space<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
               </div>
             </div>
             <div class="th-hero-meta" data-r style="--d:4">
-              <a class="th-chip" href="#reviews" data-jump><i></i>4.91 &#9733; Guest favourite</a>
+              <a class="th-chip" href="#reviews" data-jump><i></i>4.92 &#9733; Guest favourite</a>
+              <span class="th-chip th-clock" data-clock-wrap hidden><i></i>Coimbatore <b data-clock></b></span>
               <span class="th-chip"><i></i>Instant booking</span>
               <span class="th-chip"><i></i>Free parking &amp; Wi-Fi</span>
             </div>
@@ -3082,7 +3327,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
               <div class="th-hero-tags"><span class="th-chip"><i></i>Thudinest No. 2</span><span class="th-chip"><i></i>Thudiyalur, Coimbatore</span></div>
               <p class="th-big">Peacocks on the lawn. <em>A home of your own.</em></p>
             </div>
-            <div class="th-row"><a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a></div>
+            <div class="th-row"><a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" data-sheet>Check availability<span class="th-ic"><svg class="th-i"><use href="#i-cal"/></svg></span></a></div>
           </div>
         </div>
         <a class="th-cue" href="#intro" data-jump aria-label="Scroll down">
@@ -3100,7 +3345,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <a class="th-link" href="#space" data-jump>More about the space <svg class="th-i"><use href="#i-arrow"/></svg></a>
         </div>
         <div class="th-ring" data-r="pop">
-          <canvas id="th-hero-cv" aria-label="Animated letters forming Thudinest, the home, a peacock feather, the bed, Wi-Fi, a map pin, hosting, cricket, games and WhatsApp. Tap to skip ahead." role="img"></canvas>
+          <canvas id="th-hero-cv" data-cursor="Next" aria-label="Animated letters forming Thudinest, the home, a peacock feather, the bed, Wi-Fi, a map pin, hosting, cricket, games and WhatsApp. Tap to skip ahead." role="img"></canvas>
           <div class="th-ring-chip" aria-live="polite"><span id="th-hero-no">01</span><b id="th-hero-name">Thudinest</b><i aria-hidden="true"><u id="th-hero-bar"></u></i></div>
         </div>
       </div>
@@ -3119,11 +3364,11 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
         </div>
         <div class="th-track-box">
           <div class="th-track" id="th-track">
-            <button class="th-shot" type="button" style="--ar:16/9" data-full="./images/exterior.jpg" data-cap="Exterior"><img src="./images/exterior.jpg" alt="Exterior of the container home and garden" width="1069" height="602" loading="lazy"><span class="th-shot-cap">Exterior<small>01</small></span></button>
-            <button class="th-shot" type="button" style="--ar:16/10" data-full="./images/gallery/bedroom.jpg" data-cap="Bedroom"><img src="./images/gallery/bedroom.jpg" alt="The bedroom" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Bedroom<small>02</small></span></button>
-            <button class="th-shot" type="button" style="--ar:4/3" data-full="./images/gallery/living.jpg" data-cap="Living &amp; desk"><img src="./images/gallery/living.jpg" alt="Living area with a work desk" width="1600" height="1200" loading="lazy"><span class="th-shot-cap">Living &amp; desk<small>03</small></span></button>
-            <button class="th-shot" type="button" style="--ar:16/10" data-full="./images/gallery/seating.jpg" data-cap="Seating corner"><img src="./images/gallery/seating.jpg" alt="Seating corner by the door" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Seating corner<small>04</small></span></button>
-            <button class="th-shot" type="button" style="--ar:4/3" data-full="./images/gallery/bathroom.jpg" data-cap="Bathroom"><img src="./images/gallery/bathroom.jpg" alt="The attached bathroom" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Bathroom<small>05</small></span></button>
+            <button class="th-shot" type="button" data-cursor="View" style="--ar:16/9" data-full="./images/exterior.jpg" data-cap="Exterior"><img src="./images/exterior.jpg" alt="Exterior of the container home and garden" width="1069" height="602" loading="lazy"><span class="th-shot-cap">Exterior<small>01</small></span></button>
+            <button class="th-shot" type="button" data-cursor="View" style="--ar:16/10" data-full="./images/gallery/bedroom.jpg" data-cap="Bedroom"><img src="./images/gallery/bedroom.jpg" alt="The bedroom" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Bedroom<small>02</small></span></button>
+            <button class="th-shot" type="button" data-cursor="View" style="--ar:4/3" data-full="./images/gallery/living.jpg" data-cap="Living &amp; desk"><img src="./images/gallery/living.jpg" alt="Living area with a work desk" width="1600" height="1200" loading="lazy"><span class="th-shot-cap">Living &amp; desk<small>03</small></span></button>
+            <button class="th-shot" type="button" data-cursor="View" style="--ar:16/10" data-full="./images/gallery/seating.jpg" data-cap="Seating corner"><img src="./images/gallery/seating.jpg" alt="Seating corner by the door" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Seating corner<small>04</small></span></button>
+            <button class="th-shot" type="button" data-cursor="View" style="--ar:4/3" data-full="./images/gallery/bathroom.jpg" data-cap="Bathroom"><img src="./images/gallery/bathroom.jpg" alt="The attached bathroom" width="1600" height="900" loading="lazy"><span class="th-shot-cap">Bathroom<small>05</small></span></button>
             <div class="th-shot-end">
               <p>The whole tiny home is yours.</p>
               <div class="th-row"><a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a></div>
@@ -3157,11 +3402,11 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <p class="th-p" data-r style="--d:2">The guests we see most, and what a stay looks like for each.</p>
           <a class="th-btn th-btn-ink" data-r style="--d:3" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
         </div>
-        <div>
-          <article class="th-who" data-r="side" style="--d:0"><small>01</small><h3>Couples &amp; solo travellers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-heart"/></svg></span><p>A private little home with a bedroom, attached bathroom, living area and kitchenette, just for you.</p><span class="th-who-tag">A quiet, private stay on MTP Road</span></article>
-          <article class="th-who" data-r="side" style="--d:1"><small>02</small><h3>Remote workers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-laptop"/></svg></span><p>A work desk by the window, free Wi-Fi and quiet hours after 10 PM: easy to get a few days of work done.</p><span class="th-who-tag">Stay a few days and get work done</span></article>
-          <article class="th-who" data-r="side" style="--d:0"><small>03</small><h3>Hospital visits</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-hosp"/></svg></span><p>Visiting someone at VG Hospital? Stay a short distance away on MTP Road, with restaurants and shops nearby.</p><span class="th-who-tag">Close to care, restaurants and shops</span></article>
-          <article class="th-who" data-r="side" style="--d:1"><small>04</small><h3>Small businesses</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-store"/></svg></span><p>Got an access code from us? Publish a free single-page website in minutes, or run a live survey with a QR code.</p><span class="th-who-tag">Live in about two minutes</span></article>
+        <div class="th-whos" id="th-whos">
+          <article class="th-who" data-r="side" style="--d:0" data-peek="0"><small>01</small><h3>Couples &amp; solo travellers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-heart"/></svg></span><p>A private little home with a bedroom, attached bathroom, living area and kitchenette, just for you.</p><span class="th-who-tag">A quiet, private stay on MTP Road</span></article>
+          <article class="th-who" data-r="side" style="--d:1" data-peek="1"><small>02</small><h3>Remote workers</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-laptop"/></svg></span><p>A work desk by the window, free Wi-Fi and quiet hours after 10 PM: easy to get a few days of work done.</p><span class="th-who-tag">Stay a few days and get work done</span></article>
+          <article class="th-who" data-r="side" style="--d:0" data-peek="2"><small>03</small><h3>Hospital visits</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-hosp"/></svg></span><p>Visiting someone at VG Hospital? Stay a short distance away on MTP Road, with restaurants and shops nearby.</p><span class="th-who-tag">Close to care, restaurants and shops</span></article>
+          <article class="th-who" data-r="side" style="--d:1" data-peek="3"><small>04</small><h3>Small businesses</h3><span class="th-who-ic"><svg class="th-i"><use href="#i-store"/></svg></span><p>Got an access code from us? Publish a free single-page website in minutes, or run a live survey with a QR code.</p><span class="th-who-tag">Live in about two minutes</span></article>
         </div>
       </div>
     </section>
@@ -3258,19 +3503,19 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
       <div class="th-wrap th-rev">
         <div>
           <p class="th-eyebrow" data-r>Guest reviews</p>
-          <div class="th-score" data-r role="img" aria-label="Rated 4.91 out of 5, a Guest favourite on Airbnb">
+          <div class="th-score" data-r role="img" aria-label="Rated 4.92 out of 5, a Guest favourite on Airbnb">
             <svg viewBox="0 0 24 48" aria-hidden="true"><use href="#i-laurel"/></svg>
-            <b id="th-score" data-count="4.91">4.91</b>
+            <b id="th-score" data-count="4.92">4.92</b>
             <svg class="r" viewBox="0 0 24 48" aria-hidden="true"><use href="#i-laurel"/></svg>
           </div>
           <p class="th-fav" data-r><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span>Guest favourite on Airbnb</p>
         </div>
         <div>
-          <h2 class="th-h2" data-r="lines" style="font-size:clamp(2rem,3.6vw,3.4rem)"><span class="th-ln"><span>Rated <em>4.91</em> by</span></span><span class="th-ln" style="--d:1"><span>our guests.</span></span></h2>
-          <p class="th-p" data-r style="margin-top:20px">From 57 reviews on Airbnb, where Thudinest is a Guest favourite, based on ratings, reviews and reliability. Guests talk most about the hospitality, how clean it is and how comfortable it feels.</p>
+          <h2 class="th-h2" data-r="lines" style="font-size:clamp(2rem,3.6vw,3.4rem)"><span class="th-ln"><span>Rated <em>4.92</em> by</span></span><span class="th-ln" style="--d:1"><span>our guests.</span></span></h2>
+          <p class="th-p" data-r style="margin-top:20px">From 62 reviews on Airbnb, where Thudinest is a Guest favourite, based on ratings, reviews and reliability. Guests talk most about the hospitality, how clean it is and how comfortable it feels.</p>
           <ul class="th-facts" data-r>
-            <li><b data-count="57">57</b><small>reviews</small></li>
-            <li><b data-count="93" data-suffix="%">93%</b><small>five-star</small></li>
+            <li><b data-count="62">62</b><small>reviews</small></li>
+            <li><b data-count="94" data-suffix="%">94%</b><small>five-star</small></li>
             <li><b data-count="100" data-suffix="%">100%</b><small>response rate</small></li>
           </ul>
           <ul class="th-rates">
@@ -3283,7 +3528,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           </ul>
           <div class="th-mentions" data-r>
             <small>Guests mention</small>
-            <span class="th-chip">Hospitality <b>32</b></span><span class="th-chip">Cleanliness <b>17</b></span><span class="th-chip">Comfort <b>14</b></span><span class="th-chip">Location <b>10</b></span><span class="th-chip">Indoor spaces <b>9</b></span>
+            <span class="th-chip">Hospitality <b>35</b></span><span class="th-chip">Cleanliness <b>18</b></span><span class="th-chip">Comfort <b>16</b></span><span class="th-chip">Location <b>11</b></span><span class="th-chip">Indoor spaces <b>10</b></span>
           </div>
           <a class="th-btn th-btn-ghost" data-r style="margin-top:30px" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Read the reviews<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
         </div>
@@ -3298,9 +3543,9 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
           <p class="th-p" data-r style="--d:2">22 games in your browser, on a phone or a laptop. Three of our favourites:</p>
         </div>
         <div class="th-games-grid">
-          <a class="th-game" href="/tennis/" data-r="pop" style="--d:0"><div class="th-game-img"><img src="./images/games/set-point.jpg" alt="Set Point: a floodlit tennis stadium, the near player hitting a forehand" width="800" height="450" loading="lazy"><span class="th-new">New</span><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Tennis</small><h3>Set Point</h3><p>Topspin, slice, volleys and aces under the floodlights at the Thudinest Open.</p></a>
-          <a class="th-game" href="/football/" data-r="pop" style="--d:1"><div class="th-game-img"><img src="./images/games/final-whistle.jpg" alt="Final Whistle: a striker running at goal under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Football</small><h3>Final Whistle</h3><p>Take your nation through the 2026 World Cup, on a floodlit futsal court or in the stadium.</p></a>
-          <a class="th-game" href="/cricket/" data-r="pop" style="--d:2"><div class="th-game-img"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Cricket</small><h3>Floodlit Over</h3><p>Thudinest Coimbatore take on the World XI, ball by ball.</p></a>
+          <a class="th-game" data-cursor="Play" href="/tennis/" data-r="pop" style="--d:0"><div class="th-game-img"><img src="./images/games/set-point.jpg" alt="Set Point: a floodlit tennis stadium, the near player hitting a forehand" width="800" height="450" loading="lazy"><span class="th-new">New</span><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Tennis</small><h3>Set Point</h3><p>Topspin, slice, volleys and aces under the floodlights at the Thudinest Open.</p></a>
+          <a class="th-game" data-cursor="Play" href="/football/" data-r="pop" style="--d:1"><div class="th-game-img"><img src="./images/games/final-whistle.jpg" alt="Final Whistle: a striker running at goal under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Football</small><h3>Final Whistle</h3><p>Take your nation through the 2026 World Cup, on a floodlit futsal court or in the stadium.</p></a>
+          <a class="th-game" data-cursor="Play" href="/cricket/" data-r="pop" style="--d:2"><div class="th-game-img"><img src="./images/games/floodlit-over.jpg" alt="Floodlit Over: a batter at the crease under floodlights" width="800" height="450" loading="lazy"><span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></div><small>3D · Cricket</small><h3>Floodlit Over</h3><p>Thudinest Coimbatore take on the World XI, ball by ball.</p></a>
         </div>
         <a class="th-btn th-btn-ink" data-r href="#" onclick="showScreen('home'); return false;">All 22 games<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
       </div>
@@ -3332,7 +3577,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
             <div class="th-tags" data-r><span class="th-chip">MTP Road</span><span class="th-chip">Thudiyalur</span><span class="th-chip">Poombuhar Nagar</span><span class="th-chip">VG Hospital nearby</span><span class="th-chip">Restaurants</span><span class="th-chip">Shops</span><span class="th-chip">Coimbatore</span></div>
             <a class="th-btn th-btn-ink" data-r href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener">Get directions<span class="th-ic"><svg class="th-i"><use href="#i-pin"/></svg></span></a>
           </div>
-          <a class="th-map" id="th-map" href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" aria-label="Open Thudinest in Google Maps" data-r="img">
+          <a class="th-map" id="th-map" data-cursor="Map" href="https://maps.app.goo.gl/fMXQTSyXF2Dv6c4P7" target="_blank" rel="noopener" aria-label="Open Thudinest in Google Maps" data-r="img">
             <svg class="m" viewBox="0 0 600 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
               <path class="lane" d="M-20 120 C140 150 240 90 420 60 S620 90 640 70M60 480 C120 360 90 260 170 180 S250 40 230 -20M330 480 C380 400 470 380 520 300 S600 200 640 190M-20 300 C80 290 150 330 240 340 S420 420 460 480"/>
               <path class="road-bed" d="M-30 420 C120 380 200 300 300 235 S470 110 640 30"/>
@@ -3386,10 +3631,21 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
       <div class="th-wrap">
         <p class="th-eyebrow" data-r>Let's talk</p>
         <h2 class="th-big" data-r="lines"><span class="th-ln"><span>Planning a stay</span></span><span class="th-ln" style="--d:1"><span>in <em>Coimbatore?</em></span></span></h2>
+        <div class="th-cta-book" data-r>
+          <form class="th-book" id="th-cta-form" action="https://www.airbnb.com/rooms/1441766933044504126" method="get" target="_blank" rel="noopener" data-book>
+            <label class="th-f"><span class="k">Check in</span><span class="v" data-ph="Add date">Add date</span><input type="date" name="check_in" aria-label="Check in date"></label>
+            <label class="th-f"><span class="k">Check out</span><span class="v" data-ph="Add date">Add date</span><input type="date" name="check_out" aria-label="Check out date"></label>
+            <div class="th-book-row">
+              <div class="th-f th-f-g"><span class="k">Guests</span><div class="th-step"><button type="button" data-g="-1" aria-label="Fewer guests"><svg class="th-i"><use href="#i-minus"/></svg></button><output aria-live="polite">2</output><button type="button" data-g="1" aria-label="More guests" disabled><svg class="th-i"><use href="#i-plus"/></svg></button></div><input type="hidden" name="adults" value="2"></div>
+              <button class="th-btn th-btn-aqua th-book-go" type="submit">Check availability<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></button>
+            </div>
+          </form>
+          <div class="th-cta-sub"><span><b>&#9733; 4.92</b> · 62 reviews</span><span>Sleeps 2 · 1 bedroom · 1 bath</span><span>Opens on Airbnb with your dates</span></div>
+        </div>
         <div class="th-cta-grid">
           <div class="th-row" data-r>
-            <a class="th-btn th-btn-aqua" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">Book on Airbnb<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
-            <a class="th-btn th-btn-ghost" href="https://wa.me/601161165161" target="_blank" rel="noopener">WhatsApp now<span class="th-ic"><svg class="th-i"><use href="#i-wa"/></svg></span></a>
+            <a class="th-btn th-btn-ghost" href="https://wa.me/601161165161" target="_blank" rel="noopener">Questions? WhatsApp us<span class="th-ic"><svg class="th-i"><use href="#i-wa"/></svg></span></a>
+            <a class="th-btn th-btn-line" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener">See the listing<span class="th-ic"><svg class="th-i"><use href="#i-arrow"/></svg></span></a>
           </div>
           <div class="th-phones" data-r style="--d:1">
             <a href="https://wa.me/601161165161" target="_blank" rel="noopener">+60 11-6116 5161</a>
@@ -3415,7 +3671,7 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
       </div>
     </div>
     <div class="th-word" id="th-word" aria-hidden="true"><span style="--k:0">t</span><span style="--k:1">h</span><span style="--k:2">u</span><span style="--k:3">d</span><span style="--k:4">i</span><span style="--k:5">n</span><span style="--k:6">e</span><span style="--k:7">s</span><span style="--k:8">t</span></div>
-    <div class="th-wrap"><div class="th-legal"><span><b>Thudinest No. 2:</b> Poombuhar Nagar, Thudiyalur, Coimbatore · MTP Road · Tamil Nadu, India</span><span>&copy; 2026 Thudinest. All rights reserved.</span></div></div>
+    <div class="th-wrap"><div class="th-legal"><span><b>Thudinest No. 2:</b> Poombuhar Nagar, Thudiyalur, Coimbatore · MTP Road · Tamil Nadu, India</span><span><span data-clock-wrap hidden>Local time in Coimbatore <b data-clock></b> · </span>&copy; 2026 Thudinest. All rights reserved.</span></div></div>
   </footer>
 
   <!-- Floating buttons -->
@@ -3423,6 +3679,40 @@ html:not(.th-motion) .th-card, .th-card.flat { position: relative; top: 0; }
     <button class="th-top" id="th-top" type="button" aria-label="Back to top"><svg class="th-i"><use href="#i-up"/></svg></button>
     <a class="th-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg class="th-i"><use href="#i-wa"/></svg></a>
   </div>
+
+  <!-- Phone booking dock -->
+  <div class="th-dock" id="th-dock">
+    <div class="th-dock-i"><b>Thudinest No. 2</b><small><b>&#9733; 4.92</b> · Sleeps 2 · Thudiyalur</small></div>
+    <a class="th-dock-go" href="https://airbnb.com/h/thudinest" target="_blank" rel="noopener" data-sheet>Check dates<svg class="th-i"><use href="#i-arrow"/></svg></a>
+    <a class="th-dock-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg class="th-i"><use href="#i-wa"/></svg></a>
+  </div>
+
+  <!-- Booking panel -->
+  <div class="th-sheet" id="th-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="th-sheet-t" data-lenis-prevent>
+    <div class="th-sheet-bg" data-close></div>
+    <div class="th-sheet-panel">
+      <span class="th-sheet-grip" aria-hidden="true"></span>
+      <button class="th-sheet-x" type="button" data-close aria-label="Close"><svg class="th-i"><use href="#i-plus"/></svg></button>
+      <p class="th-eyebrow">Thudinest No. 2 · Thudiyalur</p>
+      <h2 class="th-sheet-t" id="th-sheet-t">Book your <em>stay.</em></h2>
+      <p class="th-sheet-s"><b>&#9733; 4.92</b> · 62 reviews · Guest favourite on Airbnb</p>
+      <div data-form-slot></div>
+      <ul class="th-sheet-facts"><li class="th-chip"><i></i>Sleeps 2</li><li class="th-chip"><i></i>1 bedroom · 1 bed · 1 bath</li><li class="th-chip"><i></i>Free parking &amp; Wi-Fi</li><li class="th-chip"><i></i>Instant booking</li></ul>
+      <a class="th-sheet-wa" href="https://wa.me/601161165161" target="_blank" rel="noopener"><svg class="th-i"><use href="#i-wa"/></svg>Questions first? WhatsApp us</a>
+    </div>
+  </div>
+
+  <!-- Who it's for: the photo that follows the pointer -->
+  <div class="th-peek" id="th-peek" aria-hidden="true">
+    <img data-src="./images/gallery/bedroom.jpg" alt="">
+    <img data-src="./images/gallery/living.jpg" alt="">
+    <img data-src="./images/exterior.jpg" alt="">
+    <div class="th-browser"><div class="th-browser-bar"><i></i><i></i><i></i><span>thudinest.com/p/<b>your-shop</b></span></div><div class="th-site"><div class="th-site-h">Your shop, online.<small>Open today · Thudiyalur</small></div><div class="th-site-g"><i></i><i></i><i></i></div><span class="th-site-b"><svg class="th-i"><use href="#i-wa"/></svg>WhatsApp us</span></div></div>
+  </div>
+
+  <div class="th-cur" id="th-cur" aria-hidden="true"><i></i></div>
+  <div class="th-cur-l" id="th-cur-l" aria-hidden="true"><span></span></div>
+  <div class="th-grain" aria-hidden="true"></div>
 
   <!-- Photo viewer -->
   <div class="th-lb" id="th-lb" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
@@ -8596,6 +8886,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if (!root || !document.getElementById('th-nav')) return;
   var html = document.documentElement;
   var motion = html.classList.contains('th-motion');
+  var fine = html.classList.contains('th-fine');
   var $ = function (s) { return root.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(root.querySelectorAll(s)); };
   var on = function () { return root.style.display !== 'none'; };
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
@@ -8605,22 +8896,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   var nav = $('#th-nav'), burger = $('#th-burger'), menu = $('#th-menu'), topBtn = $('#th-top');
   function setMenu(open) {
     burger.setAttribute('aria-expanded', String(open)); burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    if (open) { menu.hidden = false; nav.classList.remove('away'); requestAnimationFrame(function () { requestAnimationFrame(function () { menu.classList.add('open'); }); }); document.body.style.overflow = 'hidden'; }
-    else { menu.classList.remove('open'); document.body.style.overflow = ''; setTimeout(function () { if (!menu.classList.contains('open')) menu.hidden = true; }, 700); }
+    if (open) { menu.hidden = false; nav.classList.remove('away'); requestAnimationFrame(function () { requestAnimationFrame(function () { menu.classList.add('open'); }); }); lock(true); }
+    else { var was = !menu.hidden; menu.classList.remove('open'); if (was) lock(false); setTimeout(function () { if (!menu.classList.contains('open')) menu.hidden = true; }, 700); }
   }
   burger.addEventListener('click', function () { setMenu(burger.getAttribute('aria-expanded') !== 'true'); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
-  var jumping = 0;
+  var jumping = 0, lenis = null;
+  function goTo(to) {
+    jumping = Date.now();
+    if (lenis) { lenis.scrollTo(to || 0, { duration: 1.6, easing: function (t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); } }); return; }
+    if (!to) window.scrollTo({ top: 0, behavior: motion ? 'smooth' : 'auto' });
+    else to.scrollIntoView({ behavior: motion ? 'smooth' : 'auto', block: 'start' });
+  }
   $$('[data-jump]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault(); setMenu(false);
-      var to = a.getAttribute('data-jump') === 'top' ? null : document.querySelector(a.getAttribute('href'));
-      jumping = Date.now();
-      if (!to) window.scrollTo({ top: 0, behavior: motion ? 'smooth' : 'auto' });
-      else to.scrollIntoView({ behavior: motion ? 'smooth' : 'auto', block: 'start' });
+      goTo(a.getAttribute('data-jump') === 'top' ? null : document.querySelector(a.getAttribute('href')));
     });
   });
-  topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: motion ? 'smooth' : 'auto' }); });
+  topBtn.addEventListener('click', function () { goTo(null); });
 
   // ---- reveals and count-ups ----
   function countUp(el) {
@@ -8632,6 +8926,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if (k < 1) requestAnimationFrame(tick);
     })(t0);
   }
+  var startReveals = function () {};
   if (motion && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
@@ -8641,7 +8936,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         if (e.target.id === 'th-map') setTimeout(function () { e.target.classList.add('dropped'); }, 700);
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-    $$('[data-r]').forEach(function (el) { io.observe(el); });
+    startReveals = function () { $$('[data-r]').forEach(function (el) { io.observe(el); }); };
   } else {
     $$('[data-r]').forEach(function (el) { el.classList.add('in'); });
     var mp = $('#th-map'); if (mp) mp.classList.add('dropped');
@@ -8684,8 +8979,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   // ---- photo viewer ----
   var lb = $('#th-lb'), lbImg = $('#th-lb-img'), lbCap = $('#th-lb-cap'), shots = $$('.th-shot'), cur = 0, lastFocus = null;
   function showShot(i) { cur = (i + shots.length) % shots.length; var b = shots[cur]; lbImg.src = b.getAttribute('data-full'); lbImg.alt = b.querySelector('img').alt; lbCap.textContent = b.getAttribute('data-cap'); }
-  function closeLb() { lb.hidden = true; document.body.style.overflow = ''; if (lastFocus) lastFocus.focus(); }
-  shots.forEach(function (b, i) { b.addEventListener('click', function () { lastFocus = b; showShot(i); lb.hidden = false; document.body.style.overflow = 'hidden'; lb.querySelector('.x').focus(); }); });
+  function closeLb() { lb.hidden = true; lock(false); if (lastFocus) lastFocus.focus(); }
+  shots.forEach(function (b, i) { b.addEventListener('click', function () { lastFocus = b; showShot(i); lb.hidden = false; lock(true); lb.querySelector('.x').focus(); }); });
   lb.querySelector('.x').addEventListener('click', closeLb);
   lb.querySelector('.p').addEventListener('click', function () { showShot(cur - 1); });
   lb.querySelector('.n').addEventListener('click', function () { showShot(cur + 1); });
@@ -8704,8 +8999,307 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
+  // =================================================================
+  // PREMIUM LAYER: smooth scrolling, the intro, booking, the sheet and
+  // the dock, the cursor, magnetic buttons, card light, photo previews,
+  // the Coimbatore clock and the headline arriving word by word.
+  // =================================================================
+
+  // ---- scrolling is locked while a menu, the sheet or the photo viewer is open ----
+  function lock(on) {
+    document.body.style.overflow = on ? 'hidden' : '';
+    if (lenis) { if (on) lenis.stop(); else lenis.start(); }
+  }
+
+  // ---- smooth scrolling for mouse and trackpad (Lenis); touch keeps the phone's own scrolling ----
+  var lenisGen = 0;
+  function lenisOn() {
+    if (lenis || !fine || !motion || !window.Lenis || !on()) return;
+    lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 1 });
+    var gen = ++lenisGen;
+    (function loop(t) { if (!lenis || gen !== lenisGen) return; lenis.raf(t); requestAnimationFrame(loop); })(performance.now());
+    if (html.classList.contains('th-loading') || !menu.hidden || !lb.hidden || (sheet && !sheet.hidden)) lenis.stop();
+  }
+  function lenisOff() { if (lenis) { lenis.destroy(); lenis = null; lenisGen++; } }
+  if (fine && motion) {
+    var ls = document.createElement('script');
+    ls.src = '/vendor/lenis.min.js'; ls.async = true; ls.onload = lenisOn;
+    document.head.appendChild(ls);
+  }
+
+  // ---- the hero headline arrives word by word ----
+  var h1 = $('.th-hero .th-h1');
+  if (h1 && motion) {
+    var wi = 0;
+    $$('.th-hero .th-h1 .th-ln > span').forEach(function (line) {
+      var frag = document.createDocumentFragment();
+      Array.prototype.slice.call(line.childNodes).forEach(function (n) {
+        if (n.nodeType === 3) {
+          n.textContent.split(/(\s+)/).forEach(function (t) {
+            if (!t) return;
+            if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(' ')); return; }
+            var w = document.createElement('span'); w.className = 'th-wd'; w.style.setProperty('--w', wi++); w.textContent = t; frag.appendChild(w);
+          });
+        } else {
+          var w2 = document.createElement('span'); w2.className = 'th-wd'; w2.style.setProperty('--w', wi++); w2.appendChild(n); frag.appendChild(w2);
+        }
+      });
+      while (line.firstChild) line.removeChild(line.firstChild);
+      line.appendChild(frag);
+    });
+    h1.classList.add('th-words');
+  }
+
+  // ---- the intro: a counter runs while the fonts and the drawn scene get ready, then the curtain lifts ----
+  var loader = $('#th-loader'), loading = !!loader && html.classList.contains('th-loading');
+  function runLoader(done) {
+    try { sessionStorage.setItem('th-intro', '1'); } catch (e) {}
+    var num = $('#th-load-n'), lbar = $('#th-load-bar'), t0 = performance.now(), shown = 0, fontsIn = !(document.fonts && document.fonts.ready);
+    if (!fontsIn) document.fonts.ready.then(function () { fontsIn = true; });
+    var scene = $('#th-scene'), sceneBox = $('.th-hero-media');
+    function ready(el) { return el > 2.6 || (fontsIn && (!scene || (sceneBox && sceneBox.classList.contains('drawn')))); }
+    // the count keeps its own pace (it lands with the last letter of the wordmark) and never runs ahead of what has loaded
+    (function tick(now) {
+      var el = (now - t0) / 1000, ok = ready(el), pace = Math.min(1, el / 1.1);
+      var goal = Math.min(100 * (1 - Math.pow(1 - pace, 3)), ok ? 100 : 90 * (1 - Math.exp(-el * 2.2)));
+      shown += (goal - shown) * 0.3;
+      if (ok && pace >= 1 && 100 - shown < 0.8) shown = 100;
+      num.textContent = Math.floor(shown);
+      lbar.style.transform = 'scaleX(' + (shown / 100).toFixed(3) + ')';
+      if (shown >= 100 && el >= 1.2) { leave(); return; }
+      requestAnimationFrame(tick);
+    })(t0);
+    function leave() {
+      loader.classList.add('leaving');
+      setTimeout(function () {
+        loader.classList.add('out');
+        html.classList.remove('th-loading');
+        if (lenis) lenis.start();
+        lastW = -1; measure(); req();
+        done();
+        setTimeout(function () { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 1150);
+      }, 380);
+    }
+  }
+
+  // ---- booking: dates and guests, shared by every form, sent to Airbnb as the listing's own search ----
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function fromIso(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function addDays(d, n) { var c = new Date(d.getFullYear(), d.getMonth(), d.getDate()); c.setDate(c.getDate() + n); return c; }
+  var dayFmt;
+  try { dayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); }
+  catch (e) { dayFmt = { format: function (d) { return d.toDateString().slice(0, 10); } }; }
+  var book = { ci: '', co: '', g: 2 }, forms = [];
+  function paintForms() {
+    var today = iso(new Date());
+    forms.forEach(function (f) {
+      var ci = f.querySelector('[name="check_in"]'), co = f.querySelector('[name="check_out"]');
+      ci.min = today; co.min = iso(addDays(book.ci ? fromIso(book.ci) : new Date(), 1));
+      ci.value = book.ci; co.value = book.co;
+      [ci, co].forEach(function (inp) {
+        var lab = inp.parentNode, v = lab.querySelector('.v');
+        lab.classList.toggle('has', !!inp.value);
+        v.textContent = inp.value ? dayFmt.format(fromIso(inp.value)) : v.getAttribute('data-ph');
+      });
+      f.querySelector('[name="adults"]').value = book.g;
+      f.querySelector('output').textContent = book.g;
+      f.querySelector('[data-g="-1"]').disabled = book.g <= 1;
+      f.querySelector('[data-g="1"]').disabled = book.g >= 2;
+    });
+  }
+  function wireForm(f) {
+    forms.push(f);
+    var ci = f.querySelector('[name="check_in"]'), co = f.querySelector('[name="check_out"]');
+    function onIn() {
+      if (ci.value === book.ci) return;
+      book.ci = ci.value;
+      if (book.ci && (!book.co || book.co <= book.ci)) book.co = iso(addDays(fromIso(book.ci), 1));
+      paintForms();
+    }
+    function onOut() {
+      if (co.value === book.co) return;
+      book.co = co.value;
+      if (book.co && book.ci && book.co <= book.ci) book.ci = iso(addDays(fromIso(book.co), -1));
+      paintForms();
+    }
+    ci.addEventListener('change', onIn); ci.addEventListener('input', onIn);
+    co.addEventListener('change', onOut); co.addEventListener('input', onOut);
+    // on a computer the calendar opens wherever the field is clicked
+    if (fine) [ci, co].forEach(function (inp) { inp.addEventListener('click', function () { try { inp.showPicker(); } catch (e) {} }); });
+    // from the keyboard, Enter or Space opens the calendar (the field itself stays invisible)
+    [ci, co].forEach(function (inp) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); try { inp.showPicker(); } catch (err) {} }
+      });
+    });
+    Array.prototype.forEach.call(f.querySelectorAll('[data-g]'), function (b) {
+      b.addEventListener('click', function () { book.g = clamp(book.g + +b.getAttribute('data-g'), 1, 2); paintForms(); });
+    });
+    // dates left empty are left out of the link, so Airbnb simply opens the listing
+    f.addEventListener('submit', function () {
+      [ci, co].forEach(function (inp) { if (!inp.value) inp.disabled = true; });
+      setTimeout(function () { ci.disabled = co.disabled = false; }, 0);
+    });
+  }
+
+  // ---- the sheet: a bottom sheet on phones, a dialog on wider screens ----
+  var sheet = $('#th-sheet'), sheetFrom = null, dock = $('#th-dock');
+  if (sheet) {
+    var tpl = $('#th-cta-form'), slot = sheet.querySelector('[data-form-slot]');
+    if (tpl && slot) { var copy = tpl.cloneNode(true); copy.removeAttribute('id'); slot.parentNode.replaceChild(copy, slot); }
+  }
+  $$('form[data-book]').forEach(wireForm);
+  paintForms();
+  function openSheet(from) {
+    if (!sheet || !sheet.hidden) return;
+    sheetFrom = from || null;
+    sheet.hidden = false; lock(true); nav.classList.remove('away');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { sheet.classList.add('open'); }); });
+    setTimeout(function () { var x = sheet.querySelector('.th-sheet-x'); if (x) x.focus({ preventScroll: true }); }, 60);
+  }
+  function closeSheet() {
+    if (!sheet || sheet.hidden) return;
+    sheet.classList.remove('open'); sheet.classList.remove('drag');
+    sheet.querySelector('.th-sheet-panel').style.transform = '';
+    lock(false);
+    setTimeout(function () { if (!sheet.classList.contains('open')) sheet.hidden = true; }, 620);
+    if (sheetFrom && sheetFrom.focus) sheetFrom.focus({ preventScroll: true });
+  }
+  $$('[data-sheet]').forEach(function (a) {
+    a.addEventListener('click', function (e) { if (!sheet) return; e.preventDefault(); setMenu(false); openSheet(a); });
+  });
+  if (sheet) {
+    Array.prototype.forEach.call(sheet.querySelectorAll('[data-close]'), function (b) { b.addEventListener('click', closeSheet); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+    // drag the sheet down to close it
+    var panel = sheet.querySelector('.th-sheet-panel'), y0 = 0, dragY = 0, dragging = false;
+    panel.addEventListener('touchstart', function (e) {
+      if (panel.scrollTop > 0 || e.target.closest('input, button, a, output')) return;
+      dragging = true; y0 = e.touches[0].clientY; dragY = 0; sheet.classList.add('drag');
+    }, { passive: true });
+    panel.addEventListener('touchmove', function (e) {
+      if (!dragging) return;
+      dragY = Math.max(0, e.touches[0].clientY - y0);
+      panel.style.transform = 'translate3d(0,' + dragY + 'px,0)';
+    }, { passive: true });
+    panel.addEventListener('touchend', function () {
+      if (!dragging) return;
+      dragging = false; sheet.classList.remove('drag');
+      if (dragY > 110) closeSheet(); else panel.style.transform = '';
+    });
+  }
+
+  // ---- the local time in Coimbatore ----
+  var clocks = $$('[data-clock]');
+  if (clocks.length) {
+    var clockFmt = null;
+    try { clockFmt = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true }); } catch (e) {}
+    if (clockFmt) {
+      var tickClock = function () {
+        var s = clockFmt.format(new Date()).replace(/[  \s]+/g, ' ').replace(/ (am|pm)$/i, function (m) { return m.toLowerCase(); });
+        clocks.forEach(function (c) { c.textContent = s; });
+      };
+      tickClock(); setInterval(tickClock, 15000);
+    }
+  }
+
+  // ---- mouse and trackpad niceties: the cursor, magnetic buttons, card light, photo previews ----
+  if (fine && motion) {
+    var cur = $('#th-cur'), curL = $('#th-cur-l'), curLab = curL.querySelector('span');
+    var cx = -120, cy = -120, lx = -120, ly = -120, tx = -120, ty = -120, curRaf = 0, curIn = false;
+    var curLoop = function () {
+      curRaf = 0;
+      cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26;
+      lx += (tx - lx) * 0.17; ly += (ty - ly) * 0.17;
+      cur.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+      curL.style.transform = 'translate3d(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px,0)';
+      if (Math.abs(tx - cx) + Math.abs(ty - cy) + Math.abs(tx - lx) + Math.abs(ty - ly) > 0.4) curRaf = requestAnimationFrame(curLoop);
+    };
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      tx = e.clientX; ty = e.clientY;
+      if (!curIn) { curIn = true; cx = lx = tx; cy = ly = ty; cur.classList.remove('hide'); }
+      if (!curRaf) curRaf = requestAnimationFrame(curLoop);
+    }, { passive: true });
+    document.addEventListener('pointerover', function (e) {
+      var t = e.target, m = t.closest && t.closest('[data-cursor]');
+      var l = !m && t.closest && t.closest('a, button, summary, label, select, textarea, [role="button"]');
+      cur.classList.toggle('media', !!m); curL.classList.toggle('on', !!m);
+      if (m) curLab.textContent = m.getAttribute('data-cursor');
+      cur.classList.toggle('link', !!l);
+    });
+    document.addEventListener('mouseout', function (e) { if (!e.relatedTarget) { curIn = false; cur.classList.add('hide'); curL.classList.remove('on'); } });
+    window.addEventListener('pointerdown', function () { cur.classList.add('down'); });
+    window.addEventListener('pointerup', function () { cur.classList.remove('down'); });
+
+    // magnetic buttons lean toward the pointer and spring back
+    var magActive = [], magRaf = 0;
+    var magLoop = function () {
+      magRaf = 0;
+      magActive = magActive.filter(function (m) {
+        m._mx += (m._tx - m._mx) * 0.18; m._my += (m._ty - m._my) * 0.18;
+        var done = !m._tx && !m._ty && Math.abs(m._mx) < 0.05 && Math.abs(m._my) < 0.05;
+        m.style.translate = done ? '' : m._mx.toFixed(2) + 'px ' + m._my.toFixed(2) + 'px';
+        return !done;
+      });
+      if (magActive.length) magRaf = requestAnimationFrame(magLoop);
+    };
+    var wakeMag = function (m) { if (magActive.indexOf(m) < 0) magActive.push(m); if (!magRaf) magRaf = requestAnimationFrame(magLoop); };
+    $$('.th-btn, .th-cue, .th-wa, .th-top, .th-burger, .th-sheet-x').forEach(function (m) {
+      m._mx = m._my = m._tx = m._ty = 0;
+      m.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        var r = m.getBoundingClientRect(), k = m.classList.contains('th-btn') ? 0.2 : 0.32;
+        m._tx = (e.clientX - (r.left - m._mx + r.width / 2)) * k;
+        m._ty = (e.clientY - (r.top - m._my + r.height / 2)) * k * 1.25;
+        wakeMag(m);
+      });
+      m.addEventListener('pointerleave', function () { m._tx = m._ty = 0; wakeMag(m); });
+    });
+
+    // a soft light follows the pointer across the four cards
+    $$('.th-card-in').forEach(function (c) {
+      c.addEventListener('pointermove', function (e) {
+        var r = c.getBoundingClientRect(), s = r.width / c.offsetWidth || 1;
+        c.style.setProperty('--mx', ((e.clientX - r.left) / s).toFixed(0) + 'px');
+        c.style.setProperty('--my', ((e.clientY - r.top) / s).toFixed(0) + 'px');
+      });
+    });
+
+    // who it's for: a photo of the right room follows the pointer down the list
+    var whos = $('#th-whos'), peek = $('#th-peek');
+    if (whos && peek) {
+      var layers = Array.prototype.slice.call(peek.children), px = 0, py = 0, ptx = 0, pty = 0, pRaf = 0, pOn = false, pLoaded = false;
+      var pLoop = function () {
+        pRaf = 0;
+        var dx = ptx - px; px += dx * 0.14; py += (pty - py) * 0.14;
+        peek.style.translate = px.toFixed(1) + 'px ' + py.toFixed(1) + 'px';
+        peek.style.rotate = clamp(dx * 0.05, -9, 9).toFixed(2) + 'deg';
+        if (pOn || Math.abs(dx) > 0.3 || Math.abs(pty - py) > 0.3) pRaf = requestAnimationFrame(pLoop);
+      };
+      whos.addEventListener('pointerenter', function () {
+        if (pLoaded) return; pLoaded = true;
+        layers.forEach(function (l) { if (l.getAttribute('data-src')) l.src = l.getAttribute('data-src'); });
+      });
+      whos.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        ptx = e.clientX + (e.clientX + 330 > vw ? -175 : 175); pty = e.clientY;
+        if (!pOn) { pOn = true; px = ptx; py = pty; peek.classList.add('on'); }
+        if (!pRaf) pRaf = requestAnimationFrame(pLoop);
+      });
+      whos.addEventListener('pointerleave', function () { pOn = false; peek.classList.remove('on'); });
+      $$('#th-whos [data-peek]').forEach(function (row) {
+        row.addEventListener('pointerenter', function () {
+          var i = +row.getAttribute('data-peek');
+          layers.forEach(function (l, k) { l.classList.toggle('on', k === i); });
+        });
+      });
+    }
+  }
+
   // ---- the scroll loop ----
-  var bar = $('#th-progress'), hero = $('#th-hero'), heroCopy = $('#th-hero-copy'), heroOver = $('#th-hero-over'), heroPin = $('.th-hero-pin');
+  var bar = $('#th-progress'), hero = $('#th-hero'), heroCopy = $('#th-hero-copy'), heroOver = $('#th-hero-over'), heroPin = $('.th-hero-pin'), heroSide = $('.th-hero-side');
   var space = $('#space'), spacePin = $('.th-space-pin'), track = $('#th-track'), spaceBar = $('#th-space-bar'), count = $('#th-count');
   var cards = $$('.th-card'), marq = $$('#th-marq div'), map = $('#th-map'), steps = $('#th-steps'), word = $('#th-word'), feather = $('#th-feather');
   var pars = $$('[data-par]');
@@ -8717,6 +9311,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     vh = window.innerHeight; vw = document.documentElement.clientWidth;
     // the hero photo starts just under the copy
     var t = heroCopy.offsetHeight + 26;
+    if (heroSide && heroSide.offsetParent && getComputedStyle(heroSide).position === 'absolute') t = Math.max(t, heroSide.offsetParent.offsetTop + heroSide.offsetTop + heroSide.offsetHeight + 30);
     hero.style.setProperty('--t', Math.round(clamp(t, vh * 0.4, heroPin.offsetHeight - 150)) + 'px');
     if (!motion) return;
     if (vw !== lastW) {
@@ -8741,6 +9336,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     var mid = vh * 0.4, at = -1;
     spyT.forEach(function (s, i) { if (!s) return; var r = s.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) at = i; });
     spyLinks.forEach(function (a, i) { a.classList.toggle('on', i === at); });
+    if (dock) dock.classList.toggle('show', y > vh * 0.45 && cta.getBoundingClientRect().top > vh * 0.9 && menu.hidden && (!sheet || sheet.hidden));
     if (!motion) return;
     root.style.setProperty('--sp', (max > 0 ? y / max : 0).toFixed(4));
     // how fast the page is moving: things lean into the scroll and settle back
@@ -8805,10 +9401,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('load', function () { measure(); req(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lastW = -1; measure(); req(); });
   measure(); frame();
+  $$('[data-clock-wrap]').forEach(function (w) { if (clocks.length && clocks[0].textContent) w.hidden = false; });
+  if (loading) runLoader(startReveals); else startReveals();
 
-  // coming back from the game hub
+  // the game hub: a curtain where the browser has view transitions; smooth scrolling only on this page
   var show = window.showScreen;
-  if (typeof show === 'function') window.showScreen = function (name) { show.apply(this, arguments); if (name === 'landing') { lastW = -1; measure(); req(); } };
+  if (typeof show === 'function') window.showScreen = function (name) {
+    var self = this, args = arguments, wasOn = on();
+    function run() {
+      if (name !== 'landing') { closeSheet(); lenisOff(); }
+      show.apply(self, args);
+      if (name === 'landing') { lastW = -1; measure(); req(); lenisOn(); }
+      else if (wasOn) window.scrollTo(0, 0);
+    }
+    var vt = motion && typeof document.startViewTransition === 'function' && ((name === 'home' && wasOn) || (name === 'landing' && !wasOn));
+    if (!vt) { run(); return; }
+    var clear = function () { html.classList.remove('th-vt-in', 'th-vt-out'); };
+    html.classList.add(name === 'landing' ? 'th-vt-in' : 'th-vt-out');
+    try { document.startViewTransition(run).finished.then(clear, clear); } catch (e) { clear(); run(); }
+  };
 })();
 </script>
 <script>
