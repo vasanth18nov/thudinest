@@ -427,9 +427,21 @@ const ballTex = canvasTex(512, 256, (c, w, h) => {
   c.strokeStyle = 'rgba(40,40,40,0.25)'; c.lineWidth = 2;
   for (let i = 1; i < 6; i++) { c.beginPath(); for (let x = 0; x <= w; x += 4) { const y = (h * (i + 0.5)) / 6 + Math.sin((x / w) * TAU * 2 + i) * 10; if (x === 0) c.moveTo(x, y); else c.lineTo(x, y); } c.stroke(); }
 });
-const ballObj = new THREE.Mesh(new THREE.SphereGeometry(COURT.R, 24, 16), std(0xffffff, 0.45, { map: ballTex, emissive: 0xffffff, emissiveMap: ballTex, emissiveIntensity: 0.22 }));
+const ballGeo = new THREE.SphereGeometry(COURT.R, 24, 16);
+const ballObj = new THREE.Mesh(ballGeo, std(0xffffff, 0.45, { map: ballTex, emissive: 0xffffff, emissiveMap: ballTex, emissiveIntensity: 0.45 }));
 ballObj.scale.setScalar(1.3); ballObj.castShadow = true; scene.add(ballObj);
-const blob = new THREE.Mesh(new THREE.CircleGeometry(0.16, 20), new THREE.MeshBasicMaterial({ color: 0x3a2410, transparent: true, opacity: 0.35, depthWrite: false }));
+// what makes it readable from the broadcast camera: a dark rim (against the bright sky and sand) and a soft light
+// around it (against the shade and the crowd); its size is kept to a minimum on screen in updateBall
+const ballRim = new THREE.Mesh(ballGeo, new THREE.MeshBasicMaterial({ color: 0x1b0d22, side: THREE.BackSide }));
+ballRim.scale.setScalar(1.2); ballObj.add(ballRim);
+const ballHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: canvasTex(64, 64, (c, w, h) => { const g = c.createRadialGradient(w / 2, h / 2, w * 0.12, w / 2, h / 2, w / 2); g.addColorStop(0, 'rgba(255,250,225,0.95)'); g.addColorStop(0.45, 'rgba(255,236,170,0.35)'); g.addColorStop(1, 'rgba(255,230,160,0)'); c.fillStyle = g; c.fillRect(0, 0, w, h); }),
+  transparent: true, depthWrite: false, opacity: 0.7 }));
+ballHalo.scale.setScalar(COURT.R * 5.5); ballHalo.renderOrder = 4; ballObj.add(ballHalo);
+// a faint plumb line from a high ball to its spot on the sand: where it is, not only where it looks to be
+const dropLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(), new V3(0, -1, 0)]), new THREE.LineBasicMaterial({ color: 0xfff4e0, transparent: true, opacity: 0.4, depthWrite: false }));
+dropLine.frustumCulled = false; scene.add(dropLine);
+const blob = new THREE.Mesh(new THREE.CircleGeometry(0.16, 20), new THREE.MeshBasicMaterial({ color: 0x2a1608, transparent: true, opacity: 0.5, depthWrite: false }));
 blob.rotation.x = -Math.PI / 2; blob.renderOrder = 2; scene.add(blob);
 const marker = (() => {
   const tex = canvasTex(128, 128, (c, w, h) => { c.strokeStyle = '#fff'; c.lineWidth = 9; c.beginPath(); c.arc(w / 2, h / 2, w * 0.36, 0, TAU); c.stroke(); c.lineWidth = 6; c.beginPath(); c.moveTo(w * 0.36, h * 0.36); c.lineTo(w * 0.64, h * 0.64); c.moveTo(w * 0.64, h * 0.36); c.lineTo(w * 0.36, h * 0.64); c.stroke(); });
@@ -968,7 +980,7 @@ class PlayerView {
 /* broadcast: high behind your end line, the whole court in frame, as on television; side: from the sand beside the
    net, the court across the screen. Both fit the court to the screen's shape and follow the play a little. */
 const Cam = { mode: store.get('view', 'broadcast'), pos: new V3(0, 12, 30), look: new V3(0, 0.4, -1), fov: 30, shake: 0, cut: true, script: null, lift: 0,
-  tune: { pitch: 0.28, fov: 34, up: 0.15 } }; // broadcast, landscape: low enough for the sunset over the far end
+  tune: { pitch: 0.48, fov: 30, up: 0.02 } }; // broadcast, landscape: high enough to see into the far court // broadcast, landscape: low enough for the sunset over the far end
 const _cf = new V3(), _cr = new V3(), _cu = new V3(), _cp = new V3();
 // the distance along dir from look that frames every point; up shifts the frame (a lens shift, as a fraction of its
 // height) so the points fit in its lower part
@@ -1005,7 +1017,7 @@ function camTarget(dt, aspect, focus) {
   const T = Cam.tune;
   // a short landscape screen (a phone on its side) keeps the court large and gives up the sky
   const small = !portrait && innerHeight < 560;
-  const fov = portrait ? clamp(34 + (1 / aspect - 1) * 11, 34, 50) : small ? 30 : T.fov, pitch = portrait ? 0.43 : small ? 0.36 : T.pitch, up = portrait ? -0.1 : small ? 0.05 : T.up;
+  const fov = portrait ? clamp(34 + (1 / aspect - 1) * 11, 34, 50) : small ? 30 : T.fov, pitch = portrait ? 0.5 : small ? 0.48 : T.pitch, up = portrait ? -0.1 : small ? 0 : T.up;
   const dir = _v1.set(0, Math.sin(pitch), Math.cos(pitch)).normalize();
   const look = _v2.set(clamp(focus.x * 0.12, -0.6, 0.6), 0.5, -1.0);
   const d = fitDistance(dir, look, fov, aspect, COURT_PTS, portrait ? 0.03 : 0.05, up);
@@ -1408,8 +1420,15 @@ function updateBall(dt) {
   if (w > 0.5) { _ax.set(b.w[0], b.w[1], b.w[2]).normalize(); _bq.setFromAxisAngle(_ax, w * dt * 0.35); ballObj.quaternion.premultiply(_bq); }
   else if (b.live || b.rest) { const s = Math.hypot(b.v[0], b.v[2]); if (s > 0.2) { _ax.set(b.v[2], 0, -b.v[0]).normalize(); _bq.setFromAxisAngle(_ax, (s / COURT.R) * dt * (b.rest ? 1 : 0.15)); ballObj.quaternion.premultiply(_bq); } }
   const h = b.p[1];
-  blob.position.set(b.p[0], 0.012, b.p[2]); blob.scale.setScalar(1 + h * 0.18); blob.material.opacity = clamp(0.42 - h * 0.035, 0.08, 0.42);
+  // never smaller on screen than about 7 px across its radius, however far the camera (the real ball is 21 cm)
+  const dist = camera.position.distanceTo(ballObj.position), tanH = Math.tan((camera.fov * Math.PI) / 360);
+  const k = clamp((8.5 * dist * tanH * 2) / (Math.max(320, innerHeight) * COURT.R), 1.3, 3.4);
+  ballObj.scale.setScalar(k);
+  blob.position.set(b.p[0], 0.012, b.p[2]); blob.scale.setScalar((1 + h * 0.12) * (0.6 + k * 0.4)); blob.material.opacity = clamp(0.6 - h * 0.035, 0.2, 0.6);
   blob.visible = b.live || b.rest || b.held !== null;
+  const line = (b.live || b.held !== null) && h > 1.1 && !G.attract;
+  dropLine.visible = line;
+  if (line) { dropLine.position.set(b.p[0], h - COURT.R * k, b.p[2]); dropLine.scale.y = Math.max(0.01, h - COURT.R * k - 0.02); dropLine.material.opacity = clamp((h - 1.1) * 0.4, 0, 0.38); }
   if (G.trailOff && wall > G.trailOff) { trail.set(false); G.trailOff = 0; }
   trail.update(ballObj.position, dt);
   // where it will come down, on your side, for you to read
