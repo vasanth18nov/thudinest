@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1a0f1f">
+<title>Sunset Spike | Thudinest Games</title>
+<meta name="description" content="Sunset Spike: a free 3D beach volleyball game. Two against two on the sand as the sun goes down: pass, set, spike, block and dig with a computer partner, against a computer pair at three levels, with real rules. No download, no account.">
+<meta property="og:title" content="Sunset Spike · 3D beach volleyball at the Thudinest Beach Cup">
+<meta property="og:description" content="Free 3D beach volleyball in your browser: two against two by the sea at sunset. Pass, set, spike, block and dig.">
+<meta property="og:image" content="https://thudinest.com/volleyball/og.jpg">
+<meta property="og:url" content="https://thudinest.com/volleyball/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Figtree:wght@500;600;700;800&display=swap">
+<link rel="modulepreload" href="../bm/vendor/three.js">
+<link rel="modulepreload" href="js/sim.js?v=1">
+<link rel="modulepreload" href="../football/js/util.js">
+<link rel="modulepreload" href="../football/js/fans.js">
+<link rel="preload" href="../bm/players/moves.json" as="fetch" crossorigin>
+<style>
+[hidden] { display: none !important; }
+/* Layout: the beach full bleed under a broadcast HUD pinned to the safe area corners (score bug top left, camera and
+   pause top right, calls in the middle); on touch screens a floating stick on the left and two buttons on the right.
+   Menus are cards of dusk coloured glass over the live beach. */
+:root {
+  --ink: #1a0f1f;
+  --panel: rgba(32, 17, 36, 0.8);
+  --panel-soft: rgba(32, 17, 36, 0.58);
+  --rule: rgba(255, 226, 206, 0.13);
+  --rule-strong: rgba(255, 226, 206, 0.28);
+  --chalk: #fff4ea;
+  --muted: #cdb0b2;
+  --sun: #ffb547;
+  --sun-ink: #2c1400;
+  --sea: #34d9c6;
+  --sea-ink: #032621;
+  --coral: #ff6a4d;
+  --rose: #ff4f7b;
+  --scrim: rgba(22, 9, 22, 0.5);
+  --dusk: linear-gradient(100deg, #ffcf6b 0%, #ff9a4d 42%, #ff5f6d 78%, #e8467f 100%);
+  --display: "Kanit", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); }
+body {
+  color: var(--chalk); font: 500 15px/1.4 var(--ui);
+  -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
+  touch-action: none; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+.safe { position: fixed; inset: 0; pointer-events: none; }
+.lbl { font: 800 11px/1 var(--ui); letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- score bug ---------- */
+.bug { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(16px, env(safe-area-inset-left, 0px)); width: 318px; max-width: calc(100vw - 132px); border-radius: 8px; overflow: hidden; background: var(--panel); border: 1px solid var(--rule); backdrop-filter: blur(12px) saturate(1.2); -webkit-backdrop-filter: blur(12px) saturate(1.2); box-shadow: 0 12px 34px rgba(30, 6, 20, 0.35); }
+.bug-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 10px 4px; background: var(--dusk); color: var(--sun-ink); font: 800 italic 12px/1.1 var(--display); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.bug-head span:last-child { opacity: 0.78; }
+.row { display: grid; grid-template-columns: 4px minmax(0, 1fr) 20px auto 50px; align-items: center; height: 38px; }
+.row + .row { border-top: 1px solid var(--rule); }
+.row .bar { height: 100%; }
+.row.p0 .bar { background: var(--sea); } .row.p1 .bar { background: var(--coral); }
+.row .nm { padding: 0 8px 0 10px; font: 700 17px/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .srv { width: 15px; height: 15px; opacity: 0; transform: scale(0.6) rotate(-90deg); transition: opacity 220ms ease, transform 320ms cubic-bezier(.2, .9, .3, 1.3); }
+.row.serving .srv { opacity: 1; transform: none; }
+.row .ss { display: flex; gap: 2px; padding-right: 6px; }
+.row .ss i { font: 700 15px/1 var(--display); font-style: normal; color: var(--muted); min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+.row .ss i.w { color: var(--chalk); }
+.row .pt { justify-self: stretch; height: 100%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.07); font: 800 26px/1 var(--display); font-variant-numeric: tabular-nums; }
+.row .pt.bump { animation: bump 460ms ease; }
+@keyframes bump { 0% { background: var(--sun); color: var(--sun-ink); } 100% { background: rgba(255, 255, 255, 0.07); } }
+.bug-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 22px; padding: 0 10px; border-top: 1px solid var(--rule); font: 700 11px/1 var(--ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.bug-foot .tag { color: var(--sun); }
+.bug-foot .tag.t1 { color: var(--coral); }
+/* the event name, and in its place while your side has the ball, its touches */
+.bug-foot .ev { display: grid; align-items: center; }
+.bug-foot .ev > span { grid-area: 1 / 1; transition: opacity 200ms ease, transform 200ms ease; white-space: nowrap; }
+.pips { display: flex; align-items: center; gap: 5px; opacity: 0; transform: translateY(4px); }
+.pips i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--sea); box-sizing: border-box; transition: background 150ms ease; }
+.pips[data-n="1"] i:nth-child(-n+2), .pips[data-n="2"] i:nth-child(-n+3), .pips[data-n="3"] i:nth-child(-n+4) { background: var(--sea); }
+.pips b { font-weight: 800; color: var(--chalk); margin-right: 2px; }
+.bug.mine .pips { opacity: 1; transform: none; }
+.bug.mine .evname { opacity: 0; transform: translateY(-4px); }
+
+/* ---------- top right ---------- */
+.tr { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 8px; pointer-events: auto; }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--rule); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 150ms ease, transform 120ms ease; }
+.icon-btn:hover { background: rgba(60, 30, 56, 0.92); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width: 22px; height: 22px; }
+.view-btn { width: auto; padding: 0 14px 0 11px; border-radius: 22px; gap: 8px; display: flex; align-items: center; font: 700 13px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ---------- calls ---------- */
+.callout { position: absolute; left: 50%; top: 21%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; text-align: center; width: max-content; max-width: 92vw; }
+.call-main { font: 900 italic clamp(40px, 8.4vw, 84px)/0.92 var(--display); letter-spacing: 0.01em; text-transform: uppercase; text-shadow: 0 4px 26px rgba(40, 6, 24, 0.55); }
+.call-main.t-gold { background: linear-gradient(180deg, #fff0b8 0%, #ffc457 45%, #ff8a3d 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 4px 18px rgba(60, 10, 20, 0.55)); }
+.call-main.t-coral { color: var(--coral); } .call-main.t-white { color: var(--chalk); } .call-main.t-sea { color: var(--sea); }
+.call-sub { font: 700 14px/1.2 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--chalk); background: var(--panel); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 14px; white-space: nowrap; }
+.callout.show { animation: callIn 400ms cubic-bezier(.2, .9, .3, 1.25) both; }
+.callout.hide { animation: callOut 300ms ease both; }
+@keyframes callIn { from { opacity: 0; transform: translateX(-50%) scale(0.82) skewX(-6deg); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@keyframes callOut { to { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
+.pill { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 16px); transform: translateX(-50%); background: var(--dusk); color: var(--sun-ink); font: 800 italic 17px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px 7px; border-radius: 6px; box-shadow: 0 6px 20px rgba(40, 6, 24, 0.35); white-space: nowrap; }
+.timing { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); transform: translateX(-50%); font: 800 italic 23px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; text-shadow: 0 2px 12px rgba(30, 6, 20, 0.7); pointer-events: none; opacity: 0; }
+.timing.on { animation: tIn 900ms ease both; }
+.timing[data-q="Perfect"] { color: var(--sun); } .timing[data-q="Good"] { color: var(--chalk); } .timing[data-q="Late"], .timing[data-q="Early"] { color: #ff9b85; }
+@keyframes tIn { 0% { opacity: 0; transform: translate(-50%, 8px); } 15% { opacity: 1; transform: translate(-50%, 0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+
+/* lower third: the speed gun */
+.lower { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; }
+.speed { display: flex; align-items: stretch; border-radius: 6px; overflow: hidden; background: var(--panel); border: 1px solid var(--rule); }
+.speed .k { background: var(--dusk); color: var(--sun-ink); font: 800 italic 13px/1 var(--display); letter-spacing: 0.12em; padding: 9px 10px 8px; text-transform: uppercase; display: grid; place-items: center; }
+.speed .v { padding: 4px 12px 3px; font: 800 30px/1 var(--display); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 4px; }
+.speed .v small { font: 700 12px/1 var(--ui); letter-spacing: 0.1em; color: var(--muted); }
+.speed.show { animation: slideIn 420ms cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+.touch-ui .lower { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 140px); }
+@media (max-height: 520px) { .touch-ui .lower { top: calc(env(safe-area-inset-top, 0px) + 112px); } }
+.hint { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; max-width: min(720px, 92vw); padding: 8px 14px; background: var(--panel-soft); border: 1px solid var(--rule); border-radius: 10px; font: 600 13px/1.3 var(--ui); color: var(--muted); transition: opacity 600ms ease; white-space: nowrap; }
+.hint kbd { font: 700 12px/1 var(--ui); color: var(--chalk); background: rgba(255, 255, 255, 0.1); border: 1px solid var(--rule-strong); border-bottom-width: 2px; border-radius: 4px; padding: 3px 6px; margin-right: 5px; }
+.hint b { color: var(--chalk); font-weight: 700; }
+.cue-now .hint kbd.cue { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+
+/* ---------- touch controls ---------- */
+.touch { position: fixed; inset: 0; pointer-events: none; }
+@media (orientation: portrait) {
+  .touch-ui #hud::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: linear-gradient(180deg, rgba(26, 15, 31, 0) 0%, rgba(26, 15, 31, 0.7) 30%, rgba(26, 15, 31, 0.92) 70%); }
+  .touch-ui .callout { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 244px); }
+  .touch-ui .timing { bottom: calc(env(safe-area-inset-bottom, 0px) + 206px); padding: 6px 14px 5px; border-radius: 999px; background: var(--panel-soft); }
+}
+.stick-zone { position: absolute; left: 0; bottom: 0; width: 55%; height: 64%; pointer-events: auto; }
+.stick { position: absolute; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; background: rgba(32, 17, 36, 0.35); border: 2px solid rgba(255, 226, 206, 0.24); transition: opacity 200ms ease; }
+.stick .knob { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%; background: rgba(255, 244, 234, 0.88); box-shadow: 0 4px 14px rgba(30, 6, 20, 0.4); }
+.stick.idle { opacity: 0.45; }
+.stick-tag { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); font: 800 10px/1 var(--ui); letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.shots { position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); width: 196px; height: 170px; pointer-events: none; }
+.shot { --acc: 255, 181, 71; position: absolute; border-radius: 50%; pointer-events: auto; display: grid; place-items: center; text-align: center; font: 800 italic 15px/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--chalk); background: radial-gradient(circle at 50% 28%, rgba(var(--acc), 0.2), rgba(32, 17, 36, 0.84) 70%); border: 2px solid rgba(var(--acc), 0.6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 18px rgba(30, 6, 20, 0.4); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform 90ms ease, background 120ms ease, box-shadow 120ms ease, border-color 120ms ease; }
+.shot > span > span { color: rgb(var(--acc)); display: block; max-width: 84px; }
+.shot small { display: block; font: 800 10px/1 var(--ui); letter-spacing: 0.14em; color: var(--muted); margin-top: 5px; font-style: normal; }
+.shot.down { transform: scale(0.92); background: radial-gradient(circle at 50% 40%, rgba(var(--acc), 0.55), rgba(var(--acc), 0.2) 75%); }
+.cue-now .shot { border-color: rgb(var(--acc)); box-shadow: 0 0 0 5px rgba(var(--acc), 0.3), 0 0 26px rgba(var(--acc), 0.45), 0 6px 18px rgba(30, 6, 20, 0.4); }
+.shot.a { width: 100px; height: 100px; right: 0; bottom: 0; }
+.shot.b { --acc: 52, 217, 198; width: 78px; height: 78px; right: 112px; bottom: 74px; font-size: 13px; }
+
+/* ---------- cards ---------- */
+.overlay { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px); pointer-events: auto; overflow-y: auto; box-sizing: border-box; }
+.overlay > .card { margin: auto 0; }
+.overlay.dim { background: var(--scrim); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.card { width: min(440px, 100%); background: var(--panel); border: 1px solid var(--rule); border-radius: 16px; padding: 22px 22px 20px; box-shadow: 0 26px 64px rgba(30, 6, 20, 0.5); backdrop-filter: blur(16px) saturate(1.25); -webkit-backdrop-filter: blur(16px) saturate(1.25); box-sizing: border-box; }
+.menu { position: fixed; inset: 0; display: flex; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px) max(16px, calc(env(safe-area-inset-left, 0px) + 4vw)); pointer-events: auto; overflow-y: auto; box-sizing: border-box; }
+.menu .card { width: 470px; max-width: 100%; margin: auto 0; padding-bottom: 16px; }
+/* Play stays in reach while the card scrolls on a short screen */
+.menu .primary { position: sticky; bottom: 0; z-index: 2; box-shadow: 0 -12px 24px rgba(32, 17, 36, 0.92), 0 8px 26px rgba(255, 140, 70, 0.3); }
+.brand { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.brand .kicker { display: flex; align-items: center; gap: 8px; font: 800 italic 12px/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase; color: var(--sun); }
+.brand .kicker::before { content: ""; width: 18px; height: 9px; border-radius: 9px 9px 0 0; background: var(--dusk); }
+.brand h1 { margin: 0; font: 900 italic 66px/0.86 var(--display); letter-spacing: -0.01em; text-transform: uppercase; }
+.brand h1 em { font-style: italic; background: linear-gradient(180deg, #ffe7a0 0%, #ffb547 38%, #ff6a4d 72%, #e8467f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 0.06em; }
+.brand p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.field { margin-top: 14px; }
+.field > .lbl { display: block; margin-bottom: 7px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--rule); border-radius: 11px; }
+.seg button { padding: 9px 6px 8px; border-radius: 8px; font: 700 15px/1.05 var(--display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); transition: background 120ms ease, color 120ms ease; }
+.seg button small { display: block; font: 600 11px/1.2 var(--ui); letter-spacing: 0.02em; text-transform: none; margin-top: 3px; opacity: 0.85; }
+.seg button:hover { color: var(--chalk); }
+.seg button[aria-pressed="true"] { background: var(--chalk); color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px; border: 1px solid var(--rule-strong); font: 700 14px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); transition: background 120ms ease, color 120ms ease, border-color 120ms ease; }
+.chip .face { width: 26px; height: 26px; border-radius: 50%; background: #3a2236 center/cover no-repeat; flex: none; }
+.chip[aria-pressed="true"] { color: var(--ink); background: var(--chalk); border-color: var(--chalk); }
+.pairs { margin-top: 9px; display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; font: 600 13px/1.3 var(--ui); color: var(--muted); }
+.pairs b { color: var(--chalk); font-weight: 700; }
+.pairs .dot { width: 8px; height: 8px; border-radius: 50%; }
+.link-btn { color: var(--sun); font: 700 13px/1 var(--ui); padding: 4px 2px; text-decoration: underline; text-underline-offset: 3px; }
+.name-in { width: 100%; box-sizing: border-box; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--rule-strong); border-radius: 9px; color: var(--chalk); font: 700 16px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; padding: 10px 12px; user-select: text; -webkit-user-select: text; }
+.name-in::placeholder { color: var(--muted); }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; }
+.tog { display: flex; align-items: center; gap: 8px; font: 600 13px/1 var(--ui); color: var(--muted); padding: 4px 0; }
+.tog i { position: relative; width: 34px; height: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.14); transition: background 150ms ease; flex: none; }
+.tog i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--chalk); transition: transform 150ms ease; }
+.tog[aria-pressed="true"] { color: var(--chalk); }
+.tog[aria-pressed="true"] i { background: var(--sea); }
+.tog[aria-pressed="true"] i::after { transform: translateX(14px); }
+.primary { width: 100%; margin-top: 18px; padding: 15px 16px 13px; border-radius: 12px; background: var(--dusk); color: var(--sun-ink); font: 900 italic 24px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 8px 26px rgba(255, 140, 70, 0.3); transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease; position: relative; overflow: hidden; }
+.primary:hover { box-shadow: 0 10px 32px rgba(255, 140, 70, 0.45); filter: brightness(1.05); }
+.primary:active { transform: scale(0.98); }
+.primary[disabled] { cursor: progress; filter: saturate(0.4) brightness(0.8); box-shadow: none; }
+.secondary { width: 100%; margin-top: 8px; padding: 12px 16px 11px; border-radius: 12px; border: 1px solid var(--rule-strong); font: 800 italic 18px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; }
+.secondary:hover { background: rgba(255, 255, 255, 0.06); }
+.how { margin-top: 14px; font: 500 13px/1.45 var(--ui); color: var(--muted); }
+.how summary { cursor: pointer; font-weight: 700; color: var(--chalk); list-style: none; display: flex; align-items: center; gap: 6px; }
+.how summary::-webkit-details-marker { display: none; }
+.how summary::before { content: "+"; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--rule-strong); font-size: 13px; }
+.how[open] summary::before { content: "–"; }
+.how ul { margin: 8px 0 0; padding-left: 18px; }
+.how li { margin: 4px 0; }
+.how b { color: var(--chalk); }
+.how kbd { font: 700 11px/1 var(--ui); color: var(--chalk); background: rgba(255, 255, 255, 0.1); border: 1px solid var(--rule-strong); border-radius: 4px; padding: 2px 5px; }
+.home { display: inline-block; margin-top: 14px; color: var(--muted); font: 600 13px/1 var(--ui); text-decoration: none; }
+.home:hover { color: var(--chalk); text-decoration: underline; }
+.card h2 { margin: 0 0 4px; font: 900 italic 42px/0.95 var(--display); text-transform: uppercase; letter-spacing: 0; }
+.card h2.win { background: linear-gradient(180deg, #fff0b8 0%, #ffc457 45%, #ff8a3d 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.card .sub { color: var(--muted); margin: 0 0 14px; }
+.games { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.games span { padding: 6px 10px; border-radius: 7px; background: rgba(255, 255, 255, 0.07); font: 800 20px/1 var(--display); font-variant-numeric: tabular-nums; }
+.games span.w { background: rgba(52, 217, 198, 0.16); color: var(--sea); }
+.stats { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.stats th, .stats td { padding: 7px 4px; border-top: 1px solid var(--rule); text-align: center; font: 700 16px/1 var(--display); }
+.stats th { font: 800 11px/1 var(--ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.stats td:first-child, .stats th:first-child { text-align: left; font: 600 13px/1.2 var(--ui); color: var(--muted); }
+.stats tr:first-child th { border-top: 0; }
+.stats tr.you td { color: var(--chalk); }
+.stats tr.you td:first-child { color: var(--sun); }
+.stats .c0 { color: var(--sea); } .stats .c1 { color: var(--coral); }
+
+/* loading */
+.load { text-align: center; }
+.load .brand { align-items: center; margin-bottom: 18px; }
+.bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 100%; background: var(--dusk); transform-origin: left; transform: scaleX(0.04); transition: transform 200ms ease; }
+.load-step { margin-top: 10px; color: var(--muted); font-size: 13px; }
+.fatal-msg { color: var(--chalk); }
+
+@media (max-width: 560px) {
+  .bug { width: 236px; }
+  .row { height: 32px; grid-template-columns: 4px minmax(0, 1fr) 18px auto 40px; }
+  .row .nm { font-size: 14px; padding-left: 8px; letter-spacing: 0.02em; }
+  .bug-head .wide { display: none; }
+  .row .pt { font-size: 22px; }
+  .bug-head, .bug-foot { font-size: 10px; }
+  .brand h1 { font-size: 54px; }
+  .view-btn span { display: none; }
+  .view-btn { width: 44px; padding: 0; justify-content: center; }
+  .pill { top: calc(env(safe-area-inset-top, 0px) + 116px); font-size: 14px; padding: 7px 13px 6px; } /* under the score bug, not over it */
+  .menu { padding-left: 16px; }
+  .brand p { font-size: 13px; }
+  .speed .v { font-size: 24px; }
+  .call-sub { font-size: 12px; }
+}
+@media (max-height: 820px) {
+  .brand { margin-bottom: 10px; }
+  .brand h1 { font-size: 56px; }
+  .field { margin-top: 10px; }
+  .field > .lbl { margin-bottom: 5px; }
+  .seg button { padding: 7px 6px 6px; }
+  .name-in { padding: 8px 12px; }
+  .primary { margin-top: 12px; padding: 13px 16px 11px; }
+  .card { padding: 18px 20px 16px; }
+}
+@media (max-height: 520px) {
+  .brand h1 { font-size: 42px; }
+  .brand p { display: none; }
+  .bug { width: 240px; }
+  .row { height: 28px; grid-template-columns: 4px minmax(0, 1fr) 18px auto 40px; }
+  .row .nm { font-size: 13px; letter-spacing: 0.02em; }
+  .row .pt { font-size: 20px; }
+  .bug-head { font-size: 10px; padding: 4px 9px 3px; }
+  .bug-head .wide { display: none; }
+  .bug-foot { height: 19px; font-size: 10px; }
+  .shots { transform: scale(0.86); transform-origin: right bottom; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .callout.show, .callout.hide, .speed.show, .timing.on, .row .pt.bump { animation-duration: 1ms; }
+}
+</style>
+</head>
+<body>
+<canvas id="scene" tabindex="0" aria-label="Sunset Spike, a 3D beach volleyball court by the sea"></canvas>
+
+<div class="safe" id="hud" hidden>
+  <div class="bug" id="bug" aria-live="polite">
+    <div class="bug-head"><span><span class="wide">Thudinest </span>Beach Cup</span><span id="bugSet">Set 1 · to 21</span></div>
+    <div class="row p0" id="row0"><i class="bar"></i><span class="nm" id="nm0">You</span><svg class="srv" viewBox="0 0 16 16" aria-label="serving"><circle cx="8" cy="8" r="6.6" fill="#ffb547"/><path d="M8 1.4c-1.8 2.6-1.8 5.4 0 6.6s1.8 4 0 6.6M1.8 6.2c3 .3 5 1.2 6.2 1.8s3.4 .6 6.2-.4M3.4 12.4c1.2-2.4 3-4 4.6-4.4" fill="none" stroke="#2c1400" stroke-width="1.1" stroke-linecap="round"/></svg><span class="ss" id="ss0"></span><span class="pt" id="pt0">0</span></div>
+    <div class="row p1" id="row1"><i class="bar"></i><span class="nm" id="nm1">CPU</span><svg class="srv" viewBox="0 0 16 16" aria-label="serving"><circle cx="8" cy="8" r="6.6" fill="#ffb547"/><path d="M8 1.4c-1.8 2.6-1.8 5.4 0 6.6s1.8 4 0 6.6M1.8 6.2c3 .3 5 1.2 6.2 1.8s3.4 .6 6.2-.4M3.4 12.4c1.2-2.4 3-4 4.6-4.4" fill="none" stroke="#2c1400" stroke-width="1.1" stroke-linecap="round"/></svg><span class="ss" id="ss1"></span><span class="pt" id="pt1">0</span></div>
+    <div class="bug-foot"><span class="ev"><span class="evname">Beach · two v two</span><span class="pips" id="pips" data-n="0"><b>Touches</b><i></i><i></i><i></i></span></span><span id="bugTag" class="tag"></span></div>
+  </div>
+  <div class="tr">
+    <button class="icon-btn view-btn" id="viewBtn" aria-label="Switch camera view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3l2-3h8l2 3h3v12H3z"/><circle cx="12" cy="13" r="4"/></svg><span id="viewName">Broadcast</span></button>
+    <button class="icon-btn" id="pauseBtn" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  </div>
+  <div class="pill" id="pill" hidden></div>
+  <div class="callout" id="callout" hidden><div class="call-main" id="callMain"></div><div class="call-sub" id="callSub" hidden></div></div>
+  <div class="timing" id="timing" data-q=""></div>
+  <div class="lower">
+    <div class="speed" id="speed" hidden><span class="k" id="speedK">Spike</span><span class="v"><span id="speedV">0</span><small>km/h</small></span></div>
+  </div>
+  <div class="hint" id="keyHint" hidden><span><kbd>WASD</kbd>move · aim</span><span><kbd class="cue">J</kbd><b id="keyA">Spike</b></span><span><kbd class="cue">K</kbd><b id="keyB">Shot</b></span><span><kbd>C</kbd>camera</span><span><kbd>P</kbd>pause</span></div>
+</div>
+
+<div class="touch" id="touch" hidden>
+  <div class="stick-zone" id="stickZone"></div>
+  <div class="stick idle" id="stick"><span class="stick-tag" id="stickTag">Move · aim</span><div class="knob" id="knob"></div></div>
+  <div class="shots">
+    <button class="shot b" data-btn="B" aria-label="Soft touch"><span><span id="lblB">Shot</span><small>B</small></span></button>
+    <button class="shot a" data-btn="A" aria-label="Main touch"><span><span id="lblA">Spike</span><small>A</small></span></button>
+  </div>
+</div>
+
+<div class="overlay" id="loadPanel">
+  <div class="card load">
+    <div class="brand"><span class="kicker">Thudinest Beach Cup · 3D beach volleyball</span><h1>Sunset <em>Spike</em></h1></div>
+    <div class="bar"><i id="loadBar"></i></div>
+    <div class="load-step" id="loadStep">Raking the sand…</div>
+  </div>
+</div>
+
+<div class="menu" id="menu" hidden>
+  <div class="card">
+    <div class="brand"><span class="kicker">Thudinest Beach Cup · 3D beach volleyball</span><h1>Sunset <em>Spike</em></h1><p>Two against two on the sand as the sun goes down. Pass, set, spike, block and dig, with real rules.</p></div>
+    <div class="field"><span class="lbl">You play as</span><div class="chips" id="pickChips"></div>
+      <div class="pairs"><i class="dot" style="background:var(--sea)"></i><span>With <b id="mateName">…</b></span><button class="link-btn" id="mateShuffle" type="button">Change</button><i class="dot" style="background:var(--coral)"></i><span>Against <b id="oppNames">…</b></span><span></span></div></div>
+    <div class="field"><label class="lbl" for="nameIn">Your name on the scoreboard</label><input class="name-in" id="nameIn" maxlength="14" placeholder="Kavin" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><span class="lbl">Opponents</span><div class="seg" id="segDiff">
+      <button data-v="easy">Weekend<small>Relaxed</small></button><button data-v="medium">Pro Tour<small>A real match</small></button><button data-v="hard">World Champs<small>Bring it</small></button></div></div>
+    <div class="field"><span class="lbl">Match</span><div class="seg" id="segFmt">
+      <button data-v="quick">Quick<small>One set to 15</small></button><button data-v="set">Set<small>One set to 21</small></button><button data-v="match">Match<small>Best of 3 sets</small></button></div></div>
+    <div class="field"><span class="lbl">Camera</span><div class="seg" id="segView">
+      <button data-v="broadcast">Broadcast<small>TV, end on</small></button><button data-v="side">Side<small>From the sand</small></button></div></div>
+    <div class="toggles">
+      <button class="tog" id="togAuto" aria-pressed="true"><i></i>Run to the ball for me</button>
+      <button class="tog" id="togMark" aria-pressed="true"><i></i>Landing marker</button>
+      <button class="tog" id="togSound" aria-pressed="true"><i></i>Sound</button>
+    </div>
+    <button class="primary" id="playBtn" disabled>Loading…</button>
+    <details class="how" id="howTo"><summary>How to play</summary>
+      <ul>
+        <li>Two buttons. <b>A</b> is the main touch: the jump serve, the pass, the set, the spike and the block. <b>B</b> is the soft one: the float serve, a shot over the block, or attacking on two when you'd set.</li>
+        <li>Timing is everything: press just before the ball reaches you. The ring under your feet (and the buttons, on a phone) light up while a press would be <b>Perfect</b>. For a spike or a block the press is your jump, so take off as the ring lights.</li>
+        <li><b>Serving:</b> A tosses for a jump serve, B for a float. Press again as the ball comes down to hit it. The stick aims: left and right, up for deeper.</li>
+        <li>Your partner plays the touches you don't: pass, you set and they spike, or the other way round. When the other side attacks, whoever is at the net blocks and the other digs.</li>
+        <li>With <b>Run to the ball for me</b> on, you get to the ball on your own and the stick aims your serve and your spike. Off, the stick moves you too.</li>
+        <li>Keys: <kbd>J</kbd> or <kbd>Space</kbd> for A, <kbd>K</kbd> for B, <kbd>WASD</kbd> or the arrows to move and aim, <kbd>C</kbd> camera, <kbd>P</kbd> pause, <kbd>M</kbd> sound. A game controller works too.</li>
+        <li>Real rules: three touches a side, a point on every rally, sets to 21 (the third to 15), won by two clear points. The lines are in, the antennae are out, and a ball off the tape plays on.</li>
+      </ul>
+    </details>
+    <a class="home" href="/">← Back to thudinest.com</a>
+  </div>
+</div>
+
+<div class="overlay dim" id="pausePanel" hidden>
+  <div class="card">
+    <h2>Paused</h2>
+    <p class="sub" id="pauseSub"></p>
+    <div class="field"><span class="lbl">Camera</span><div class="seg" id="segViewP">
+      <button data-v="broadcast">Broadcast</button><button data-v="side">Side</button></div></div>
+    <div class="toggles">
+      <button class="tog" id="togAutoP"><i></i>Run to the ball</button>
+      <button class="tog" id="togMarkP"><i></i>Landing marker</button>
+      <button class="tog" id="togSoundP"><i></i>Sound</button>
+      <button class="tog" id="togVoiceP"><i></i>Referee's voice</button>
+    </div>
+    <button class="primary" id="resumeBtn">Resume</button>
+    <button class="secondary" id="restartBtn">Restart match</button>
+    <button class="secondary" id="quitBtn">Main menu</button>
+  </div>
+</div>
+
+<div class="overlay dim" id="endPanel" hidden>
+  <div class="card">
+    <h2 id="endTitle">Match won</h2>
+    <p class="sub" id="endSub"></p>
+    <div class="games" id="endGames"></div>
+    <table class="stats" id="endStats"></table>
+    <button class="primary" id="againBtn">Rematch</button>
+    <button class="secondary" id="menuBtn">Change settings</button>
+  </div>
+</div>
+
+<div class="overlay dim" id="fatal" hidden>
+  <div class="card"><h2>Washed out</h2><p class="fatal-msg" id="fatalMsg">The 3D beach could not start on this device.</p><p class="sub" id="fatalWhy"></p><button class="primary" onclick="location.reload()">Reload</button><a class="home" href="/">← Back to thudinest.com</a></div>
+</div>
+
+<script>
+/* Errors before the game module runs (an old browser without modules, a blocked download) still get a message */
+window.__fatal = (msg, why) => {
+  document.getElementById('loadPanel').hidden = true; document.getElementById('menu').hidden = true;
+  document.getElementById('fatal').hidden = false;
+  if (msg) document.getElementById('fatalMsg').textContent = msg;
+  document.getElementById('fatalWhy').textContent = why ? 'Details: ' + String(why).slice(0, 180) : '';
+};
+window.addEventListener('error', (e) => { if (!window.__booted) window.__fatal(null, e.message); });
+setTimeout(() => { if (!window.__booted) window.__fatal('The beach is taking too long to load. Check the connection and reload.'); }, 45000);
+</script>
+<script type="module" src="js/game.js?v=1"></script>
+<script nomodule>window.__fatal('This browser is too old for the 3D beach. Try a current Chrome, Safari, Edge or Firefox.');</script>
+</body>
+</html>

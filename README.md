@@ -20,8 +20,9 @@ Deployed via Netlify → add your Netlify URL here.
   14 more games including **Bazooka Man** (`/bazooka-man/`), a standalone
   physics-puzzle game, and **Floodlit Over** (`/cricket/`), a 3D cricket
   batting game, **Guest Rush** (`/guest-rush/`), a 3D homestay game, and
-  **Rally Point** (`/bm/`), a 3D badminton game, and **Final Whistle**
-  (`/football/`), a 3D football game on a futsal court or in a stadium — see below.
+  **Rally Point** (`/bm/`), a 3D badminton game, **Final Whistle**
+  (`/football/`), a 3D football game on a futsal court or in a stadium, and **Sunset Spike**
+  (`/volleyball/`), a 3D beach volleyball game — see below.
 
 ## Adding Property Photos
 
@@ -347,6 +348,44 @@ formats: Quick (first to four games, a tiebreak at 3 all), a set to six, or best
 Files: `tennis/index.html`, `tennis/js/sim.js`, `tennis/js/game.js`, `tennis/og.jpg`; it loads three.js, the players,
 the clips and the crowd sounds from `bm/` and the spectators from `football/models`.
 
+## Sunset Spike (`/volleyball/`)
+
+A 3D beach volleyball game: two against two on the sand at the Thudinest Beach Cup, the sun going down over the sea
+behind the far end. You play the near side with a computer partner against a computer pair at three levels (Weekend,
+Pro Tour, World Champs), in the broadcast view or from the sand beside the court. Three formats: Quick (one set to 15),
+one set to 21, or best of three (21, 21, 15), with real rules: three touches a side, rally scoring, sets won by two,
+the serve staying with a team while it wins and passing between partners when it comes back, the lines in and the
+antennae out.
+
+- **The volleyball** (`js/sim.js`, no graphics, so it runs headless in Node for test matches): the ball flies with drag
+  and the Magnus lift of its spin (a jump serve and a spike dip with topspin, a float serve wanders), clips the tape and
+  plays on, dies in the mesh, and counts as out off the antennae or under the net. Solvers find the launch that puts
+  each touch where it was aimed (a pass high to the setter's spot, a set to where the hitter meets it at the top of a
+  jump, a spike or a shot clearing the block). Each player plans where to take the ball and runs there; a ball out of
+  reach is dived for. A block is a jump at the net: a stuff straight down, a touch off the hands, or a soft block up.
+- **The computer** passes, sets and attacks with its level's skills, aims at the open court around the block and away
+  from the defender (a cut shot over an in close blocker, a roll when the contact is too low), serves at the seams and
+  the weaker receiver, blocks line or angle while the defender takes the other, reads the hitter some of the time,
+  and lets go a ball it judges out. Headless test matches give side outs near 65%, rallies with digs and transition
+  attacks, and the stronger level winning; a scripted human at average timing beats Pro Tour and loses to World Champs.
+- **Controls**: one stick and two buttons. A (J or Space) is the main touch: the jump serve, the pass, the set, the
+  spike and the block; B (K) the soft one: the float serve, a shot over the block, or attacking on two. Press just
+  before the ball arrives; for a spike or a block the press is the jump. The ring under your feet and the buttons
+  light up while a press would be Perfect. The serve is two presses (the toss, then the hit). Run to the ball for me
+  (on by default) moves you and the stick aims the serve and the attack; off, the stick moves you too.
+- **The look**: Rally Point's players, clips and IK, with volleyball arm poses (the platform, the set, the bow and
+  arrow of the spike, the block, the dive) and jumps; a shader sky with the low sun and clouds, the sea with the sun's
+  path on it and foam at the shore, raked sand that keeps the ball's marks a while, blue tape lines, the net with its antennae
+  that bellies when the ball goes in, a grandstand of Final Whistle's spectators under a sail, flags, palms, umbrellas,
+  festoon lights, and the referee on his stand who signals each point.
+- **The broadcast**: score bug with sets, points, the server and set or match point, your side's touches, serve and
+  spike speeds, the calls (Ace, Kill, Stuff block, Out, Off the antenna, Four touches…), Perfect timing, the score
+  read out after each point, and match stats (kills, aces, stuff blocks, errors, side out, your fastest spike and
+  serve, your timing, the longest rally).
+
+Files: `volleyball/index.html`, `volleyball/js/sim.js`, `volleyball/js/game.js`, `volleyball/og.jpg`; it loads three.js,
+the players, the clips and the crowd sounds from `bm/` and the spectators from `football/models`.
+
 ## Final Whistle (`/football/`)
 
 A standalone 3D football game with two grounds: the **futsal court** (the default; a 40 x 20 m artificial-turf court
@@ -452,6 +491,7 @@ bazooka-man/    ← Bazooka Man game (standalone static page, own JS/CSS)
 cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary banks + players/ model)
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 bm/             ← Rally Point 3D badminton (page, js/sim.js + js/game.js, vendor/three.js, players/)
+volleyball/     ← Sunset Spike 3D beach volleyball (page, js/sim.js + js/game.js, og.jpg)
 images/         ← add your property photos here
 README.md       ← this file
 ```
