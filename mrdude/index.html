@@ -9,7 +9,19 @@
 <meta name="theme-color" content="#08090b">
 <meta property="og:title" content="Mr Dude Car Wash">
 <meta property="og:description" content="Your car needs a bath too. Wash from RM10 in Taman Sungai Besi, KL.">
-<meta property="og:image" content="https://thudinest.com/mrdude/img/logo.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thudinest.com/mrdude/">
+<meta property="og:site_name" content="Mr Dude Car Wash">
+<meta property="og:image" content="https://thudinest.com/mrdude/img/og-cover.jpg">
+<meta property="og:image:secure_url" content="https://thudinest.com/mrdude/img/og-cover.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mr Dude Car Washing and Detailing logo">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mr Dude Car Wash">
+<meta name="twitter:description" content="Your car needs a bath too. Wash from RM10 in Taman Sungai Besi, KL.">
+<meta name="twitter:image" content="https://thudinest.com/mrdude/img/og-cover.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%BF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,8 +61,8 @@
   /* Header, always on a dark pill so the logo reads over every section */
   .bar { position: fixed; z-index: 50; top: 12px; left: var(--gutter); right: var(--gutter); display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
   .bar > * { pointer-events: auto; }
-  .brand { display: block; width: 92px; height: 50px; border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 6px 22px rgba(0,0,0,.4); }
-  .brand img { width: 100%; height: 100%; object-fit: cover; }
+  .brand { display: block; width: 84px; height: 64px; border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 6px 22px rgba(0,0,0,.4); }
+  .brand img { width: 100%; height: 100%; object-fit: contain; }
   .nav { display: flex; align-items: center; gap: 2px; padding: 5px; background: rgba(8,9,11,.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 99px; font-size: 13px; font-weight: 700; color: var(--soap); }
   .nav a { text-decoration: none; padding: 8px 13px; border-radius: 99px; transition: background .2s, color .2s; }
   .nav a:hover { background: rgba(255,255,255,.12); }
@@ -58,7 +70,7 @@
   .nav a.wa:hover { background: #ffc266; }
   .progress { position: fixed; z-index: 60; left: 0; right: 0; top: 0; height: 3px; pointer-events: none; }
   .progress i { position: absolute; inset: 0; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); transform: scaleX(0); transform-origin: left; }
-  @media (max-width: 760px) { .nav a:not(.wa) { display: none; } .brand { width: 76px; height: 42px; } }
+  @media (max-width: 760px) { .nav a:not(.wa) { display: none; } .brand { width: 68px; height: 52px; } }
 
   /* Buttons */
   .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 22px; border-radius: 99px; font-weight: 800; font-size: 15px; text-decoration: none; transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s, color .2s; }
@@ -347,7 +359,7 @@
 <div class="progress" aria-hidden="true"><i></i></div>
 
 <header class="bar">
-  <a class="brand" href="#hero" data-scroll aria-label="Mr Dude Car Wash, back to top"><img src="img/logo.jpg" alt="Mr Dude Car Washing and Detailing logo"></a>
+  <a class="brand" href="#hero" data-scroll aria-label="Mr Dude Car Wash, back to top"><img src="img/logo.jpg?v=2" alt="Mr Dude Car Washing and Detailing logo"></a>
   <nav class="nav" aria-label="Sections">
     <a href="#services" data-scroll>Services</a>
     <a href="#menu" data-scroll>Prices</a>
@@ -593,7 +605,7 @@
       <div class="lcard" id="lcard">
         <div class="lcard-top">
           <div><b>Redeem your free<br>Mr Dude car wash</b><span>Buy 5 washes, get 1 free!</span></div>
-          <img src="img/logo.jpg" alt="">
+          <img src="img/logo.jpg?v=2" alt="">
         </div>
         <div class="cells" id="cells"></div>
         <div class="lcard-foot"><span class="veh">Vehicle no: <span id="plate">YOU 2022</span></span><i>Loyalty<br>card</i></div>
@@ -642,7 +654,7 @@
       </div>
     </div>
     <div class="colophon">
-      <img src="img/logo.jpg" alt="" loading="lazy">
+      <img src="img/logo.jpg?v=2" alt="" loading="lazy">
       <span>Clips and photos from Mr Dude Car Wash. Page on <a href="https://thudinest.com/">thudinest.com</a>.</span>
     </div>
   </section>
