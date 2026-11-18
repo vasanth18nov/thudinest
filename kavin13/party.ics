@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//thudinest.com//Kavin 13//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:kavin13-birthday-20261125@thudinest.com
+DTSTAMP:20261118T040000Z
+DTSTART:20261125T113000Z
+DTEND:20261125T153000Z
+SUMMARY:Kavin's 13th Birthday Party 🎉
+LOCATION:GD Multitech\, Thudiyalur\, Coimbatore
+DESCRIPTION:Kavin is turning 13! Party from 5 PM onwards. RSVP to Dad on WhatsApp: +60 11 6116 5161. Invite: https://thudinest.com/kavin13/
+URL:https://thudinest.com/kavin13/
+BEGIN:VALARM
+TRIGGER:-PT3H
+ACTION:DISPLAY
+DESCRIPTION:Kavin's birthday party today at 5 PM
+END:VALARM
+END:VEVENT
+END:VCALENDAR
