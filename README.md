@@ -483,6 +483,18 @@ ball goes in. A tap or key skips it.
 **Changing a squad** — edit `TEAMS` at the top of `football/js/main.js` (name, short name, colours, kit and
 keeper's kit, and the XI in order: keeper, four defenders, three midfielders, three forwards).
 
+## Karaoke (`/karaoke/`)
+
+A single-file karaoke app (`karaoke/index.html`, vanilla JS, no build step). Live
+mic monitoring goes straight from the mic to `AudioContext.destination` with
+`latencyHint: 0` and browser voice processing off, so no extra buffering is
+added. Output-device choice uses `AudioContext.setSinkId` (Chrome/Edge).
+Echo/reverb presets sit on top of the undelayed dry voice. Synced lyrics are
+fetched from LRCLIB.net (CORS-enabled, no key). Also: a centre-channel vocal
+remover for local files, YouTube links via the IFrame API (lyrics stay in
+sync), a live note detector, and recording of the mix to WebM/M4A. The mic
+needs https or localhost, which thudinest.com already provides.
+
 ## Files
 
 ```
