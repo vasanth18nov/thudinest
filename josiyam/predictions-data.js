@@ -39,7 +39,8 @@
     Venus: { en: 'Venus', sa: 'Sukra', ta: 'சுக்கிரன்', taGen: 'சுக்கிரனின்', ab: { en: 'Ve', ta: 'சுக்' }, dasha: { en: 'Venus', ta: 'சுக்கிர' } },
     Saturn: { en: 'Saturn', sa: 'Sani', ta: 'சனி', taGen: 'சனியின்', ab: { en: 'Sa', ta: 'சனி' }, dasha: { en: 'Saturn', ta: 'சனி' } },
     Rahu: { en: 'Rahu', sa: 'Rahu', ta: 'ராகு', taGen: 'ராகுவின்', ab: { en: 'Ra', ta: 'ராகு' }, dasha: { en: 'Rahu', ta: 'ராகு' } },
-    Ketu: { en: 'Ketu', sa: 'Ketu', ta: 'கேது', taGen: 'கேதுவின்', ab: { en: 'Ke', ta: 'கேது' }, dasha: { en: 'Ketu', ta: 'கேது' } }
+    Ketu: { en: 'Ketu', sa: 'Ketu', ta: 'கேது', taGen: 'கேதுவின்', ab: { en: 'Ke', ta: 'கேது' }, dasha: { en: 'Ketu', ta: 'கேது' } },
+    Kuliga: { en: 'Kuliga (Gulika)', sa: 'Gulika', ta: 'குளிகன்', ab: { en: 'Kul', ta: 'குளி' }, short: { en: 'Kuliga', ta: 'குளிகன்' } }
   };
 
   K.nakshatra = [
@@ -223,6 +224,12 @@
     advanced: { en: 'Calculation settings', ta: 'கணித அமைப்புகள்' },
     nodeType: { en: 'Rahu / Ketu', ta: 'ராகு / கேது' },
     nodeMean: { en: 'Mean node', ta: 'சராசரி (Mean)' }, nodeTrue: { en: 'True node', ta: 'உண்மை (True)' },
+    sunriseType: { en: 'Sunrise', ta: 'சூரிய உதயம்' },
+    sunUpper: { en: 'Upper limb', ta: 'மேல் விளிம்பு' }, sunMid: { en: 'Mid limb', ta: 'நடு விளிம்பு' },
+    sunriseNote: { en: 'Mid limb (centre of the sun, no refraction) matches most printed Thirukanitha panchangams. It sets the nazhigai and Kuliga.', ta: 'நடு விளிம்பு (சூரியனின் மையம், ஒளிவிலகல் இல்லாமல்) பெரும்பாலான அச்சிட்ட திருக்கணித பஞ்சாங்கங்களுடன் ஒத்துப்போகும். நாழிகையும் குளிகனும் இதைப் பொறுத்தவை.' },
+    sunModeUpper: { en: 'upper limb', ta: 'மேல் விளிம்பு' }, sunModeMid: { en: 'mid limb', ta: 'நடு விளிம்பு' },
+    pKuliga: { en: 'Kuliga', ta: 'குளிகன்' }, pKuligaTime: { en: 'Kuliga time', ta: 'குளிகை நேரம்' },
+    inspKuligaNote: { en: 'Kuliga (Gulika) is an upagraha, the son of Saturn: the Lagna rising at the end of Saturn’s eighth of the day or night. It is shown for reference and is not used in the readings.', ta: 'குளிகன் ஒரு உபகிரகம், சனியின் மைந்தன்: பகல் அல்லது இரவின் எட்டில் சனியின் பாகம் முடியும் நேரத்தில் உதிக்கும் லக்னம். குறிப்புக்காக மட்டும் காட்டப்படுகிறது; பலன்களில் பயன்படுத்தப்படவில்லை.' },
     ayanamsaFixed: { en: 'Ayanamsa: Lahiri (Chitrapaksha)', ta: 'அயனாம்சம்: லகிரி (சித்ரபக்ஷ)' },
     generate: { en: 'Cast my Jathagam', ta: 'ஜாதகம் கணி' },
     sample: { en: 'Load sample chart', ta: 'மாதிரி ஜாதகம்' },

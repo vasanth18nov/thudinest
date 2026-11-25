@@ -193,7 +193,7 @@
 
   /* ------------------------------------------------------------------ chart */
   /**
-   * @param {object} o  { utcMs, lat, lon, nodeType: 'mean'|'true', offsetMs (display only) }
+   * @param {object} o  { utcMs, lat, lon, nodeType: 'mean'|'true', sunrise: 'upper'|'mid', offsetMs (display only) }
    */
   function computeChart(o) {
     const { utcMs, lat, lon } = o;
@@ -261,7 +261,9 @@
       janmaNakshatra: bodies.Moon.nakshatra, janmaPada: bodies.Moon.pada
     };
     chart.dasha = vimshottari(L.Moon, utcMs);
-    chart.panchang = panchang(chart, o.offsetMs || 0);
+    chart.sunriseMode = o.sunrise === 'mid' ? 'mid' : 'upper';
+    chart.panchang = panchang(chart, o.offsetMs || 0, chart.sunriseMode);
+    chart.kuliga = kuliga(chart, nodeType);
     return chart;
   }
 
@@ -311,10 +313,14 @@
   }
 
   /* ------------------------------------------------------------------ panchangam */
-  function sunEvent(direction, startMs, lat, lon) {
+  // mode 'upper': upper limb on the horizon with standard refraction (modern almanac sunrise).
+  // mode 'mid':   centre of the disc on the true horizon, no refraction (Mid Limb, as in Thirukanitha panchangams).
+  function sunEvent(direction, startMs, lat, lon, mode) {
     try {
       const obs = new A.Observer(lat, lon, 0);
-      const t = A.SearchRiseSet(A.Body.Sun, obs, direction, new Date(startMs), 1.2);
+      const t = mode === 'mid'
+        ? A.SearchAltitude(A.Body.Sun, obs, direction, new Date(startMs), 1.2, 0)
+        : A.SearchRiseSet(A.Body.Sun, obs, direction, new Date(startMs), 1.2);
       return t ? t.date.getTime() : null;
     } catch (e) { return null; }
   }
@@ -337,7 +343,7 @@
     return (a + b) / 2;
   }
   // Tamil month start (day 1) for solar month `sign` near `aroundMs` → civil day start (UTC ms) of day 1
-  function tamilMonthDay1(sign, aroundMs, lat, lon, offsetMs) {
+  function tamilMonthDay1(sign, aroundMs, lat, lon, offsetMs, mode) {
     const target = sign * 30;
     const s = sunSidAt(aroundMs);
     const ahead = angDiff(target, s);              // degrees until target (negative: already past)
@@ -345,13 +351,13 @@
     const t = solveSunCrossing(target, guess - 3 * DAY_MS, guess + 3 * DAY_MS);
     if (t == null) return null;
     const c = civil(t, offsetMs);
-    const sunset = sunEvent(-1, c.dayStartUtc, lat, lon);
+    const sunset = sunEvent(-1, c.dayStartUtc, lat, lon, mode);
     // Tamil rule: sankranti before sunset → that day is day 1, otherwise the next day
     const day1 = (sunset != null && t < sunset) ? c.dayStartUtc : c.dayStartUtc + DAY_MS;
     return { day1, sankranti: t };
   }
 
-  function panchang(chart, offsetMs) {
+  function panchang(chart, offsetMs, mode) {
     const { utcMs, lat, lon } = chart;
     const B = chart.bodies;
     const elong = norm(B.Moon.lon - B.Sun.lon);
@@ -365,15 +371,15 @@
 
     // Vedic day runs sunrise to sunrise
     const c = civil(utcMs, offsetMs);
-    let sunrise = sunEvent(+1, c.dayStartUtc, lat, lon);
+    let sunrise = sunEvent(+1, c.dayStartUtc, lat, lon, mode);
     let hinduDayStart = c.dayStartUtc;
     let weekday = c.wd;
     if (sunrise != null && utcMs < sunrise) {
       hinduDayStart -= DAY_MS;
       weekday = (weekday + 6) % 7;
-      sunrise = sunEvent(+1, hinduDayStart, lat, lon);
+      sunrise = sunEvent(+1, hinduDayStart, lat, lon, mode);
     }
-    const sunset = sunEvent(-1, hinduDayStart, lat, lon);
+    const sunset = sunEvent(-1, hinduDayStart, lat, lon, mode);
     let nazhigai = null;
     if (sunrise != null) {
       const mins = (utcMs - sunrise) / 60000;
@@ -388,7 +394,7 @@
       const sunSign = B.Sun.sign;
       let best = null;
       for (const s of [(sunSign + 11) % 12, sunSign, (sunSign + 1) % 12]) {
-        const r = tamilMonthDay1(s, utcMs, lat, lon, offsetMs);
+        const r = tamilMonthDay1(s, utcMs, lat, lon, offsetMs, mode);
         if (r && r.day1 <= hinduDayStart + 1000 && (!best || r.day1 > best.day1)) best = { sign: s, ...r };
       }
       if (best) {
@@ -405,6 +411,37 @@
       tithi, paksha: tithi < 15 ? 'shukla' : 'krishna', tithiFraction: (elong % 12) / 12,
       yoga, karana, weekday, sunrise, sunset, nazhigai, tamil,
       nakshatra: B.Moon.nakshatra, pada: B.Moon.pada
+    };
+  }
+
+  /* ------------------------------------------------------------------ Kuliga (Gulika) */
+  // The day (sunrise to sunset) or night (sunset to next sunrise) is split into eight equal parts.
+  // Day parts are ruled in weekday order from the weekday lord, night parts from the lord of the
+  // fifth weekday; the eighth part has no lord. Kuliga is the Lagna rising at the end of Saturn's part.
+  function kuliga(chart, nodeType) {
+    const pc = chart.panchang;
+    const { utcMs, lat, lon } = chart;
+    if (pc.sunrise == null || pc.sunset == null) return null;
+    let isDay = utcMs >= pc.sunrise && utcMs < pc.sunset;
+    let from, to;
+    if (isDay) { from = pc.sunrise; to = pc.sunset; }
+    else {
+      from = pc.sunset;
+      to = sunEvent(+1, pc.sunset, lat, lon, chart.sunriseMode);
+      if (to == null) return null;
+    }
+    const part = (to - from) / 8;
+    const startLord = isDay ? pc.weekday : (pc.weekday + 4) % 7;   // 0 = Sunday … 6 = Saturday
+    const satIdx = (6 - startLord + 7) % 7;
+    const atMs = from + (satIdx + 1) * part;
+    const lonV = siderealAll(atMs, lat, lon, nodeType).lons.Lagna;
+    const sign = signOf(lonV), deg = lonV - sign * 30, nk = nakshatraOf(lonV), d9 = navamsaSign(lonV);
+    return {
+      name: 'Kuliga', lon: lonV, sign, deg, degText: fmtDms(deg), lonText: fmtDms(lonV),
+      nakshatra: nk.index, pada: nk.pada, nakLord: nk.lord, nakFraction: nk.fraction,
+      navamsa: d9, vargottama: d9 === sign, house: houseFrom(chart.lagnaSign, sign), houseFromMoon: houseFrom(chart.moonSign, sign),
+      signLord: SIGN_LORD[sign], retro: false, combust: false, dignity: null,
+      atMs, isDay, partStart: from + satIdx * part, partEnd: atMs
     };
   }
 

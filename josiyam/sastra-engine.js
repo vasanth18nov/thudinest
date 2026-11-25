@@ -325,9 +325,11 @@
         facts.push([T(K.ui.pTamilDate, lang), `${T(K.tamilMonth[pc.tamil.month], lang)} ${pc.tamil.day}`]);
         facts.push([T(K.ui.pTamilYear, lang), T(K.ui.yearSuffix, lang, { x: T(K.tamilYear[pc.tamil.yearIndex], lang) })]);
       }
-      if (ctx.fmtTime && pc.sunrise) facts.push([T(K.ui.pSunrise, lang), ctx.fmtTime(pc.sunrise)]);
-      if (ctx.fmtTime && pc.sunset) facts.push([T(K.ui.pSunset, lang), ctx.fmtTime(pc.sunset)]);
+      const srMode = ` (${T(chart.sunriseMode === 'mid' ? K.ui.sunModeMid : K.ui.sunModeUpper, lang)})`;
+      if (ctx.fmtTime && pc.sunrise) facts.push([T(K.ui.pSunrise, lang), ctx.fmtTime(pc.sunrise) + srMode]);
+      if (ctx.fmtTime && pc.sunset) facts.push([T(K.ui.pSunset, lang), ctx.fmtTime(pc.sunset) + srMode]);
       if (pc.nazhigai) facts.push([T(K.ui.pNazhigai, lang), T(K.ui.pNazhigaiVal, lang, { x: pc.nazhigai.n, y: pc.nazhigai.v })]);
+      if (ctx.fmtTime && chart.kuliga) facts.push([T(K.ui.pKuligaTime, lang), `${ctx.fmtTime(chart.kuliga.partStart)} → ${ctx.fmtTime(chart.kuliga.partEnd)}`]);
       facts.push([T(K.ui.pAyanamsa, lang), chart.ayanamsaText]);
       cards.push({ title: T(K.ui.panchangTitle, lang), facts, paras: ctx.beforeSunrise ? ['* ' + T(K.ui.pVedicDayNote, lang)] : [], id: 'panchang' });
       sections.push({ id: 'star', title: T(K.ui.tabStar, lang), cards });

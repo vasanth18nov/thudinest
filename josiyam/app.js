@@ -16,7 +16,7 @@
   const reduced = () => RM.matches;
 
   const SAMPLE = {
-    name: null, gender: 'male', y: 1991, m: 6, d: 3, hh: 9, mm: 15, node: 'mean',
+    name: null, gender: 'male', y: 1991, m: 6, d: 3, hh: 9, mm: 15, node: 'mean', sunrise: 'upper',
     place: { label: 'Coimbatore, Tamil Nadu, India', short: 'Coimbatore', ta: 'கோயம்புத்தூர்', lat: 11.006, lon: 76.966, tz: 'Asia/Kolkata' }
   };
   // South Indian grid: sign index → [row, col]; Meenam top-left, Mesham second in the top row, clockwise
@@ -25,7 +25,7 @@
 
   const state = {
     lang: 'en', chart: null, input: null, offsetMs: 0, sel: null, pinned: false, d9Tab: false, rtab: 'star', openMd: null,
-    cities: null, citiesP: null, place: null, gender: 'male', ampm: 'am', node: 'mean', tzMode: 'auto', h24: false,
+    cities: null, citiesP: null, place: null, gender: 'male', ampm: 'am', node: 'mean', sunrise: 'upper', tzMode: 'auto', h24: false,
     list: [], active: -1, lastWorld: 0, future: null, fyear: null, openBk: null, fcI: null
   };
 
@@ -240,6 +240,7 @@
     if (id === 'fGender') state.gender = v;
     else if (id === 'fAmPm') state.ampm = v;
     else if (id === 'fNode') state.node = v;
+    else if (id === 'fSunrise') state.sunrise = v;
     else if (id === 'fTzMode') { state.tzMode = v; $('#fOffset').disabled = v !== 'fixed'; }
     updateResolved();
   }
@@ -483,7 +484,7 @@
       if (!place) return showError('errPlace', '#fPlace');
     }
     const name = $('#fName').value.trim().slice(0, 60);
-    generate({ name: name || null, gender: state.gender, ...d, hh, mm: +mi, node: state.node, place }, true);
+    generate({ name: name || null, gender: state.gender, ...d, hh, mm: +mi, node: state.node, sunrise: state.sunrise, place }, true);
   }
 
   function fillForm(input) {
@@ -493,6 +494,7 @@
     setHour24(input.hh);
     $('#fMin').value = String(input.mm);
     state.node = input.node || 'mean'; setSeg('fNode', state.node);
+    state.sunrise = input.sunrise === 'mid' ? 'mid' : 'upper'; setSeg('fSunrise', state.sunrise);
     if (input.place.manual) {
       $('#fManual').checked = true; $('#manualBox').hidden = false; $('#placeField').hidden = true;
       $('#fLat').value = input.place.lat; $('#fLon').value = input.place.lon;
@@ -548,7 +550,7 @@
     try {
       if (!E || !window.Astronomy) throw new Error('engine not loaded');
       const conv = E.localToUtc({ y: input.y, m: input.m, d: input.d, hh: input.hh, mm: input.mm, tz: input.place.tz, offsetMinutes: input.place.offsetMinutes });
-      const chart = E.computeChart({ utcMs: conv.utcMs, lat: input.place.lat, lon: input.place.lon, nodeType: input.node, offsetMs: conv.offsetMs });
+      const chart = E.computeChart({ utcMs: conv.utcMs, lat: input.place.lat, lon: input.place.lon, nodeType: input.node, sunrise: input.sunrise, offsetMs: conv.offsetMs });
       const civilWd = new Date(Date.UTC(2000, input.m - 1, input.d)); civilWd.setUTCFullYear(input.y);
       Object.assign(state, { chart, input, offsetMs: conv.offsetMs, sel: null, pinned: false, openMd: null, rtab: 'star', beforeSunrise: civilWd.getUTCDay() !== chart.panchang.weekday, future: null, fyear: null, openBk: null, fcI: null });
       $('#results').hidden = false;
@@ -592,6 +594,9 @@
     $('#who').innerHTML = `<div class="wn">${esc(ip.name || t('jathagamSheet'))}</div><div class="wd">${esc(birthLine())} · UTC${esc(fmtOffset(state.offsetMs))}</div>`;
   }
 
+  const bodyOf = (p) => (p === 'Kuliga' ? state.chart.kuliga : state.chart.bodies[p]);
+  const isPt = (p) => p === 'Lagna' || p === 'Kuliga';   // points, not grahas: no aspects or dignity
+
   /* ================================================================ South Indian chart */
   function renderChart(host, kind, animate) {
     const c = state.chart;
@@ -602,9 +607,10 @@
     for (let s = 0; s < 12; s++) {
       const [r, col] = POS[s];
       const names = ORDER.filter((p) => occ[s].includes(p));
+      if (c.kuliga && (kind === 'd1' ? c.kuliga.sign : c.kuliga.navamsa) === s) names.push('Kuliga');
       const chips = names.map((p) => {
-        const b = c.bodies[p];
-        const cls = p === 'Lagna' ? 'lg' : (b.natural === 'benefic' ? 'b' : 'm');
+        const b = bodyOf(p);
+        const cls = p === 'Lagna' ? 'lg' : p === 'Kuliga' ? 'kl' : (b.natural === 'benefic' ? 'b' : 'm');
         const deg = kind === 'd1' ? `<span class="dg">${Math.floor(b.deg)}°</span>` : '';
         const rt = b.retro && p !== 'Rahu' && p !== 'Ketu' ? `<span class="rt">${t('retroMark')}</span>` : '';
         return `<span class="chip ${cls}" data-p="${p}" style="--i:${idx++}" title="${esc(PN(p))}">${esc(PA(p))}${deg}${rt}</span>`;
@@ -668,13 +674,13 @@
     const sel = state.sel, c = state.chart;
     if (!sel || !c) return;
     if (sel.type === 'planet') {
-      const b = c.bodies[sel.p];
+      const b = bodyOf(sel.p);
       $$(`.chip[data-p="${sel.p}"]`).forEach((x) => x.classList.add('is-sel'));
       $(`.ptable tr[data-p="${sel.p}"]`)?.classList.add('is-sel');
       const lordD1 = E.SIGN_LORD[b.sign], lordD9 = E.SIGN_LORD[b.navamsa];
       $(`#d1 .chip[data-p="${lordD1}"]`)?.classList.add('is-lord');
       $(`#d9 .chip[data-p="${lordD9}"]`)?.classList.add('is-lord');
-      if (sel.p !== 'Lagna') c.aspects[sel.p].forEach((s) => $(`#d1 .cell[data-s="${s}"]`)?.classList.add('is-aspect'));
+      if (!isPt(sel.p)) c.aspects[sel.p].forEach((s) => $(`#d1 .cell[data-s="${s}"]`)?.classList.add('is-aspect'));
     } else {
       const host = sel.k === 'd9' ? '#d9' : '#d1';
       $(`${host} .cell[data-s="${sel.s}"]`)?.classList.add('is-sel');
@@ -689,7 +695,7 @@
     if (!sel) { el.innerHTML = `<p class="hint">${esc(t('chartHint'))}</p>`; return; }
     const tagsFor = (b) => [b.retro && b.name !== 'Rahu' && b.name !== 'Ketu' ? `<span class="tag rt">${esc(t('retro'))}</span>` : '', b.combust ? `<span class="tag down">${esc(t('combust'))}</span>` : '', b.vargottama ? `<span class="tag up">${esc(t('vargottama'))}</span>` : ''].join('');
     if (sel.type === 'planet') {
-      const p = sel.p, b = c.bodies[p];
+      const p = sel.p, b = bodyOf(p);
       const lord = E.SIGN_LORD[b.sign], lb = c.bodies[lord];
       const rows = [
         [t('inspDegree'), `${esc(b.degText)} <span class="tzline">(${esc(b.lonText)})</span>`],
@@ -700,10 +706,10 @@
         [t('inspLord'), esc(t('inspLordAt', { p: PN(lord), h: lb.house, s: SN(lb.sign) }))]
       ];
       if (b.dignity) rows.splice(5, 0, [t('thDignity'), esc(L(K.dignity[b.dignity]))]);
-      if (p !== 'Lagna') rows.push([t('inspAspects'), esc(c.aspects[p].map((s) => `${E.houseFrom(c.lagnaSign, s)} (${SN(s)})`).join(', '))]);
+      if (!isPt(p)) rows.push([t('inspAspects'), esc(c.aspects[p].map((s) => `${E.houseFrom(c.lagnaSign, s)} (${SN(s)})`).join(', '))]);
       const tags = tagsFor(b);
       if (tags) rows.push([t('thNotes'), tags]);
-      const note = (p === 'Rahu' || p === 'Ketu') ? `<p class="hint">${esc(t('inspNodeNote'))}</p>` : '';
+      const note = (p === 'Rahu' || p === 'Ketu') ? `<p class="hint">${esc(t('inspNodeNote'))}</p>` : p === 'Kuliga' ? `<p class="hint">${esc(t('inspKuligaNote'))}</p>` : '';
       el.innerHTML = `<div class="ih"><span class="it">${esc(t('inspPlanet', { p: PN(p), ...S.signVars(b.sign, state.lang) }))}</span></div>${factsHtml(rows)}${note}`;
     } else {
       const s = sel.s, d9 = sel.k === 'd9';
@@ -766,12 +772,12 @@
   function renderTable() {
     const c = state.chart;
     const head = ['thGraha', 'thRasi', 'thDegree', 'thNak', 'thPada', 'thStarLord', 'thNav', 'thHouse', 'thDignity', 'thNotes'].map((k) => `<th scope="col">${esc(t(k))}</th>`).join('');
-    const rows = ORDER.map((p) => {
-      const b = c.bodies[p];
-      const cls = p === 'Lagna' ? 'lg' : (b.natural === 'benefic' ? 'b' : 'm');
+    const rows = ORDER.concat(c.kuliga ? ['Kuliga'] : []).map((p) => {
+      const b = bodyOf(p);
+      const cls = p === 'Lagna' ? 'lg' : p === 'Kuliga' ? 'kl' : (b.natural === 'benefic' ? 'b' : 'm');
       const dig = b.dignity ? `<span class="tag ${['exalted', 'moolatrikona', 'own'].includes(b.dignity) ? 'up' : b.dignity === 'debilitated' ? 'down' : ''}">${esc(L(K.dignity[b.dignity].short))}</span>` : '—';
       const notes = [b.retro && p !== 'Rahu' && p !== 'Ketu' ? `<span class="tag rt">${esc(t('retro'))}</span>` : '', b.combust ? `<span class="tag down">${esc(t('combust'))}</span>` : '', b.vargottama ? `<span class="tag up">${esc(t('vargottama'))}</span>` : ''].join('');
-      return `<tr data-p="${p}" tabindex="0"><td class="pn ${cls}">${esc(p === 'Lagna' ? L(K.planet.Lagna.short) : PN(p))}</td><td>${esc(SN(b.sign))}</td><td class="mono">${esc(b.degText)}</td><td>${esc(NK(b.nakshatra))}</td><td class="mono">${b.pada}</td><td>${esc(PN(b.nakLord))}</td><td>${esc(SN(b.navamsa))}</td><td class="mono">${b.house}</td><td>${dig}</td><td>${notes || '—'}</td></tr>`;
+      return `<tr data-p="${p}" tabindex="0"><td class="pn ${cls}">${esc(isPt(p) ? L(K.planet[p].short) : PN(p))}</td><td>${esc(SN(b.sign))}</td><td class="mono">${esc(b.degText)}</td><td>${esc(NK(b.nakshatra))}</td><td class="mono">${b.pada}</td><td>${esc(PN(b.nakLord))}</td><td>${esc(SN(b.navamsa))}</td><td class="mono">${b.house}</td><td>${dig}</td><td>${notes || '—'}</td></tr>`;
     }).join('');
     $('#ptable').innerHTML = `<thead><tr>${head}</tr></thead><tbody>${rows}</tbody>`;
     applyHighlights();
@@ -1183,7 +1189,8 @@
       [t('place'), placeText(ip.place)], [t('pCoords'), fmtCoord(ip.place.lat, ip.place.lon)],
       [t('pUtc'), 'UTC' + fmtOffset(state.offsetMs)], [t('pVaara'), L(K.weekday[pc.weekday])],
       [t('janmaNak'), `${NK(c.janmaNakshatra)} · ${t('pada')} ${c.janmaPada}`], [t('janmaRasi'), SN(c.moonSign)],
-      [t('lagna'), `${SN(c.lagnaSign)} ${c.bodies.Lagna.degText}`], [t('pTithi'), `${L(K.paksha[pc.paksha])} ${tithi}`],
+      [t('lagna'), `${SN(c.lagnaSign)} ${c.bodies.Lagna.degText}`], [t('pKuliga'), c.kuliga ? `${SN(c.kuliga.sign)} ${c.kuliga.degText}` : '—'],
+      [t('pSunrise'), pc.sunrise ? `${fmtTime(pc.sunrise)} (${t(c.sunriseMode === 'mid' ? 'sunModeMid' : 'sunModeUpper')})` : '—'], [t('pTithi'), `${L(K.paksha[pc.paksha])} ${tithi}`],
       [t('pYoga'), L(K.yoga[pc.yoga])], [t('pKarana'), L(K.karana[pc.karana])]
     ];
     if (pc.tamil) pairs.push([t('pTamilDate'), `${L(K.tamilMonth[pc.tamil.month])} ${pc.tamil.day}`], [t('pTamilYear'), t('yearSuffix', { x: L(K.tamilYear[pc.tamil.yearIndex]) })]);
@@ -1212,6 +1219,7 @@
     if (p.ta) q.set('pt', p.ta);
     if (ip.name) q.set('n', ip.name);
     q.set('g', ip.gender); q.set('node', ip.node);
+    if (ip.sunrise === 'mid') q.set('sr', 'mid');
     return `${location.origin}${location.pathname}#${q.toString()}`;
   }
   function fromHash() {
@@ -1228,7 +1236,7 @@
     };
     const input = {
       name: (h.get('n') || '').slice(0, 60) || null, gender: ['male', 'female', 'other'].includes(h.get('g')) ? h.get('g') : 'male',
-      y: +dm[1], m: +dm[2], d: +dm[3], hh: Math.min(23, +tm[1]), mm: Math.min(59, +tm[2]), node: h.get('node') === 'true' ? 'true' : 'mean', place
+      y: +dm[1], m: +dm[2], d: +dm[3], hh: Math.min(23, +tm[1]), mm: Math.min(59, +tm[2]), node: h.get('node') === 'true' ? 'true' : 'mean', sunrise: h.get('sr') === 'mid' ? 'mid' : 'upper', place
     };
     fillForm(input);
     generate(input, true);

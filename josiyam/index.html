@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=kuliga1">
 <script>
   // choose language before first paint to avoid a flash of the wrong language
   (function () {
@@ -159,8 +159,16 @@
               <button type="button" role="radio" data-v="true" aria-checked="false" data-i18n="nodeTrue">True node</button>
             </div>
           </div>
-          <p class="note" data-i18n="ayanamsaFixed">Ayanamsa: Lahiri (Chitrapaksha)</p>
+          <div class="field">
+            <span class="lbl" id="srLbl" data-i18n="sunriseType">Sunrise</span>
+            <div class="seg" role="radiogroup" aria-labelledby="srLbl" id="fSunrise">
+              <button type="button" role="radio" data-v="upper" aria-checked="true" data-i18n="sunUpper">Upper limb</button>
+              <button type="button" role="radio" data-v="mid" aria-checked="false" data-i18n="sunMid">Mid limb</button>
+            </div>
+          </div>
         </div>
+        <p class="note" data-i18n="sunriseNote">Mid limb (centre of the sun, no refraction) matches most printed Thirukanitha panchangams. It sets the nazhigai and Kuliga.</p>
+        <p class="note" data-i18n="ayanamsaFixed">Ayanamsa: Lahiri (Chitrapaksha)</p>
       </details>
 
       <p class="form-error" id="formError" role="alert"></p>
@@ -336,11 +344,11 @@
 
 <script src="vendor/astronomy.browser.min.js" defer></script>
 <script src="vendor/tz-lookup.js" defer></script>
-<script src="astro-engine.js" defer></script>
-<script src="predictions-data.js" defer></script>
-<script src="sastra-engine.js" defer></script>
+<script src="astro-engine.js?v=kuliga1" defer></script>
+<script src="predictions-data.js?v=kuliga1" defer></script>
+<script src="sastra-engine.js?v=kuliga1" defer></script>
 <script src="future-engine.js" defer></script>
 <script src="motion.js" defer></script>
-<script src="app.js" defer></script>
+<script src="app.js?v=kuliga1" defer></script>
 </body>
 </html>
