@@ -539,6 +539,23 @@ browser.
   The footer link opens it any time. QR codes per amount live in
   `josiyam/dakshinai/` (made with Python `segno`); phones also get a UPI app
   button and a "save QR" PNG.
+- `porutham.js`: Thirumana Porutham, the ten South Indian marriage checks
+  (Dinam, Ganam, Mahendram, Stree Deergham, Yoni, Rasi, Rasi Athipathi,
+  Vasiyam, Rajju, Vedhai), counted from the bride's star to the groom's, plus a
+  Chevvai dosham comparison when both birth charts are known. Uthamam = 1,
+  Madhyamam = ½; Rajju or Vedhai failing marks the match "not advised". Pure
+  functions; `~/thudinest-assets/josiyam/tests/porutham_check.cjs` checks every
+  star/pada pair. Rasi, Vasiyam and Stree Deergham tables vary between
+  families, which the page says.
+- `match.js`: "My family" (charts saved in this browser only, as
+  `josiyam-family` in localStorage; tap to reopen, two taps to remove) and the
+  Porutham section (partner by birth details, by star and pada alone, or from
+  My family). It plugs into `app.js` through `window.JosiyamHooks`.
+- `divine.js` / `divine.css`: the temple-light layer (sunburst, halo and lotus
+  behind the hero wheel, deepam beside section titles, kolam dividers, temple
+  skyline above the footer, gold dust following the pointer, a shower of
+  marigold, jasmine and rose petals when a chart or a good match is revealed),
+  plus the My family and Porutham styles. Reduced motion turns it off.
 
 ## Files
 

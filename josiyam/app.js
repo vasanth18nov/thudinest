@@ -29,6 +29,12 @@
     list: [], active: -1, lastWorld: 0, future: null, fyear: null, openBk: null, fcI: null
   };
 
+  // add-on modules (family, porutham, divine visuals) register here before this file runs
+  const HOOKS = window.JosiyamHooks || (window.JosiyamHooks = []);
+  function runHooks(name, ...args) {
+    for (const h of HOOKS) if (typeof h[name] === 'function') { try { h[name](...args); } catch (e) { console.error(e); } }
+  }
+
   /* ================================================================ i18n helpers */
   const L = (o, vars) => S.T(o, state.lang, vars);
   const t = (key, vars) => (K.ui[key] ? L(K.ui[key], vars) : key);
@@ -47,6 +53,7 @@
     document.title = t('pageTitle');
     if (MO) MO.splitWords($('#heroTitle'));
     updateShareLinks();
+    runHooks('applyStatic');
   }
   function updateToggle() {
     const tg = $('.lang-toggle');
@@ -578,6 +585,7 @@
     renderPrint();
     setChartTab(state.d9Tab);
     updateShareLinks();
+    runHooks('render', animate);
     if (MO) {
       MO.reveal($('#results'), !animate);
       requestAnimationFrame(() => MO.indicator($('#rtabs'), $('#rtabs [aria-selected="true"]')));
@@ -1368,6 +1376,11 @@
     });
     initFutureEvents();
     initDakshinai();
+    runHooks('init', {
+      state, t, L, esc, $, $$, reduced, E, K, S, MO, NK, SN, PN, pad,
+      loadCities, searchCities, cityToPlace, placeText, placeShort, tzFromCoords, fmtYMD, fmtHM, fmtCoord, fmtOffset,
+      fillForm, generate, toast, renderAll
+    });
     let rz = 0;
     window.addEventListener('resize', () => {
       clearTimeout(rz);
