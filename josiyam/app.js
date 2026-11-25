@@ -43,6 +43,7 @@
     $$('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
     $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
     $$('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+    $$('[data-i18n-alt]').forEach((el) => { el.alt = t(el.dataset.i18nAlt); });
     document.title = t('pageTitle');
     if (MO) MO.splitWords($('#heroTitle'));
     updateShareLinks();
@@ -553,6 +554,7 @@
       $('#results').hidden = false;
       document.body.classList.add('has-chart');
       renderAll(animate && !reduced());
+      dkArm();
       showError(null);
       requestAnimationFrame(() => $('#results').scrollIntoView({ behavior: 'auto', block: 'start' }));
     } catch (err) {
@@ -1232,6 +1234,89 @@
     generate(input, true);
     return true;
   }
+
+  /* ================================================================ dakshinai popup */
+  const DK = {
+    upi: 'upi://pay?pa=7845151569@kotakbank&pn=VASANTHAKRISHNAN%20GOVINDARAJ&cu=INR&tn=Thudinest%20Josiyam',
+    key: 'josiyam-dakshinai', amt: '101', shownAt: 0, lastFocus: null, armed: false, timer: 0
+  };
+  function dkSnoozed() {
+    try { const v = JSON.parse(localStorage.getItem(DK.key) || 'null'); return !!(v && v.until > Date.now()); } catch (e) { return false; }
+  }
+  function dkSnooze(days) {
+    try { localStorage.setItem(DK.key, JSON.stringify({ until: Date.now() + days * 864e5 })); } catch (e) { /* private mode */ }
+  }
+  function dkSetAmt(a) {
+    DK.amt = a;
+    $$('#dkAmts button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.amt === a)));
+    $('#dkQr').src = `dakshinai/qr-${a}.svg`;
+    $('#dkApp').href = DK.upi + (a === 'any' ? '' : `&am=${a}.00`);
+  }
+  function dkOpen() {
+    const el = $('#dk');
+    if (!el.hidden) return;
+    DK.lastFocus = document.activeElement;
+    el.hidden = false;
+    document.body.classList.add('dk-on');
+    requestAnimationFrame(() => { el.classList.add('on'); $('.dk-card', el).focus({ preventScroll: true }); });
+  }
+  function dkClose(days) {
+    const el = $('#dk');
+    if (el.hidden) return;
+    dkSnooze(days);
+    el.classList.remove('on');
+    document.body.classList.remove('dk-on');
+    setTimeout(() => { el.hidden = true; }, reduced() ? 0 : 320);
+    if (DK.lastFocus && DK.lastFocus.focus) DK.lastFocus.focus({ preventScroll: true });
+  }
+  // Called after every new chart: show once the reader reaches the end, if they actually spent time reading.
+  function dkArm() {
+    DK.shownAt = Date.now();
+    DK.armed = !dkSnoozed();
+  }
+  function initDakshinai() {
+    dkSetAmt(DK.amt);
+    $$('#dkAmts button').forEach((b) => b.addEventListener('click', () => dkSetAmt(b.dataset.amt)));
+    $('#dkAmts').addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+      const bs = $$('#dkAmts button'), i = bs.findIndex((b) => b.dataset.amt === DK.amt);
+      const n = bs[(i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length];
+      dkSetAmt(n.dataset.amt); n.focus(); e.preventDefault();
+    });
+    $$('[data-dk-close]').forEach((b) => b.addEventListener('click', () => dkClose(7)));
+    $('#dkDone').addEventListener('click', () => { dkClose(120); toast(t('dkThanks')); });
+    $('#dkOpen').addEventListener('click', (e) => { e.preventDefault(); dkOpen(); });
+    $('#dkCopy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText('7845151569@kotakbank'); toast(t('dkCopied')); }
+      catch (e) { window.prompt(t('dkUpi'), '7845151569@kotakbank'); }
+    });
+    document.addEventListener('keydown', (e) => {
+      const el = $('#dk');
+      if (el.hidden) return;
+      if (e.key === 'Escape') { dkClose(7); return; }
+      if (e.key === 'Tab') {
+        const f = $$('button, a[href], [tabindex="0"]', $('.dk-card', el)).filter((x) => x.offsetParent !== null);
+        if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { f[f.length - 1].focus(); e.preventDefault(); }
+        else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { f[0].focus(); e.preventDefault(); }
+      }
+    });
+    if (!('IntersectionObserver' in window)) return;
+    new IntersectionObserver((ents) => {
+      if (!ents.some((x) => x.isIntersecting) || !DK.armed) return;
+      // Jumping straight to the bottom is not reading: wait until the chart has been open a while.
+      const wait = Math.max(1200, 45000 - (Date.now() - DK.shownAt));
+      clearTimeout(DK.timer);
+      DK.timer = setTimeout(() => {
+        if (!DK.armed || dkSnoozed() || document.hidden) return;
+        const r = $('#readEnd').getBoundingClientRect();
+        if (r.top > innerHeight * 1.6) return; // scrolled back up; try again next time they reach the end
+        DK.armed = false;
+        dkOpen();
+      }, wait);
+    }, { rootMargin: '0px 0px 120px 0px' }).observe($('#readEnd'));
+  }
+
   function toast(msg) {
     const el = $('#toast');
     el.textContent = msg; el.classList.add('on');
@@ -1274,6 +1359,7 @@
       catch (e) { window.prompt(t('share'), url); }
     });
     initFutureEvents();
+    initDakshinai();
     let rz = 0;
     window.addEventListener('resize', () => {
       clearTimeout(rz);

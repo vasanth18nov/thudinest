@@ -533,6 +533,12 @@ browser.
   list or `vendor/tz-lookup.js`, and historical offsets (1942–45 war time,
   Madras time) come from the browser's time-zone data.
 - `?lang=ta` opens in Tamil; the choice is remembered as `josiyam-lang`.
+- Dakshinai popup: once a reader reaches the end of the chart (and it has been
+  open at least 45 s) a UPI donation card appears. Closing it snoozes it for
+  7 days, "I have offered" for 120 days (`josiyam-dakshinai` in localStorage).
+  The footer link opens it any time. QR codes per amount live in
+  `josiyam/dakshinai/` (made with Python `segno`); phones also get a UPI app
+  button and a "save QR" PNG.
 
 ## Files
 

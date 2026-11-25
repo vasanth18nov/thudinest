@@ -265,13 +265,14 @@
       <div class="accordion" id="dashaList"></div>
     </section>
 
+    <div class="read-end" id="readEnd" aria-hidden="true"></div>
     <p class="print-foot" id="printFoot"></p>
   </section>
 </main>
 
 <footer class="foot">
   <p data-i18n="footerBuilt">Thudinest Josiyam on thudinest.com · Planet positions: Astronomy Engine (MIT) · Places: GeoNames (CC BY 4.0) and © OpenStreetMap contributors</p>
-  <p><a href="/" data-i18n="backHome">thudinest.com</a> · <a id="waApp" href="#" target="_blank" rel="noopener" data-i18n="shareWa">Share on WhatsApp</a></p>
+  <p><a href="/" data-i18n="backHome">thudinest.com</a> · <a href="#" id="dkOpen" data-i18n="dkFootLink">Offer dakshinai</a> · <a id="waApp" href="#" target="_blank" rel="noopener" data-i18n="shareWa">Share on WhatsApp</a></p>
 </footer>
 
 <button type="button" class="totop" id="toTop" aria-label="Back to top" data-i18n-aria="backTop"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" class="tt-trk"/><circle cx="20" cy="20" r="18" class="tt-ring"/><path d="M20 26V14M14.5 19.5 20 14l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -284,6 +285,38 @@
     </div>
     <p class="cast-step" id="castStep" aria-live="polite"></p>
     <button type="button" class="cast-skip" data-i18n="skipAnim">Skip</button>
+  </div>
+</div>
+
+<div class="dk" id="dk" hidden>
+  <div class="dk-backdrop" data-dk-close></div>
+  <div class="dk-card" role="dialog" aria-modal="true" aria-labelledby="dkTitle" aria-describedby="dkLead" tabindex="-1">
+    <button type="button" class="dk-x" data-dk-close aria-label="Close" data-i18n-aria="dkClose"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="dk-lamp" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="dk-flame" d="M32 6c5 8 8 13 8 18a8 8 0 0 1-16 0c0-5 3-10 8-18z"/><path class="dk-bowl" d="M10 38h44c-2 10-11 16-22 16S12 48 10 38z"/><path class="dk-base" d="M24 56h16l3 4H21z"/></svg></div>
+    <p class="dk-kicker" data-i18n="dkKicker">Dakshinai</p>
+    <h2 id="dkTitle" data-i18n="dkTitle">Your Jathagam is complete</h2>
+    <p class="dk-lead" id="dkLead" data-i18n="dkLead">At the end of a reading, it is customary to offer the josiyar a small dakshinai. This one is free, ad free and private, and your offering keeps it that way.</p>
+    <div class="dk-amts" role="radiogroup" aria-label="Amount" data-i18n-aria="dkAmount" id="dkAmts">
+      <button type="button" role="radio" aria-checked="false" data-amt="51">₹51</button>
+      <button type="button" role="radio" aria-checked="true" data-amt="101">₹101</button>
+      <button type="button" role="radio" aria-checked="false" data-amt="251">₹251</button>
+      <button type="button" role="radio" aria-checked="false" data-amt="501">₹501</button>
+      <button type="button" role="radio" aria-checked="false" data-amt="any" data-i18n="dkAny">Any</button>
+    </div>
+    <div class="dk-pay">
+      <figure class="dk-qr"><img id="dkQr" src="dakshinai/qr-101.svg" width="220" height="220" alt="UPI QR code for Thudinest Josiyam" data-i18n-alt="dkQrAlt" loading="lazy"><figcaption data-i18n="dkScan">Scan with GPay, PhonePe, Paytm or any UPI app</figcaption></figure>
+      <div class="dk-side">
+        <a class="btn primary dk-app" id="dkApp" href="#"><span class="btn-glow" aria-hidden="true"></span><span data-i18n="dkOpenApp">Pay with a UPI app</span></a>
+        <a class="btn ghost sm dk-save" href="dakshinai/thudinest-josiyam-dakshinai.png" download><span data-i18n="dkSave">Save QR to gallery</span></a>
+        <button type="button" class="dk-upi" id="dkCopy"><span class="dk-upi-l" data-i18n="dkUpi">UPI ID</span><span class="dk-upi-v">7845151569@kotakbank</span><span class="dk-upi-c" data-i18n="dkCopy">Copy</span></button>
+        <p class="dk-payee">Vasanthakrishnan Govindaraj · Kotak</p>
+      </div>
+    </div>
+    <div class="dk-foot">
+      <button type="button" class="dk-done" id="dkDone" data-i18n="dkDone">I have offered 🙏</button>
+      <button type="button" class="dk-later" data-dk-close data-i18n="dkLater">Maybe later</button>
+    </div>
+    <p class="dk-stay"><span data-i18n="dkStay">Visiting Coimbatore? Stay with us at</span> <a href="/">Thudi Nest</a></p>
   </div>
 </div>
 
