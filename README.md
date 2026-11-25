@@ -495,6 +495,33 @@ remover for local files, YouTube links via the IFrame API (lyrics stay in
 sync), a live note detector, and recording of the mix to WebM/M4A. The mic
 needs https or localhost, which thudinest.com already provides.
 
+## Josiyam (`/josiyam/`)
+
+A South Indian Vedic astrology (Jathagam) app in English and Tamil. Plain
+HTML/CSS/JS, no build step and no server: everything is calculated in the
+browser.
+
+- `astro-engine.js`: sidereal positions with the Lahiri (Chitrapaksha)
+  ayanamsa (Thirukanitham). Planets come from Astronomy Engine (MIT, vendored
+  in `josiyam/vendor/`); the ascendant, mean/true nodes, nakshatra, pada,
+  navamsa, Vimshottari dasha, panchangam and Tamil calendar are computed here.
+  Checked against the Swiss Ephemeris: planets within 16", ayanamsa within
+  0.1", true node within 42".
+- `predictions-data.js`: the bilingual knowledge base (27 nakshatras, 12 rasis,
+  12 lagnas, 9 grahas in 12 houses, yogas, doshas, dashas, transits, remedies).
+- `sastra-engine.js`: the rule engine (functional benefics/malefics per lagna,
+  Chevvai dosham with exceptions, Kala Sarpa, Pancha Mahapurusha, Gajakesari,
+  Budhaditya, Neecha Bhanga and others) and the report it writes.
+- `app.js`: form, place search, the South Indian chart, report tabs, dasha
+  timeline, share link (`#d=…&t=…&lat=…&lon=…&tz=…`) and print sheet.
+- Places: `data/cities.json` is built from GeoNames (CC BY 4.0) by a script
+  outside the repo (`~/thudinest-assets/josiyam/build_cities.py`). Typing
+  searches only this file; "Search worldwide" sends one query to OpenStreetMap
+  Nominatim (their policy forbids type-ahead). Time zones come from the city
+  list or `vendor/tz-lookup.js`, and historical offsets (1942–45 war time,
+  Madras time) come from the browser's time-zone data.
+- `?lang=ta` opens in Tamil; the choice is remembered as `josiyam-lang`.
+
 ## Files
 
 ```
@@ -504,6 +531,7 @@ cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary 
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 bm/             ← Rally Point 3D badminton (page, js/sim.js + js/game.js, vendor/three.js, players/)
 volleyball/     ← Sunset Spike 3D beach volleyball (page, js/sim.js + js/game.js, og.jpg)
+josiyam/        ← Josiyam: South Indian Jathagam in English/Tamil (engine, knowledge base, data/cities.json)
 images/         ← add your property photos here
 README.md       ← this file
 ```
