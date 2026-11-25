@@ -512,8 +512,20 @@ browser.
 - `sastra-engine.js`: the rule engine (functional benefics/malefics per lagna,
   Chevvai dosham with exceptions, Kala Sarpa, Pancha Mahapurusha, Gajakesari,
   Budhaditya, Neecha Bhanga and others) and the report it writes.
-- `app.js`: form, place search, the South Indian chart, report tabs, dasha
-  timeline, share link (`#d=…&t=…&lat=…&lon=…&tz=…`) and print sheet.
+- `future-engine.js`: the 12-year forecast. Every month is scored from the
+  running dasha, bhukti and antaram lords (their role and strength for the
+  Lagna, the houses they rule and occupy) and from gochara (Jupiter, Saturn,
+  Rahu and the fast planets from the Moon and Lagna). It produces year and
+  life-area scores with the reasons, key dates and a reading for each bhukti.
+- `motion.js`: the animations (casting sequence, planets flying into their
+  houses, orbiting grahas, constellations, scroll reveals, card spotlight,
+  count-ups, sliding tab indicators, progress bar). Reduced motion turns them off.
+- `app.js`: form, place search, the South Indian chart, report tabs, the future
+  section (fortune graph, year cards, bhukti list), dasha timeline, share link
+  (`#d=…&t=…&lat=…&lon=…&tz=…`), WhatsApp share and print sheet.
+- `og.jpg`: the 1200×630 link preview, laid out so WhatsApp's square crop still
+  shows the whole zodiac ring and name. Rendered by
+  `~/thudinest-assets/josiyam/og/render.mjs`; bump `?v=` in the meta tags when it changes.
 - Places: `data/cities.json` is built from GeoNames (CC BY 4.0) by a script
   outside the repo (`~/thudinest-assets/josiyam/build_cities.py`). Typing
   searches only this file; "Search worldwide" sends one query to OpenStreetMap

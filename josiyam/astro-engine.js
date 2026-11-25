@@ -142,6 +142,17 @@
     return { lons: out, ayanamsa: ayan, time };
   }
 
+  // Sidereal longitude of one body (planets or nodes) at a UTC instant — used for transit scans
+  function bodyLon(name, ms, nodeType) {
+    const time = A.MakeTime(new Date(ms));
+    if (name === 'Rahu' || name === 'Ketu') {
+      const T = time.tt / 36525;
+      const r = norm((nodeType === 'true' ? trueNode(time) : meanNode(T)) - ayanamsa(T));
+      return name === 'Ketu' ? norm(r + 180) : r;
+    }
+    return siderealBody(name, time);
+  }
+
   /* ------------------------------------------------------------------ derived facts */
   function nakshatraOf(lon) {
     const L = norm(lon);
@@ -488,7 +499,7 @@
     ayanamsa, AYAN_J2000, meanNode, trueNode,
     nakshatraOf, navamsaSign, dignity, dignityDetailed, relationTo, naturalRelation,
     computeChart, siderealAll, vimshottari, currentPeriod, subPeriods, ymd,
-    transitNow, nextIngress, prevIngress,
+    transitNow, nextIngress, prevIngress, bodyLon,
     tzOffsetMs, localToUtc, isValidTz, latJ2000
   };
 });

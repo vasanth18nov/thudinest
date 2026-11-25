@@ -1195,6 +1195,160 @@
     functionalNote: { en: 'Following Parashara, a planet’s nature for your chart comes from the houses it rules from the Lagna: trine lords (1, 5, 9) help, lords of 3, 6, 8 and 11 bring trouble, and ruling a kendra takes away the goodness of natural benefics. House numbers are in brackets.', ta: 'பராசரர் முறைப்படி, ஒரு கிரகத்தின் தன்மை லக்னத்திலிருந்து அது ஆளும் வீடுகளைப் பொறுத்தது: திரிகோண (1, 5, 9) அதிபதிகள் நன்மை செய்வர்; 3, 6, 8, 11 அதிபதிகள் சிரமம் தருவர்; கேந்திராதிபத்தியம் இயற்கைச் சுபர்களின் நன்மையைக் குறைக்கும். அடைப்புக்குறியில் வீட்டு எண்கள்.' }
   });
 
+  /* ================================================================ FUTURE (year-by-year forecast) */
+  K.future = {
+    ui: {
+      title: { en: 'Your future, year by year', ta: 'எதிர்கால பலன் — ஆண்டு வாரியாக' },
+      sub: { en: 'Twelve years ahead, read from your dasha periods and the transits of Jupiter, Saturn and Rahu over your Moon sign and Lagna. Tap a year for its full reading.', ta: 'உங்கள் தசா புத்திகளும், சந்திர ராசி மற்றும் லக்னத்தின் மீது குரு, சனி, ராகு கோசாரங்களும் அடிப்படையாக அடுத்த 12 ஆண்டுகள். முழு பலனுக்கு ஓர் ஆண்டைத் தொடவும்.' },
+      chartTitle: { en: 'Fortune index, month by month', ta: 'மாதவாரி அதிர்ஷ்டக் குறியீடு' },
+      chartNote: { en: '0–100 · above 50 leans favourable, below 50 asks for care', ta: '0–100 · 50-க்கு மேல் சாதகம், கீழே கவனம் தேவை' },
+      bandDasha: { en: 'Dasha · Bhukti', ta: 'தசை · புத்தி' },
+      bandSaturn: { en: 'Saturn from Moon', ta: 'ராசிக்கு சனி' },
+      bandJupiter: { en: 'Jupiter from Moon', ta: 'ராசிக்கு குரு' },
+      tableView: { en: 'Table view of all twelve years', ta: '12 ஆண்டுகளின் அட்டவணை' },
+      thYear: { en: 'Year', ta: 'ஆண்டு' }, overall: { en: 'Overall', ta: 'ஒட்டுமொத்தம்' },
+      periods: { en: 'Dasha periods this year', ta: 'இந்த ஆண்டின் தசா புத்திகள்' },
+      transits: { en: 'Major transits', ta: 'முக்கிய கோசாரங்கள்' },
+      areas: { en: 'Life areas', ta: 'வாழ்க்கை அம்சங்கள்' },
+      months: { en: 'Month by month', ta: 'மாதவாரியாக' },
+      keyDates: { en: 'Key dates', ta: 'முக்கிய தேதிகள்' },
+      remedies: { en: 'Remedies for the year', ta: 'இந்த ஆண்டுக்கான பரிகாரங்கள்' },
+      bhuktiTitle: { en: 'Period by period', ta: 'புத்தி வாரியாக' },
+      bhuktiSub: { en: 'Every bhukti in these twelve years, with the life areas it switches on. Tap one to open it.', ta: 'இந்த 12 ஆண்டுகளின் ஒவ்வொரு புத்தியும், அது தூண்டும் வாழ்க்கை அம்சங்களும். திறக்க ஒன்றைத் தொடவும்.' },
+      activates: { en: 'Areas this period switches on', ta: 'இக்காலம் தூண்டும் அம்சங்கள்' },
+      antarams: { en: 'Antarams (sub-periods)', ta: 'அந்தரங்கள்' },
+      backdrop: { en: 'Transit backdrop', ta: 'கோசாரப் பின்னணி' },
+      best: { en: 'Best months', ta: 'சிறந்த மாதங்கள்' }, caution: { en: 'Take care in', ta: 'கவனம் தேவைப்படும் மாதங்கள்' },
+      why: { en: 'Why', ta: 'காரணம்' },
+      levels: { good: { en: 'Favourable', ta: 'சாதகம்' }, mixed: { en: 'Mixed', ta: 'கலவை' }, tough: { en: 'Testing', ta: 'சோதனை' } },
+      score: { en: 'Score', ta: 'மதிப்பெண்' },
+      today: { en: 'Today', ta: 'இன்று' },
+      fromMoon: { en: '{x} from Moon', ta: 'ராசிக்கு {x}' },
+      fromLagna: { en: '{x} from Lagna', ta: 'லக்னத்திற்கு {x}' },
+      startOfYear: { en: 'the start of the year', ta: 'ஆண்டின் தொடக்கம்' },
+      until: { en: 'until {x}', ta: '{x} வரை' },
+      noPeriod: { en: 'Outside the 120-year dasha cycle.', ta: '120 ஆண்டு தசா சுழற்சிக்கு வெளியே.' },
+      shareWa: { en: 'Share on WhatsApp', ta: 'வாட்ஸ்அப்பில் பகிர்' },
+      shareText: { en: 'My Jathagam on Josiyam — Rasi, Navamsam, dasha and a 12-year forecast in English & Tamil:', ta: 'ஜோசியத்தில் என் ஜாதகம் — ராசி, நவாம்சம், தசை, 12 ஆண்டு பலன் (தமிழ் & ஆங்கிலம்):' },
+      shareApp: { en: 'Free South Indian Jathagam in English & Tamil — Rasi, Navamsam, dasha and 12-year palan:', ta: 'இலவச தென்னிந்திய ஜாதகம் — ராசி, நவாம்சம், தசை, 12 ஆண்டு பலன், தமிழிலும் ஆங்கிலத்திலும்:' }
+    },
+    yearLevel: [
+      { title: { en: 'An excellent year', ta: 'மிகச் சிறந்த ஆண்டு' }, en: 'The year’s dasha lords and transits pull in the same direction. Openings can arrive in several areas at once — make the big moves, sign the important papers and invest in long-term goals, while staying humble and generous.', ta: 'இந்த ஆண்டின் தசா நாதர்களும் கோசாரங்களும் ஒரே திசையில் செயல்படுகின்றன. பல துறைகளில் ஒரே நேரத்தில் வாய்ப்புகள் திறக்கும் — பெரிய முடிவுகள், முக்கிய ஒப்பந்தங்கள், நீண்டகால இலக்குகளுக்கான முதலீடுகளுக்கு ஏற்ற காலம்; பணிவும் தாராளமும் காக்கவும்.' },
+      { title: { en: 'A favourable year', ta: 'சாதகமான ஆண்டு' }, en: 'More support than resistance. Progress comes steadily if you keep to a plan; use the best months below for launches, interviews, purchases and auspicious events.', ta: 'எதிர்ப்பை விட ஆதரவு அதிகம். திட்டப்படி செயல்பட்டால் முன்னேற்றம் நிலையாக வரும்; கீழே உள்ள சிறந்த மாதங்களை புதிய தொடக்கங்கள், நேர்காணல்கள், பொருள் வாங்குதல், சுப நிகழ்வுகளுக்குப் பயன்படுத்துங்கள்.' },
+      { title: { en: 'A balanced year', ta: 'சமநிலையான ஆண்டு' }, en: 'Gains and tests arrive in roughly equal measure. Choose your battles: push forward in the areas marked favourable and hold steady where the reading asks for care.', ta: 'லாபங்களும் சோதனைகளும் ஏறக்குறைய சம அளவில் வரும். சாதகம் எனக் குறிக்கப்பட்ட அம்சங்களில் முன்னேறுங்கள்; கவனம் தேவை என்ற இடங்களில் நிதானமாக இருங்கள்.' },
+      { title: { en: 'A testing year', ta: 'சோதனையான ஆண்டு' }, en: 'Results need effort this year. Consolidate rather than expand, keep savings and health routines strong and avoid hasty commitments — steady work now builds the next rise.', ta: 'இந்த ஆண்டு பலனுக்கு முயற்சி தேவை. விரிவாக்கத்தை விட நிலைப்படுத்துங்கள்; சேமிப்பையும் உடல்நலப் பழக்கங்களையும் வலுப்படுத்துங்கள்; அவசர ஒப்பந்தங்களைத் தவிர்க்கவும் — இப்போதைய நிலையான உழைப்பு அடுத்த உயர்வைக் கட்டும்.' },
+      { title: { en: 'A demanding year', ta: 'கடினமான ஆண்டு' }, en: 'Several heavy influences overlap. Protect your health first, avoid risk, debt and disputes, lean on family and trusted advisers and keep up the remedies below. Hard years pass and leave real strength behind.', ta: 'பல கடுமையான தாக்கங்கள் ஒன்றாக வருகின்றன. முதலில் உடல்நலத்தைக் காக்கவும்; ஆபத்து, கடன், வழக்குகளைத் தவிர்க்கவும்; குடும்பம், நம்பகமான ஆலோசகர்களைச் சார்ந்திருங்கள்; கீழே உள்ள பரிகாரங்களைத் தொடருங்கள். கடினமான ஆண்டுகள் கடந்து உண்மையான வலிமையை விட்டுச் செல்லும்.' }
+    ],
+    dashaYear: { en: 'Through {x} you are in the {p} Maha Dasha.', ta: '{x} முழுவதும் {p} மகா தசை நடைபெறுகிறது.' },
+    dashaTurn: { en: 'On {x} the {p} Maha Dasha ends and the {q} Maha Dasha begins — a major turning point in life.', ta: '{x} அன்று {p} மகா தசை முடிந்து {q} மகா தசை தொடங்குகிறது — வாழ்க்கையில் ஒரு முக்கியத் திருப்பம்.' },
+    transitFrom: { en: 'From {x}:', ta: '{x} முதல்:' },
+    area: {
+      career: { name: { en: 'Career & status', ta: 'தொழில் & அந்தஸ்து' },
+        good: { en: 'Work goes well: recognition, responsibility and, for many, a promotion, new role or business growth. Put yourself forward for leadership and visible projects.', ta: 'பணியில் நல்ல முன்னேற்றம்: அங்கீகாரம், பொறுப்பு, பலருக்கு பதவி உயர்வு, புதிய பணி அல்லது தொழில் வளர்ச்சி. தலைமைப் பொறுப்புகளுக்கும் முக்கியத் திட்டங்களுக்கும் முன்வாருங்கள்.' },
+        mixed: { en: 'Career moves forward in steps: some progress, some waiting. Upgrade your skills, record your achievements and change jobs only with a firm offer in hand.', ta: 'தொழில் படிப்படியாக முன்னேறும்: சில முன்னேற்றம், சில காத்திருப்பு. திறன்களை மேம்படுத்துங்கள், சாதனைகளைப் பதிவு செய்யுங்கள்; உறுதியான வாய்ப்பு கையில் இருந்தால் மட்டுமே வேலை மாறுங்கள்.' },
+        tough: { en: 'Work asks for patience: a heavier load, slower recognition or friction with seniors. Stay disciplined and do not quit in frustration — this phase rewards persistence.', ta: 'பணியில் பொறுமை தேவை: அதிகச் சுமை, தாமதமான அங்கீகாரம் அல்லது மேலதிகாரிகளுடன் உரசல். ஒழுக்கமாக இருங்கள்; கோபத்தில் வேலையை விடாதீர்கள் — விடாமுயற்சிக்கு இக்காலம் பலன் தரும்.' } },
+      wealth: { name: { en: 'Wealth & finance', ta: 'தனம் & பொருளாதாரம்' },
+        good: { en: 'Income and savings grow; a good year for investing, clearing loans and buying assets — choose sound, long-term options.', ta: 'வருமானமும் சேமிப்பும் பெருகும்; முதலீடு, கடனடைப்பு, சொத்து வாங்குதலுக்கு நல்ல ஆண்டு — நிலையான நீண்டகால வழிகளைத் தேர்ந்தெடுக்கவும்.' },
+        mixed: { en: 'Money comes and goes. Keep a budget, build an emergency fund and do not lend without documents.', ta: 'பணம் வந்து போகும். வரவு-செலவுத் திட்டம் வையுங்கள், அவசரகால நிதியை உருவாக்குங்கள், ஆவணமின்றி கடன் கொடுக்க வேண்டாம்.' },
+        tough: { en: 'Expenses can outrun income. Postpone big purchases and speculation, avoid standing surety and protect your savings.', ta: 'செலவுகள் வருமானத்தை மிஞ்சலாம். பெரிய கொள்முதல், ஊக வணிகத்தைத் தள்ளிப்போடுங்கள்; ஜாமீன் நிற்பதைத் தவிர்த்து சேமிப்பைக் காக்கவும்.' } },
+      love: { name: { en: 'Marriage & relationships', ta: 'திருமணம் & உறவுகள்' },
+        good: { en: 'Relationships blossom. For the unmarried, marriage talks and engagements are favoured; for couples, closeness, celebrations and perhaps happy family news.', ta: 'உறவுகள் மலரும். திருமணமாகாதவர்களுக்கு திருமணப் பேச்சு, நிச்சயதார்த்தம் சாதகம்; தம்பதிகளுக்கு நெருக்கம், கொண்டாட்டங்கள், மகிழ்ச்சியான குடும்பச் செய்தி.' },
+        mixed: { en: 'Relationships need attention: good moments alongside misunderstandings. Talk openly, give each other space and match horoscopes carefully before any commitment.', ta: 'உறவுகளில் கவனம் தேவை: இனிய தருணங்களுடன் சில தவறான புரிதல்களும். மனம் திறந்து பேசுங்கள், இடம் கொடுங்கள்; உறுதிமொழிக்கு முன் ஜாதகப் பொருத்தத்தைக் கவனமாகப் பாருங்கள்.' },
+        tough: { en: 'Relationships are tested: distance, ego clashes or delays in marriage plans. Patience, kindness and avoiding harsh words will carry you through.', ta: 'உறவுகள் சோதிக்கப்படும்: பிரிவு, அகந்தை மோதல், திருமணத் திட்டங்களில் தாமதம். பொறுமை, அன்பு, கடுஞ்சொல் தவிர்த்தல் உங்களைக் கரைசேர்க்கும்.' } },
+      health: { name: { en: 'Health & vitality', ta: 'உடல்நலம்' },
+        good: { en: 'Good vitality and quick recovery. A fine year to build fitness habits that last.', ta: 'நல்ல உடல் வலிமையும் விரைவான குணமடைதலும். நீடிக்கும் உடற்பயிற்சிப் பழக்கங்களை உருவாக்க ஏற்ற ஆண்டு.' },
+        mixed: { en: 'Health is steady with minor ups and downs; regular sleep, food and exercise keep it that way.', ta: 'சிறு ஏற்றத் தாழ்வுகளுடன் உடல்நலம் நிலையாக இருக்கும்; ஒழுங்கான உறக்கம், உணவு, உடற்பயிற்சி அதைக் காக்கும்.' },
+        tough: { en: 'Energy may dip and old complaints can return. Keep up regular check-ups, avoid risky travel and stunts, and rest well.', ta: 'சக்தி குறையலாம்; பழைய பிரச்சினைகள் மீண்டும் வரலாம். முறையான பரிசோதனைகள், ஆபத்தான பயணம் தவிர்த்தல், நல்ல ஓய்வு அவசியம்.' } },
+      home: { name: { en: 'Home, property & family', ta: 'வீடு, சொத்து & குடும்பம்' },
+        good: { en: 'Domestic happiness and support from family; favourable for buying or renovating a home, a vehicle or land.', ta: 'குடும்ப மகிழ்ச்சியும் ஆதரவும்; வீடு, வாகனம், நிலம் வாங்குதல் அல்லது புதுப்பித்தலுக்குச் சாதகம்.' },
+        mixed: { en: 'Home life is busy — repairs, responsibilities or a change of residence. Plan property matters carefully.', ta: 'வீட்டு வாழ்க்கை பரபரப்பாக இருக்கும் — பழுதுபார்ப்பு, பொறுப்புகள் அல்லது இட மாற்றம். சொத்து விஷயங்களைக் கவனமாகத் திட்டமிடுங்கள்.' },
+        tough: { en: 'Domestic peace needs care; look after your parents’ health and avoid property disputes or rushed deals.', ta: 'குடும்ப அமைதியில் கவனம் தேவை; பெற்றோரின் உடல்நலத்தைக் கவனித்து, சொத்து தகராறுகளையும் அவசர பரிவர்த்தனைகளையும் தவிர்க்கவும்.' } },
+      learning: { name: { en: 'Education & children', ta: 'கல்வி & குழந்தைகள்' },
+        good: { en: 'Excellent for studies, exams, new courses and creative work, with good news concerning children.', ta: 'படிப்பு, தேர்வுகள், புதிய படிப்புகள், படைப்புப் பணிகளுக்கு மிகச் சிறப்பு; குழந்தைகள் பற்றிய நற்செய்தி.' },
+        mixed: { en: 'Studies and children’s matters progress with effort; stay consistent and guide rather than pressure.', ta: 'படிப்பும் குழந்தைகள் விஷயங்களும் முயற்சியுடன் முன்னேறும்; தொடர்ச்சியாக இருங்கள், அழுத்தாமல் வழிநடத்துங்கள்.' },
+        tough: { en: 'Concentration and results need extra work; avoid speculation and give children patient attention.', ta: 'கவனமும் தேர்வு முடிவுகளும் கூடுதல் உழைப்பைக் கோரும்; ஊக முதலீடுகளைத் தவிர்த்து குழந்தைகளுக்குப் பொறுமையான கவனம் கொடுங்கள்.' } },
+      travel: { name: { en: 'Travel, fortune & spirituality', ta: 'பயணம், பாக்கியம் & ஆன்மிகம்' },
+        good: { en: 'Fortune smiles: pilgrimages, foreign travel or opportunities abroad, and blessings from elders and teachers.', ta: 'அதிர்ஷ்டம் கைகூடும்: புனிதப் பயணம், வெளிநாட்டுப் பயணம் அல்லது வாய்ப்புகள், பெரியோர் மற்றும் குருவின் ஆசி.' },
+        mixed: { en: 'Travel brings both gains and expense; spiritual practice steadies the mind.', ta: 'பயணங்கள் லாபமும் செலவும் தரும்; ஆன்மிகப் பயிற்சி மனதை நிலைப்படுத்தும்.' },
+        tough: { en: 'Travel plans may be delayed or costly, so check documents twice. Quiet devotion and charity bring the best results.', ta: 'பயணத் திட்டங்கள் தாமதமாகலாம் அல்லது செலவு கூடலாம்; ஆவணங்களை இருமுறை சரிபாருங்கள். அமைதியான பக்தியும் தானமும் சிறந்த பலன் தரும்.' } }
+    },
+    why: {
+      lord: { en: '{p} ({r}), your {x} lord, is tied to this area: it rules {y} and sits in the {h} house.', ta: '{x} நாதன் {p} ({r}) இந்த அம்சத்தோடு தொடர்புடையவர்: {y} அதிபதி, {h}-ஆம் வீட்டில் உள்ளார்.' },
+      lordPlaced: { en: '{p} ({r}), your {x} lord, sits in the {h} house, which governs this area.', ta: '{x} நாதன் {p} ({r}) இந்த அம்சத்தைக் குறிக்கும் {h}-ஆம் வீட்டில் உள்ளார்.' },
+      lordRules: { en: '{p} ({r}), your {x} lord, rules {y} and so steers this area.', ta: '{x} நாதன் {p} ({r}) இந்த அம்சத்தைக் குறிக்கும் {y} அதிபதி.' },
+      karaka: { en: '{p}, the natural significator (karaka) of this area, runs as your {x} lord.', ta: 'இந்த அம்சத்தின் இயற்கைக் காரகன் {p} உங்கள் {x} நாதனாக நடைபெறுகிறார்.' },
+      jupIn: { en: 'Jupiter transits your {h} house from {x}, blessing these matters.', ta: '{x} முதல் குரு உங்கள் {h}-ஆம் வீட்டில் சஞ்சரித்து இவ்விஷயங்களுக்கு அருள் தருவார்.' },
+      jupAsp: { en: 'Jupiter aspects your {h} house from {x}, adding protection.', ta: '{x} முதல் குரு உங்கள் {h}-ஆம் வீட்டைப் பார்த்துப் பாதுகாப்பு தருவார்.' },
+      satIn: { en: 'Saturn transits your {h} house from {x}, slowing these matters and asking for patience.', ta: '{x} முதல் சனி உங்கள் {h}-ஆம் வீட்டில் சஞ்சரிப்பதால் இவ்விஷயங்கள் மெதுவாகும்; பொறுமை தேவை.' },
+      satGood: { en: 'Saturn transits your {h} house from {x}, rewarding steady effort here.', ta: '{x} முதல் சனி உங்கள் {h}-ஆம் வீட்டில் சஞ்சரித்து நிலையான முயற்சிக்குப் பலன் தருவார்.' },
+      rahuIn: { en: 'Rahu crosses your {h} house from {x}: expect sudden changes or unusual openings.', ta: '{x} முதல் ராகு உங்கள் {h}-ஆம் வீட்டைக் கடக்கிறார்: திடீர் மாற்றங்கள் அல்லது வித்தியாசமான வாய்ப்புகள்.' },
+      healthLord: { en: '{p}, your {x} lord, is linked to the 6th, 8th or 12th house, so guard your health in this period.', ta: '{x} நாதன் {p} 6, 8 அல்லது 12-ஆம் வீட்டோடு தொடர்புடையவர் — இக்காலத்தில் உடல்நலத்தைக் காக்கவும்.' },
+      healthLagna: { en: '{p}, your Lagna lord, runs as your {x} lord, which supports vitality.', ta: 'உங்கள் லக்னாதிபதி {p} {x} நாதனாக நடைபெறுவதால் உடல் வலிமைக்கு ஆதரவு.' },
+      sade: { en: 'Saturn is in the {h} sign from your Moon ({y}) from {x}, so pace yourself.', ta: '{x} முதல் சனி உங்கள் ராசிக்கு {h}-இல் ({y}) — நிதானமாகச் செயல்படுங்கள்.' },
+      dasha: { en: 'dasha', ta: 'தசா' }, bhukti: { en: 'bhukti', ta: 'புத்தி' }
+    },
+    events: gb([
+      ['Self & health: confidence, new beginnings and personal recognition', 'சுயம் & உடல்: தன்னம்பிக்கை, புதிய தொடக்கங்கள், தனிப்பட்ட அங்கீகாரம்'],
+      ['Wealth & family: savings, income and family gatherings', 'தனம் & குடும்பம்: சேமிப்பு, வருமானம், குடும்ப ஒன்றுகூடல்கள்'],
+      ['Courage & communication: initiative, short trips, media work and help from siblings', 'தைரியம் & தொடர்பு: முன்முயற்சி, குறுகிய பயணங்கள், ஊடகப் பணி, சகோதரர் உதவி'],
+      ['Home & property: a new home, vehicle or land; comfort and peace', 'வீடு & சொத்து: புதிய வீடு, வாகனம் அல்லது நிலம்; சுகமும் அமைதியும்'],
+      ['Children & intellect: studies, creativity, good news about children, wise investments', 'குழந்தைகள் & அறிவு: படிப்பு, படைப்பாற்றல், குழந்தைகள் பற்றிய நற்செய்தி, புத்திசாலித்தனமான முதலீடு'],
+      ['Competition & service: victory over rivals, debts cleared, a new job', 'போட்டி & சேவை: எதிரிகள் மீது வெற்றி, கடன் தீர்வு, புதிய வேலை'],
+      ['Marriage & partnership: marriage, engagement or a valuable business partner', 'திருமணம் & கூட்டு: திருமணம், நிச்சயதார்த்தம் அல்லது மதிப்புமிக்க கூட்டாளி'],
+      ['Hidden gains: inheritance, insurance or a research breakthrough', 'மறைவான லாபம்: பரம்பரைச் சொத்து, காப்பீடு அல்லது ஆராய்ச்சியில் முன்னேற்றம்'],
+      ['Fortune & dharma: luck, higher studies, long journeys, blessings of father and teachers', 'பாக்கியம் & தர்மம்: அதிர்ஷ்டம், உயர்கல்வி, தூரப் பயணம், தந்தை மற்றும் குருவின் ஆசி'],
+      ['Career: promotion, recognition, a new role or business growth', 'தொழில்: பதவி உயர்வு, அங்கீகாரம், புதிய பொறுப்பு அல்லது தொழில் வளர்ச்சி'],
+      ['Gains: higher income, wishes fulfilled, helpful friends', 'லாபம்: வருமான உயர்வு, ஆசைகள் நிறைவேறுதல், உதவும் நண்பர்கள்'],
+      ['Foreign & spiritual: travel abroad, retreats, charity and restful sleep', 'வெளிநாடு & ஆன்மிகம்: வெளிநாட்டுப் பயணம், தியானம், தானம், நல்ல உறக்கம்']
+    ]),
+    eventsHard: gb([
+      ['Self & health: fatigue or self-doubt — pace yourself', 'சுயம் & உடல்: சோர்வு அல்லது தயக்கம் — நிதானமாகச் செல்லுங்கள்'],
+      ['Wealth & family: expenses and harsh words at home — budget and speak gently', 'தனம் & குடும்பம்: செலவுகள், வீட்டில் கடுஞ்சொற்கள் — திட்டமிட்டுச் செலவிட்டு மென்மையாகப் பேசுங்கள்'],
+      ['Courage & communication: restless effort; avoid rash moves and quarrels with siblings', 'தைரியம் & தொடர்பு: அமைதியற்ற முயற்சி; அவசர முடிவுகளையும் சகோதரருடன் சண்டையையும் தவிர்க்கவும்'],
+      ['Home & property: domestic worries, repairs or mother’s health', 'வீடு & சொத்து: குடும்பக் கவலைகள், பழுதுபார்ப்பு அல்லது தாயின் உடல்நலம்'],
+      ['Children & intellect: worries over children or studies; avoid speculation', 'குழந்தைகள் & அறிவு: குழந்தைகள் அல்லது படிப்பு பற்றிய கவலை; ஊக முதலீடு தவிர்க்கவும்'],
+      ['Health & debts: illness, loans or disputes need attention', 'உடல்நலம் & கடன்: நோய், கடன் அல்லது வழக்குகளில் கவனம் தேவை'],
+      ['Marriage & partnership: strain or delays; handle disagreements calmly', 'திருமணம் & கூட்டு: உரசல் அல்லது தாமதம்; கருத்து வேறுபாடுகளை அமைதியாகக் கையாளுங்கள்'],
+      ['Sudden events: health scares, losses or obstacles — avoid risks', 'திடீர் நிகழ்வுகள்: உடல்நல அச்சம், இழப்பு அல்லது தடைகள் — ஆபத்துகளைத் தவிர்க்கவும்'],
+      ['Fortune & dharma: delayed luck or differences with father or teachers', 'பாக்கியம் & தர்மம்: தாமதமான அதிர்ஷ்டம் அல்லது தந்தை, குருவுடன் கருத்து வேறுபாடு'],
+      ['Career: pressure at work, changes or friction with seniors', 'தொழில்: பணியில் அழுத்தம், மாற்றங்கள் அல்லது மேலதிகாரிகளுடன் உரசல்'],
+      ['Gains: income with strings attached; choose friends carefully', 'லாபம்: நிபந்தனைகளுடன் வரும் வருமானம்; நண்பர்களைக் கவனமாகத் தேர்ந்தெடுங்கள்'],
+      ['Expenses & losses: rising costs and poor sleep — spend carefully', 'செலவு & இழப்பு: கூடும் செலவு, உறக்கக் குறைவு — கவனமாகச் செலவிடுங்கள்']
+    ]),
+    month: {
+      Sun: { good: { en: 'recognition and energy', ta: 'அங்கீகாரம், உற்சாகம்' }, bad: { en: 'ego clashes and fatigue', ta: 'அகந்தை மோதல், சோர்வு' } },
+      Mars: { good: { en: 'courage, wins, property moves', ta: 'தைரியம், வெற்றி, சொத்து முயற்சிகள்' }, bad: { en: 'haste, disputes, injuries', ta: 'அவசரம், வாக்குவாதம், காயம்' } },
+      Mercury: { good: { en: 'deals, studies, paperwork', ta: 'ஒப்பந்தங்கள், படிப்பு, ஆவணப் பணி' }, bad: { en: 'miscommunication, document errors', ta: 'தவறான புரிதல், ஆவணப் பிழைகள்' } },
+      Venus: { good: { en: 'comforts, romance, purchases', ta: 'சுகம், காதல், பொருள் வாங்குதல்' }, bad: { en: 'overspending, relationship friction', ta: 'அதிகச் செலவு, உறவில் உரசல்' } }
+    },
+    ev: {
+      maha: { en: '{p} Maha Dasha begins', ta: '{p} மகா தசை தொடக்கம்' },
+      bhukti: { en: '{p} bhukti begins', ta: '{p} புத்தி தொடக்கம்' },
+      ingress: { en: '{p} enters {s} — {x} from your Moon', ta: '{p} {sl} பிரவேசம் — ராசிக்கு {x}-இல்' },
+      ingressShort: { en: '{p} enters {s}', ta: '{p} {sl} பிரவேசம்' }
+    },
+    cast: [
+      { en: 'Reading the sky at your birth…', ta: 'உங்கள் பிறப்பு நேர வானத்தைப் படிக்கிறது…' },
+      { en: 'Rising Lagna on the eastern horizon…', ta: 'கிழக்குத் தொடுவானில் லக்னம் கணிக்கிறது…' },
+      { en: 'Placing the nine grahas…', ta: 'நவக்கிரகங்களை அமர்த்துகிறது…' },
+      { en: 'Dividing the Navamsam…', ta: 'நவாம்சம் பிரிக்கிறது…' },
+      { en: 'Unfolding 120 years of dasha…', ta: '120 ஆண்டு தசையை விரிக்கிறது…' },
+      { en: 'Writing your palan…', ta: 'உங்கள் பலனை எழுதுகிறது…' }
+    ]
+  };
+  Object.assign(K.ui, {
+    navFuture: { en: 'Future', ta: 'எதிர்காலம்' },
+    futureTitle: { en: 'Your future, year by year', ta: 'எதிர்கால பலன் — ஆண்டு வாரியாக' },
+    futureSub: { en: 'Twelve years ahead, read from your dasha periods and the transits of Jupiter, Saturn and Rahu over your Moon sign and Lagna. Tap a year for its full reading.', ta: 'உங்கள் தசா புத்திகளும், சந்திர ராசி மற்றும் லக்னத்தின் மீது குரு, சனி, ராகு கோசாரங்களும் அடிப்படையாக அடுத்த 12 ஆண்டுகள். முழு பலனுக்கு ஓர் ஆண்டைத் தொடவும்.' },
+    futureChart: { en: 'Fortune index, month by month', ta: 'மாதவாரி அதிர்ஷ்டக் குறியீடு' },
+    futureChartNote: { en: '0–100 · above 50 leans favourable, below 50 asks for care', ta: '0–100 · 50-க்கு மேல் சாதகம், கீழே கவனம் தேவை' },
+    futureTable: { en: 'Table view of all twelve years', ta: '12 ஆண்டுகளின் அட்டவணை' },
+    futureBhukti: { en: 'Period by period', ta: 'புத்தி வாரியாக' },
+    futureBhuktiSub: { en: 'Every bhukti in these twelve years, with the life areas it switches on. Tap one to open it.', ta: 'இந்த 12 ஆண்டுகளின் ஒவ்வொரு புத்தியும், அது தூண்டும் வாழ்க்கை அம்சங்களும். திறக்க ஒன்றைத் தொடவும்.' },
+    shareWa: { en: 'Share on WhatsApp', ta: 'வாட்ஸ்அப்பில் பகிர்' },
+    backTop: { en: 'Back to top', ta: 'மேலே செல்' },
+    skipAnim: { en: 'Skip', ta: 'தவிர்' }
+  });
 
   return K;
 });

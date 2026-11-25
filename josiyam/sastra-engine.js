@@ -680,5 +680,5 @@
     return { sections, yogas, functional: fn };
   }
 
-  return { functionalNature, detectYogas, buildReport, strength, T, signVars, ord, housesOwned, PD };
+  return { functionalNature, detectYogas, buildReport, strength, T, signVars, ord, housesOwned, PD, roleOf, neechaBhangaMap };
 });

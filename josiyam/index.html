@@ -14,13 +14,20 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="thudinest.com">
 <meta property="og:title" content="Josiyam — your South Indian Jathagam, in English and தமிழ்">
-<meta property="og:description" content="Rasi & Navamsam charts, Vimshottari dasha and classical Sastra readings with the Lahiri ayanamsa. Free, private, runs in your browser.">
+<meta property="og:description" content="Rasi & Navamsam charts, Vimshottari dasha, a 12-year forecast and classical Sastra palan with the Lahiri ayanamsa. Free, private, runs in your browser.">
 <meta property="og:url" content="https://thudinest.com/josiyam/">
-<meta property="og:image" content="https://thudinest.com/josiyam/og.jpg">
+<meta property="og:image" content="https://thudinest.com/josiyam/og.jpg?v=2">
+<meta property="og:image:secure_url" content="https://thudinest.com/josiyam/og.jpg?v=2">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="Josiyam — South Indian Jathagam in English and Tamil, with a golden zodiac wheel">
+<meta property="og:locale" content="en_IN">
+<meta property="og:locale:alternate" content="ta_IN">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://thudinest.com/josiyam/og.jpg">
+<meta name="twitter:image" content="https://thudinest.com/josiyam/og.jpg?v=2">
+<meta name="twitter:title" content="Josiyam — your South Indian Jathagam, in English and தமிழ்">
+<meta name="twitter:description" content="Rasi & Navamsam charts, Vimshottari dasha, a 12-year forecast and Sastra palan. Free, private, runs in your browser.">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"Josiyam","alternateName":"ஜோசியம்","url":"https://thudinest.com/josiyam/","applicationCategory":"LifestyleApplication","operatingSystem":"Any (web browser)","inLanguage":["en","ta"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"description":"South Indian Vedic astrology (Jathagam) with Rasi and Navamsam charts, Vimshottari dasha and rule-based Sastra predictions in English and Tamil, using the Lahiri (Thirukanitham) ayanamsa."}
 </script>
@@ -52,6 +59,7 @@
   <nav class="nav-links" aria-label="Sections">
     <a href="#charts" data-i18n="navChart">Chart</a>
     <a href="#palan" data-i18n="navReport">Palan</a>
+    <a href="#future" data-i18n="navFuture">Future</a>
     <a href="#dasha" data-i18n="navDasha">Dasha</a>
   </nav>
   <div class="lang-toggle" role="group" aria-label="Language" data-i18n-aria="langLabel">
@@ -59,11 +67,12 @@
     <button type="button" data-lang="ta" aria-pressed="false" lang="ta">தமிழ்</button>
     <span class="lang-thumb" aria-hidden="true"></span>
   </div>
+  <span class="prog" id="prog" aria-hidden="true"></span>
 </header>
 
 <main>
   <section class="hero" aria-labelledby="heroTitle">
-    <div class="wheel-wrap" aria-hidden="true"><svg class="wheel" id="wheel" viewBox="-300 -300 600 600"></svg></div>
+    <div class="wheel-wrap" aria-hidden="true"><div class="wheel-par"><svg class="wheel" id="wheel" viewBox="-380 -380 760 760"></svg></div></div>
     <div class="hero-copy">
       <p class="kicker" data-i18n="heroKicker">Thirukanitham · Lahiri ayanamsa</p>
       <h1 id="heroTitle" data-i18n="heroTitle">Your Jathagam, written in the stars</h1>
@@ -171,6 +180,7 @@
       <div class="res-actions">
         <button class="btn ghost sm" type="button" id="editBtn" data-i18n="edit">Edit details</button>
         <button class="btn ghost sm" type="button" id="shareBtn" data-i18n="share">Copy link</button>
+        <a class="btn ghost sm wa" id="waBtn" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 8.4c.3-.6.6-.6.9-.6h.5c.2 0 .4 0 .6.5l.7 1.6c.1.2.1.4 0 .6l-.4.6c-.1.2-.2.3 0 .6.4.7 1 1.4 1.7 1.9.5.4 1 .6 1.3.7.2.1.4 0 .5-.1l.6-.7c.2-.2.3-.2.6-.1l1.5.7c.3.1.4.2.4.4 0 .5-.2 1.1-.6 1.4-.5.4-1.2.6-1.9.5-1.4-.2-2.9-1-4.1-2.1-1.3-1.2-2.2-2.7-2.5-4-.1-.8.1-1.5.3-1.9Z" fill="currentColor"/></svg><span data-i18n="shareWa">Share on WhatsApp</span></a>
         <button class="btn primary sm" type="button" id="printBtn"><span data-i18n="print">Print / Save as PDF</span></button>
       </div>
     </div>
@@ -213,6 +223,36 @@
       <p class="disclaimer" data-i18n="disclaimer">Jyotisha readings are traditional guidance for reflection, not certainties.</p>
     </section>
 
+    <section id="future" class="block" aria-labelledby="futureTitle">
+      <div class="block-head">
+        <div>
+          <h2 id="futureTitle" data-i18n="futureTitle">Your future, year by year</h2>
+          <p class="block-sub" data-i18n="futureSub">Twelve years ahead, read from your dasha periods and transits.</p>
+        </div>
+      </div>
+      <div class="fchart glass" id="fchart">
+        <div class="fc-head">
+          <h3 class="sub-title" data-i18n="futureChart">Fortune index, month by month</h3>
+          <p class="fc-note"><span data-i18n="futureChartNote">0–100</span><span class="fc-legend" id="fcLegend"></span></p>
+        </div>
+        <div class="fc-plot" id="fcPlot" tabindex="0" role="img"></div>
+        <div class="fc-tip" id="fcTip" role="status" hidden></div>
+      </div>
+      <div class="ychips" id="ychips" role="tablist" aria-label="Years"></div>
+      <div id="ycard"></div>
+      <details class="tview glass">
+        <summary data-i18n="futureTable">Table view of all twelve years</summary>
+        <div class="scroll-x"><table class="ftable" id="ftable"></table></div>
+      </details>
+      <div class="block-head sub">
+        <div>
+          <h3 class="sub-title" data-i18n="futureBhukti">Period by period</h3>
+          <p class="block-sub" data-i18n="futureBhuktiSub">Every bhukti in these twelve years.</p>
+        </div>
+      </div>
+      <div class="accordion" id="bhuktis"></div>
+    </section>
+
     <section id="dasha" class="block" aria-labelledby="dashaTitle">
       <div class="block-head">
         <div>
@@ -231,8 +271,21 @@
 
 <footer class="foot">
   <p data-i18n="footerBuilt">Josiyam on thudinest.com · Planet positions: Astronomy Engine (MIT) · Places: GeoNames (CC BY 4.0) and © OpenStreetMap contributors</p>
-  <p><a href="/" data-i18n="backHome">thudinest.com</a></p>
+  <p><a href="/" data-i18n="backHome">thudinest.com</a> · <a id="waApp" href="#" target="_blank" rel="noopener" data-i18n="shareWa">Share on WhatsApp</a></p>
 </footer>
+
+<button type="button" class="totop" id="toTop" aria-label="Back to top" data-i18n-aria="backTop"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" class="tt-trk"/><circle cx="20" cy="20" r="18" class="tt-ring"/><path d="M20 26V14M14.5 19.5 20 14l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+<div class="cast" id="cast" hidden>
+  <div class="cast-inner">
+    <div class="cast-art" aria-hidden="true">
+      <svg class="cast-wheel" viewBox="-130 -130 260 260" id="castWheel"></svg>
+      <svg class="cast-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47"/></svg>
+    </div>
+    <p class="cast-step" id="castStep" aria-live="polite"></p>
+    <button type="button" class="cast-skip" data-i18n="skipAnim">Skip</button>
+  </div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -253,6 +306,8 @@
 <script src="astro-engine.js" defer></script>
 <script src="predictions-data.js" defer></script>
 <script src="sastra-engine.js" defer></script>
+<script src="future-engine.js" defer></script>
+<script src="motion.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

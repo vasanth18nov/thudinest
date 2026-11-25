@@ -7,6 +7,7 @@
 (function () {
   'use strict';
   const E = window.JosiyamEngine, K = window.JosiyamData, S = window.JosiyamSastra;
+  const MO = window.JosiyamMotion, FU = window.JosiyamFuture;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -25,7 +26,7 @@
   const state = {
     lang: 'en', chart: null, input: null, offsetMs: 0, sel: null, pinned: false, d9Tab: false, rtab: 'star', openMd: null,
     cities: null, citiesP: null, place: null, gender: 'male', ampm: 'am', node: 'mean', tzMode: 'auto', h24: false,
-    list: [], active: -1, lastWorld: 0
+    list: [], active: -1, lastWorld: 0, future: null, fyear: null, openBk: null, fcI: null
   };
 
   /* ================================================================ i18n helpers */
@@ -43,6 +44,8 @@
     $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
     $$('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
     document.title = t('pageTitle');
+    if (MO) MO.splitWords($('#heroTitle'));
+    updateShareLinks();
   }
   function updateToggle() {
     const tg = $('.lang-toggle');
@@ -104,34 +107,67 @@
   function initStars() {
     const cv = $('#stars');
     const ctx = cv.getContext('2d');
-    let w = 0, h = 0, dpr = 1, stars = [], shoot = null, raf = 0, last = 0, nextShoot = 4000;
+    let w = 0, h = 0, dpr = 1, stars = [], shoot = null, raf = 0, last = 0, nextShoot = 4000, nextCon = 2500;
+    const cons = [];
     function resize() {
       dpr = Math.min(2, window.devicePixelRatio || 1);
       w = window.innerWidth; h = window.innerHeight;
       cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.min(320, Math.round((w * h) / 4800));
+      const n = Math.min(340, Math.round((w * h) / 4600));
       stars = Array.from({ length: n }, () => {
         const r = Math.random();
         return {
           x: Math.random() * w, y: Math.random() * h, s: r < 0.86 ? 0.5 + Math.random() * 0.7 : 1.1 + Math.random() * 0.9,
-          a: 0.25 + Math.random() * 0.65, sp: 0.4 + Math.random() * 1.6, ph: Math.random() * 6.28,
+          a: 0.25 + Math.random() * 0.65, sp: 0.4 + Math.random() * 1.6, ph: Math.random() * 6.28, d: 0.25 + Math.random() * 0.9,
           c: r < 0.12 ? '255,214,140' : r < 0.2 ? '180,200,255' : '255,250,235', v: 0.004 + Math.random() * 0.012
         };
       });
+      cons.length = 0;
       if (reduced()) draw(0, true);
+    }
+    const pos = (st) => {
+      const sh = MO ? MO.shift : { x: 0, y: 0 };
+      return [st.x - sh.x * 16 * st.d, st.y - sh.y * 11 * st.d];
+    };
+    function addConstellation(tm) {
+      const bright = stars.filter((s) => s.s > 1.05);
+      if (bright.length < 4) return;
+      const a = bright[Math.floor(Math.random() * bright.length)];
+      const near = bright.filter((b) => b !== a && Math.hypot(b.x - a.x, b.y - a.y) < 230).sort((p, q) => Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y)).slice(0, 3);
+      if (near.length < 2) return;
+      const chain = [a];
+      for (const b of near) chain.push(b);
+      cons.push({ chain, t0: tm, dur: 5200 });
     }
     function draw(tm, still) {
       ctx.clearRect(0, 0, w, h);
       const sec = tm / 1000;
+      for (let i = cons.length - 1; i >= 0; i--) {
+        const c = cons[i], k = (tm - c.t0) / c.dur;
+        if (k >= 1) { cons.splice(i, 1); continue; }
+        const al = Math.sin(Math.PI * k) * 0.32;
+        const grow = Math.min(1, k * 2.2);
+        ctx.strokeStyle = `rgba(241,217,130,${al.toFixed(3)})`;
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        for (let j = 0; j < c.chain.length - 1; j++) {
+          const [x1, y1] = pos(c.chain[j]), [x2, y2] = pos(c.chain[j + 1]);
+          const seg = Math.max(0, Math.min(1, grow * (c.chain.length - 1) - j));
+          if (seg <= 0) break;
+          ctx.moveTo(x1, y1); ctx.lineTo(x1 + (x2 - x1) * seg, y1 + (y2 - y1) * seg);
+        }
+        ctx.stroke();
+      }
       for (const st of stars) {
         if (!still) { st.y -= st.v * st.s; if (st.y < -2) { st.y = h + 2; st.x = Math.random() * w; } }
         const al = still ? st.a : st.a * (0.55 + 0.45 * Math.sin(sec * st.sp + st.ph));
+        const [x, y] = pos(st);
         ctx.fillStyle = `rgba(${st.c},${al.toFixed(3)})`;
         if (st.s > 1.2) {
-          ctx.beginPath(); ctx.arc(st.x, st.y, st.s, 0, 6.283); ctx.fill();
-          if (al > 0.75) { ctx.fillStyle = `rgba(${st.c},${(al * 0.18).toFixed(3)})`; ctx.beginPath(); ctx.arc(st.x, st.y, st.s * 3.2, 0, 6.283); ctx.fill(); }
-        } else ctx.fillRect(st.x, st.y, st.s, st.s);
+          ctx.beginPath(); ctx.arc(x, y, st.s, 0, 6.283); ctx.fill();
+          if (al > 0.75) { ctx.fillStyle = `rgba(${st.c},${(al * 0.18).toFixed(3)})`; ctx.beginPath(); ctx.arc(x, y, st.s * 3.2, 0, 6.283); ctx.fill(); }
+        } else ctx.fillRect(x, y, st.s, st.s);
       }
       if (shoot) {
         const k = (tm - shoot.t0) / shoot.dur;
@@ -152,6 +188,7 @@
         shoot = { t0: tm, dur: 900, x: Math.random() * w * 0.7 + w * 0.2, y: Math.random() * h * 0.35, dx: -(220 + Math.random() * 200), dy: 120 + Math.random() * 90 };
         nextShoot = tm + 7000 + Math.random() * 9000;
       }
+      if (tm > nextCon && cons.length < 2) { addConstellation(tm); nextCon = tm + 3500 + Math.random() * 4500; }
       draw(tm, false);
     }
     resize();
@@ -182,7 +219,18 @@
     for (const [r, dy] of [[104, -6], [78, 9], [55, -10], [33, 6]]) s += tri(r, dy, true);
     for (const [r, dy] of [[100, 7], [74, -8], [50, 10], [30, -6], [14, 0]]) s += tri(r, dy, false);
     s += '<circle r="3.5" fill="currentColor"/></g>';
+    svg.setAttribute('viewBox', '-380 -380 760 760');
     svg.innerHTML = s;
+    if (MO) MO.addOrbits(svg);
+    const cw = $('#castWheel');
+    if (cw) {
+      let c = '<g fill="none" stroke="currentColor"><circle r="122" stroke-width="1.2"/><circle r="98" stroke-width=".8" opacity=".6"/>';
+      for (let k = 0; k < 12; k++) { const [x1, y1] = pt(98, k * 30), [x2, y2] = pt(122, k * 30); c += `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke-width=".8"/>`; }
+      c += '</g><g fill="currentColor" font-size="13" text-anchor="middle" dominant-baseline="central" font-family="serif">';
+      for (let k = 0; k < 12; k++) { const [x, y] = pt(110, k * 30 + 15); c += `<text x="${f(x)}" y="${f(y)}">${G[k]}&#xFE0E;</text>`; }
+      c += '</g><g class="cw-in" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M0,-74 L64,37 L-64,37 Z"/><path d="M0,74 L64,-37 L-64,-37 Z"/><circle r="30" opacity=".6"/></g><circle r="4" fill="currentColor"/>';
+      cw.innerHTML = c;
+    }
   }
 
   /* ================================================================ form */
@@ -494,18 +542,19 @@
   }
 
   /* ================================================================ generate */
-  function generate(input, animate) {
+  async function generate(input, animate) {
+    if (animate && MO && !reduced()) await MO.cast(K.future.cast.map((x) => L(x)), 2300);
     try {
       if (!E || !window.Astronomy) throw new Error('engine not loaded');
       const conv = E.localToUtc({ y: input.y, m: input.m, d: input.d, hh: input.hh, mm: input.mm, tz: input.place.tz, offsetMinutes: input.place.offsetMinutes });
       const chart = E.computeChart({ utcMs: conv.utcMs, lat: input.place.lat, lon: input.place.lon, nodeType: input.node, offsetMs: conv.offsetMs });
       const civilWd = new Date(Date.UTC(2000, input.m - 1, input.d)); civilWd.setUTCFullYear(input.y);
-      Object.assign(state, { chart, input, offsetMs: conv.offsetMs, sel: null, pinned: false, openMd: null, rtab: 'star', beforeSunrise: civilWd.getUTCDay() !== chart.panchang.weekday });
+      Object.assign(state, { chart, input, offsetMs: conv.offsetMs, sel: null, pinned: false, openMd: null, rtab: 'star', beforeSunrise: civilWd.getUTCDay() !== chart.panchang.weekday, future: null, fyear: null, openBk: null, fcI: null });
       $('#results').hidden = false;
       document.body.classList.add('has-chart');
       renderAll(animate && !reduced());
       showError(null);
-      requestAnimationFrame(() => $('#results').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }));
+      requestAnimationFrame(() => $('#results').scrollIntoView({ behavior: 'auto', block: 'start' }));
     } catch (err) {
       console.error(err);
       showError('errCalc');
@@ -520,9 +569,15 @@
     renderInspector();
     renderTable();
     renderReport();
+    renderFuture(animate);
     renderDasha();
     renderPrint();
     setChartTab(state.d9Tab);
+    updateShareLinks();
+    if (MO) {
+      MO.reveal($('#results'), !animate);
+      requestAnimationFrame(() => MO.indicator($('#rtabs'), $('#rtabs [aria-selected="true"]')));
+    }
   }
 
   /* ================================================================ header */
@@ -554,7 +609,8 @@
       }).join('');
       const h = E.houseFrom(lagna, s);
       const label = `${SN(s)}. ${t('houseN', { h })}. ${names.length ? names.map(PN).join(', ') : t('none')}`;
-      cells.push(`<div class="cell${s === lagna ? ' lagna' : ''}" role="button" tabindex="0" data-s="${s}" data-k="${kind}" style="grid-row:${r + 1};grid-column:${col + 1}" aria-label="${esc(label)}">${chips}<span class="hn">${h}</span><span class="sl">${esc(K.signAbbr[state.lang][s])}</span></div>`);
+      const rip = names.length ? `<span class="rip" style="--ri:${idx - names.length}"></span>` : '';
+      cells.push(`<div class="cell${s === lagna ? ' lagna' : ''}" role="button" tabindex="0" data-s="${s}" data-k="${kind}" style="grid-row:${r + 1};grid-column:${col + 1}" aria-label="${esc(label)}">${rip}${chips}<span class="hn">${h}</span><span class="sl">${esc(K.signAbbr[state.lang][s])}</span></div>`);
     }
     let center;
     if (kind === 'd1') {
@@ -588,11 +644,15 @@
       ln('M0 200H100', '', 0.46), ln('M300 200H400', '', 0.5), ln('M200 0V100', '', 0.54), ln('M200 300V400', '', 0.58),
       ln(`M${x} ${y + 22}L${x + 22} ${y}`, 'lg', 0.9), ln(`M${x} ${y + 31}L${x + 31} ${y}`, 'lg', 0.98)
     ].join('');
-    host.classList.remove('anim');
+    host.classList.remove('anim', 'pre');
     host.innerHTML = `<div class="grid">${cells.join('')}<div class="center">${center}</div></div><svg class="lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>`;
     host.setAttribute('role', 'group');
     host.setAttribute('aria-label', kind === 'd1' ? t('rasiChart') : t('navamsaChart'));
-    if (animate) { void host.offsetWidth; host.classList.add('anim'); }
+    if (animate) {
+      host.classList.add('pre');
+      const go = () => { if (MO) MO.flyOffsets(host); host.classList.add('anim'); };
+      if (MO) MO.whenVisible(host, go, 0.3); else go();
+    }
   }
 
   /* ---- selection & highlights ---- */
@@ -732,7 +792,8 @@
     const paras = (cd.paras || []).map((p) => `<p>${esc(p)}</p>`).join('');
     const sub = cd.sub && cd.sub.length ? `<p class="subT">${esc(cd.subTitle || '')}</p><ul>${cd.sub.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
     const badge = cd.badge ? `<span class="badge">${esc(cd.badge)}</span>` : '';
-    return `<article class="rcard glass ${cd.tone || ''}"><div class="rc-head"><h4 class="rc-title">${esc(cd.title)}</h4>${badge}</div>${rule}${facts}${paras}${sub}</article>`;
+    const vis = cd.id === 'panchang' && MO ? MO.moonSvg(state.chart.moonPhase, 44) : '';
+    return `<article class="rcard glass ${cd.tone || ''}"><div class="rc-head"><h4 class="rc-title">${esc(cd.title)}</h4>${badge}${vis}</div>${rule}${facts}${paras}${sub}</article>`;
   }
   function renderReport() {
     const rep = S.buildReport(state.chart, state.lang, {
@@ -757,6 +818,7 @@
     state.rtab = id;
     $$('#rtabs [role="tab"]').forEach((b) => { const on = b.id === 'rt-' + id; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
     $$('#rpanels .rpanel').forEach((p) => p.classList.toggle('on', p.id === 'rp-' + id));
+    if (MO) MO.indicator($('#rtabs'), $('#rt-' + id));
   }
   function initReportEvents() {
     $('#rtabs').addEventListener('click', (e) => { const b = e.target.closest('[role="tab"]'); if (b) setReportTab(b.id.slice(3)); });
@@ -766,6 +828,287 @@
       const n = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
       setReportTab(tabs[n].id.slice(3), true);
       e.preventDefault();
+    });
+  }
+
+  /* ================================================================ share links */
+  function shareUrlSafe() { try { return state.input ? shareUrl() : null; } catch (e) { return null; } }
+  function updateShareLinks() {
+    const app = 'https://thudinest.com/josiyam/';
+    const wa = $('#waApp');
+    if (wa) wa.href = `https://wa.me/?text=${encodeURIComponent(L(K.future.ui.shareApp) + ' ' + app)}`;
+    const b = $('#waBtn');
+    const u = shareUrlSafe();
+    if (b && u) b.href = `https://wa.me/?text=${encodeURIComponent(L(K.future.ui.shareText) + ' ' + u)}`;
+  }
+
+  /* ================================================================ future */
+  const LV_COL = { good: '#34A884', mixed: '#8E8AA3', tough: '#DE6B35' };
+  const PL_COL = { Sun: '#F2B45A', Moon: '#D9DCF2', Mars: '#F08A73', Mercury: '#7FD3A8', Jupiter: '#EBCB62', Venus: '#F2B8D6', Saturn: '#8FA2F0', Rahu: '#A9A4BC', Ketu: '#C9A585' };
+  const INK_ON_FILL = '#0B0D17';
+  const fctx = () => ({ fmtDate, nowMs: Date.now() });
+  let measureCtx = null;
+  function textW(str, px) {
+    if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
+    measureCtx.font = `600 ${px}px "Plus Jakarta Sans", "Noto Sans Tamil", sans-serif`;
+    return measureCtx.measureText(str).width;
+  }
+  function ensureFuture() {
+    if (!FU || !state.chart) return null;
+    if (!state.future || state.future.chartRef !== state.chart) {
+      const F = FU.compute(state.chart, { startYear: new Date().getFullYear(), years: 12, gender: state.input.gender, nowMs: Date.now() });
+      F.chartRef = state.chart;
+      state.future = F;
+    }
+    if (state.fyear == null) state.fyear = new Date().getMonth() <= 8 ? 0 : 1;
+    return state.future;
+  }
+  function renderFuture(animate) {
+    const F = ensureFuture();
+    $('#future').hidden = !F;
+    if (!F) return;
+    renderYears(F);
+    renderYearCard(F, animate);
+    renderFutureChart(F, animate);
+    renderFTable(F);
+    renderBhuktis(F);
+  }
+  function lvWord(lv) { return L(K.future.ui.levels[lv]); }
+  function renderYears(F) {
+    const host = $('#ychips');
+    host.innerHTML = F.years.map((y, i) => {
+      const lv = FU.levelOf(y.overall);
+      return `<button type="button" role="tab" class="ychip lv-${lv}" data-y="${i}" aria-selected="${i === state.fyear}" tabindex="${i === state.fyear ? 0 : -1}" style="--v:${y.overall};--c:${LV_COL[lv]}">` +
+        `<span class="yr">${y.year}</span><span class="yring" aria-hidden="true"><b>${y.overall}</b></span><span class="ylv">${esc(lvWord(lv))}</span></button>`;
+    }).join('');
+    requestAnimationFrame(() => MO && MO.indicator(host, $('#ychips [aria-selected="true"]')));
+  }
+  function setYear(i, focus) {
+    if (i === state.fyear || !state.future) return;
+    state.fyear = i;
+    $$('#ychips .ychip').forEach((b) => { const on = +b.dataset.y === i; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+    if (MO) MO.indicator($('#ychips'), $('#ychips [aria-selected="true"]'));
+    const card = $('#ycard');
+    card.classList.add('swap');
+    setTimeout(() => { renderYearCard(state.future, true); card.classList.remove('swap'); renderFutureChart(state.future, false); }, reduced() ? 0 : 180);
+  }
+  function renderYearCard(F, animate) {
+    const Y = FU.composeYear(F, state.chart, state.fyear, state.lang, fctx());
+    const lv = Y.score >= 56 ? 'good' : Y.score >= 45 ? 'mixed' : 'tough';
+    const U = K.future.ui;
+    const when = (tr) => [tr.from ? `${t('from')} ${tr.from}` : '', tr.to ? L(U.until, { x: tr.to }) : ''].filter(Boolean).join(' · ');
+    const html = `<article class="ycard glass lv-${lv}" id="yc">
+      <header class="yc-head">
+        <div class="gauge" style="--v:${Y.score};--c:${LV_COL[lv]}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="g-trk" cx="60" cy="60" r="52"/><circle class="g-val" cx="60" cy="60" r="52" pathLength="100"/></svg><span class="gv" id="gv">${animate && !reduced() ? 0 : Y.score}</span><span class="gl">/ 100</span></div>
+        <div class="yc-intro"><p class="yc-year">${Y.year}</p><h3 class="yc-title">${esc(Y.levelTitle)}</h3>${Y.intro.map((p) => `<p>${esc(p)}</p>`).join('')}</div>
+      </header>
+      <div class="yc-grid">
+        <section class="yc-sec"><h4>${esc(L(U.periods))}</h4><ul class="plist">${Y.periods.map((p) => `<li class="${p.current ? 'cur' : ''}"><span class="sw c-${p.lord}"></span><div><b>${esc(p.title)}</b><span>${esc(p.from)} → ${esc(p.to)} · ${esc(p.role)}</span></div><span class="lvtag lv-${p.level}">${esc(lvWord(p.level))} · ${p.score}</span></li>`).join('') || `<li>${esc(L(U.noPeriod))}</li>`}</ul></section>
+        <section class="yc-sec"><h4>${esc(L(U.keyDates))}</h4><ol class="kd">${Y.keyDates.map((k) => `<li class="k-${k.type}"><time>${esc(k.date)}</time><span>${esc(k.text)}</span></li>`).join('') || `<li><span>${esc(t('none'))}</span></li>`}</ol></section>
+      </div>
+      <section class="yc-sec"><h4>${esc(L(U.transits))}</h4><div class="tgrid">${Y.transits.map((tr) => `<div class="trn ${tr.tone}"><div class="tr-h"><span class="pdot" style="background:${PL_COL[tr.p]}"></span><b>${esc(tr.planet)} · ${esc(tr.sign)}</b>${tr.title ? `<span class="badge">${esc(tr.title)}</span>` : ''}</div><p class="tr-w">${esc(tr.where)}${when(tr) ? ' · ' + esc(when(tr)) : ''}</p>${tr.text ? `<p>${esc(tr.text)}</p>` : ''}</div>`).join('')}</div></section>
+      <section class="yc-sec"><h4>${esc(L(U.areas))}</h4><div class="areas">${Y.areas.map((a, i) => `<div class="area lv-${a.level}" style="--k:${i}"><div class="ah"><span class="an">${esc(a.name)}</span><span class="as"><b>${a.score}</b> · ${esc(a.levelText)}</span></div><div class="meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${a.score}" aria-label="${esc(a.name)}"><i style="--v:${a.score}%;--c:${LV_COL[a.level]}"></i></div><p>${esc(a.text)}</p>${a.why.length ? `<details class="why"><summary>${esc(L(U.why))}</summary><ul>${a.why.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></details>` : ''}</div>`).join('')}</div></section>
+      <section class="yc-sec"><h4>${esc(L(U.months))}</h4><div class="months">${Y.months.map((m) => `<div class="mo lv-${m.level}" style="--v:${m.score};--k:${m.i};--c:${LV_COL[m.level]}" tabindex="0" aria-label="${esc(m.label)}: ${m.score}. ${esc(m.notes.join('; '))}"><span class="ml">${esc(m.label)}</span><span class="mbar"><i></i></span><b class="ms">${m.score}</b><span class="mn">${esc(m.notes.join(' · '))}</span></div>`).join('')}</div>
+        <p class="bestline">${esc(L(U.best))}: <b>${esc(Y.best.map((m) => m.label).join(', ') || t('none'))}</b>${Y.caution.length ? ` · ${esc(L(U.caution))}: <b>${esc(Y.caution.map((m) => m.label).join(', '))}</b>` : ''}</p></section>
+      ${Y.remedies.length ? `<section class="yc-sec"><h4>${esc(L(U.remedies))}</h4><ul class="rem">${Y.remedies.map((r) => `<li><b>${esc(r.planet)}:</b> ${esc(r.text)}</li>`).join('')}</ul></section>` : ''}
+    </article>`;
+    const host = $('#ycard');
+    host.innerHTML = html;
+    const card = $('#yc');
+    const show = () => { card.classList.add('shown'); if (MO && animate) MO.countUp($('#gv'), Y.score, 1200); else $('#gv').textContent = String(Y.score); };
+    if (animate && MO && !reduced()) MO.whenVisible(card, () => requestAnimationFrame(show), 0.15);
+    else card.classList.add('shown', 'instant');
+  }
+
+  function smoothPath(p) {
+    let d = `M${p[0][0].toFixed(1)},${p[0][1].toFixed(1)}`;
+    for (let i = 0; i < p.length - 1; i++) {
+      const p0 = p[i - 1] || p[i], p1 = p[i], p2 = p[i + 1], p3 = p[i + 2] || p2;
+      d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+    }
+    return d;
+  }
+  function renderFutureChart(F, animate) {
+    if (!F) return;
+    const host = $('#fcPlot');
+    const W = Math.max(300, Math.floor(host.clientWidth || 900));
+    const narrow = W < 640;
+    const ml = 30, mr = 8, mt = 22, plotH = narrow ? 160 : 220;
+    const iw = W - ml - mr;
+    const X = (tm) => ml + ((tm - F.start) / (F.end - F.start)) * iw;
+    const Yv = (v) => mt + (1 - v / 100) * plotH;
+    const pts = F.months.map((m) => [X(m.ms), Yv(m.overall)]);
+    const line = smoothPath(pts);
+    const base = Yv(0);
+    const area = `${line} L${pts[pts.length - 1][0].toFixed(1)},${base} L${pts[0][0].toFixed(1)},${base} Z`;
+    let g = '';
+    for (const v of [0, 25, 50, 75, 100]) g += `<line class="gl${v === 50 ? ' mid' : ''}" x1="${ml}" x2="${ml + iw}" y1="${Yv(v)}" y2="${Yv(v)}"/><text class="ytk" x="${ml - 6}" y="${Yv(v) + 3.5}">${v}</text>`;
+    const sel = F.years[state.fyear];
+    const ys0 = X(Date.UTC(sel.year, 0, 1)), ys1 = X(Date.UTC(sel.year + 1, 0, 1));
+    g += `<rect class="ysel" x="${ys0.toFixed(1)}" y="${mt}" width="${(ys1 - ys0).toFixed(1)}" height="${plotH}" rx="4"/>`;
+    const slot = iw / F.Y;
+    F.years.forEach((y, i) => {
+      const x0 = X(Date.UTC(y.year, 0, 1)), x1 = X(Date.UTC(y.year + 1, 0, 1));
+      if (i) g += `<line class="yb" x1="${x0.toFixed(1)}" x2="${x0.toFixed(1)}" y1="${mt}" y2="${mt + plotH}"/>`;
+      const lab = slot < 44 ? `’${String(y.year).slice(2)}` : String(y.year);
+      g += `<text class="xtk${i === state.fyear ? ' on' : ''}" x="${((x0 + x1) / 2).toFixed(1)}" y="${mt + plotH + 16}">${lab}</text>`;
+    });
+    const now = Date.now();
+    if (now > F.start && now < F.end) g += `<line class="today" x1="${X(now).toFixed(1)}" x2="${X(now).toFixed(1)}" y1="${mt - 6}" y2="${mt + plotH}"/><text class="todayL" x="${X(now).toFixed(1)}" y="${mt - 9}">${esc(L(K.future.ui.today))}</text>`;
+    let hi = 0, lo = 0;
+    F.months.forEach((m, i) => { if (m.overall > F.months[hi].overall) hi = i; if (m.overall < F.months[lo].overall) lo = i; });
+    const ext = [[hi, -9], [lo, 15]].map(([i, dy]) => `<circle class="ext" cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="4"/><text class="extL" x="${pts[i][0].toFixed(1)}" y="${(pts[i][1] + dy).toFixed(1)}">${F.months[i].overall}</text>`).join('');
+    // bands share the same time axis
+    const bands = [];
+    const satClass = (h) => ([3, 6, 11].includes(h) ? 'good' : [12, 1, 2, 4, 7, 8].includes(h) ? 'tough' : 'mixed');
+    const jupClass = (h) => ([2, 5, 7, 9, 11].includes(h) ? 'good' : [8, 12, 6].includes(h) ? 'tough' : 'mixed');
+    bands.push({ label: L(K.future.ui.bandDasha), segs: F.bhuktis.map((b) => ({ a: Math.max(b.start, F.start), b: Math.min(b.end, F.end), fill: PL_COL[b.bd], texts: [`${PA(b.md)}·${PA(b.bd)}`, PA(b.bd)], tip: `${t('dashaPeriod', { p: PD(b.md), q: PD(b.bd) })} · ${fmtDate(b.start)} → ${fmtDate(b.end)}` })) });
+    bands.push({ label: L(K.future.ui.bandSaturn), segs: F.segs.Saturn.map((s) => { const st = K.transit.saturn[s.hM - 1]; return { a: s.start, b: s.end, fill: LV_COL[satClass(s.hM)], texts: [`${ordn(s.hM)} · ${SN(s.sign)}`, ordn(s.hM)], tip: `${PN('Saturn')} · ${SN(s.sign)} · ${L(K.future.ui.fromMoon, { x: ordn(s.hM) })}${st.title ? ' · ' + L(st.title) : ''} · ${fmtDate(s.start)} → ${fmtDate(s.end)}` }; }) });
+    bands.push({ label: L(K.future.ui.bandJupiter), segs: F.segs.Jupiter.map((s) => ({ a: s.start, b: s.end, fill: LV_COL[jupClass(s.hM)], texts: [`${ordn(s.hM)} · ${SN(s.sign)}`, ordn(s.hM)], tip: `${PN('Jupiter')} · ${SN(s.sign)} · ${L(K.future.ui.fromMoon, { x: ordn(s.hM) })} · ${fmtDate(s.start)} → ${fmtDate(s.end)}` })) });
+    let by = mt + plotH + 34, bk = 0;
+    let bh = '';
+    for (const band of bands) {
+      bh += `<text class="bandL" x="${ml}" y="${by}">${esc(band.label)}</text>`;
+      const y = by + 5;
+      for (const sg of band.segs) {
+        const x0 = X(sg.a) + 1, x1 = X(sg.b) - 1, w = x1 - x0;
+        if (w <= 0.5) continue;
+        bh += `<rect class="seg" style="--k:${bk++}" x="${x0.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="18" rx="4" fill="${sg.fill}" data-tip="${esc(sg.tip)}"/>`;
+        const txt = sg.texts.find((s) => textW(s, 10.5) + 10 <= w);
+        if (txt) bh += `<text class="segL" x="${(x0 + 5).toFixed(1)}" y="${y + 12.5}" fill="${INK_ON_FILL}">${esc(txt)}</text>`;
+      }
+      by += 42;
+    }
+    const H = by - 8;
+    host.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="fsvg${animate && !reduced() ? ' pre' : ''}">
+      ${g}<path class="farea" d="${area}"/><path class="fline" d="${line}" pathLength="1"/>${ext}
+      <line class="cx" id="fcX" x1="0" x2="0" y1="${mt}" y2="${mt + plotH}" visibility="hidden"/><circle class="cdot" id="fcDot" r="4.5" visibility="hidden"/>
+      <rect class="hit" x="${ml}" y="${mt}" width="${iw}" height="${plotH}"/>${bh}</svg>`;
+    host.setAttribute('aria-label', `${L(K.future.ui.chartTitle)}: ${F.years.map((y) => `${y.year} ${y.overall}`).join(', ')}`);
+    $('#fcLegend').innerHTML = ['good', 'mixed', 'tough'].map((k) => `<span><i style="background:${LV_COL[k]}"></i>${esc(lvWord(k))}</span>`).join('');
+    state.fcGeo = { X, Yv, pts, ml, iw, mt, plotH };
+    const svg = $('svg', host);
+    if (animate && !reduced() && MO) MO.whenVisible(svg, () => svg.classList.add('drawn'), 0.2);
+    else svg.classList.add('drawn');
+  }
+  function fcShow(i, px, py) {
+    const F = state.future, G = state.fcGeo;
+    if (!F || !G) return;
+    i = Math.max(0, Math.min(F.months.length - 1, i));
+    state.fcI = i;
+    const m = F.months[i], [x, y] = G.pts[i];
+    const cx = $('#fcX'), dot = $('#fcDot');
+    cx.setAttribute('x1', x); cx.setAttribute('x2', x); cx.setAttribute('visibility', 'visible');
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('visibility', 'visible');
+    const d = new Date(m.ms);
+    const tip = $('#fcTip');
+    tip.textContent = '';
+    const v = document.createElement('b'); v.className = 'tv'; v.textContent = String(m.overall); tip.appendChild(v);
+    const rows = [`${monthName(d.getUTCMonth())} ${d.getUTCFullYear()} · ${lvWord(FU.levelOf(m.overall))}`];
+    if (m.md) rows.push(t('dashaPeriod', { p: PD(m.md), q: PD(m.bd) }));
+    rows.push(`${PN('Saturn')} ${ordn(m.sat.hM)} · ${PN('Jupiter')} ${ordn(m.jup.hM)} · ${PN('Rahu')} ${ordn(m.rah.hM)} — ${L(K.future.ui.fromMoon, { x: '' }).trim()}`);
+    for (const r of rows) { const s = document.createElement('span'); s.textContent = r; tip.appendChild(s); }
+    placeTip(px != null ? px : x, py != null ? py : y);
+  }
+  function placeTip(x, y) {
+    const tip = $('#fcTip'), plot = $('#fcPlot');
+    tip.hidden = false;
+    const left = plot.offsetLeft + x, top = plot.offsetTop + y;
+    const w = tip.offsetWidth, maxL = plot.offsetLeft + plot.clientWidth - w - 4;
+    tip.style.left = `${Math.max(plot.offsetLeft + 4, Math.min(maxL, left + 14))}px`;
+    tip.style.top = `${Math.max(4, top - tip.offsetHeight - 12)}px`;
+  }
+  function fcHide() {
+    $('#fcTip').hidden = true;
+    const cx = $('#fcX'), dot = $('#fcDot');
+    if (cx) cx.setAttribute('visibility', 'hidden');
+    if (dot) dot.setAttribute('visibility', 'hidden');
+  }
+  function renderFTable(F) {
+    const keys = FU.AREA_KEYS;
+    $('#ftable').innerHTML = `<thead><tr><th scope="col">${esc(L(K.future.ui.thYear))}</th><th scope="col">${esc(L(K.future.ui.overall))}</th>${keys.map((k) => `<th scope="col">${esc(L(K.future.area[k].name))}</th>`).join('')}</tr></thead><tbody>${F.years.map((y) => `<tr><th scope="row">${y.year}</th><td>${y.overall} · ${esc(lvWord(FU.levelOf(y.overall)))}</td>${keys.map((k) => `<td>${y.areas[k]} · ${esc(lvWord(FU.levelOf(y.areas[k])))}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  }
+  function renderBhuktis(F) {
+    const now = Date.now();
+    if (state.openBk == null) { const c = F.bhuktis.findIndex((b) => now >= b.start && now < b.end); state.openBk = new Set([c >= 0 ? c : 0]); }
+    const U = K.future.ui;
+    $('#bhuktis').innerHTML = F.bhuktis.map((b, i) => {
+      const B = FU.composeBhukti(F, state.chart, i, state.lang, fctx());
+      const open = state.openBk.has(i);
+      const ant = B.antarams.map((a) => `<tr class="${a.current ? 'cur' : a.past ? 'past' : ''}"><td>${esc(a.name)}</td><td>${esc(a.from)}</td><td>${esc(a.to)}</td></tr>`).join('');
+      return `<div class="md bk${B.current ? ' cur' : ''}${B.past ? ' past' : ''}${open ? ' open' : ''}" id="bk-${i}">
+        <button type="button" class="md-btn" aria-expanded="${open}" aria-controls="bkp-${i}" data-i="${i}">
+          <span class="sw c-${B.bd}"></span>
+          <span class="mt">${esc(B.title)}${B.current ? `<small>${esc(t('current'))}</small>` : ''}</span>
+          <span class="md-d">${esc(B.from)} → ${esc(B.to)} <span class="lvtag lv-${B.level}">${esc(B.levelText)} · ${B.score}</span></span><span class="chev" aria-hidden="true"></span>
+        </button>
+        <div class="md-panel" id="bkp-${i}" role="region"><div><div class="bk-body">
+          ${B.paras.map((p) => `<p>${esc(p)}</p>`).join('')}
+          <p class="subT">${esc(L(U.activates))}</p><ul class="act">${B.activates.map((a) => `<li class="${a.good ? 'g' : 'h'}"><span class="ai" aria-hidden="true">${a.good ? '↑' : '!'}</span>${esc(a.text)}</li>`).join('')}</ul>
+          <p class="subT">${esc(L(U.backdrop))}</p><p>${esc(B.backdrop.join(' · '))}</p>${B.moves.length ? `<ul class="moves">${B.moves.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
+          <p class="subT">${esc(L(U.antarams))}</p><table class="btable"><thead><tr><th>${esc(t('antaram'))}</th><th>${esc(t('from'))}</th><th>${esc(t('to'))}</th></tr></thead><tbody>${ant}</tbody></table>
+          ${B.remedy ? `<p class="subT">${esc(L(K.dasha.remedyTitle))}</p><p>${esc(B.remedy)}</p>` : ''}
+        </div></div></div>
+      </div>`;
+    }).join('');
+  }
+  function initFutureEvents() {
+    $('#ychips').addEventListener('click', (e) => { const b = e.target.closest('.ychip'); if (b) setYear(+b.dataset.y); });
+    $('#ychips').addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const n = state.future ? state.future.Y : 12;
+      setYear((state.fyear + (e.key === 'ArrowRight' ? 1 : -1) + n) % n, true);
+    });
+    const plot = $('#fcPlot');
+    plot.addEventListener('pointermove', (e) => {
+      const G = state.fcGeo, F = state.future;
+      if (!G || !F) return;
+      const r = plot.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const seg = e.target.closest && e.target.closest('rect.seg');
+      if (seg) {
+        const tip = $('#fcTip'); tip.textContent = '';
+        const s = document.createElement('span'); s.textContent = seg.dataset.tip; tip.appendChild(s);
+        $('#fcX').setAttribute('visibility', 'hidden'); $('#fcDot').setAttribute('visibility', 'hidden');
+        placeTip(x, y);
+        return;
+      }
+      if (y > G.mt + G.plotH + 22) { fcHide(); return; }
+      const i = Math.round(((x - G.ml) / G.iw) * F.months.length - 0.5);
+      fcShow(i, x, y);
+    });
+    plot.addEventListener('pointerleave', fcHide);
+    plot.addEventListener('click', (e) => {
+      const G = state.fcGeo, F = state.future;
+      if (!G || !F) return;
+      const r = plot.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      if (y > G.mt + G.plotH + 22) return;
+      const i = Math.max(0, Math.min(F.months.length - 1, Math.round(((x - G.ml) / G.iw) * F.months.length - 0.5)));
+      setYear(Math.floor(i / 12));
+    });
+    plot.addEventListener('keydown', (e) => {
+      const F = state.future;
+      if (!F) return;
+      let i = state.fcI == null ? state.fyear * 12 : state.fcI;
+      if (e.key === 'ArrowRight') i++;
+      else if (e.key === 'ArrowLeft') i--;
+      else if (e.key === 'Enter') { setYear(Math.floor(i / 12)); return; }
+      else if (e.key === 'Escape') { fcHide(); return; }
+      else return;
+      e.preventDefault();
+      fcShow(i);
+    });
+    plot.addEventListener('blur', fcHide);
+    $('#bhuktis').addEventListener('click', (e) => {
+      const b = e.target.closest('.md-btn');
+      if (!b) return;
+      const i = +b.dataset.i, el = $('#bk-' + i);
+      const open = !el.classList.contains('open');
+      el.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', String(open));
+      if (open) state.openBk.add(i); else state.openBk.delete(i);
     });
   }
 
@@ -785,7 +1128,7 @@
       const w = ((b - a) / span) * 100;
       const left = ((a - D.birthMs) / span) * 100;
       const isCur = cur && cur.maha === md;
-      tl += `<div class="seg-t c-${md.lord}${isCur ? ' cur' : ''}" style="width:${w.toFixed(3)}%" data-md="${D.mahas.indexOf(md)}" title="${esc(t('dashaOf', { p: PD(md.lord) }))} · ${esc(fmtDate(a))} → ${esc(fmtDate(b))}">${esc(PA(md.lord))}</div>`;
+      tl += `<div class="seg-t c-${md.lord}${isCur ? ' cur' : ''}" style="width:${w.toFixed(3)}%;--k:${D.mahas.indexOf(md)}" data-md="${D.mahas.indexOf(md)}" title="${esc(t('dashaOf', { p: PD(md.lord) }))} · ${esc(fmtDate(a))} → ${esc(fmtDate(b))}">${esc(PA(md.lord))}</div>`;
       if (w > 4) ages += `<span class="age" style="left:${left.toFixed(2)}%">${ageAt(a)}</span>`;
     }
     let nowMark = '';
@@ -907,6 +1250,7 @@
     document.documentElement.lang = state.lang;
     buildWheel();
     initStars();
+    if (MO) { MO.intro(); MO.parallax(); MO.spotlight(); MO.progress(); }
     initForm();
     applyStatic();
     updateToggle();
@@ -917,10 +1261,27 @@
     $$('.lang-toggle button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang, true)));
     $('#editBtn').addEventListener('click', () => { $('#birth').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); setTimeout(() => $('#fName').focus({ preventScroll: true }), 400); });
     $('#printBtn').addEventListener('click', () => window.print());
+    const opened = [];
+    window.addEventListener('beforeprint', () => {
+      $$('details.tview, details.why').forEach((d) => { if (!d.open) { d.open = true; opened.push(d); } });
+      if (MO) MO.reveal(document, true);
+      $$('.si-chart').forEach((h) => h.classList.remove('pre'));
+    });
+    window.addEventListener('afterprint', () => { while (opened.length) opened.pop().open = false; });
     $('#shareBtn').addEventListener('click', async () => {
       const url = shareUrl();
       try { await navigator.clipboard.writeText(url); toast(t('copied')); }
       catch (e) { window.prompt(t('share'), url); }
+    });
+    initFutureEvents();
+    let rz = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(rz);
+      rz = setTimeout(() => {
+        if (!state.chart) return;
+        renderFutureChart(state.future, false);
+        if (MO) { MO.indicator($('#rtabs'), $('#rtabs [aria-selected="true"]')); MO.indicator($('#ychips'), $('#ychips [aria-selected="true"]')); }
+      }, 160);
     });
     window.addEventListener('hashchange', () => { fromHash(); });
     fromHash();
