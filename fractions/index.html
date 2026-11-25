@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fraction Workshop · thudinest</title>
+<meta name="description" content="Learn fractions with pictures you can tap: what a fraction means, equivalent fractions, comparing, adding, subtracting, multiplying, dividing and mixed numbers. With a step-by-step fraction calculator and practice questions.">
+<link rel="canonical" href="https://thudinest.com/fractions/">
+<meta name="theme-color" content="#F3F5FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1224" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="thudinest.com">
+<meta property="og:title" content="Fraction Workshop: fractions, one piece at a time">
+<meta property="og:description" content="Tap, cut and colour your way through fractions. Eight short lessons, a step-by-step calculator and practice questions.">
+<meta property="og:url" content="https://thudinest.com/fractions/">
+<meta property="og:image" content="https://thudinest.com/fractions/og.jpg?v=1">
+<meta property="og:image:secure_url" content="https://thudinest.com/fractions/og.jpg?v=1">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fraction Workshop: a colourful fraction wall with halves, thirds, quarters and more">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://thudinest.com/fractions/og.jpg?v=1">
+<meta name="twitter:title" content="Fraction Workshop: fractions, one piece at a time">
+<meta name="twitter:description" content="Eight short lessons with pictures you can tap, a step-by-step calculator and practice questions.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LearningResource","name":"Fraction Workshop","url":"https://thudinest.com/fractions/","inLanguage":"en","isAccessibleForFree":true,"educationalLevel":"Primary and middle school","learningResourceType":["Interactive resource","Practice exercise"],"teaches":["What a fraction means","Equivalent fractions","Simplifying fractions","Comparing fractions","Adding and subtracting fractions","Multiplying fractions","Dividing fractions","Mixed numbers"],"description":"Interactive fraction lessons with pictures, a step-by-step fraction calculator and practice questions."}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap">
+<link rel="stylesheet" href="fractions.css?v=1">
+</head>
+<body>
+<a class="skip" href="#meaning">Skip to lesson 1</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="Fraction Workshop, back to top">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="25" rx="5" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="3" y="3" width="11" height="11" rx="1.5" fill="var(--t2)"/><rect x="14" y="3" width="11" height="11" rx="1.5" fill="var(--t4)"/><rect x="3" y="14" width="11" height="11" rx="1.5" fill="var(--t6)"/><path d="M14 2.5v23M2.5 14h23" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span class="brand-t">Fraction Workshop</span>
+    </a>
+    <nav class="toc" aria-label="Lessons">
+      <a href="#meaning">Meaning</a>
+      <a href="#same">Same amount</a>
+      <a href="#compare">Compare</a>
+      <a href="#add">Add</a>
+      <a href="#subtract">Subtract</a>
+      <a href="#multiply">Multiply</a>
+      <a href="#divide">Divide</a>
+      <a href="#mixed">Mixed numbers</a>
+      <a href="#calculator">Calculator</a>
+      <a href="#practice">Practice</a>
+      <a href="#sheet">Summary</a>
+    </nav>
+  </div>
+  <span class="progress" aria-hidden="true"></span>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">A free maths lesson from thudinest</p>
+        <h1>Fractions, <span class="cut">one piece</span> at a time.</h1>
+        <p class="lede">A fraction is a share of one whole thing. Eight short lessons take you from “what does 3/4 mean?” to dividing fractions, and every idea comes with a picture you can tap.</p>
+        <div class="cta">
+          <a class="btn" href="#meaning">Start lesson 1</a>
+          <a class="btn ghost" href="#calculator">Solve my own sum</a>
+        </div>
+        <ul class="hero-facts">
+          <li>8 lessons</li>
+          <li>Calculator that shows every step</li>
+          <li>Endless practice questions</li>
+        </ul>
+      </div>
+      <div class="wall-card">
+        <div class="wall-head">
+          <p class="wall-title">The fraction wall</p>
+          <p class="wall-hint">Tap any tile</p>
+        </div>
+        <div class="wall" id="wall" role="group" aria-label="Fraction wall: rows cut into 1, 2, 3, 4, 5, 6, 8, 10 and 12 equal pieces"></div>
+        <div class="wall-read" id="wallRead" aria-live="polite"></div>
+        <p class="wall-say" id="wallSay"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 MEANING -->
+  <section class="wrap lesson" id="meaning" aria-labelledby="h-meaning">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="1">Lesson 1 of 8</p>
+      <h2 id="h-meaning">What a fraction means</h2>
+      <p>Cut one thing into <b>equal</b> pieces. A fraction tells you how many of those pieces you have.</p>
+      <p>The <b>bottom number</b> (the denominator) says how many equal pieces one whole is cut into. The <b>top number</b> (the numerator) says how many of those pieces you have.</p>
+      <p>So <span class="fr"><span class="fr-n">3</span><span class="fr-d">8</span></span> means: cut it into 8 equal pieces and take 3 of them.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Bottom: how many pieces make one whole.<br>Top: how many pieces you’ve got.</p>
+      </div>
+      <div class="careful">
+        <span class="careful-k">Careful</span>
+        <p>The pieces must be the same size. A cake cut into 4 uneven slices is not cut into quarters.</p>
+      </div>
+    </div>
+    <div class="bench" id="bench-meaning">
+      <div class="bench-row">
+        <div id="mk-in"></div>
+        <div class="seg" role="group" aria-label="Picture type">
+          <button type="button" data-shape="pie" aria-pressed="true">Pizza</button>
+          <button type="button" data-shape="bar" aria-pressed="false">Chocolate bar</button>
+          <button type="button" data-shape="line" aria-pressed="false">Number line</button>
+        </div>
+      </div>
+      <div id="mk-vis" aria-hidden="true"></div>
+      <p class="vis-cap" style="margin-top:-8px">Tap the pieces, or use the + and − buttons.</p>
+      <div id="mk-read" aria-live="polite"></div>
+      <div class="sub-bench">
+        <div>
+          <p class="bench-k">Bigger bottom, smaller pieces</p>
+          <p style="margin:0">One piece of each. The more pieces you cut, the smaller each one gets, so <span class="fr"><span class="fr-n">1</span><span class="fr-d">8</span></span> is less than <span class="fr"><span class="fr-n">1</span><span class="fr-d">2</span></span>.</p>
+        </div>
+        <div class="sizes" id="mk-sizes" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 SAME AMOUNT -->
+  <section class="wrap lesson" id="same" aria-labelledby="h-same">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="2">Lesson 2 of 8</p>
+      <h2 id="h-same">Same amount, new name</h2>
+      <p>Cut every piece of <span class="fr"><span class="fr-n">2</span><span class="fr-d">3</span></span> in half. Now you have 4 pieces out of 6. Nothing was added and nothing was eaten, so <span class="fr"><span class="fr-n">2</span><span class="fr-d">3</span></span> and <span class="fr"><span class="fr-n">4</span><span class="fr-d">6</span></span> are the same amount. They are called <b>equivalent fractions</b>.</p>
+      <p>Going the other way is called <b>simplifying</b>: divide the top and the bottom by a number that goes into both, and keep going until no number does.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Multiply or divide the top and the bottom by the same number. The amount stays the same.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="bench-row">
+        <div id="eq-in"></div>
+        <div class="xform" id="eq-x" aria-live="polite"></div>
+      </div>
+      <div class="rng">
+        <label for="eq-k">Cut every piece into <output id="eq-ko" for="eq-k">2</output></label>
+        <input type="range" id="eq-k" min="1" max="6" value="2" step="1">
+      </div>
+      <div id="eq-vis" aria-hidden="true"></div>
+      <div class="chips" id="eq-chips"></div>
+      <div class="sub-bench">
+        <div>
+          <p class="bench-k">Simplify it yourself</p>
+          <p style="margin:0">Pick a number that goes into both the top and the bottom. Keep going until there are none left.</p>
+        </div>
+        <div class="bench-row">
+          <div id="sp-in"></div>
+          <div class="trail" id="sp-trail" aria-live="polite"></div>
+        </div>
+        <div class="chips" id="sp-chips"></div>
+        <p class="muted" id="sp-hint" style="margin:0"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 COMPARE -->
+  <section class="wrap lesson" id="compare" aria-labelledby="h-compare">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="3">Lesson 3 of 8</p>
+      <h2 id="h-compare">Which one is bigger?</h2>
+      <p>When the bottoms match, the pieces are the same size, so the fraction with the bigger top wins.</p>
+      <p>When the bottoms are different, rename both fractions so they have the same bottom (lesson 2), then compare the tops.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Same bottom: bigger top is bigger.<br>Same top: smaller bottom is bigger, because its pieces are bigger.</p>
+      </div>
+      <div class="tip">
+        <span class="tip-k">Shortcut</span>
+        <p>Cross-multiply. For <span class="fr"><span class="fr-n">3</span><span class="fr-d">5</span></span> and <span class="fr"><span class="fr-n">4</span><span class="fr-d">7</span></span>: 3 × 7 = 21 and 4 × 5 = 20. 21 is bigger, so <span class="fr"><span class="fr-n">3</span><span class="fr-d">5</span></span> is bigger.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="bench-row">
+        <div id="cmp-a"></div>
+        <span class="op" style="font-size:1.6rem">and</span>
+        <div id="cmp-b"></div>
+      </div>
+      <div id="cmp-vis" aria-hidden="true"></div>
+      <div id="cmp-read" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 ADD -->
+  <section class="wrap lesson" id="add" aria-labelledby="h-add">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="4">Lesson 4 of 8</p>
+      <h2 id="h-add">Adding fractions</h2>
+      <p>You can only add pieces of the same size. One half plus one third isn’t “two” of anything, until you cut both into sixths: 3 sixths and 2 sixths make 5 sixths.</p>
+      <p>Pick a sum, then press <b>Next step</b>.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Make the bottoms the same. Add the tops. Keep the bottom. Simplify.</p>
+      </div>
+      <div class="careful">
+        <span class="careful-k">Careful</span>
+        <p>Never add the bottoms. <span class="fr"><span class="fr-n">1</span><span class="fr-d">2</span></span> + <span class="fr"><span class="fr-n">1</span><span class="fr-d">2</span></span> is <span class="fr"><span class="fr-n">2</span><span class="fr-d">2</span></span>, one whole. It is not <span class="fr"><span class="fr-n">2</span><span class="fr-d">4</span></span>, which is only a half.</p>
+      </div>
+    </div>
+    <div class="bench" id="walk-add"></div>
+  </section>
+
+  <!-- 5 SUBTRACT -->
+  <section class="wrap lesson" id="subtract" aria-labelledby="h-sub">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="5">Lesson 5 of 8</p>
+      <h2 id="h-sub">Taking away</h2>
+      <p>Subtracting works just like adding. Make the bottoms match, then take away the tops.</p>
+      <p>The crossed-out pieces in the picture are the ones you take away. What’s left is the answer.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Make the bottoms the same. Subtract the tops. Keep the bottom. Simplify.</p>
+      </div>
+    </div>
+    <div class="bench" id="walk-sub"></div>
+  </section>
+
+  <!-- 6 MULTIPLY -->
+  <section class="wrap lesson" id="multiply" aria-labelledby="h-mul">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="6">Lesson 6 of 8</p>
+      <h2 id="h-mul">Multiplying fractions</h2>
+      <p>This is the easiest one: no common bottom needed. In fractions, “of” means “times”, so <span class="fr"><span class="fr-n">1</span><span class="fr-d">2</span></span> × <span class="fr"><span class="fr-n">3</span><span class="fr-d">4</span></span> means “half of three quarters”.</p>
+      <p>In the square, the purple columns are <span class="fr"><span class="fr-n">3</span><span class="fr-d">4</span></span>. The orange rows take <span class="fr"><span class="fr-n">1</span><span class="fr-d">2</span></span> of the square. The green boxes, shaded both ways, are the answer.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Top × top. Bottom × bottom. Then simplify.</p>
+      </div>
+      <div class="tip">
+        <span class="tip-k">Whole numbers</span>
+        <p>Write a whole number over 1. 3 × <span class="fr"><span class="fr-n">2</span><span class="fr-d">5</span></span> = <span class="fr"><span class="fr-n">3</span><span class="fr-d">1</span></span> × <span class="fr"><span class="fr-n">2</span><span class="fr-d">5</span></span> = <span class="fr"><span class="fr-n">6</span><span class="fr-d">5</span></span>.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="bench-row">
+        <div class="qline">
+          <div id="mul-a"></div><span class="op">×</span><div id="mul-b"></div>
+        </div>
+      </div>
+      <div class="chips" id="mul-chips"></div>
+      <div class="area-wrap" id="mul-vis"></div>
+      <div id="mul-read" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 DIVIDE -->
+  <section class="wrap lesson" id="divide" aria-labelledby="h-div">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="7">Lesson 7 of 8</p>
+      <h2 id="h-div">Dividing fractions</h2>
+      <p><span class="fr"><span class="fr-n">3</span><span class="fr-d">4</span></span> ÷ <span class="fr"><span class="fr-n">1</span><span class="fr-d">8</span></span> asks a simple question: how many eighths fit into three quarters? The picture shows 6.</p>
+      <p>To work it out without a picture, use <b>Keep, Change, Flip</b>. Keep the first fraction. Change ÷ into ×. Flip the second fraction upside down. Then multiply as in lesson 6.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">Keep. Change. Flip. Then multiply.</p>
+      </div>
+      <div class="tip">
+        <span class="tip-k">Why the answer grows</span>
+        <p>Dividing by a fraction smaller than 1 gives a bigger answer, because lots of small pieces fit inside.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="qline">
+        <div id="div-a"></div><span class="op">÷</span><div id="div-b"></div>
+      </div>
+      <div class="chips" id="div-chips"></div>
+      <div>
+        <p class="bench-k" id="div-q"></p>
+        <div id="div-fit" aria-hidden="true"></div>
+      </div>
+      <div class="sub-bench">
+        <div class="bench-row">
+          <p class="bench-k" style="margin:0">Keep, change, flip</p>
+          <button type="button" class="btn sm ghost" id="div-play">Play it again</button>
+        </div>
+        <div id="div-kcf"></div>
+        <div id="div-read" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 MIXED -->
+  <section class="wrap lesson" id="mixed" aria-labelledby="h-mixed">
+    <div class="lesson-text">
+      <p class="lesson-no" data-lesson="8">Lesson 8 of 8</p>
+      <h2 id="h-mixed">Mixed numbers</h2>
+      <p>When the top is bigger than the bottom, you have more than one whole. <span class="fr"><span class="fr-n">7</span><span class="fr-d">3</span></span> is 7 thirds: that’s 2 whole things and 1 third left over. Written as a <b>mixed number</b>, it is <span class="mx"><span class="wn">2</span><span class="fr"><span class="fr-n">1</span><span class="fr-d">3</span></span></span>.</p>
+      <p>A fraction like <span class="fr"><span class="fr-n">7</span><span class="fr-d">3</span></span>, with the top bigger than the bottom, is called an <b>improper fraction</b>. Both ways of writing it are correct.</p>
+      <div class="rule">
+        <p class="rule-k">Remember</p>
+        <p class="big-rule">To a mixed number: divide the top by the bottom. The remainder is the new top.<br>Back again: whole × bottom + top.</p>
+      </div>
+      <div class="tip">
+        <span class="tip-k">Before you calculate</span>
+        <p>Turn mixed numbers into improper fractions before you add, subtract, multiply or divide them.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="bench-row"><div id="mix-in"></div></div>
+      <div id="mix-vis" aria-hidden="true"></div>
+      <div class="convert" id="mix-read" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section class="wrap lesson" id="calculator" aria-labelledby="h-calc">
+    <div class="lesson-text">
+      <p class="lesson-no">Your turn</p>
+      <h2 id="h-calc">Fraction calculator</h2>
+      <p>Put in any two fractions or mixed numbers, choose +, −, × or ÷, and see every step worked out in plain words.</p>
+      <p>For a mixed number, type the whole number in the dashed box on the left. Leave it empty for an ordinary fraction.</p>
+      <div class="tip">
+        <span class="tip-k">Homework check</span>
+        <p>Do the sum on paper first, then check each step here. If your answer is different, find the first step where it goes wrong.</p>
+      </div>
+    </div>
+    <div class="bench">
+      <div class="bench-row" style="justify-content:flex-start">
+        <p class="bench-k" style="margin:0">Choose</p>
+        <div class="ops" role="group" aria-label="Operation" id="calc-ops">
+          <button type="button" data-op="+" aria-pressed="true" aria-label="add">+</button>
+          <button type="button" data-op="−" aria-pressed="false" aria-label="subtract">−</button>
+          <button type="button" data-op="×" aria-pressed="false" aria-label="multiply">×</button>
+          <button type="button" data-op="÷" aria-pressed="false" aria-label="divide">÷</button>
+        </div>
+      </div>
+      <div class="calc-q qline">
+        <div id="calc-a"></div>
+        <span class="op" id="calc-sym" aria-hidden="true">+</span>
+        <div id="calc-b"></div>
+      </div>
+      <div class="calc-out" id="calc-out" aria-live="polite"></div>
+      <ol class="steps" id="calc-steps"></ol>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="wrap lesson" id="practice" aria-labelledby="h-prac">
+    <div class="lesson-text">
+      <p class="lesson-no">Your turn</p>
+      <h2 id="h-prac">Practice round</h2>
+      <p>Choose a level. Each question is new. Type your answer in the boxes: whole number on the left (only if you need one), top and bottom on the right.</p>
+      <p>If you get one wrong, have another go, or press <b>Show me how</b> to see the steps.</p>
+      <div class="tip">
+        <span class="tip-k">Levels</span>
+        <p><b>Easy:</b> reading, same-bottom sums, simplifying. <b>Medium:</b> different bottoms, comparing, multiplying, mixed numbers. <b>Hard:</b> dividing and mixed-number sums.</p>
+      </div>
+    </div>
+    <div class="bench" id="quiz"></div>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section class="wrap sheet" id="sheet" aria-labelledby="h-sheet">
+    <div class="sheet-head">
+      <p class="lesson-no">Summary</p>
+      <h2 id="h-sheet">Everything on one page</h2>
+      <p>The eight rules from the lessons, each with one example. Take a screenshot to keep it.</p>
+    </div>
+    <div class="sheet-grid" id="sheet-grid"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p style="margin:0">Fraction Workshop is a free page on <a href="/">thudinest.com</a>.</p>
+    <a href="#top">Back to the top</a>
+  </div>
+</footer>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<script src="fractions.js?v=1"></script>
+</body>
+</html>

@@ -557,6 +557,25 @@ browser.
   marigold, jasmine and rose petals when a chart or a good match is revealed),
   plus the My family and Porutham styles. Reduced motion turns it off.
 
+## Fraction Workshop (`/fractions/`)
+
+Interactive fraction lessons: `index.html`, `fractions.css`, `fractions.js`
+(plain JS, no libraries; fonts from Google Fonts).
+
+- Hero: a tappable fraction wall (1 to 12ths) that lights up every equivalent row.
+- Eight lessons: meaning (pizza / bar / number line), equivalent fractions and
+  simplifying, comparing, adding and subtracting (step-by-step walkthrough),
+  multiplying (area model), dividing ("how many fit" picture plus Keep, Change,
+  Flip), mixed numbers.
+- Calculator: any two fractions or mixed numbers, every step explained. One
+  solver (`solve()` in `fractions.js`) drives the calculator, the walkthroughs
+  and the practice answers.
+- Practice: Easy / Medium / Hard / Mix question generator, two tries, then the
+  worked solution. Best streak is kept in localStorage (`fractions-best`).
+- Tests and the og.jpg renderer live outside the repo in
+  `~/thudinest-assets/fractions` (`tests/ui.mjs` fuzzes the solver against exact
+  arithmetic, answers 480 practice questions, checks phone overflow).
+
 ## Files
 
 ```
@@ -566,6 +585,7 @@ cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary 
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 bm/             ← Rally Point 3D badminton (page, js/sim.js + js/game.js, vendor/three.js, players/)
 volleyball/     ← Sunset Spike 3D beach volleyball (page, js/sim.js + js/game.js, og.jpg)
+fractions/      ← Fraction Workshop: interactive fraction lessons, calculator and practice
 josiyam/        ← Thudinest Josiyam: South Indian Jathagam in English/Tamil (engine, knowledge base, data/cities.json)
 images/         ← add your property photos here
 README.md       ← this file
