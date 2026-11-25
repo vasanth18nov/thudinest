@@ -495,7 +495,7 @@ remover for local files, YouTube links via the IFrame API (lyrics stay in
 sync), a live note detector, and recording of the mix to WebM/M4A. The mic
 needs https or localhost, which thudinest.com already provides.
 
-## Josiyam (`/josiyam/`)
+## Thudinest Josiyam (`/josiyam/`)
 
 A South Indian Vedic astrology (Jathagam) app in English and Tamil. Plain
 HTML/CSS/JS, no build step and no server: everything is calculated in the
@@ -543,7 +543,7 @@ cricket/        ← Floodlit Over 3D cricket game (one page + voice/ commentary 
 guest-rush/     ← Guest Rush 3D homestay game (one self-contained page)
 bm/             ← Rally Point 3D badminton (page, js/sim.js + js/game.js, vendor/three.js, players/)
 volleyball/     ← Sunset Spike 3D beach volleyball (page, js/sim.js + js/game.js, og.jpg)
-josiyam/        ← Josiyam: South Indian Jathagam in English/Tamil (engine, knowledge base, data/cities.json)
+josiyam/        ← Thudinest Josiyam: South Indian Jathagam in English/Tamil (engine, knowledge base, data/cities.json)
 images/         ← add your property photos here
 README.md       ← this file
 ```

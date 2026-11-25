@@ -394,6 +394,7 @@ html[lang="ta"] .btable th { text-transform: none; letter-spacing: 0; }
 @media (max-width: 640px) {
   .nav { gap: 10px; padding: 10px 14px; }
   .brand-ta { display: none; }
+  .brand-en { font-size: 14px; letter-spacing: .08em; white-space: nowrap; }
   .nav-links { display: none; }
   .lang-toggle button { min-width: 0; padding: 6px 11px; }
   body.has-chart .lang-toggle { margin-left: auto; }

@@ -188,8 +188,8 @@
 
   /* ================================================================ INTERFACE TEXT */
   K.ui = {
-    pageTitle: { en: 'Josiyam — South Indian Jathagam (Thirukanitham)', ta: 'ஜோசியம் — தென்னிந்திய ஜாதகம் (திருக்கணிதம்)' },
-    brand: { en: 'Josiyam', ta: 'ஜோசியம்' },
+    pageTitle: { en: 'Thudinest Josiyam — South Indian Jathagam (Thirukanitham)', ta: 'துடிநெஸ்ட் ஜோசியம் — தென்னிந்திய ஜாதகம் (திருக்கணிதம்)' },
+    brand: { en: 'Thudinest Josiyam', ta: 'துடிநெஸ்ட் ஜோசியம்' },
     navChart: { en: 'Chart', ta: 'கட்டம்' }, navReport: { en: 'Palan', ta: 'பலன்' }, navDasha: { en: 'Dasha', ta: 'தசை' },
     langLabel: { en: 'Language', ta: 'மொழி' },
     heroKicker: { en: 'Thirukanitham · Lahiri ayanamsa', ta: 'திருக்கணிதம் · லகிரி அயனாம்சம்' },
@@ -309,7 +309,7 @@
     nowLabel: { en: 'Now', ta: 'இன்று' },
     dashaPeriod: { en: '{p} Dasha · {q} Bhukti', ta: '{p} தசை · {q} புத்தி' },
 
-    footerBuilt: { en: 'Josiyam on thudinest.com · Planet positions: Astronomy Engine (MIT) · Places: GeoNames (CC BY 4.0) and © OpenStreetMap contributors', ta: 'thudinest.com ஜோசியம் · கிரக நிலைகள்: Astronomy Engine (MIT) · ஊர்கள்: GeoNames (CC BY 4.0), © OpenStreetMap பங்களிப்பாளர்கள்' },
+    footerBuilt: { en: 'Thudinest Josiyam on thudinest.com · Planet positions: Astronomy Engine (MIT) · Places: GeoNames (CC BY 4.0) and © OpenStreetMap contributors', ta: 'துடிநெஸ்ட் ஜோசியம் · thudinest.com · கிரக நிலைகள்: Astronomy Engine (MIT) · ஊர்கள்: GeoNames (CC BY 4.0), © OpenStreetMap பங்களிப்பாளர்கள்' },
     backHome: { en: 'thudinest.com', ta: 'thudinest.com' },
     reduceMotion: { en: 'Reduce motion', ta: 'அசைவைக் குறை' },
     skip: { en: 'Skip to birth details', ta: 'பிறப்பு விவரங்களுக்குச் செல்' },
@@ -1229,7 +1229,7 @@
       until: { en: 'until {x}', ta: '{x} வரை' },
       noPeriod: { en: 'Outside the 120-year dasha cycle.', ta: '120 ஆண்டு தசா சுழற்சிக்கு வெளியே.' },
       shareWa: { en: 'Share on WhatsApp', ta: 'வாட்ஸ்அப்பில் பகிர்' },
-      shareText: { en: 'My Jathagam on Josiyam — Rasi, Navamsam, dasha and a 12-year forecast in English & Tamil:', ta: 'ஜோசியத்தில் என் ஜாதகம் — ராசி, நவாம்சம், தசை, 12 ஆண்டு பலன் (தமிழ் & ஆங்கிலம்):' },
+      shareText: { en: 'My Jathagam on Thudinest Josiyam — Rasi, Navamsam, dasha and a 12-year forecast in English & Tamil:', ta: 'துடிநெஸ்ட் ஜோசியத்தில் என் ஜாதகம் — ராசி, நவாம்சம், தசை, 12 ஆண்டு பலன் (தமிழ் & ஆங்கிலம்):' },
       shareApp: { en: 'Free South Indian Jathagam in English & Tamil — Rasi, Navamsam, dasha and 12-year palan:', ta: 'இலவச தென்னிந்திய ஜாதகம் — ராசி, நவாம்சம், தசை, 12 ஆண்டு பலன், தமிழிலும் ஆங்கிலத்திலும்:' }
     },
     yearLevel: [
