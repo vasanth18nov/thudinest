@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Narrate: text to speech · thudinest</title>
+<meta name="description" content="Type or paste text and hear it read aloud, using the voices built into your browser.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f6f5f2;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #6b6b70;
+    --line: #dcdad4;
+    --accent: #2f6fed;
+    --accent-ink: #ffffff;
+    --danger: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121317;
+      --card: #1c1d23;
+      --ink: #f1f1f3;
+      --muted: #a3a4ad;
+      --line: #33353d;
+      --accent: #6d9bff;
+      --accent-ink: #0b0c10;
+      --danger: #ff8a80;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121317;
+    --card: #1c1d23;
+    --ink: #f1f1f3;
+    --muted: #a3a4ad;
+    --line: #33353d;
+    --accent: #6d9bff;
+    --accent-ink: #0b0c10;
+    --danger: #ff8a80;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    font: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .counter { text-align: right; color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 620px) {
+    .controls { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  }
+  label { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 4px; }
+  select, input[type="range"] { width: 100%; }
+  select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+  }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  #status { margin-top: 12px; min-height: 1.5em; color: var(--muted); }
+  #status.error { color: var(--danger); }
+  .note { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Narrate</h1>
+  <p class="sub">Type or paste text, pick a voice, and hear it read aloud. Runs entirely in your browser.</p>
+
+  <div class="card">
+    <label for="text">Your text</label>
+    <textarea id="text" placeholder="Paste or type the text you want read aloud…"></textarea>
+    <div class="counter"><span id="count">0</span> / 20,000 characters</div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div>
+        <label for="voice">Voice</label>
+        <select id="voice"></select>
+      </div>
+      <div>
+        <label for="rate">Speed <span class="val" id="rateVal">1.00</span></label>
+        <input type="range" id="rate" min="0.5" max="2" step="0.05" value="1">
+      </div>
+      <div>
+        <label for="pitch">Pitch <span class="val" id="pitchVal">1.00</span></label>
+        <input type="range" id="pitch" min="0" max="2" step="0.05" value="1">
+      </div>
+      <div>
+        <label for="volume">Volume <span class="val" id="volumeVal">1.00</span></label>
+        <input type="range" id="volume" min="0" max="1" step="0.05" value="1">
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="primary" id="play">Narrate</button>
+      <button id="preview">Preview voice</button>
+      <button id="stop" disabled>Stop</button>
+    </div>
+    <div id="status" role="status" aria-live="polite"></div>
+  </div>
+
+  <p class="note" id="support">
+    Voices come from your device, so they differ between computers and phones. For the deepest voice, lower the pitch.
+    Narration can be played but not downloaded, because browsers don't allow saving built-in voices as audio files.
+  </p>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const MAX_CHARS = 20000;
+  const CHUNK_MAX = 180;
+  const PREVIEW_TEXT = "Hi there. This is a quick preview of how I sound at these settings. I hope you like what you hear.";
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    text: $("text"), count: $("count"), voice: $("voice"),
+    rate: $("rate"), pitch: $("pitch"), volume: $("volume"),
+    rateVal: $("rateVal"), pitchVal: $("pitchVal"), volumeVal: $("volumeVal"),
+    play: $("play"), preview: $("preview"), stop: $("stop"),
+    status: $("status"), support: $("support"),
+  };
+
+  const hasSpeech = !!window.speechSynthesis && typeof window.SpeechSynthesisUtterance === "function";
+
+  function setStatus(msg, isError) {
+    els.status.textContent = msg || "";
+    els.status.classList.toggle("error", !!isError);
+  }
+
+  function safe(fn) {
+    try { return fn(); } catch (e) { return undefined; }
+  }
+
+  function updateCount() {
+    els.count.textContent = els.text.value.length.toLocaleString();
+  }
+
+  function showValues() {
+    els.rateVal.textContent = Number(els.rate.value).toFixed(2);
+    els.pitchVal.textContent = Number(els.pitch.value).toFixed(2);
+    els.volumeVal.textContent = Number(els.volume.value).toFixed(2);
+    safe(() => localStorage.setItem("narrate-settings", JSON.stringify({
+      voice: els.voice.value, rate: els.rate.value, pitch: els.pitch.value, volume: els.volume.value,
+    })));
+  }
+
+  function loadSettings() {
+    const saved = safe(() => JSON.parse(localStorage.getItem("narrate-settings") || "null"));
+    if (!saved) return;
+    if (saved.rate) els.rate.value = saved.rate;
+    if (saved.pitch) els.pitch.value = saved.pitch;
+    if (saved.volume) els.volume.value = saved.volume;
+    if (saved.voice) els.voice.dataset.saved = saved.voice;
+  }
+
+  // Split text into sentence-sized pieces so long text speaks reliably.
+  function chunkText(text) {
+    const sentences = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]*\s*/g) || [];
+    const chunks = [];
+    let current = "";
+    for (const raw of sentences) {
+      const s = raw.trim();
+      if (!s) continue;
+      if (s.length > CHUNK_MAX) {
+        // Flush what we have, then break the very long sentence at spaces.
+        if (current) { chunks.push(current); current = ""; }
+        let piece = "";
+        for (const w of s.split(" ")) {
+          if ((piece + " " + w).trim().length > CHUNK_MAX) {
+            if (piece) chunks.push(piece);
+            piece = w;
+          } else {
+            piece = (piece + " " + w).trim();
+          }
+        }
+        if (piece) chunks.push(piece);
+        continue;
+      }
+      if ((current + " " + s).trim().length > CHUNK_MAX) {
+        if (current) chunks.push(current);
+        current = s;
+      } else {
+        current = (current + " " + s).trim();
+      }
+    }
+    if (current) chunks.push(current);
+    return chunks;
+  }
+
+  let englishVoices = [];
+
+  function fillVoices() {
+    const all = safe(() => speechSynthesis.getVoices()) || [];
+    englishVoices = all.filter((v) => /^en/i.test(v.lang));
+    // Put US English first, then everything else in English.
+    englishVoices.sort((a, b) => {
+      const au = /^en[-_]US/i.test(a.lang) ? 0 : 1;
+      const bu = /^en[-_]US/i.test(b.lang) ? 0 : 1;
+      return au - bu || a.name.localeCompare(b.name);
+    });
+    const previous = els.voice.dataset.saved || els.voice.value;
+    els.voice.innerHTML = "";
+    if (!englishVoices.length) {
+      const opt = document.createElement("option");
+      opt.textContent = "No English voices found on this device";
+      opt.value = "";
+      els.voice.appendChild(opt);
+      els.play.disabled = true;
+      els.preview.disabled = true;
+      return;
+    }
+    englishVoices.forEach((v, i) => {
+      const opt = document.createElement("option");
+      opt.value = v.name;
+      opt.textContent = `${v.name} (${v.lang})`;
+      els.voice.appendChild(opt);
+    });
+    const match = [...els.voice.options].find((o) => o.value === previous);
+    els.voice.value = match ? match.value : englishVoices[0].name;
+    els.play.disabled = false;
+    els.preview.disabled = false;
+  }
+
+  function currentVoice() {
+    return englishVoices.find((v) => v.name === els.voice.value) || englishVoices[0] || null;
+  }
+
+  let queue = [];
+  let speaking = false;
+  let runId = 0;
+
+  function stopAll() {
+    runId++;
+    queue = [];
+    speaking = false;
+    safe(() => speechSynthesis.cancel());
+    els.stop.disabled = true;
+    els.play.disabled = !englishVoices.length;
+    els.preview.disabled = !englishVoices.length;
+  }
+
+  function speakChunks(chunks, label) {
+    stopAll();
+    const id = runId;
+    const voice = currentVoice();
+    speaking = true;
+    els.stop.disabled = false;
+    els.play.disabled = true;
+    els.preview.disabled = true;
+    let index = 0;
+
+    function next() {
+      if (id !== runId) return;
+      if (index >= chunks.length) {
+        speaking = false;
+        els.stop.disabled = true;
+        els.play.disabled = false;
+        els.preview.disabled = false;
+        setStatus("Finished.");
+        return;
+      }
+      setStatus(`${label} ${index + 1} of ${chunks.length}…`);
+      const u = new SpeechSynthesisUtterance(chunks[index]);
+      if (voice) u.voice = voice;
+      u.lang = voice ? voice.lang : "en-US";
+      u.rate = Number(els.rate.value);
+      u.pitch = Number(els.pitch.value);
+      u.volume = Number(els.volume.value);
+      u.onend = () => { index++; next(); };
+      u.onerror = (e) => {
+        if (id !== runId) return;
+        // "interrupted" and "canceled" are normal when the user presses Stop.
+        if (e.error === "interrupted" || e.error === "canceled") return;
+        speaking = false;
+        els.stop.disabled = true;
+        els.play.disabled = false;
+        els.preview.disabled = false;
+        setStatus("The browser could not speak this text (" + e.error + "). Try another voice.", true);
+      };
+      speechSynthesis.speak(u);
+    }
+    next();
+  }
+
+  els.play.addEventListener("click", () => {
+    const text = els.text.value.trim();
+    if (!text) { setStatus("Type or paste some text first.", true); return; }
+    if (text.length > MAX_CHARS) {
+      setStatus(`That's ${text.length.toLocaleString()} characters. Please keep it under ${MAX_CHARS.toLocaleString()}.`, true);
+      return;
+    }
+    const chunks = chunkText(text);
+    if (!chunks.length) { setStatus("Nothing to read in that text.", true); return; }
+    speakChunks(chunks, "Reading part");
+  });
+
+  els.preview.addEventListener("click", () => {
+    speakChunks([PREVIEW_TEXT], "Previewing");
+  });
+
+  els.stop.addEventListener("click", () => {
+    stopAll();
+    setStatus("Stopped.");
+  });
+
+  els.text.addEventListener("input", updateCount);
+  [els.rate, els.pitch, els.volume, els.voice].forEach((el) => {
+    el.addEventListener("input", showValues);
+    el.addEventListener("change", showValues);
+  });
+
+  if (!hasSpeech) {
+    els.support.textContent = "This browser can't read text aloud. Try Chrome, Edge, Safari, or Firefox.";
+    els.play.disabled = true;
+    els.preview.disabled = true;
+    els.voice.innerHTML = '<option>Not supported in this browser</option>';
+    setStatus("Speech is not supported in this browser.", true);
+  } else {
+    loadSettings();
+    fillVoices();
+    // Voices load asynchronously in most browsers.
+    speechSynthesis.addEventListener("voiceschanged", fillVoices);
+    setTimeout(fillVoices, 500);
+    showValues();
+  }
+  updateCount();
+
+  // Stop speech if the page is hidden or closed.
+  window.addEventListener("pagehide", () => safe(() => speechSynthesis.cancel()));
+})();
+</script>
+</body>
+</html>
